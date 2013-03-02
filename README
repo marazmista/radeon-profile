@@ -1,0 +1,10 @@
+Simple application to read current clocks of ATi Radeon cards (xf86-video-ati)
+
+
+Troubleshooting
+
+1. "Err" instead of values:
+	Try start app as root. Need to read system files.
+	
+2. "no values":
+	Check /sys/kernel/debug. If it's empty, try "mount -t debugfs none /sys/kernel/debug"
