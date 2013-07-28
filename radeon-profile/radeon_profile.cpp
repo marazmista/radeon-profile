@@ -66,13 +66,13 @@ void radeon_profile::timerEvent() {
 
     if (getPowerMethod().contains("profile",Qt::CaseInsensitive)) {
         ui->tabWidget->setCurrentIndex(0);
-        ui->dpmProfiles->setEnabled(false);
+        ui->tabWidget->setTabEnabled(1,false);
         ui->currentProfile->setText(getCurrentPowerProfile(profilePath));
         getClocks("profile");
 
     } else if (getPowerMethod().contains("dpm",Qt::CaseInsensitive)) {
         ui->tabWidget->setCurrentIndex(1);
-        ui->stdProfiles->setEnabled(false);
+        ui->tabWidget->setTabEnabled(0,false);
         ui->currentDpmProfile->setText(getCurrentPowerProfile(dpmState));
         getClocks("dpm");
 
