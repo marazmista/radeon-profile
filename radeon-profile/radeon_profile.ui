@@ -32,7 +32,7 @@
       <x>290</x>
       <y>50</y>
       <width>181</width>
-      <height>111</height>
+      <height>114</height>
      </rect>
     </property>
     <property name="tabPosition">
@@ -69,7 +69,7 @@
         <x>10</x>
         <y>5</y>
         <width>161</width>
-        <height>21</height>
+        <height>22</height>
        </rect>
       </property>
       <property name="text">
@@ -82,7 +82,7 @@
         <x>10</x>
         <y>30</y>
         <width>161</width>
-        <height>21</height>
+        <height>22</height>
        </rect>
       </property>
       <property name="text">
@@ -95,7 +95,7 @@
         <x>10</x>
         <y>55</y>
         <width>161</width>
-        <height>21</height>
+        <height>22</height>
        </rect>
       </property>
       <property name="text">
@@ -110,7 +110,7 @@
       <x>10</x>
       <y>40</y>
       <width>271</width>
-      <height>121</height>
+      <height>124</height>
      </rect>
     </property>
     <property name="font">
@@ -141,9 +141,9 @@
    <widget class="QLineEdit" name="l_profile">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>320</x>
       <y>8</y>
-      <width>141</width>
+      <width>151</width>
       <height>22</height>
      </rect>
     </property>

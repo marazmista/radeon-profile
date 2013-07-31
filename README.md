@@ -1,5 +1,7 @@
 Simple application to read current clocks of ATi Radeon cards (xf86-video-ati)
+Install lm_sensors for gpu temperature.
 
+App need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`
 
 # Troubleshooting
 
@@ -10,4 +12,4 @@ Simple application to read current clocks of ATi Radeon cards (xf86-video-ati)
 
 
 # Screenshot
-[Main window](https://docs.google.com/file/d/0B7nxOyrvj2IiT0QwMGJ6aTgwaWc/edit?usp=sharing)
+[Main window](https://docs.google.com/file/d/0B7nxOyrvj2IiM1dwblU4MmFjdU0/edit?usp=sharing)

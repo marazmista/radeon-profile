@@ -15,7 +15,7 @@ class radeon_profile : public QMainWindow
 public:
     explicit radeon_profile(QWidget *parent = 0);
     ~radeon_profile();
-
+    QString appHomePath;
     const QString powerMethod = "/sys/class/drm/card0/device/power_method";
 
     const QString profilePath = "/sys/class/drm/card0/device/power_profile";
