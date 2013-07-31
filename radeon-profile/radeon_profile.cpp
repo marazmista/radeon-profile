@@ -159,7 +159,7 @@ QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
 
 QString radeon_profile::getGPUTemp() {
     system(QString("sensors | grep VGA | cut -b 19-25 > "+ appHomePath + "/vgatemp").toStdString().c_str());
-    QFile gpuTempFile(QApplication::applicationDirPath() + "/vgatemp");
+    QFile gpuTempFile(appHomePath + "/vgatemp");
     if (gpuTempFile.open(QIODevice::ReadOnly))
        return "Current GPU temp: "+gpuTempFile.readLine(8);
     else
