@@ -28,15 +28,21 @@ public:
 private slots:
     void on_chProfile_clicked();
     void timerEvent();
+    void on_pushButton_clicked();
 
-    void on_btn_chDpmProfile_clicked();
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
 
 private:
     Ui::radeon_profile *ui;
     QString getPowerMethod();
-    void getClocks(const QString);
+    QStringList getClocks(const QString);
     QString getCurrentPowerProfile(const QString);
     void setProfile(const QString, const QStringList);
+    void setProfile(const QString, const QString);
+    QString getGPUTemp();
+    QStringList fillGpuDataTable(const QString);
 };
 
 #endif // RADEON_PROFILE_H

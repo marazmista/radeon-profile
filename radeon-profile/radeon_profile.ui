@@ -6,328 +6,183 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>321</width>
-    <height>218</height>
+    <width>480</width>
+    <height>171</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>292</width>
-    <height>174</height>
+    <width>480</width>
+    <height>171</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>321</width>
-    <height>218</height>
+    <width>480</width>
+    <height>171</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Radeon Profile</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QFrame" name="frame">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>301</width>
-      <height>85</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Panel</enum>
-    </property>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>151</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Monospace</family>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Current GPU clock:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>151</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Monospace</family>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Current mem clock:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="currentGPU">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>10</y>
-       <width>101</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Monospace</family>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>800 MHz</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="currentMEM">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>30</y>
-       <width>101</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Monospace</family>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>600 MHz</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_5">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>151</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Monospace</family>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Voltage:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="currentVolts">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>60</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Monospace</family>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>900 mV</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>100</y>
-      <width>301</width>
+      <x>290</x>
+      <y>50</y>
+      <width>181</width>
       <height>111</height>
      </rect>
     </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::North</enum>
+    </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="stdProfiles">
      <attribute name="title">
       <string>Standard profiles</string>
      </attribute>
-     <widget class="QFrame" name="frame_2">
+     <widget class="QPushButton" name="chProfile">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>281</width>
-        <height>63</height>
+        <width>161</width>
+        <height>41</height>
        </rect>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::Panel</enum>
+      <property name="text">
+       <string>Change profile</string>
       </property>
-      <widget class="QLabel" name="label_7">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>131</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Current profile:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="currentProfile">
-       <property name="geometry">
-        <rect>
-         <x>170</x>
-         <y>9</y>
-         <width>101</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>default</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="chProfile">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>36</y>
-         <width>131</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Change profile</string>
-       </property>
-      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="dpmProfiles">
      <attribute name="title">
-      <string>DPM profiles</string>
+      <string>DPM</string>
      </attribute>
-     <widget class="QFrame" name="frame_3">
+     <widget class="QPushButton" name="pushButton">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
-        <width>281</width>
-        <height>63</height>
+        <y>5</y>
+        <width>161</width>
+        <height>21</height>
        </rect>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::Panel</enum>
+      <property name="text">
+       <string>Battery</string>
       </property>
-      <widget class="QLabel" name="label_8">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>131</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Current profile:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="currentDpmProfile">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>0</y>
-         <width>131</width>
-         <height>61</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>performance</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_chDpmProfile">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>36</y>
-         <width>131</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Change profile</string>
-       </property>
-      </widget>
+     </widget>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Balanced</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>55</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Performance</string>
+      </property>
      </widget>
     </widget>
+   </widget>
+   <widget class="QListWidget" name="list_currentGPUData">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>271</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Monospace</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>GPU data:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="l_profile">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>8</y>
+      <width>141</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Droid Sans Mono</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>10</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Monospace</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Current profile:</string>
+    </property>
    </widget>
   </widget>
  </widget>

@@ -48,38 +48,35 @@ void radeon_profile::setProfile(const QString filePath, const QStringList profil
                                             &ok);
 
     if (ok) {
-        system(QString("echo "+ newProfile + " >> "+ filePath ).toStdString().c_str());
+        system(QString("echo "+ newProfile + " > "+ filePath ).toStdString().c_str());
     }
+}
+
+void radeon_profile::setProfile(const QString filePath, const QString newProfile) {
+    system(QString("echo "+ newProfile + " > "+ filePath ).toStdString().c_str());
 }
 
 void radeon_profile::on_chProfile_clicked() {
     setProfile(radeon_profile::profilePath, QStringList() << "default" << "auto" << "low" << "mid" << "high");
 }
 
-void radeon_profile::on_btn_chDpmProfile_clicked()
-{
-    setProfile(radeon_profile::dpmState, QStringList() << "balanced" << "battery" << "performance");
-}
-
-
 void radeon_profile::timerEvent() {
-
     if (getPowerMethod().contains("profile",Qt::CaseInsensitive)) {
         ui->tabWidget->setCurrentIndex(0);
         ui->tabWidget->setTabEnabled(1,false);
-        ui->currentProfile->setText(getCurrentPowerProfile(profilePath));
-        getClocks("profile");
+
+        ui->l_profile->setText(getCurrentPowerProfile(profilePath));
+        ui->list_currentGPUData->addItems(fillGpuDataTable("profile"));
 
     } else if (getPowerMethod().contains("dpm",Qt::CaseInsensitive)) {
         ui->tabWidget->setCurrentIndex(1);
         ui->tabWidget->setTabEnabled(0,false);
-        ui->currentDpmProfile->setText(getCurrentPowerProfile(dpmState));
-        getClocks("dpm");
+        ui->l_profile->setText(getCurrentPowerProfile(dpmState));
+
+        ui->list_currentGPUData->addItems(fillGpuDataTable("dpm"));
 
     } else {
-        ui->currentGPU->setText(radeon_profile::err);
-        ui->currentMEM->setText(radeon_profile::err);
-        ui->currentVolts->setText(radeon_profile::err);
+        ui->list_currentGPUData->addItem("Can't read data");
     }
 
 }
@@ -93,10 +90,11 @@ QString radeon_profile::getPowerMethod() {
         return QString::null;
 }
 
-void radeon_profile::getClocks(const QString powerMethod) {
+QStringList radeon_profile::getClocks(const QString powerMethod) {
 
     system(QString("cp " + radeon_profile::clocksPath + " " + QApplication::applicationDirPath() + "/").toStdString().c_str()); // must copy thus file in sys are update too fast to read? //
     QFile clocks(QApplication::applicationDirPath() + "/radeon_pm_info");
+    QStringList gpuData;
 
     if (clocks.exists()) {
         if (clocks.open(QIODevice::ReadOnly)) {
@@ -110,9 +108,10 @@ void radeon_profile::getClocks(const QString powerMethod) {
                     i++;
                 }
 
-                ui->currentGPU->setText(QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000) + " MHz");
-                ui->currentMEM->setText(QString().setNum(data[3].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000) + " MHz");
-                ui->currentVolts->setText(QString().setNum(data[4].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()) + " mV");
+                gpuData << "Current GPU clock: " + QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000) + " MHz";
+                gpuData << "Current mem clock: " +QString().setNum(data[3].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000) + " MHz";
+                gpuData << "-------------------------";
+                gpuData << "Voltage: " + QString().setNum(data[4].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()) + " mV";
             }
             else if (powerMethod == "dpm") {
                 QString data[2];
@@ -123,28 +122,31 @@ void radeon_profile::getClocks(const QString powerMethod) {
                     i++;
                 }
 
-                ui->currentGPU->setText(QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[4].toFloat() / 100) + " MHz");
-                ui->currentMEM->setText(QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[6].toFloat() / 100) + " MHz");
-                ui->currentVolts->setText(QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[8].toFloat()) + " mV");
+                gpuData << "Current GPU clock: " + QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[4].toFloat() / 100) + " MHz";
+                gpuData << "Current mem clock: " +QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[6].toFloat() / 100) + " MHz";
+                gpuData << "------------------------";
+                gpuData << "Voltage: " +QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[8].toFloat()) + " mV";
             }
 
             else {
-                ui->currentGPU->setText(radeon_profile::err);
-                ui->currentMEM->setText(radeon_profile::err);
-                ui->currentVolts->setText(radeon_profile::err);
+                gpuData << "Current GPU clock: " + radeon_profile::err;
+                gpuData << "Current mem clock: " + radeon_profile::err;
+                gpuData << "Voltage: "+radeon_profile::err;
             }
         }
         else {
-            ui->currentGPU->setText(radeon_profile::noValues);
-            ui->currentMEM->setText(radeon_profile::noValues);
-            ui->currentVolts->setText(radeon_profile::noValues);
+            gpuData << "Current GPU clock: " + radeon_profile::noValues;
+            gpuData << "Current mem clock: " + radeon_profile::noValues;
+            gpuData << "------------------------";
+            gpuData << "Voltage: "+ radeon_profile::noValues;
         }
-
-        ui->currentProfile->setText(getCurrentPowerProfile(radeon_profile::profilePath));
+        gpuData << "------------------------";
 
         clocks.remove();
         clocks.close();
+        return gpuData;
     }
+    return gpuData;
 }
 
 QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
@@ -158,5 +160,36 @@ QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
             return radeon_profile::err;
     } else
        return radeon_profile::noValues;
+}
 
+QString radeon_profile::getGPUTemp() {
+    system(QString("sensors | grep VGA | cut -b 19-25 > "+ QApplication::applicationDirPath() + "/vgatemp").toStdString().c_str());
+    QFile gpuTempFile(QApplication::applicationDirPath() + "/vgatemp");
+    if (gpuTempFile.open(QIODevice::ReadOnly))
+       return "Current GPU temp: "+gpuTempFile.readLine(8);
+    else
+       return "No temps.";
+}
+
+QStringList radeon_profile::fillGpuDataTable(const QString profile) {
+    ui->list_currentGPUData->clear();
+    QStringList completeData;
+    completeData << getClocks(profile);
+    completeData << getGPUTemp();
+    return completeData;
+}
+
+void radeon_profile::on_pushButton_clicked()
+{
+    setProfile(dpmState,"battery");
+}
+
+void radeon_profile::on_pushButton_2_clicked()
+{
+    setProfile(dpmState,"balanced");
+}
+
+void radeon_profile::on_pushButton_3_clicked()
+{
+    setProfile(dpmState,"performance");
 }
