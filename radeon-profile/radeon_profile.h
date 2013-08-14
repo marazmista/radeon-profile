@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QString>
+#include "qcustomplot.h"
+#include <QVector>
 
 namespace Ui {
 class radeon_profile;
@@ -17,6 +19,10 @@ public:
     ~radeon_profile();
     QString appHomePath;
 
+    int i = 0;
+    double maxT = 0.0,minT = 0.0,current; // for temps
+    double rangeX =180;
+
     const QString powerMethod = "/sys/class/drm/card0/device/power_method";
     const QString profilePath = "/sys/class/drm/card0/device/power_profile";
     const QString dpmState = "/sys/class/drm/card0/device/power_dpm_state";
@@ -30,6 +36,7 @@ private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
+    void changeRange();
 
 private:
     Ui::radeon_profile *ui;
@@ -40,6 +47,8 @@ private:
     void setProfile(const QString, const QString);
     QString getGPUTemp();
     QStringList fillGpuDataTable(const QString);
+    QStringList getGLXInfo();
+    void setupGraphs();
 };
 
 #endif // RADEON_PROFILE_H

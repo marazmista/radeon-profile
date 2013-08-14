@@ -30,9 +30,12 @@ radeon_profile::radeon_profile(QWidget *parent) :
     if (!appHome.exists())
         appHome.mkdir(QDir::homePath() + "/.radeon-profile");
 
+    ui->list_glxinfo->addItems(getGLXInfo());
+    setupGraphs();
+
     QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
-
+    connect(ui->spin_seconds,SIGNAL(valueChanged(int)),this,SLOT(changeRange()));
     timer->start(1000);
     timerEvent();
 }
@@ -77,6 +80,13 @@ void radeon_profile::timerEvent() {
         ui->list_currentGPUData->addItem("Can't read data");
     }
 
+    // count seconds to move graph to right
+    i++;
+    ui->plotTemp->xAxis->setRange(i+20, rangeX,Qt::AlignRight);
+    ui->plotTemp->replot();
+
+    ui->plotColcks->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
+    ui->plotColcks->replot();
 }
 
 QString radeon_profile::getPowerMethod() {
@@ -90,6 +100,7 @@ QString radeon_profile::getPowerMethod() {
 
 QStringList radeon_profile::getClocks(const QString powerMethod) {
     QStringList gpuData;
+    double coreClock = 0,memClock= 0;  // for plots
 
     if (QFile(radeon_profile::clocksPath).exists()) {
         system(QString("cp " + radeon_profile::clocksPath + " " + appHomePath + "/").toStdString().c_str()); // must copy thus file in sys are update too fast to read? //
@@ -105,13 +116,15 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                     switch (i) {
                         case 1: {
                             if (s.contains("current engine clock")) {
-                                gpuData << "Current GPU clock: " + QString().setNum(s.split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000) + " MHz";
+                                coreClock = QString().setNum(s.split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
+                                gpuData << "Current GPU clock: " + QString().setNum(coreClock) + " MHz";
                                 break;
                             }
                         };
                         case 3: {
                             if (s.contains("current memory clock")) {
-                                gpuData << "Current mem clock: " +QString().setNum(s.split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000) + " MHz";
+                                memClock = QString().setNum(s.split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
+                                gpuData << "Current mem clock: " + QString().setNum(memClock) + " MHz";
                                 break;
                             }
                         }
@@ -134,10 +147,15 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                     data[i] = clocks.readLine(500);
                     i++;
                 }
-                if (data[1].contains("sclk"))
-                    gpuData << "Current GPU clock: " + QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[4].toFloat() / 100) + " MHz";
-                if (data[1].contains("mclk"))
-                    gpuData << "Current mem clock: " +QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[6].toFloat() / 100) + " MHz";
+                if (data[1].contains("sclk")) {
+                    coreClock = QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[4].toFloat() / 100).toDouble();
+                    gpuData << "Current GPU clock: " + QString().setNum(coreClock) + " MHz";
+                }
+                if (data[1].contains("mclk")) {
+                    memClock = QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[6].toFloat() / 100).toDouble();
+                    gpuData << "Current mem clock: " + QString().setNum(memClock) + " MHz";
+                }
+
                 if (data[1].contains("vddc")) {
                     gpuData << "------------------------";
                     gpuData << "Voltage (vddc): " +QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[8].toFloat()) + " mV";
@@ -160,6 +178,14 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
         gpuData << "------------------------";
 
         clocks.close();
+
+        // update plots
+        if (memClock > ui->plotColcks->yAxis->range().upper)
+            ui->plotColcks->yAxis->setRange(0,memClock + 100);
+
+        ui->plotColcks->graph(0)->addData(i,coreClock);
+        ui->plotColcks->graph(1)->addData(i,memClock);
+
         return gpuData;
     }
     else {
@@ -188,8 +214,21 @@ QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
 QString radeon_profile::getGPUTemp() {
     system(QString("sensors | grep VGA | cut -b 19-25 > "+ appHomePath + "/vgatemp").toStdString().c_str());
     QFile gpuTempFile(appHomePath + "/vgatemp");
-    if (gpuTempFile.open(QIODevice::ReadOnly))
-       return "Current GPU temp: "+gpuTempFile.readLine(8);
+    if (gpuTempFile.open(QIODevice::ReadOnly)) {
+        QString temp = gpuTempFile.readLine(8) ;
+        current = QString(temp.remove(temp.length()-2,4)).toDouble();
+
+        if (minT == 0)
+            minT = current;
+        maxT = (current >= maxT) ? current : maxT;
+        minT = (current <= minT) ? current : minT;
+
+        if (maxT > ui->plotTemp->yAxis->range().upper)
+            ui->plotTemp->yAxis->setRange(minT - 10,maxT+10);
+        ui->plotTemp->graph(0)->addData(i,current);
+        ui->l_minMaxTemp->setText("Max: " + QString().setNum(maxT) + " | Min: " + QString().setNum(minT));
+        return "Current GPU temp: "+temp+"C";
+    }
     else
        return "No temps.";
 }
@@ -215,4 +254,73 @@ void radeon_profile::on_pushButton_2_clicked()
 void radeon_profile::on_pushButton_3_clicked()
 {
     setProfile(dpmState,"performance");
+}
+
+void radeon_profile::setupGraphs()
+{
+    ui->plotColcks->setBackground(Qt::darkGray);
+    ui->plotTemp->setBackground(Qt::darkGray);
+
+    ui->plotTemp->yAxis->setRange(0,20);
+    ui->plotColcks->yAxis->setRange(0,100);
+
+    ui->plotTemp->xAxis->setLabel("time");
+    ui->plotTemp->yAxis->setLabel("temperature");
+    ui->plotColcks->xAxis->setLabel("time");
+    ui->plotColcks->yAxis->setLabel("MHz");
+
+    ui->plotTemp->addGraph(); // temp graph
+    ui->plotColcks->addGraph(); // core clock graph
+    ui->plotColcks->addGraph(); // mem clock graph
+
+    ui->plotTemp->graph(0)->setPen(QPen(Qt::yellow));
+    ui->plotColcks->graph(1)->setPen(QPen(Qt::black));
+    ui->plotColcks->graph(0)->setPen(QPen(Qt::white));
+
+    // legend //
+    ui->plotColcks->graph(0)->setName("GPU clock");
+    ui->plotColcks->graph(1)->setName("Memory clock");
+    ui->plotColcks->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignLeft);
+    ui->plotColcks->legend->setVisible(true);
+
+    ui->plotColcks->replot();
+    ui->plotTemp->replot();
+}
+
+
+QStringList radeon_profile::getGLXInfo() {
+    QStringList data;
+    QFile gpuInfo(appHomePath + "/gpuinfo");
+
+    system(QString("lspci | grep VGA > "+ appHomePath + "/gpuinfo").toStdString().c_str());
+    system(QString("glxinfo | grep direct >> "+ appHomePath + "/gpuinfo").toStdString().c_str());
+    system(QString("glxinfo | grep OpenGL >>"+ appHomePath + "/gpuinfo").toStdString().c_str());
+
+    if (gpuInfo.open(QIODevice::ReadOnly)) {
+        while (!gpuInfo.atEnd()) {
+            QString s;
+            s = gpuInfo.readLine(300);
+
+            if (s.contains("VGA")) {
+                QString tmps = s.split(":",QString::SkipEmptyParts)[2];
+                data.append("VGA:"+tmps.left(tmps.indexOf('\n')));
+            }
+            if (s.contains("direct rendering"))
+                data.append(s.left(s.indexOf('\n')));
+            if (s.contains("OpenGL renderer string"))
+                data.append(s.left(s.indexOf('\n')));
+            if (s.contains("OpenGL core profile version string:"))
+                data.append(s.left(s.indexOf('\n')));
+            if (s.contains("OpenGL core profile shading language version string"))
+                data.append(s.left(s.indexOf('\n')));
+            if (s.contains("OpenGL version string"))
+                data.append(s.left(s.indexOf('\n')));
+        }
+    }
+
+    return data;
+}
+
+void radeon_profile::changeRange() {
+    rangeX = ui->spin_seconds->value();
 }

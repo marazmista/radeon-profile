@@ -3,6 +3,8 @@ Install lm_sensors for gpu temperature.
 
 App need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`
 
+Graph widget: http://www.qcustomplot.com/
+
 # Troubleshooting
 
 
@@ -12,4 +14,5 @@ App need to be run with root privilages for read clocks and changing profiles. Y
 
 
 # Screenshot
-[Main window](https://docs.google.com/file/d/0B7nxOyrvj2IiM1dwblU4MmFjdU0/edit?usp=sharing)
+[Main window](https://docs.google.com/file/d/0B7nxOyrvj2IiZ2otNWxKMVJmakU/edit?usp=sharing)
+[Graphs](https://docs.google.com/file/d/0B7nxOyrvj2IiTmdGQ3AyUS1hQ28/edit?usp=sharing)
