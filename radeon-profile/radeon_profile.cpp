@@ -31,6 +31,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
         appHome.mkdir(QDir::homePath() + "/.radeon-profile");
 
     ui->list_glxinfo->addItems(getGLXInfo());
+    ui->mainTabs->setCurrentIndex(0);
     setupGraphs();
 
     QTimer *timer = new QTimer();
