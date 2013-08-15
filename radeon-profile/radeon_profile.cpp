@@ -35,7 +35,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
-    connect(ui->spin_seconds,SIGNAL(valueChanged(int)),this,SLOT(changeRange()));
+    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeRange()));
     timer->start(1000);
     timerEvent();
 }
@@ -322,5 +322,5 @@ QStringList radeon_profile::getGLXInfo() {
 }
 
 void radeon_profile::changeRange() {
-    rangeX = ui->spin_seconds->value();
+    rangeX = ui->timeSlider->value();
 }

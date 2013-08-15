@@ -33,7 +33,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -200,22 +200,43 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="3">
-         <widget class="QSpinBox" name="spin_seconds">
+         <widget class="QSlider" name="timeSlider">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="minimum">
-           <number>10</number>
+           <number>30</number>
           </property>
           <property name="maximum">
            <number>3600</number>
           </property>
+          <property name="singleStep">
+           <number>10</number>
+          </property>
+          <property name="pageStep">
+           <number>180</number>
+          </property>
           <property name="value">
            <number>180</number>
           </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
          </widget>
         </item>
-        <item row="3" column="0" colspan="4">
+        <item row="2" column="0" colspan="5">
          <widget class="QCustomPlot" name="plotColcks" native="true"/>
         </item>
-        <item row="2" column="0" colspan="4">
+        <item row="1" column="0" colspan="5">
          <widget class="QCustomPlot" name="plotTemp" native="true"/>
         </item>
         <item row="0" column="1">
@@ -240,7 +261,14 @@
         <item row="0" column="2">
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Time range:</string>
+           <string>30s</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>1h</string>
           </property>
          </widget>
         </item>
