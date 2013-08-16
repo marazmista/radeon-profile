@@ -213,11 +213,12 @@ QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
 }
 
 QString radeon_profile::getGPUTemp() {
-    system(QString("sensors | grep VGA | cut -b 19-25 > "+ appHomePath + "/vgatemp").toStdString().c_str());
+    system(QString("sensors | grep VGA > "+ appHomePath + "/vgatemp").toStdString().c_str());
     QFile gpuTempFile(appHomePath + "/vgatemp");
     if (gpuTempFile.open(QIODevice::ReadOnly)) {
-        QString temp = gpuTempFile.readLine(8) ;
-        current = QString(temp.remove(temp.length()-2,4)).toDouble();
+        QString temp = gpuTempFile.readLine(50);
+        temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
+        current = temp.toDouble();
 
         if (minT == 0)
             minT = current;
