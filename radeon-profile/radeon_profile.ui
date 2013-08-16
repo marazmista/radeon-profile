@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>Radeon Profile</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="radeon-resource.qrc">
+    <normaloff>:/icon/icon.png</normaloff>:/icon/icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0">
@@ -288,6 +292,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="radeon-resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -20,3 +20,6 @@ HEADERS  += radeon_profile.h \
     qcustomplot.h
 
 FORMS    += radeon_profile.ui
+
+RESOURCES += \
+    radeon-resource.qrc
