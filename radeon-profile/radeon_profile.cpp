@@ -72,6 +72,9 @@ void radeon_profile::on_chProfile_clicked() {
 }
 
 void radeon_profile::timerEvent() {
+    if (!refreshWhenHidden->isChecked() && this->isHidden())
+        return;
+
     QString s = getPowerMethod();
     if (s.contains("profile",Qt::CaseInsensitive)) {
         ui->tabWidget->setCurrentIndex(0);
@@ -352,6 +355,12 @@ void radeon_profile::setupTrayIcon() {
     changeProfile->setText("Change standard profile");
     connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
 
+    // refresh when hidden
+    refreshWhenHidden = new QAction(this);
+    refreshWhenHidden->setCheckable(true);
+    refreshWhenHidden->setChecked(true);
+    refreshWhenHidden->setText("Keep refreshing when hidden");
+
     // dpm menu //
     dpmMenu = new QMenu(this);
     dpmMenu->setTitle("DPM");
@@ -373,6 +382,8 @@ void radeon_profile::setupTrayIcon() {
     dpmMenu->addAction(dpmSetPerformance);
 
     // add stuff above to menu //
+    trayMenu->addAction(refreshWhenHidden);
+    trayMenu->addSeparator();
     trayMenu->addAction(changeProfile);
     trayMenu->addMenu(dpmMenu);
     trayMenu->addSeparator();

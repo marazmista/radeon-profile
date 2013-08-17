@@ -33,7 +33,7 @@ public:
     const QString noValues = "no values";
 
     QSystemTrayIcon *trayIcon;
-    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile;
+    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
     QMenu *dpmMenu, *trayMenu;
 
 private slots:
