@@ -5,6 +5,8 @@
 #include <QString>
 #include "qcustomplot.h"
 #include <QVector>
+#include <QSystemTrayIcon>
+#include <QEvent>
 
 namespace Ui {
 class radeon_profile;
@@ -37,6 +39,8 @@ private slots:
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
     void changeRange();
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+    void closeApplication();
 
 private:
     Ui::radeon_profile *ui;
@@ -49,6 +53,7 @@ private:
     QStringList fillGpuDataTable(const QString);
     QStringList getGLXInfo();
     void setupGraphs();
+    void setupTrayIcon();
 };
 
 #endif // RADEON_PROFILE_H

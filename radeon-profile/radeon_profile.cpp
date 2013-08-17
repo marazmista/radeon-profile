@@ -18,6 +18,12 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDir>
+#include <QSystemTrayIcon>
+#include <QMenu>
+
+QSystemTrayIcon *trayIcon;
+QAction *closeApp;
+QMenu *trayMenu;
 
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
@@ -33,6 +39,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     ui->list_glxinfo->addItems(getGLXInfo());
     ui->mainTabs->setCurrentIndex(0);
     setupGraphs();
+    setupTrayIcon();
 
     QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
@@ -88,6 +95,13 @@ void radeon_profile::timerEvent() {
 
     ui->plotColcks->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
     ui->plotColcks->replot();
+
+    //tray icon tooltip
+    QString tooltipdata = "Current profile: "+ui->l_profile->text()+ '\n';
+    for (short i = 0; i < ui->list_currentGPUData->count(); i++) {
+        tooltipdata += ui->list_currentGPUData->item(i)->text() + '\n';
+    }
+    trayIcon->setToolTip(tooltipdata);
 }
 
 QString radeon_profile::getPowerMethod() {
@@ -325,4 +339,31 @@ QStringList radeon_profile::getGLXInfo() {
 
 void radeon_profile::changeRange() {
     rangeX = ui->timeSlider->value();
+}
+
+void radeon_profile::setupTrayIcon() {
+    closeApp = new QAction(this);
+    closeApp->setText("Quit");
+    connect(closeApp,SIGNAL(triggered()),this,SLOT(closeApplication()));
+    trayMenu = new QMenu();
+    trayMenu->addSeparator();
+    trayMenu->addAction(closeApp);
+
+    QIcon appicon(":/icon/icon.png");
+    trayIcon = new QSystemTrayIcon(appicon,this);
+    trayIcon->show();
+    trayIcon->setContextMenu(trayMenu);
+    connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+}
+
+void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
+    switch (reason) {
+        case QSystemTrayIcon::Trigger:
+            if (isHidden()) show(); else hide();
+            break;
+    }
+}
+
+void radeon_profile::closeApplication() {
+    this->close();
 }
