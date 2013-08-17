@@ -23,7 +23,7 @@ public:
 
     int i = 0;
     double maxT = 0.0,minT = 0.0,current; // for temps
-    double rangeX =180;
+    double rangeX = 180; // for graph scale
 
     const QString powerMethod = "/sys/class/drm/card0/device/power_method";
     const QString profilePath = "/sys/class/drm/card0/device/power_profile";
@@ -32,15 +32,18 @@ public:
     const QString err = "Err";
     const QString noValues = "no values";
 
+    QSystemTrayIcon *trayIcon;
+    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile;
+    QMenu *dpmMenu, *trayMenu;
+
 private slots:
     void on_chProfile_clicked();
     void timerEvent();
-    void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
-    void on_pushButton_3_clicked();
+    void on_btn_dpmBattery_clicked();
+    void on_btn_dpmBalanced_clicked();
+    void on_btn_dpmPerformance_clicked();
     void changeRange();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void closeApplication();
 
 private:
     Ui::radeon_profile *ui;

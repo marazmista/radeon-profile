@@ -21,10 +21,6 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 
-QSystemTrayIcon *trayIcon;
-QAction *closeApp;
-QMenu *trayMenu;
-
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
@@ -46,6 +42,11 @@ radeon_profile::radeon_profile(QWidget *parent) :
     connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeRange()));
     timer->start(1000);
     timerEvent();
+
+    if (ui->stdProfiles->isEnabled())
+        dpmMenu->setEnabled(false);
+    if (ui->dpmProfiles->isEnabled())
+        changeProfile->setEnabled(false);
 }
 
 radeon_profile::~radeon_profile()
@@ -242,7 +243,7 @@ QString radeon_profile::getGPUTemp() {
         if (maxT > ui->plotTemp->yAxis->range().upper)
             ui->plotTemp->yAxis->setRange(minT - 10,maxT+10);
         ui->plotTemp->graph(0)->addData(i,current);
-        ui->l_minMaxTemp->setText("Max: " + QString().setNum(maxT) + " | Min: " + QString().setNum(minT));
+        ui->l_minMaxTemp->setText("Current: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) +"C");
         return "Current GPU temp: "+temp+"C";
     }
     else
@@ -257,18 +258,15 @@ QStringList radeon_profile::fillGpuDataTable(const QString profile) {
     return completeData;
 }
 
-void radeon_profile::on_pushButton_clicked()
-{
+void radeon_profile::on_btn_dpmBattery_clicked() {
     setProfile(dpmState,"battery");
 }
 
-void radeon_profile::on_pushButton_2_clicked()
-{
+void radeon_profile::on_btn_dpmBalanced_clicked() {
     setProfile(dpmState,"balanced");
 }
 
-void radeon_profile::on_pushButton_3_clicked()
-{
+void radeon_profile::on_btn_dpmPerformance_clicked() {
     setProfile(dpmState,"performance");
 }
 
@@ -342,13 +340,45 @@ void radeon_profile::changeRange() {
 }
 
 void radeon_profile::setupTrayIcon() {
+    trayMenu = new QMenu();
+
+    //close //
     closeApp = new QAction(this);
     closeApp->setText("Quit");
-    connect(closeApp,SIGNAL(triggered()),this,SLOT(closeApplication()));
-    trayMenu = new QMenu();
+    connect(closeApp,SIGNAL(triggered()),this,SLOT(close()));
+
+    // standard profiles
+    changeProfile = new QAction(this);
+    changeProfile->setText("Change standard profile");
+    connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
+
+    // dpm menu //
+    dpmMenu = new QMenu(this);
+    dpmMenu->setTitle("DPM");
+
+    dpmSetBattery = new QAction(this);
+    dpmSetBalanced = new QAction(this);
+    dpmSetPerformance = new QAction(this);
+
+    dpmSetBattery->setText("Battery");
+    dpmSetBalanced->setText("Balanced");
+    dpmSetPerformance->setText("Performance");
+
+    connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(on_btn_dpmBattery_clicked()));
+    connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(on_btn_dpmBalanced_clicked()));
+    connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(on_btn_dpmPerformance_clicked()));
+
+    dpmMenu->addAction(dpmSetBattery);
+    dpmMenu->addAction(dpmSetBalanced);
+    dpmMenu->addAction(dpmSetPerformance);
+
+    // add stuff above to menu //
+    trayMenu->addAction(changeProfile);
+    trayMenu->addMenu(dpmMenu);
     trayMenu->addSeparator();
     trayMenu->addAction(closeApp);
 
+    // setup icon finally //
     QIcon appicon(":/icon/icon.png");
     trayIcon = new QSystemTrayIcon(appicon,this);
     trayIcon->show();
@@ -362,8 +392,4 @@ void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
             if (isHidden()) show(); else hide();
             break;
     }
-}
-
-void radeon_profile::closeApplication() {
-    this->close();
 }

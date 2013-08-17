@@ -143,21 +143,21 @@
            </attribute>
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="0" column="0">
-             <widget class="QPushButton" name="pushButton">
+             <widget class="QPushButton" name="btn_dpmBattery">
               <property name="text">
                <string>Battery</string>
               </property>
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QPushButton" name="pushButton_2">
+             <widget class="QPushButton" name="btn_dpmBalanced">
               <property name="text">
                <string>Balanced</string>
               </property>
              </widget>
             </item>
             <item row="2" column="0">
-             <widget class="QPushButton" name="pushButton_3">
+             <widget class="QPushButton" name="btn_dpmPerformance">
               <property name="text">
                <string>Performance</string>
               </property>
