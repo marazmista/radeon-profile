@@ -285,6 +285,8 @@ void radeon_profile::setupGraphs()
     ui->plotTemp->yAxis->setLabel("temperature");
     ui->plotColcks->xAxis->setLabel("time");
     ui->plotColcks->yAxis->setLabel("MHz");
+    ui->plotTemp->xAxis->setTickLabels(false);
+    ui->plotColcks->xAxis->setTickLabels(false);
 
     ui->plotTemp->addGraph(); // temp graph
     ui->plotColcks->addGraph(); // core clock graph
