@@ -17,5 +17,5 @@ Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 
 
 # Screenshot
-[Main window](https://docs.google.com/file/d/0B7nxOyrvj2IiZ2otNWxKMVJmakU/edit?usp=sharing)
-[Graphs](https://docs.google.com/file/d/0B7nxOyrvj2IiTmdGQ3AyUS1hQ28/edit?usp=sharing)
+[Main window](https://docs.google.com/file/d/0B7nxOyrvj2IiSWlTeE5GdGdDejQ/edit?usp=sharing)
+[Graphs](https://docs.google.com/file/d/0B7nxOyrvj2IiNXJVaEFLU0F4eWs/edit?usp=sharing)
