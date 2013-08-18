@@ -104,7 +104,7 @@
           <property name="minimumSize">
            <size>
             <width>181</width>
-            <height>114</height>
+            <height>131</height>
            </size>
           </property>
           <property name="maximumSize">
@@ -118,6 +118,9 @@
           </property>
           <property name="currentIndex">
            <number>1</number>
+          </property>
+          <property name="elideMode">
+           <enum>Qt::ElideNone</enum>
           </property>
           <widget class="QWidget" name="stdProfiles">
            <attribute name="title">
@@ -144,22 +147,55 @@
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="0" column="0">
              <widget class="QPushButton" name="btn_dpmBattery">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>28</height>
+               </size>
+              </property>
               <property name="text">
                <string>Battery</string>
+              </property>
+              <property name="icon">
+               <iconset resource="radeon-resource.qrc">
+                <normaloff>:/icon/arrow1.png</normaloff>:/icon/arrow1.png</iconset>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
             <item row="1" column="0">
              <widget class="QPushButton" name="btn_dpmBalanced">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>28</height>
+               </size>
+              </property>
               <property name="text">
                <string>Balanced</string>
+              </property>
+              <property name="icon">
+               <iconset resource="radeon-resource.qrc">
+                <normaloff>:/icon/arrow2.png</normaloff>:/icon/arrow2.png</iconset>
               </property>
              </widget>
             </item>
             <item row="2" column="0">
              <widget class="QPushButton" name="btn_dpmPerformance">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>28</height>
+               </size>
+              </property>
               <property name="text">
                <string>Performance</string>
+              </property>
+              <property name="icon">
+               <iconset resource="radeon-resource.qrc">
+                <normaloff>:/icon/arrow3.png</normaloff>:/icon/arrow3.png</iconset>
               </property>
              </widget>
             </item>

@@ -372,8 +372,11 @@ void radeon_profile::setupTrayIcon() {
     dpmSetPerformance = new QAction(this);
 
     dpmSetBattery->setText("Battery");
+    dpmSetBattery->setIcon(QIcon(":/icon/arrow1.png"));
     dpmSetBalanced->setText("Balanced");
+    dpmSetBalanced->setIcon(QIcon(":/icon/arrow2.png"));
     dpmSetPerformance->setText("Performance");
+    dpmSetPerformance->setIcon(QIcon(":/icon/arrow3.png"));
 
     connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(on_btn_dpmBattery_clicked()));
     connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(on_btn_dpmBalanced_clicked()));
