@@ -22,7 +22,7 @@ public:
     QString appHomePath;
 
     int i = 0;
-    double maxT = 0.0,minT = 0.0,current; // for temps
+    double maxT = 0.0,minT = 0.0,current,tempSum = 0; // for temps
     double rangeX = 180; // for graph scale
 
     const QString powerMethod = "/sys/class/drm/card0/device/power_method";
@@ -42,8 +42,14 @@ private slots:
     void on_btn_dpmBattery_clicked();
     void on_btn_dpmBalanced_clicked();
     void on_btn_dpmPerformance_clicked();
-    void changeRange();
+    void changeTimeRange();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
+
+    void on_cb_showFreqGraph_clicked(bool checked);
+
+    void on_cb_showTempsGraph_clicked(bool checked);
+
+    void on_cb_showVoltsGraph_clicked(bool checked);
 
 private:
     Ui::radeon_profile *ui;

@@ -34,12 +34,13 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     ui->list_glxinfo->addItems(getGLXInfo());
     ui->mainTabs->setCurrentIndex(0);
+    ui->plotVolts->setVisible(false);
     setupGraphs();
     setupTrayIcon();
 
     QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
-    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeRange()));
+    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
     timer->start(1000);
     timerEvent();
 
@@ -100,6 +101,9 @@ void radeon_profile::timerEvent() {
     ui->plotColcks->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
     ui->plotColcks->replot();
 
+    ui->plotVolts->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
+    ui->plotVolts->replot();
+
     //tray icon tooltip
     QString tooltipdata = "Current profile: "+ui->l_profile->text()+ '\n';
     for (short i = 0; i < ui->list_currentGPUData->count(); i++) {
@@ -119,7 +123,7 @@ QString radeon_profile::getPowerMethod() {
 
 QStringList radeon_profile::getClocks(const QString powerMethod) {
     QStringList gpuData;
-    double coreClock = 0,memClock= 0;  // for plots
+    double coreClock = 0,memClock= 0, voltsGPU = 0;  // for plots
 
     if (QFile(radeon_profile::clocksPath).exists()) {
         system(QString("cp " + radeon_profile::clocksPath + " " + appHomePath + "/").toStdString().c_str()); // must copy thus file in sys are update too fast to read? //
@@ -150,7 +154,8 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                         case 4: {
                             if (s.contains("voltage")) {
                                 gpuData << "-------------------------";
-                                gpuData << "Voltage: " + QString().setNum(s.split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()) + " mV";
+                                voltsGPU = QString().setNum(s.split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toDouble();
+                                gpuData << "Voltage: " + QString().setNum(voltsGPU) + " mV";
                                 break;
                             }
                         }
@@ -176,11 +181,12 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                 }
 
                 if (data[1].contains("vddc")) {
+                    voltsGPU = QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[8].toFloat()).toDouble();
                     gpuData << "------------------------";
-                    gpuData << "Voltage (vddc): " +QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[8].toFloat()) + " mV";
+                    gpuData << "Voltage (vddc): " + QString().setNum(voltsGPU) + " mV";
                 }
                 if (data[1].contains("vddci"))
-                    gpuData << "Voltage (vddci): " +QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[10].toFloat()) + " mV";
+                    gpuData << "Voltage (vddci): " + QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[10].toFloat()) + " mV";
             }
             else {
                 gpuData << "Current GPU clock: " + radeon_profile::err;
@@ -199,11 +205,20 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
         clocks.close();
 
         // update plots
-        if (memClock > ui->plotColcks->yAxis->range().upper)
-            ui->plotColcks->yAxis->setRange(0,memClock + 100);
+        if (memClock > ui->plotColcks->yAxis->range().upper) { // assume that mem clocks are often bigger than core
+            ui->plotColcks->yAxis->setRangeUpper(memClock + 100);
+        }
+        if (voltsGPU > ui->plotVolts->yAxis->range().upper) {
+            ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
+        }
 
         ui->plotColcks->graph(0)->addData(i,coreClock);
         ui->plotColcks->graph(1)->addData(i,memClock);
+
+        if (voltsGPU != 0)
+            ui->plotVolts->graph(0)->addData(i,voltsGPU);
+        else
+            ui->cb_showVoltsGraph->setEnabled(false);
 
         return gpuData;
     }
@@ -218,7 +233,6 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
 }
 
 QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
-
     QFile profile(filePath);
 
     if (profile.exists()) {
@@ -237,16 +251,18 @@ QString radeon_profile::getGPUTemp() {
         QString temp = gpuTempFile.readLine(50);
         temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
         current = temp.toDouble();
+        tempSum += current;
 
         if (minT == 0)
             minT = current;
         maxT = (current >= maxT) ? current : maxT;
         minT = (current <= minT) ? current : minT;
 
-        if (maxT > ui->plotTemp->yAxis->range().upper)
-            ui->plotTemp->yAxis->setRange(minT - 10,maxT+10);
+        if (maxT > ui->plotTemp->yAxis->range().upper || minT < ui->plotTemp->yAxis->range().lower)
+            ui->plotTemp->yAxis->setRange(minT - 10,maxT + 10);
+
         ui->plotTemp->graph(0)->addData(i,current);
-        ui->l_minMaxTemp->setText("Current: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) +"C");
+        ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
         return "Current GPU temp: "+temp+"C";
     }
     else
@@ -277,26 +293,32 @@ void radeon_profile::setupGraphs()
 {
     ui->plotColcks->setBackground(Qt::darkGray);
     ui->plotTemp->setBackground(Qt::darkGray);
+    ui->plotVolts->setBackground(Qt::darkGray);
 
-    ui->plotTemp->yAxis->setRange(0,20);
-    ui->plotColcks->yAxis->setRange(0,100);
+    ui->plotColcks->yAxis->setRange(100,150);
+    ui->plotVolts->yAxis->setRange(100,150);
 
     ui->plotTemp->xAxis->setLabel("time");
     ui->plotTemp->yAxis->setLabel("temperature");
     ui->plotColcks->xAxis->setLabel("time");
     ui->plotColcks->yAxis->setLabel("MHz");
+    ui->plotVolts->xAxis->setLabel("time");
+    ui->plotVolts->yAxis->setLabel("voltage");
     ui->plotTemp->xAxis->setTickLabels(false);
     ui->plotColcks->xAxis->setTickLabels(false);
+    ui->plotVolts->xAxis->setTickLabels(false);
 
     ui->plotTemp->addGraph(); // temp graph
     ui->plotColcks->addGraph(); // core clock graph
     ui->plotColcks->addGraph(); // mem clock graph
+    ui->plotVolts->addGraph(); // volts gpu
 
     ui->plotTemp->graph(0)->setPen(QPen(Qt::yellow));
     ui->plotColcks->graph(1)->setPen(QPen(Qt::black));
-    ui->plotColcks->graph(0)->setPen(QPen(Qt::white));
+    ui->plotColcks->graph(0)->setPen(QPen(Qt::cyan));
+    ui->plotVolts->graph(0)->setPen(QPen(Qt::blue));
 
-    // legend //
+    // legend clocks //
     ui->plotColcks->graph(0)->setName("GPU clock");
     ui->plotColcks->graph(1)->setName("Memory clock");
     ui->plotColcks->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignLeft);
@@ -304,6 +326,7 @@ void radeon_profile::setupGraphs()
 
     ui->plotColcks->replot();
     ui->plotTemp->replot();
+    ui->plotVolts->replot();
 }
 
 
@@ -340,7 +363,7 @@ QStringList radeon_profile::getGLXInfo() {
     return data;
 }
 
-void radeon_profile::changeRange() {
+void radeon_profile::changeTimeRange() {
     rangeX = ui->timeSlider->value();
 }
 
@@ -408,4 +431,20 @@ void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
             if (isHidden()) show(); else hide();
             break;
     }
+}
+
+
+void radeon_profile::on_cb_showFreqGraph_clicked(bool checked)
+{
+    ui->plotColcks->setVisible(checked);
+}
+
+void radeon_profile::on_cb_showTempsGraph_clicked(bool checked)
+{
+    ui->plotTemp->setVisible(checked);
+}
+
+void radeon_profile::on_cb_showVoltsGraph_clicked(bool checked)
+{
+    ui->plotVolts->setVisible(checked);
 }
