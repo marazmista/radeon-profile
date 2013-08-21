@@ -16,6 +16,11 @@ Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 * __"no values":__ Check `/sys/kernel/debug`. If it's empty, try `# mount -t debugfs none /sys/kernel/debug`
 
 
+# Bulid
+
+Type: `qmake-qt4 && make`
+
+
 # Screenshot
 [Main window](https://docs.google.com/file/d/0B7nxOyrvj2IiSWlTeE5GdGdDejQ/edit?usp=sharing)
-[Graphs](https://docs.google.com/file/d/0B7nxOyrvj2IiNXJVaEFLU0F4eWs/edit?usp=sharing)
+[Graphs](https://docs.google.com/file/d/0B7nxOyrvj2IiZ0JfdGFRM3RPUjA/edit?usp=sharing)

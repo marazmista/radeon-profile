@@ -259,7 +259,7 @@ QString radeon_profile::getGPUTemp() {
         minT = (current <= minT) ? current : minT;
 
         if (maxT > ui->plotTemp->yAxis->range().upper || minT < ui->plotTemp->yAxis->range().lower)
-            ui->plotTemp->yAxis->setRange(minT - 10,maxT + 10);
+            ui->plotTemp->yAxis->setRange(minT - 5,maxT + 5);
 
         ui->plotTemp->graph(0)->addData(i,current);
         ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
@@ -303,7 +303,7 @@ void radeon_profile::setupGraphs()
     ui->plotColcks->xAxis->setLabel("time");
     ui->plotColcks->yAxis->setLabel("MHz");
     ui->plotVolts->xAxis->setLabel("time");
-    ui->plotVolts->yAxis->setLabel("voltage");
+    ui->plotVolts->yAxis->setLabel("mV");
     ui->plotTemp->xAxis->setTickLabels(false);
     ui->plotColcks->xAxis->setTickLabels(false);
     ui->plotVolts->xAxis->setTickLabels(false);
