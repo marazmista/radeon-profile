@@ -278,7 +278,7 @@
         <item row="2" column="0" colspan="9">
          <widget class="QCustomPlot" name="plotTemp" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -294,7 +294,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Frequency graph</string>
+           <string>Clocks graph</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -303,6 +303,12 @@
         </item>
         <item row="0" column="7">
          <widget class="QSlider" name="timeSlider">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -338,17 +344,34 @@
         <item row="3" column="0" colspan="9">
          <widget class="QCustomPlot" name="plotColcks" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
          </widget>
         </item>
-        <item row="0" column="0" colspan="5" alignment="Qt::AlignLeft">
+        <item row="4" column="0" colspan="9">
+         <widget class="QCustomPlot" name="plotVolts" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="8">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>1h</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="6">
          <widget class="QLabel" name="l_minMaxTemp">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -361,23 +384,6 @@
           </property>
           <property name="text">
            <string>temps label</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="9">
-         <widget class="QCustomPlot" name="plotVolts" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="8">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>1h</string>
           </property>
          </widget>
         </item>
