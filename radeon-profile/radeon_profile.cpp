@@ -37,6 +37,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     ui->plotVolts->setVisible(false);
     setupGraphs();
     setupTrayIcon();
+    setupOptionsMenu();
 
     QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
@@ -48,6 +49,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
         dpmMenu->setEnabled(false);
     if (ui->dpmProfiles->isEnabled())
         changeProfile->setEnabled(false);
+
 }
 
 radeon_profile::~radeon_profile()
@@ -104,7 +106,11 @@ void radeon_profile::timerEvent() {
     ui->plotVolts->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
     ui->plotVolts->replot();
 
-    //tray icon tooltip
+    refreshTooltip();
+}
+
+void radeon_profile::refreshTooltip()
+{
     QString tooltipdata = "Current profile: "+ui->l_profile->text()+ '\n';
     for (short i = 0; i < ui->list_currentGPUData->count(); i++) {
         tooltipdata += ui->list_currentGPUData->item(i)->text() + '\n';
@@ -208,15 +214,16 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
         if (memClock > ui->plotColcks->yAxis->range().upper) { // assume that mem clocks are often bigger than core
             ui->plotColcks->yAxis->setRangeUpper(memClock + 100);
         }
-        if (voltsGPU > ui->plotVolts->yAxis->range().upper) {
-            ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
-        }
 
         ui->plotColcks->graph(0)->addData(i,coreClock);
         ui->plotColcks->graph(1)->addData(i,memClock);
 
-        if (voltsGPU != 0)
+        if (voltsGPU != 0)  {
+            if (voltsGPU > ui->plotVolts->yAxis->range().upper) {
+                ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
+            }
             ui->plotVolts->graph(0)->addData(i,voltsGPU);
+        }
         else
             ui->cb_showVoltsGraph->setEnabled(false);
 
@@ -258,8 +265,8 @@ QString radeon_profile::getGPUTemp() {
         maxT = (current >= maxT) ? current : maxT;
         minT = (current <= minT) ? current : minT;
 
-        if (maxT > ui->plotTemp->yAxis->range().upper || minT < ui->plotTemp->yAxis->range().lower)
-            ui->plotTemp->yAxis->setRange(minT - 5,maxT + 5);
+        if (maxT >= ui->plotTemp->yAxis->range().upper || minT <= ui->plotTemp->yAxis->range().lower)
+            ui->plotTemp->yAxis->setRange(minT - 5, maxT + 5);
 
         ui->plotTemp->graph(0)->addData(i,current);
         ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
@@ -433,7 +440,6 @@ void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
     }
 }
 
-
 void radeon_profile::on_cb_showFreqGraph_clicked(bool checked)
 {
     ui->plotColcks->setVisible(checked);
@@ -447,4 +453,41 @@ void radeon_profile::on_cb_showTempsGraph_clicked(bool checked)
 void radeon_profile::on_cb_showVoltsGraph_clicked(bool checked)
 {
     ui->plotVolts->setVisible(checked);
+}
+
+void radeon_profile::setupOptionsMenu()
+{
+    optionsMenu = new QMenu(this);
+    ui->btn_options->setMenu(optionsMenu);
+
+    QAction *resetMinMax = new QAction(this);
+    resetMinMax->setText("Reset min/max temperature");
+
+    QAction *resetGraphs = new QAction(this);
+    resetGraphs->setText("Reset graphs vertical scale");
+
+    QAction *showLegend = new QAction(this);
+    showLegend->setText("Show legend");
+    showLegend->setCheckable(true);
+    showLegend->setChecked(true);
+
+    optionsMenu->addAction(showLegend);
+    optionsMenu->addSeparator();
+    optionsMenu->addAction(resetMinMax);
+    optionsMenu->addAction(resetGraphs);
+
+    connect(resetMinMax,SIGNAL(triggered()),this,SLOT(resetMinMax()));
+    connect(resetGraphs,SIGNAL(triggered()),this,SLOT(resetGraphs()));
+    connect(showLegend,SIGNAL(triggered(bool)),this,SLOT(showLegend(bool)));
+}
+
+void radeon_profile::resetGraphs() {
+        ui->plotColcks->yAxis->setRange(100,150);
+        ui->plotVolts->yAxis->setRange(100,150);
+        ui->plotTemp->yAxis->setRange(10,20);
+}
+
+void radeon_profile::showLegend(bool checked) {
+        ui->plotColcks->legend->setVisible(checked);
+        ui->plotColcks->replot();
 }

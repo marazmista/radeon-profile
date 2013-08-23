@@ -22,7 +22,7 @@ public:
     QString appHomePath;
 
     int i = 0;
-    double maxT = 0.0,minT = 0.0,current,tempSum = 0; // for temps
+    double maxT = 0.0,minT = 0.0,current,tempSum = 0;
     double rangeX = 180; // for graph scale
 
     const QString powerMethod = "/sys/class/drm/card0/device/power_method";
@@ -34,7 +34,7 @@ public:
 
     QSystemTrayIcon *trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
-    QMenu *dpmMenu, *trayMenu;
+    QMenu *dpmMenu, *trayMenu, *optionsMenu;
 
 private slots:
     void on_chProfile_clicked();
@@ -44,12 +44,13 @@ private slots:
     void on_btn_dpmPerformance_clicked();
     void changeTimeRange();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-
     void on_cb_showFreqGraph_clicked(bool checked);
-
     void on_cb_showTempsGraph_clicked(bool checked);
-
     void on_cb_showVoltsGraph_clicked(bool checked);
+    void showLegend(bool checked);
+    void resetGraphs();
+
+    inline void resetMinMax() { minT = 0; maxT = 0; }
 
 private:
     Ui::radeon_profile *ui;
@@ -63,6 +64,8 @@ private:
     QStringList getGLXInfo();
     void setupGraphs();
     void setupTrayIcon();
+    void setupOptionsMenu();
+    void refreshTooltip();
 };
 
 #endif // RADEON_PROFILE_H
