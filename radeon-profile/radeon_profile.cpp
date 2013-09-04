@@ -36,8 +36,9 @@ radeon_profile::radeon_profile(QWidget *parent) :
     ui->mainTabs->setCurrentIndex(0);
     ui->plotVolts->setVisible(false);
     setupGraphs();
-    setupTrayIcon();
+    setupForcePowerLevelMenu();
     setupOptionsMenu();
+    setupTrayIcon();
 
     QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
@@ -57,7 +58,7 @@ radeon_profile::~radeon_profile()
     delete ui;
 }
 
-void radeon_profile::setProfile(const QString filePath, const QStringList profiles) {
+void radeon_profile::setValueToFile(const QString filePath, const QStringList profiles) {
     bool ok;
     QString newProfile = QInputDialog::getItem(this, "Select new Radeon profile (ONLY ROOT)", "Profile",profiles,0,false,&ok);
 
@@ -66,12 +67,12 @@ void radeon_profile::setProfile(const QString filePath, const QStringList profil
     }
 }
 
-void radeon_profile::setProfile(const QString filePath, const QString newProfile) {
-    system(QString("echo "+ newProfile + " > "+ filePath ).toStdString().c_str());
+void radeon_profile::setValueToFile(const QString filePath, const QString newValue) {
+    system(QString("echo "+ newValue + " > "+ filePath ).toStdString().c_str());
 }
 
 void radeon_profile::on_chProfile_clicked() {
-    setProfile(radeon_profile::profilePath, QStringList() << "default" << "auto" << "low" << "mid" << "high");
+    setValueToFile(radeon_profile::profilePath, QStringList() << "default" << "auto" << "low" << "mid" << "high");
 }
 
 void radeon_profile::timerEvent() {
@@ -89,7 +90,7 @@ void radeon_profile::timerEvent() {
         ui->tabWidget->setCurrentIndex(1);
         ui->tabWidget->setTabEnabled(0,false);
 
-        ui->l_profile->setText(getCurrentPowerProfile(dpmState));
+        ui->l_profile->setText(getCurrentPowerProfile(dpmStateFile));
         ui->list_currentGPUData->addItems(fillGpuDataTable("dpm"));
     } else {
         ui->list_currentGPUData->addItem("Can't read data");
@@ -111,7 +112,7 @@ void radeon_profile::timerEvent() {
 
 void radeon_profile::refreshTooltip()
 {
-    QString tooltipdata = "Current profile: "+ui->l_profile->text()+ '\n';
+    QString tooltipdata = "Current profile: "+ui->l_profile->text() +"\n";
     for (short i = 0; i < ui->list_currentGPUData->count(); i++) {
         tooltipdata += ui->list_currentGPUData->item(i)->text() + '\n';
     }
@@ -119,7 +120,7 @@ void radeon_profile::refreshTooltip()
 }
 
 QString radeon_profile::getPowerMethod() {
-    QFile powerMethodFile(radeon_profile::powerMethod);
+    QFile powerMethodFile(radeon_profile::powerMethodFile);
     if (powerMethodFile.open(QIODevice::ReadOnly)) {
         QString pMethod = powerMethodFile.readLine(20);
         return pMethod;
@@ -241,14 +242,20 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
 
 QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
     QFile profile(filePath);
+    QFile forceProfile(forcePowerLevelFile);
+    QString pp;
 
     if (profile.exists()) {
         if (profile.open(QIODevice::ReadOnly)) {
-            return profile.readLine(13);
+            pp = profile.readLine(13);
+            if (forceProfile.open(QIODevice::ReadOnly))
+                pp += "| " + forceProfile.readLine(5);
         } else
-            return radeon_profile::err;
+            pp = radeon_profile::err;
     } else
-       return radeon_profile::noValues;
+       pp = radeon_profile::noValues;
+
+    return pp;
 }
 
 QString radeon_profile::getGPUTemp() {
@@ -285,15 +292,15 @@ QStringList radeon_profile::fillGpuDataTable(const QString profile) {
 }
 
 void radeon_profile::on_btn_dpmBattery_clicked() {
-    setProfile(dpmState,"battery");
+    setValueToFile(dpmStateFile,"battery");
 }
 
 void radeon_profile::on_btn_dpmBalanced_clicked() {
-    setProfile(dpmState,"balanced");
+    setValueToFile(dpmStateFile,"balanced");
 }
 
 void radeon_profile::on_btn_dpmPerformance_clicked() {
-    setProfile(dpmState,"performance");
+    setValueToFile(dpmStateFile,"performance");
 }
 
 void radeon_profile::setupGraphs()
@@ -415,6 +422,8 @@ void radeon_profile::setupTrayIcon() {
     dpmMenu->addAction(dpmSetBattery);
     dpmMenu->addAction(dpmSetBalanced);
     dpmMenu->addAction(dpmSetPerformance);
+    dpmMenu->addSeparator();
+    dpmMenu->addMenu(forcePowerMenu);
 
     // add stuff above to menu //
     trayMenu->addAction(refreshWhenHidden);
@@ -490,4 +499,40 @@ void radeon_profile::resetGraphs() {
 void radeon_profile::showLegend(bool checked) {
         ui->plotColcks->legend->setVisible(checked);
         ui->plotColcks->replot();
+}
+
+void radeon_profile::setupForcePowerLevelMenu() {
+    forcePowerMenu = new QMenu(this);
+    ui->btn_forcePowerLevel->setMenu(forcePowerMenu);
+
+    QAction *forceAuto = new QAction(this);
+    forceAuto->setText("Auto");
+
+    QAction *forceLow = new QAction(this);
+    forceLow->setText("Low");
+
+    QAction *forceHigh = new QAction(this);
+    forceHigh->setText("High");
+
+    forcePowerMenu->setTitle("Force power level");
+    forcePowerMenu->addAction(forceAuto);
+    forcePowerMenu->addSeparator();
+    forcePowerMenu->addAction(forceLow);
+    forcePowerMenu->addAction(forceHigh);
+
+    connect(forceAuto,SIGNAL(triggered()),this,SLOT(forceAuto()));
+    connect(forceLow,SIGNAL(triggered()),this,SLOT(forceLow()));
+    connect(forceHigh,SIGNAL(triggered()),this,SLOT(forceHigh()));
+}
+
+void radeon_profile::forceAuto() {
+    setValueToFile(forcePowerLevelFile,"auto");
+}
+
+void radeon_profile::forceLow() {
+    setValueToFile(forcePowerLevelFile,"low");
+}
+
+void radeon_profile::forceHigh() {
+    setValueToFile(forcePowerLevelFile,"high");
 }
