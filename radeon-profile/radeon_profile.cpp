@@ -263,24 +263,27 @@ QString radeon_profile::getGPUTemp() {
     QFile gpuTempFile(appHomePath + "/vgatemp");
     if (gpuTempFile.open(QIODevice::ReadOnly)) {
         QString temp = gpuTempFile.readLine(50);
-        temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
-        current = temp.toDouble();
-        tempSum += current;
+        if (!temp.isEmpty()){
+            temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
+            current = temp.toDouble();
+            tempSum += current;
 
-        if (minT == 0)
-            minT = current;
-        maxT = (current >= maxT) ? current : maxT;
-        minT = (current <= minT) ? current : minT;
+            if (minT == 0)
+                minT = current;
+            maxT = (current >= maxT) ? current : maxT;
+            minT = (current <= minT) ? current : minT;
 
-        if (maxT >= ui->plotTemp->yAxis->range().upper || minT <= ui->plotTemp->yAxis->range().lower)
-            ui->plotTemp->yAxis->setRange(minT - 5, maxT + 5);
+            if (maxT >= ui->plotTemp->yAxis->range().upper || minT <= ui->plotTemp->yAxis->range().lower)
+                ui->plotTemp->yAxis->setRange(minT - 5, maxT + 5);
 
-        ui->plotTemp->graph(0)->addData(i,current);
-        ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
-        return "Current GPU temp: "+temp+"C";
+            ui->plotTemp->graph(0)->addData(i,current);
+            ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
+            return "Current GPU temp: "+temp+"C";
+        } else
+            return "";
     }
     else
-       return "No temps.";
+        return "";
 }
 
 QStringList radeon_profile::fillGpuDataTable(const QString profile) {
