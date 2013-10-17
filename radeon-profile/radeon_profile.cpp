@@ -298,7 +298,7 @@ QString radeon_profile::getGPUTemp() {
             ui->plotTemp->graph(0)->addData(i,current);
             ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
             return "Current GPU temp: "+temp+"C";
-        } else  return "";
+        } else return "";
     } else return "";
 }
 
@@ -392,7 +392,7 @@ QStringList radeon_profile::getGLXInfo() {
                 data.append(s.left(s.indexOf('\n')));
         }
     }
-
+    gpuInfo.close();
     return data;
 }
 
