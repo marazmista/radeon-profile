@@ -269,6 +269,7 @@ void radeon_profile::testSensor() {
         else
             pciSensor = false;
     }
+    gpuTempFile.close();
 }
 
 QString radeon_profile::getGPUTemp() {
@@ -280,6 +281,7 @@ QString radeon_profile::getGPUTemp() {
     QFile gpuTempFile(appHomePath + "/vgatemp");
     if (gpuTempFile.open(QIODevice::ReadOnly)) {
         QString temp = gpuTempFile.readLine(50);
+        gpuTempFile.close();
         if (!temp.isEmpty()) {
             temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
             current = temp.toDouble();
