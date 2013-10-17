@@ -39,6 +39,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     setupForcePowerLevelMenu();
     setupOptionsMenu();
     setupTrayIcon();
+    testSensor();
 
     QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
@@ -258,12 +259,28 @@ QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
     return pp;
 }
 
+void radeon_profile::testSensor() {
+    system(QString("sensors | grep radeon -A 2 | grep temp  > "+ appHomePath + "/vgatemp").toStdString().c_str());
+    QFile gpuTempFile(appHomePath + "/vgatemp");
+
+    if (gpuTempFile.open(QIODevice::ReadOnly)) {
+        if (!gpuTempFile.readLine(50).isNull())
+            pciSensor = true;
+        else
+            pciSensor = false;
+    }
+}
+
 QString radeon_profile::getGPUTemp() {
-    system(QString("sensors | grep VGA > "+ appHomePath + "/vgatemp").toStdString().c_str());
+    if (pciSensor)
+        system(QString("sensors | grep radeon -A 2 | grep temp  > "+ appHomePath + "/vgatemp").toStdString().c_str());
+    else
+        system(QString("sensors | grep VGA  > "+ appHomePath + "/vgatemp").toStdString().c_str());
+
     QFile gpuTempFile(appHomePath + "/vgatemp");
     if (gpuTempFile.open(QIODevice::ReadOnly)) {
         QString temp = gpuTempFile.readLine(50);
-        if (!temp.isEmpty()){
+        if (!temp.isEmpty()) {
             temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
             current = temp.toDouble();
             tempSum += current;
@@ -279,11 +296,8 @@ QString radeon_profile::getGPUTemp() {
             ui->plotTemp->graph(0)->addData(i,current);
             ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
             return "Current GPU temp: "+temp+"C";
-        } else
-            return "";
-    }
-    else
-        return "";
+        } else  return "";
+    } else return "";
 }
 
 QStringList radeon_profile::fillGpuDataTable(const QString profile) {

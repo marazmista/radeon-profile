@@ -20,6 +20,7 @@ public:
     explicit radeon_profile(QWidget *parent = 0);
     ~radeon_profile();
     QString appHomePath;
+    bool pciSensor = false;
 
     int i = 0;
     double maxT = 0.0,minT = 0.0,current,tempSum = 0;
@@ -71,6 +72,7 @@ private:
     void setupOptionsMenu();
     void refreshTooltip();
     void setupForcePowerLevelMenu();
+    void testSensor();
 };
 
 #endif // RADEON_PROFILE_H
