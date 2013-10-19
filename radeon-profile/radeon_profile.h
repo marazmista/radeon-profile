@@ -73,6 +73,7 @@ private:
     void refreshTooltip();
     void setupForcePowerLevelMenu();
     void testSensor();
+    void changeEvent(QEvent *event);
 };
 
 #endif // RADEON_PROFILE_H

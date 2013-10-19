@@ -372,7 +372,6 @@ void radeon_profile::setupGraphs()
     ui->plotVolts->replot();
 }
 
-
 QStringList radeon_profile::getGLXInfo() {
     QStringList data;
     QFile gpuInfo(appHomePath + "/gpuinfo");
@@ -473,7 +472,7 @@ void radeon_profile::setupTrayIcon() {
 void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
     switch (reason) {
         case QSystemTrayIcon::Trigger:
-            if (isHidden()) show(); else hide();
+        if (isHidden()) show(); else hide();
             break;
     }
 }
@@ -564,4 +563,14 @@ void radeon_profile::forceLow() {
 
 void radeon_profile::forceHigh() {
     setValueToFile(forcePowerLevelFile,"high");
+}
+
+void radeon_profile::changeEvent(QEvent *event)
+{
+    if(event->type() == QEvent::WindowStateChange) {
+        if(isMinimized())
+            this->hide();
+
+        event->ignore();
+    }
 }
