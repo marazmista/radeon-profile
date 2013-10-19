@@ -200,6 +200,8 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                 gpuData << "Current GPU clock: " + radeon_profile::err;
                 gpuData << "Current mem clock: " + radeon_profile::err;
                 gpuData << "Voltage: "+radeon_profile::err;
+                ui->cb_showFreqGraph->setChecked(false),ui->cb_showFreqGraph->setEnabled(false),ui->cb_showVoltsGraph->setEnabled(false),
+                        ui->plotColcks->setVisible(false),ui->plotVolts->setVisible(false);
             }
         }
         else {
@@ -207,6 +209,8 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
             gpuData << "Current mem clock: " + radeon_profile::noValues;
             gpuData << "------------------------";
             gpuData << "Voltage: "+ radeon_profile::noValues;
+            ui->cb_showFreqGraph->setChecked(false),ui->cb_showFreqGraph->setEnabled(false),ui->cb_showVoltsGraph->setEnabled(false),
+                    ui->plotColcks->setVisible(false),ui->plotVolts->setVisible(false);
         }
         gpuData << "------------------------";
 
@@ -214,7 +218,7 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
 
         // update plots
         if (memClock > ui->plotColcks->yAxis->range().upper) { // assume that mem clocks are often bigger than core
-            ui->plotColcks->yAxis->setRangeUpper(memClock + 100);
+            ui->plotColcks->yAxis->setRangeUpper(memClock + 200);
         }
 
         ui->plotColcks->graph(0)->addData(i,coreClock);
@@ -232,11 +236,13 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
         return gpuData;
     }
     else {
-        gpuData << "Current GPU clock: " + radeon_profile::noValues;
-        gpuData << "Current mem clock: " + radeon_profile::noValues;
+        gpuData << "Current GPU clock: " + radeon_profile::noValues + " (root rights? debugfs mounted?)";
+        gpuData << "Current mem clock: " + radeon_profile::noValues + " (root rights? debugfs mounted?)";
         gpuData << "------------------------";
-        gpuData << "Voltage: "+ radeon_profile::noValues;
+        gpuData << "Voltage: "+ radeon_profile::noValues + " (root rights? debugfs mounted?)";
         gpuData << "------------------------";
+        ui->cb_showFreqGraph->setChecked(false),ui->cb_showFreqGraph->setEnabled(false),ui->cb_showVoltsGraph->setEnabled(false),
+                ui->plotColcks->setVisible(false),ui->plotVolts->setVisible(false);
         return gpuData;
     }
 }
@@ -260,11 +266,11 @@ QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
 }
 
 void radeon_profile::testSensor() {
-    system(QString("sensors | grep radeon -A 2 | grep temp  > "+ appHomePath + "/vgatemp").toStdString().c_str());
+    system(QString("sensors | grep radeon-pci > "+ appHomePath + "/vgatemp").toStdString().c_str());
     QFile gpuTempFile(appHomePath + "/vgatemp");
 
     if (gpuTempFile.open(QIODevice::ReadOnly)) {
-        if (!gpuTempFile.readLine(50).isNull())
+        if (!gpuTempFile.readLine(50).isEmpty())
             pciSensor = true;
         else
             pciSensor = false;
@@ -274,7 +280,7 @@ void radeon_profile::testSensor() {
 
 QString radeon_profile::getGPUTemp() {
     if (pciSensor)
-        system(QString("sensors | grep radeon -A 2 | grep temp  > "+ appHomePath + "/vgatemp").toStdString().c_str());
+        system(QString("sensors | grep radeon-pci -A 2 | grep temp  > "+ appHomePath + "/vgatemp").toStdString().c_str());
     else
         system(QString("sensors | grep VGA  > "+ appHomePath + "/vgatemp").toStdString().c_str());
 
@@ -283,7 +289,7 @@ QString radeon_profile::getGPUTemp() {
         QString temp = gpuTempFile.readLine(50);
         gpuTempFile.close();
         if (!temp.isEmpty()) {
-            temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
+            temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°"); 
             current = temp.toDouble();
             tempSum += current;
 
@@ -298,7 +304,11 @@ QString radeon_profile::getGPUTemp() {
             ui->plotTemp->graph(0)->addData(i,current);
             ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
             return "Current GPU temp: "+temp+"C";
-        } else return "";
+        } else {
+            ui->plotTemp->setVisible(false),ui->cb_showTempsGraph->setEnabled(false),
+                    ui->cb_showTempsGraph->setChecked(false),ui->l_minMaxTemp->setVisible(false);
+            return "";
+        }
     } else return "";
 }
 
@@ -328,8 +338,8 @@ void radeon_profile::setupGraphs()
     ui->plotTemp->setBackground(Qt::darkGray);
     ui->plotVolts->setBackground(Qt::darkGray);
 
-    ui->plotColcks->yAxis->setRange(100,150);
-    ui->plotVolts->yAxis->setRange(100,150);
+    ui->plotColcks->yAxis->setRange(100,200);
+    ui->plotVolts->yAxis->setRange(500,650);
 
     ui->plotTemp->xAxis->setLabel("time");
     ui->plotTemp->yAxis->setLabel("temperature");
@@ -510,8 +520,8 @@ void radeon_profile::setupOptionsMenu()
 }
 
 void radeon_profile::resetGraphs() {
-        ui->plotColcks->yAxis->setRange(100,150);
-        ui->plotVolts->yAxis->setRange(100,150);
+        ui->plotColcks->yAxis->setRange(100,200);
+        ui->plotVolts->yAxis->setRange(500,650);
         ui->plotTemp->yAxis->setRange(10,20);
 }
 
