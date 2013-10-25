@@ -219,7 +219,7 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
         // update plots
         if (memClock > ui->plotColcks->yAxis->range().upper && memClock != 0) // assume that mem clocks are often bigger than core
             ui->plotColcks->yAxis->setRangeUpper(memClock + 150);
-        else if (coreClock != 0)
+        else if (coreClock != 0 && memClock == 0)
             ui->plotColcks->yAxis->setRangeUpper(coreClock + 150);
 
         ui->plotColcks->graph(0)->addData(i,coreClock);
