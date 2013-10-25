@@ -21,6 +21,11 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 
+#define startClocksScaleL 100
+#define startClocksScaleH 400
+#define startVoltsScaleL 500
+#define startVoltsScaleH 650
+
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
@@ -339,8 +344,8 @@ void radeon_profile::setupGraphs()
     ui->plotTemp->setBackground(Qt::darkGray);
     ui->plotVolts->setBackground(Qt::darkGray);
 
-    ui->plotColcks->yAxis->setRange(100,400);
-    ui->plotVolts->yAxis->setRange(500,650);
+    ui->plotColcks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
+    ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
 
     ui->plotTemp->xAxis->setLabel("time");
     ui->plotTemp->yAxis->setLabel("temperature");
@@ -520,8 +525,8 @@ void radeon_profile::setupOptionsMenu()
 }
 
 void radeon_profile::resetGraphs() {
-        ui->plotColcks->yAxis->setRange(100,200);
-        ui->plotVolts->yAxis->setRange(500,650);
+        ui->plotColcks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
+        ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
         ui->plotTemp->yAxis->setRange(10,20);
 }
 
