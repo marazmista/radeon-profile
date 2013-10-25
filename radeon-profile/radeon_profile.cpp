@@ -179,21 +179,21 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                     data[i] = clocks.readLine(500);
                     i++;
                 }
-                if (data[1].contains("sclk")) {
+                if (data[1].contains("sclk:")) {
                     coreClock = QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[4].toFloat() / 100).toDouble();
                     gpuData << "Current GPU clock: " + QString().setNum(coreClock) + " MHz";
                 }
-                if (data[1].contains("mclk")) {
+                if (data[1].contains("mclk:")) {
                     memClock = QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[6].toFloat() / 100).toDouble();
                     gpuData << "Current mem clock: " + QString().setNum(memClock) + " MHz";
                 }
 
-                if (data[1].contains("vddc")) {
+                if (data[1].contains("vddc:")) {
                     voltsGPU = QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[8].toFloat()).toDouble();
                     gpuData << "------------------------";
                     gpuData << "Voltage (vddc): " + QString().setNum(voltsGPU) + " mV";
                 }
-                if (data[1].contains("vddci"))
+                if (data[1].contains("vddci:"))
                     gpuData << "Voltage (vddci): " + QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[10].toFloat()) + " mV";
             }
             else {
@@ -217,17 +217,18 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
         clocks.close();
 
         // update plots
-        if (memClock > ui->plotColcks->yAxis->range().upper) { // assume that mem clocks are often bigger than core
+        if (memClock > ui->plotColcks->yAxis->range().upper && memClock != 0) // assume that mem clocks are often bigger than core
             ui->plotColcks->yAxis->setRangeUpper(memClock + 150);
-        }
+        else if (coreClock != 0)
+            ui->plotColcks->yAxis->setRangeUpper(coreClock + 150);
 
         ui->plotColcks->graph(0)->addData(i,coreClock);
         ui->plotColcks->graph(1)->addData(i,memClock);
 
         if (voltsGPU != 0)  {
-            if (voltsGPU > ui->plotVolts->yAxis->range().upper) {
+            if (voltsGPU > ui->plotVolts->yAxis->range().upper)
                 ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
-            }
+
             ui->plotVolts->graph(0)->addData(i,voltsGPU);
         }
         else
