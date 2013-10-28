@@ -184,22 +184,36 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                     data[i] = clocks.readLine(500);
                     i++;
                 }
-                if (data[1].contains("sclk:")) {
-                    coreClock = QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[4].toFloat() / 100).toDouble();
+
+                QRegExp rx;
+
+                rx.setPattern("sclk:\\s\\d+");
+                rx.indexIn(data[1]);
+                if (!rx.cap(0).isEmpty()) {
+                    coreClock = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
                     gpuData << "Current GPU clock: " + QString().setNum(coreClock) + " MHz";
                 }
-                if (data[1].contains("mclk:")) {
-                    memClock = QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[6].toFloat() / 100).toDouble();
+
+                rx.setPattern("mclk:\\s\\d+");
+                rx.indexIn(data[1]);
+                if (!rx.cap(0).isEmpty()) {
+                    memClock = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
                     gpuData << "Current mem clock: " + QString().setNum(memClock) + " MHz";
                 }
 
-                if (data[1].contains("vddc:")) {
-                    voltsGPU = QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[8].toFloat()).toDouble();
+                rx.setPattern("vddc:\\s\\d+");
+                rx.indexIn(data[1]);
+                if (!rx.cap(0).isEmpty()) {
+                    voltsGPU = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
                     gpuData << "------------------------";
                     gpuData << "Voltage (vddc): " + QString().setNum(voltsGPU) + " mV";
                 }
-                if (data[1].contains("vddci:"))
-                    gpuData << "Voltage (vddci): " + QString().setNum(data[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[10].toFloat()) + " mV";
+
+                rx.setPattern("vddci:\\s\\d+");
+                rx.indexIn(data[1]);
+                if (!rx.cap(0).isEmpty()) {
+                    gpuData << "Voltage (vddci): " + rx.cap(0).split(' ',QString::SkipEmptyParts)[1] + " mV";
+                }
             }
             else {
                 gpuData << "Current GPU clock: " + radeon_profile::err;
