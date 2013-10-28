@@ -397,6 +397,7 @@ QStringList radeon_profile::getGLXInfo() {
     QFile gpuInfo(appHomePath + "/gpuinfo");
 
     system(QString("lspci | grep VGA > "+ appHomePath + "/gpuinfo").toStdString().c_str());
+    system(QString("xdriinfo >>"+ appHomePath + "/gpuinfo").toStdString().c_str());
     system(QString("glxinfo | grep direct >> "+ appHomePath + "/gpuinfo").toStdString().c_str());
     system(QString("glxinfo | grep OpenGL >>"+ appHomePath + "/gpuinfo").toStdString().c_str());
 
@@ -409,6 +410,8 @@ QStringList radeon_profile::getGLXInfo() {
                 QString tmps = s.split(":",QString::SkipEmptyParts)[2];
                 data.append("VGA:"+tmps.left(tmps.indexOf('\n')));
             }
+            if (s.contains("Screen 0:"))
+                data.append("Driver:"+s.left(s.indexOf('\n')).split(':',QString::SkipEmptyParts)[1]);
             if (s.contains("direct rendering"))
                 data.append(s.left(s.indexOf('\n')));
             if (s.contains("OpenGL renderer string"))
