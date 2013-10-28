@@ -26,6 +26,8 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
+const int appVersion = 20131028;
+
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
@@ -57,6 +59,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     if (ui->dpmProfiles->isEnabled())
         changeProfile->setEnabled(false);
 
+    radeon_profile::setWindowTitle("Radeon Profile (v. "+QString().setNum(appVersion)+")");
 }
 
 radeon_profile::~radeon_profile()
@@ -118,7 +121,7 @@ void radeon_profile::timerEvent() {
 
 void radeon_profile::refreshTooltip()
 {
-    QString tooltipdata = "Current profile: "+ui->l_profile->text() +"\n";
+    QString tooltipdata = radeon_profile::windowTitle() + "\nCurrent profile: "+ui->l_profile->text() +"\n";
     for (short i = 0; i < ui->list_currentGPUData->count(); i++) {
         tooltipdata += ui->list_currentGPUData->item(i)->text() + '\n';
     }
@@ -276,13 +279,13 @@ QString radeon_profile::getCurrentPowerProfile(const QString filePath) {
         if (profile.open(QIODevice::ReadOnly)) {
             pp = profile.readLine(13);
             if (forceProfile.open(QIODevice::ReadOnly))
-                pp += "| " + forceProfile.readLine(5);
+                pp += " | " + forceProfile.readLine(5);
         } else
             pp = radeon_profile::err;
     } else
        pp = radeon_profile::noValues;
 
-    return pp;
+    return pp.remove('\n');
 }
 
 void radeon_profile::testSensor() {
