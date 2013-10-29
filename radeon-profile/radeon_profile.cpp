@@ -41,12 +41,14 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     ui->list_glxinfo->addItems(getGLXInfo());
     ui->mainTabs->setCurrentIndex(0);
+    ui->tabWidget_2->setCurrentIndex(0);
     ui->plotVolts->setVisible(false);
     setupGraphs();
     setupForcePowerLevelMenu();
     setupOptionsMenu();
     setupTrayIcon();
     testSensor();
+    getModuleInfo();
 
     QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
@@ -598,5 +600,30 @@ void radeon_profile::changeEvent(QEvent *event)
             this->hide();
 
         event->ignore();
+    }
+}
+
+void radeon_profile::getModuleInfo() {
+    system(QString("modinfo -p radeon | sort >" + appHomePath + "/moddesc").toStdString().c_str());
+    system(QString("grep . /sys/module/radeon/parameters/* >" + appHomePath + "/modsettings").toStdString().c_str());
+    QFile modDescFile(appHomePath + "/moddesc");
+    QFile modSettingsFile(appHomePath + "/modsettings");
+
+    if (modDescFile.open(QIODevice::ReadOnly) && modSettingsFile.open(QIODevice::ReadOnly)) {
+        while (!modDescFile.atEnd() && !modSettingsFile.atEnd()) {
+            QString mdl = modDescFile.readLine(500);
+            QString mds = modSettingsFile.readLine(500);
+
+            if (mdl.contains(":") && mds.contains(":")) {
+                QString modName = mdl.split(":",QString::SkipEmptyParts)[0];
+                QString modDesc = mdl.split(":",QString::SkipEmptyParts)[1];
+                QString modValue = mds.split(":",QString::SkipEmptyParts)[1];
+
+                QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << modName.left(modName.indexOf('\n')) << modValue.left(modValue.indexOf('\n')) << modDesc.left(modDesc.indexOf('\n')));
+                ui->list_modInfo->addTopLevelItem(item);
+            }
+        }
+        modDescFile.close();
+        modSettingsFile.close();
     }
 }

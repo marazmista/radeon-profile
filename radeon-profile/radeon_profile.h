@@ -74,6 +74,7 @@ private:
     void setupForcePowerLevelMenu();
     void testSensor();
     void changeEvent(QEvent *event);
+    void getModuleInfo();
 };
 
 #endif // RADEON_PROFILE_H
