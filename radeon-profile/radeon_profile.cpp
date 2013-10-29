@@ -26,7 +26,7 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131028;
+const int appVersion = 20131029;
 
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
@@ -141,7 +141,7 @@ QString radeon_profile::getPowerMethod() {
 
 QStringList radeon_profile::getClocks(const QString powerMethod) {
     QStringList gpuData;
-    double coreClock = 0,memClock= 0, voltsGPU = 0;  // for plots
+    double coreClock = 0,memClock= 0, voltsGPU = 0, uvdvclk = 0, uvddclk = 0;  // for plots
 
     if (QFile(radeon_profile::clocksPath).exists()) {
         system(QString("cp " + radeon_profile::clocksPath + " " + appHomePath + "/").toStdString().c_str()); // must copy thus file in sys are update too fast to read? //
@@ -206,6 +206,22 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                     gpuData << "Current mem clock: " + QString().setNum(memClock) + " MHz";
                 }
 
+                rx.setPattern("vclk:\\s\\d+");
+                rx.indexIn(data[0]);
+                if (!rx.cap(0).isEmpty()) {
+                    uvdvclk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
+                    if (uvdvclk != 0)
+                        gpuData << "UVD clock (vclk): " + QString().setNum(uvdvclk) + " MHz";
+                }
+
+                rx.setPattern("dclk:\\s\\d+");
+                rx.indexIn(data[0]);
+                if (!rx.cap(0).isEmpty()) {
+                    uvddclk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
+                    if (uvddclk != 0)
+                        gpuData << "UVD clock (dclk): " + QString().setNum(uvddclk) + " MHz";
+                }
+
                 rx.setPattern("vddc:\\s\\d+");
                 rx.indexIn(data[1]);
                 if (!rx.cap(0).isEmpty()) {
@@ -248,6 +264,8 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
 
         ui->plotColcks->graph(0)->addData(i,coreClock);
         ui->plotColcks->graph(1)->addData(i,memClock);
+        ui->plotColcks->graph(2)->addData(i,uvdvclk);
+        ui->plotColcks->graph(3)->addData(i,uvddclk);
 
         if (voltsGPU != 0)  {
             if (voltsGPU > ui->plotVolts->yAxis->range().upper)
@@ -379,16 +397,31 @@ void radeon_profile::setupGraphs()
     ui->plotTemp->addGraph(); // temp graph
     ui->plotColcks->addGraph(); // core clock graph
     ui->plotColcks->addGraph(); // mem clock graph
+    ui->plotColcks->addGraph(); // uvd
+    ui->plotColcks->addGraph(); // uvd
     ui->plotVolts->addGraph(); // volts gpu
 
-    ui->plotTemp->graph(0)->setPen(QPen(Qt::yellow));
-    ui->plotColcks->graph(1)->setPen(QPen(Qt::black));
-    ui->plotColcks->graph(0)->setPen(QPen(Qt::cyan));
-    ui->plotVolts->graph(0)->setPen(QPen(Qt::blue));
+    QPen pen;
+    pen.setWidth(2);
+    pen.setCapStyle(Qt::SquareCap);
+    pen.setColor(Qt::yellow);
+    ui->plotTemp->graph(0)->setPen(pen);
+    pen.setColor(Qt::black);
+    ui->plotColcks->graph(1)->setPen(pen);
+    pen.setColor(Qt::cyan);
+    ui->plotColcks->graph(0)->setPen(pen);
+    pen.setColor(Qt::red);
+    ui->plotColcks->graph(2)->setPen(pen);
+    pen.setColor(Qt::green);
+    ui->plotColcks->graph(3)->setPen(pen);
+    pen.setColor(Qt::blue);
+    ui->plotVolts->graph(0)->setPen(pen);
 
     // legend clocks //
     ui->plotColcks->graph(0)->setName("GPU clock");
     ui->plotColcks->graph(1)->setName("Memory clock");
+    ui->plotColcks->graph(2)->setName("UVD (vclk)");
+    ui->plotColcks->graph(3)->setName("UVD (dclk)");
     ui->plotColcks->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignLeft);
     ui->plotColcks->legend->setVisible(true);
 
