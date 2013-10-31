@@ -20,19 +20,6 @@ public:
     explicit radeon_profile(QWidget *parent = 0);
     ~radeon_profile();
     QString appHomePath;
-    bool pciSensor = false;
-
-    int i = 0;
-    double maxT = 0.0,minT = 0.0,current,tempSum = 0;
-    double rangeX = 180; // for graph scale
-
-    const QString powerMethodFile = "/sys/class/drm/card0/device/power_method";
-    const QString profilePath = "/sys/class/drm/card0/device/power_profile";
-    const QString dpmStateFile = "/sys/class/drm/card0/device/power_dpm_state";
-    const QString clocksPath = "/sys/kernel/debug/dri/0/radeon_pm_info";
-    const QString forcePowerLevelFile = "/sys/class/drm/card0/device/power_dpm_force_performance_level";
-    const QString err = "Err";
-    const QString noValues = "no values";
 
     QSystemTrayIcon *trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
@@ -54,8 +41,7 @@ private slots:
     void forceAuto();
     void forceLow();
     void forceHigh();
-
-    inline void resetMinMax() { minT = 0; maxT = 0; }
+    void resetMinMax();
 
 private:
     Ui::radeon_profile *ui;
