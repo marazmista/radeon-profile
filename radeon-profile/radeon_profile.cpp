@@ -26,7 +26,7 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131029;
+const int appVersion = 20131122;
 
 static bool pciSensor = false;
 
@@ -225,7 +225,7 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                 if (!rx.cap(0).isEmpty()) {
                     uvdvclk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
                     if (uvdvclk != 0)
-                        gpuData << "UVD clock (vclk): " + QString().setNum(uvdvclk) + " MHz";
+                        gpuData << "UVD video core clock (vclk): " + QString().setNum(uvdvclk) + " MHz";
                 }
 
                 rx.setPattern("dclk:\\s\\d+");
@@ -233,7 +233,7 @@ QStringList radeon_profile::getClocks(const QString powerMethod) {
                 if (!rx.cap(0).isEmpty()) {
                     uvddclk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
                     if (uvddclk != 0)
-                        gpuData << "UVD clock (dclk): " + QString().setNum(uvddclk) + " MHz";
+                        gpuData << "UVD decoder clock (dclk): " + QString().setNum(uvddclk) + " MHz";
                 }
 
                 rx.setPattern("vddc:\\s\\d+");
@@ -436,8 +436,8 @@ void radeon_profile::setupGraphs()
     // legend clocks //
     ui->plotColcks->graph(0)->setName("GPU clock");
     ui->plotColcks->graph(1)->setName("Memory clock");
-    ui->plotColcks->graph(2)->setName("UVD (vclk)");
-    ui->plotColcks->graph(3)->setName("UVD (dclk)");
+    ui->plotColcks->graph(2)->setName("Video core clock");
+    ui->plotColcks->graph(3)->setName("Decoder clock");
     ui->plotColcks->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignLeft);
     ui->plotColcks->legend->setVisible(true);
 
