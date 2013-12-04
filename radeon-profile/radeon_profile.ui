@@ -180,7 +180,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QTabWidget" name="tabWidget">
+            <widget class="QTabWidget" name="tabs_pm">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -350,7 +350,7 @@
          </widget>
         </item>
         <item row="2" column="0" colspan="4">
-         <widget class="QTabWidget" name="tabWidget_2">
+         <widget class="QTabWidget" name="tabs_systemInfo">
           <property name="font">
            <font>
             <family>Monospace</family>

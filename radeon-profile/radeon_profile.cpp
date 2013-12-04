@@ -63,7 +63,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     // setup ui elemensts
     ui->list_glxinfo->addItems(getGLXInfo());
     ui->mainTabs->setCurrentIndex(0);
-    ui->tabWidget_2->setCurrentIndex(0);
+    ui->tabs_systemInfo->setCurrentIndex(0);
     ui->plotVolts->setVisible(false);
     setupGraphs();
     setupForcePowerLevelMenu();
@@ -81,9 +81,20 @@ radeon_profile::radeon_profile(QWidget *parent) :
     connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
     timer->start(1000);
 
+    // dpm or profile tab enable
     switch (selectedPowerMethod) {
-    case DPM: changeProfile->setEnabled(false); break;
-    case PROFILE: dpmMenu->setEnabled(false); break;
+    case DPM: {
+        changeProfile->setEnabled(false);
+        ui->tabs_pm->setCurrentIndex(1);
+        ui->tabs_pm->setTabEnabled(0,false);
+        break;
+    }
+    case PROFILE: {
+        dpmMenu->setEnabled(false);
+        ui->tabs_pm->setCurrentIndex(0);
+        ui->tabs_pm->setTabEnabled(1,false);
+        break;
+    }
     case PM_UNKNOWN: {
         dpmMenu->setEnabled(false);
         changeProfile->setEnabled(false);
@@ -106,21 +117,10 @@ void radeon_profile::timerEvent() {
         return;
 
     switch (selectedPowerMethod) {
-    case DPM: {
-        ui->tabWidget->setCurrentIndex(1);
-        ui->tabWidget->setTabEnabled(0,false);
-
-        ui->l_profile->setText(getCurrentPowerProfile());
-        break;
-    }
-    case PROFILE: {
-        ui->tabWidget->setCurrentIndex(0);
-        ui->tabWidget->setTabEnabled(1,false);
-
-        ui->l_profile->setText(getCurrentPowerProfile());
-        break;
-    }
+    case DPM: ui->l_profile->setText(getCurrentPowerProfile()); break;
+    case PROFILE: ui->l_profile->setText(getCurrentPowerProfile()); break;
     case PM_UNKNOWN: {
+        ui->tabs_pm->setEnabled(false);
         ui->list_currentGPUData->addItem("Can't read data");
         return;
         break;
@@ -180,7 +180,6 @@ void radeon_profile::getPowerMethod() {
     } else
         selectedPowerMethod = PM_UNKNOWN;
 }
-
 
 void radeon_profile::testSensor() {
     QStringList out = grabSystemInfo("sensors");
