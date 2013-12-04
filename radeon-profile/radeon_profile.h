@@ -45,13 +45,13 @@ private slots:
 
 private:
     Ui::radeon_profile *ui;
-    QString getPowerMethod();
-    QStringList getClocks(const QString);
-    QString getCurrentPowerProfile(const QString);
+    void getPowerMethod();
+    QStringList getClocks(const char powerMethod);
+    QString getCurrentPowerProfile();
     void setValueToFile(const QString, const QStringList);
     void setValueToFile(const QString, const QString);
     QString getGPUTemp();
-    QStringList fillGpuDataTable(const QString);
+    QStringList fillGpuDataTable();
     QStringList getGLXInfo();
     void setupGraphs();
     void setupTrayIcon();
@@ -61,6 +61,7 @@ private:
     void testSensor();
     void changeEvent(QEvent *event);
     void getModuleInfo();
+    QStringList grabSystemInfo(const QString cmd);
 };
 
 #endif // RADEON_PROFILE_H
