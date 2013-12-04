@@ -81,10 +81,15 @@ radeon_profile::radeon_profile(QWidget *parent) :
     connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
     timer->start(1000);
 
-    if (ui->stdProfiles->isEnabled())
+    switch (selectedPowerMethod) {
+    case DPM: changeProfile->setEnabled(false); break;
+    case PROFILE: dpmMenu->setEnabled(false); break;
+    case PM_UNKNOWN: {
         dpmMenu->setEnabled(false);
-    if (ui->dpmProfiles->isEnabled())
         changeProfile->setEnabled(false);
+        break;
+    }
+    }
 
     radeon_profile::setWindowTitle("Radeon Profile (v. "+QString().setNum(appVersion)+")");
 }
@@ -424,6 +429,7 @@ QString radeon_profile::getGPUTemp() {
 
 //===================================
 // === GUI events === //
+// == menu forcePowerLevel
 void radeon_profile::forceAuto() {
     setValueToFile(forcePowerLevelFilePath,"auto");
 }
@@ -436,6 +442,23 @@ void radeon_profile::forceHigh() {
     setValueToFile(forcePowerLevelFilePath,"high");
 }
 
+// == buttons for forcePowerLevel
+void radeon_profile::on_btn_forceAuto_clicked()
+{
+    forceAuto();
+}
+
+void radeon_profile::on_btn_forceHigh_clicked()
+{
+    forceHigh();
+}
+
+void radeon_profile::on_btn_forceLow_clicked()
+{
+    forceLow();
+}
+
+// == others
 void radeon_profile::on_btn_dpmBattery_clicked() {
     setValueToFile(dpmStateFilePath,"battery");
 }
@@ -673,7 +696,6 @@ void radeon_profile::setupOptionsMenu()
 
 void radeon_profile::setupForcePowerLevelMenu() {
     forcePowerMenu = new QMenu(this);
-    ui->btn_forcePowerLevel->setMenu(forcePowerMenu);
 
     QAction *forceAuto = new QAction(this);
     forceAuto->setText("Auto");

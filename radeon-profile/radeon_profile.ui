@@ -249,7 +249,20 @@
                <property name="spacing">
                 <number>1</number>
                </property>
-               <item row="0" column="0">
+               <item row="5" column="0">
+                <widget class="QPushButton" name="btn_forceAuto">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Auto</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0" colspan="4">
                 <widget class="QPushButton" name="btn_dpmBattery">
                  <property name="minimumSize">
                   <size>
@@ -269,7 +282,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="1" column="0" colspan="4">
                 <widget class="QPushButton" name="btn_dpmBalanced">
                  <property name="minimumSize">
                   <size>
@@ -286,7 +299,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
+               <item row="2" column="0" colspan="4">
                 <widget class="QPushButton" name="btn_dpmPerformance">
                  <property name="minimumSize">
                   <size>
@@ -303,16 +316,29 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0">
-                <widget class="QPushButton" name="btn_forcePowerLevel">
+               <item row="5" column="3">
+                <widget class="QPushButton" name="btn_forceLow">
                  <property name="maximumSize">
                   <size>
-                   <width>140</width>
+                   <width>50</width>
                    <height>16777215</height>
                   </size>
                  </property>
                  <property name="text">
-                  <string>Force power level</string>
+                  <string>Low</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="2">
+                <widget class="QPushButton" name="btn_forceHigh">
+                 <property name="maximumSize">
+                  <size>
+                   <width>50</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>High</string>
                  </property>
                 </widget>
                </item>

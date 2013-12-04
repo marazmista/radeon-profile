@@ -43,6 +43,12 @@ private slots:
     void forceHigh();
     void resetMinMax();
 
+    void on_btn_forceAuto_clicked();
+
+    void on_btn_forceHigh_clicked();
+
+    void on_btn_forceLow_clicked();
+
 private:
     Ui::radeon_profile *ui;
     void getPowerMethod();
