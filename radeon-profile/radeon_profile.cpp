@@ -117,8 +117,9 @@ void radeon_profile::timerEvent() {
         return;
 
     switch (selectedPowerMethod) {
-    case DPM: ui->l_profile->setText(getCurrentPowerProfile()); break;
-    case PROFILE: ui->l_profile->setText(getCurrentPowerProfile()); break;
+    case DPM:
+    case PROFILE:
+        ui->l_profile->setText(getCurrentPowerProfile()); break;
     case PM_UNKNOWN: {
         ui->tabs_pm->setEnabled(false);
         ui->list_currentGPUData->addItem("Can't read data");
