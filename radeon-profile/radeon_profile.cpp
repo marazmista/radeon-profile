@@ -74,6 +74,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     testSensor();
     getModuleInfo();
     getPowerMethod();
+    getCardConnectors();
 
    // timer init
     QTimer *timer = new QTimer();
@@ -200,12 +201,12 @@ void radeon_profile::getModuleInfo() {
     for (int i =0; i < modInfo.count(); i++) {
         if (modInfo[i].contains(":")) {
             // read module param name and description from modinfo command
-            QString modName = modInfo[i].split(":",QString::SkipEmptyParts)[0];
-            QString modDesc = modInfo[i].split(":",QString::SkipEmptyParts)[1];
+            QString modName = modInfo[i].split(":",QString::SkipEmptyParts)[0],
+                    modDesc = modInfo[i].split(":",QString::SkipEmptyParts)[1],
+                    modValue;
 
             // read current param values
             QFile mp("/sys/module/radeon/parameters/" +modName);
-            QString modValue;
             if(mp.open(QIODevice::ReadOnly))
                 modValue = mp.readLine(20);
             else
@@ -225,6 +226,28 @@ QStringList radeon_profile::getGLXInfo() {
     data << "Driver:" +grabSystemInfo("xdriinfo").filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
     data << grabSystemInfo("glxinfo").filter(QRegExp("direct|OpenGL.+:.+"));
     return data;
+}
+
+void radeon_profile::getCardConnectors() {
+    QStringList out = grabSystemInfo("xrandr"), screens, connectors;
+    screens = out.filter(QRegExp("Screen\\s\\d"));
+    for (int i = 0; i < screens.count(); i++) {
+        QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << screens[i].split(':')[0] << screens[i].split(",")[1].remove(" current "));
+        ui->list_connectors->addTopLevelItem(item);
+    }
+    ui->list_connectors->addTopLevelItem(new QTreeWidgetItem(QStringList() << "------"));
+
+    connectors =  out.filter(QRegExp(".+connected"));
+    for (int i = 0; i < connectors.count(); i++) {
+        QString connector = connectors[i].split(' ')[0],
+                status = connectors[i].split(' ')[1],
+                res = connectors[i].split(' ')[2].split('+')[0];
+
+        status = (status == "connected") ? status + " @ " + QString((res.contains('x')) ? res : "unknown") : status;
+
+        QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << connector << status);
+        ui->list_connectors->addTopLevelItem(item);
+    }
 }
 //========
 

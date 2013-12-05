@@ -68,6 +68,7 @@ private:
     void changeEvent(QEvent *event);
     void getModuleInfo();
     QStringList grabSystemInfo(const QString cmd);
+    void getCardConnectors();
 };
 
 #endif // RADEON_PROFILE_H
