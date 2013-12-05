@@ -42,16 +42,10 @@ private slots:
     void forceLow();
     void forceHigh();
     void resetMinMax();
-
     void on_btn_forceAuto_clicked();
-
     void on_btn_forceHigh_clicked();
-
     void on_btn_forceLow_clicked();
-
     void on_combo_gpus_currentIndexChanged(int index);
-
-    void on_combo_gpus_currentIndexChanged(const QString &arg1);
 
 private:
     Ui::radeon_profile *ui;
