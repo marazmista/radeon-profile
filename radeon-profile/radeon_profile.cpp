@@ -27,7 +27,7 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131204;
+const int appVersion = 20131205;
 
 static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -49,9 +49,10 @@ enum powerMethod {
 };
 
 enum tempSensor {
-    PCI = 0,  // PCI Card, 'radeon-pci' label on sensors output
-    MB_SENSOR = 1,  // Card in motherboard, 'VGA' label on sensors output
-    TS_UNKNOWN = 2
+    SYSFS_HWMON = 0, // try to read temp from /sys/class/drm/card0/device/hwmon/hwmon0/temp1_input
+    PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
+    MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
+    TS_UNKNOWN
 };
 
 radeon_profile::radeon_profile(QWidget *parent) :
@@ -103,6 +104,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     }
     }
 
+    timerEvent();
     radeon_profile::setWindowTitle("Radeon Profile (v. "+QString().setNum(appVersion)+")");
 }
 
@@ -161,7 +163,7 @@ QStringList radeon_profile::grabSystemInfo(const QString cmd) {
 QStringList radeon_profile::fillGpuDataTable() {
     ui->list_currentGPUData->clear();
     QStringList completeData;
-    completeData << getClocks(selectedPowerMethod);
+    completeData << getClocks();
     completeData << getGPUTemp();
     return completeData;
 }
@@ -184,14 +186,23 @@ void radeon_profile::getPowerMethod() {
 }
 
 void radeon_profile::testSensor() {
-    QStringList out = grabSystemInfo("sensors");
+    QFile hwmon("/sys/class/drm/card0/device/hwmon/hwmon0/temp1_input");
 
-    if (!out.filter("radeon-pci").isEmpty())
-        selectedTempSensor = PCI;
-    else if (!out.filter("VGA").isEmpty())
-        selectedTempSensor = MB_SENSOR;
-    else
-        selectedTempSensor = TS_UNKNOWN;
+    // first, try read temp from sysfs (no need for lm_sensors), if it fails, try other methods
+    if (hwmon.open(QIODevice::ReadOnly)) {
+        if (!QString(hwmon.readLine(20)).isEmpty()) {
+            selectedTempSensor = SYSFS_HWMON;
+            return;
+        }
+    } else {
+        QStringList out = grabSystemInfo("sensors");
+        if (!out.filter("radeon-pci").isEmpty())
+            selectedTempSensor = PCI_SENSOR;
+        else if (!out.filter("VGA").isEmpty())
+            selectedTempSensor = MB_SENSOR;
+        else
+            selectedTempSensor = TS_UNKNOWN;
+    }
 }
 
 void radeon_profile::getModuleInfo() {
@@ -206,7 +217,7 @@ void radeon_profile::getModuleInfo() {
                     modValue;
 
             // read current param values
-            QFile mp("/sys/module/radeon/parameters/" +modName);
+            QFile mp("/sys/class/drm/card0/device/driver/module/holders/radeon/parameters/" +modName);
             if(mp.open(QIODevice::ReadOnly))
                 modValue = mp.readLine(20);
             else
@@ -253,14 +264,14 @@ void radeon_profile::getCardConnectors() {
 
 //===================================
 // === Core of the app, get clocks, power profile and temps ===//
-QStringList radeon_profile::getClocks(const char powerMethod) {
+QStringList radeon_profile::getClocks() {
     QStringList gpuData;
     double coreClock = 0,memClock= 0, voltsGPU = 0, uvdvclk = 0, uvddclk = 0;  // for plots
 
     if (QFile(clocksPath).exists()) {  // check for debugfs access
         QStringList out = grabSystemInfo("cat "+clocksPath);
 
-        switch (powerMethod) {
+        switch (selectedPowerMethod) {
         case DPM: {
             QRegExp rx;
 
@@ -412,15 +423,25 @@ QString radeon_profile::getCurrentPowerProfile() {
 
 QString radeon_profile::getGPUTemp() {
     QString temp;
-    QStringList out = grabSystemInfo("sensors");
 
     switch (selectedTempSensor) {
-    case PCI: {
+    case SYSFS_HWMON: {
+        QFile hwmon("/sys/class/drm/card0/device/hwmon/hwmon0/temp1_input");
+        hwmon.open(QIODevice::ReadOnly);
+        temp = hwmon.readLine(20);
+        hwmon.close();
+        temp.remove(temp.length()-2,3);  // remove three zeros at end of number
+    }
+    case PCI_SENSOR: {
+        QStringList out = grabSystemInfo("sensors");
         temp = out[out.indexOf("radeon-pci")+3];
+        temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
         break;
     }
     case MB_SENSOR: {
+        QStringList out = grabSystemInfo("sensors");
         temp = out.filter("VGA")[0];
+        temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
         break;
     }
     case TS_UNKNOWN: {
@@ -431,7 +452,6 @@ QString radeon_profile::getGPUTemp() {
     }
     }
 
-    temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
     current = temp.toDouble();
     tempSum += current;
 

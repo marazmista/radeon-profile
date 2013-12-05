@@ -42,6 +42,9 @@
     </property>
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTabs">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="minimumSize">
        <size>
         <width>471</width>
@@ -742,6 +745,9 @@
        </layout>
       </widget>
       <widget class="QWidget" name="configTab">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <attribute name="title">
         <string>Configuration</string>
        </attribute>

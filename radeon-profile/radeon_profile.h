@@ -52,7 +52,7 @@ private slots:
 private:
     Ui::radeon_profile *ui;
     void getPowerMethod();
-    QStringList getClocks(const char powerMethod);
+    QStringList getClocks();
     QString getCurrentPowerProfile();
     void setValueToFile(const QString, const QStringList);
     void setValueToFile(const QString, const QString);
