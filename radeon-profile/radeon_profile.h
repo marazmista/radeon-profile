@@ -49,6 +49,10 @@ private slots:
 
     void on_btn_forceLow_clicked();
 
+    void on_combo_gpus_currentIndexChanged(int index);
+
+    void on_combo_gpus_currentIndexChanged(const QString &arg1);
+
 private:
     Ui::radeon_profile *ui;
     void getPowerMethod();
@@ -69,6 +73,8 @@ private:
     void getModuleInfo();
     QStringList grabSystemInfo(const QString cmd);
     void getCardConnectors();
+    void detectCards();
+    void figureOutGPUDataPaths();
 };
 
 #endif // RADEON_PROFILE_H

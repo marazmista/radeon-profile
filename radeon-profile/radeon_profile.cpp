@@ -33,12 +33,8 @@ static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
 static char selectedPowerMethod, selectedTempSensor;
 
-static const QString
-    powerMethodFilePath = "/sys/class/drm/card0/device/power_method",
-    profilePath = "/sys/class/drm/card0/device/power_profile",
-    dpmStateFilePath = "/sys/class/drm/card0/device/power_dpm_state",
-    clocksPath = "/sys/kernel/debug/dri/0/radeon_pm_info",
-    forcePowerLevelFilePath = "/sys/class/drm/card0/device/power_dpm_force_performance_level",
+static QString
+    powerMethodFilePath, profilePath,  dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath,
     err = "Err",
     noValues = "no values";
 
@@ -61,6 +57,9 @@ radeon_profile::radeon_profile(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    detectCards();
+    figureOutGPUDataPaths();
+
     // setup ui elemensts
     ui->list_glxinfo->addItems(getGLXInfo());
     ui->mainTabs->setCurrentIndex(0);
@@ -81,7 +80,8 @@ radeon_profile::radeon_profile(QWidget *parent) :
     QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
     connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
-    timer->start(1000);
+    timer->setInterval(1000);
+    timer->start();
 
     // dpm or profile tab enable
     switch (selectedPowerMethod) {
@@ -125,7 +125,7 @@ void radeon_profile::timerEvent() {
         ui->l_profile->setText(getCurrentPowerProfile()); break;
     case PM_UNKNOWN: {
         ui->tabs_pm->setEnabled(false);
-        ui->list_currentGPUData->addItem("Can't read data");
+        ui->list_currentGPUData->addItem("Can't read data. Card not detected.");
         return;
         break;
     }
@@ -186,7 +186,7 @@ void radeon_profile::getPowerMethod() {
 }
 
 void radeon_profile::testSensor() {
-    QFile hwmon("/sys/class/drm/card0/device/hwmon/hwmon0/temp1_input");
+    QFile hwmon(sysfsHwmonPath);
 
     // first, try read temp from sysfs (no need for lm_sensors), if it fails, try other methods
     if (hwmon.open(QIODevice::ReadOnly)) {
@@ -206,6 +206,7 @@ void radeon_profile::testSensor() {
 }
 
 void radeon_profile::getModuleInfo() {
+    ui->list_modInfo->clear();
     QStringList modInfo = grabSystemInfo("modinfo -p radeon");
     modInfo.sort();
 
@@ -217,11 +218,8 @@ void radeon_profile::getModuleInfo() {
                     modValue;
 
             // read current param values
-            QFile mp("/sys/class/drm/card0/device/driver/module/holders/radeon/parameters/" +modName);
-            if(mp.open(QIODevice::ReadOnly))
-                modValue = mp.readLine(20);
-            else
-                modValue = "unknown";
+            QFile mp(moduleParamsPath+modName);
+            modValue = (mp.open(QIODevice::ReadOnly)) ?  modValue = mp.readLine(20) : "unknown";
 
             QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << modName.left(modName.indexOf('\n')) << modValue.left(modValue.indexOf('\n')) << modDesc.left(modDesc.indexOf('\n')));
             ui->list_modInfo->addTopLevelItem(item);
@@ -231,15 +229,20 @@ void radeon_profile::getModuleInfo() {
 }
 
 QStringList radeon_profile::getGLXInfo() {
-    QStringList data;
+    QStringList data, gpus = grabSystemInfo("lspci").filter("Radeon",Qt::CaseInsensitive);
+    gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
 
-    data << "VGA:"+grabSystemInfo("lspci").filter("Radeon",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[2];
+    // loop for multi gpu
+    for (int i = 0; i < gpus.count(); i++)
+        data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
+
     data << "Driver:" +grabSystemInfo("xdriinfo").filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
     data << grabSystemInfo("glxinfo").filter(QRegExp("direct|OpenGL.+:.+"));
     return data;
 }
 
 void radeon_profile::getCardConnectors() {
+    ui->list_connectors->clear();
     QStringList out = grabSystemInfo("xrandr"), screens, connectors;
     screens = out.filter(QRegExp("Screen\\s\\d"));
     for (int i = 0; i < screens.count(); i++) {
@@ -259,6 +262,29 @@ void radeon_profile::getCardConnectors() {
         QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << connector << status);
         ui->list_connectors->addTopLevelItem(item);
     }
+}
+
+void radeon_profile::detectCards() {
+    QStringList out = grabSystemInfo("ls /sys/class/drm/").filter("card");
+    for (char i = 0; i < out.count(); i++) {
+        QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
+        if (f.open(QIODevice::ReadOnly)) {
+            if (f.readLine(50).contains("DRIVER=radeon"))
+                ui->combo_gpus->addItem("card"+QString().setNum(i));
+        }
+    }
+}
+
+void radeon_profile::figureOutGPUDataPaths() {
+    QString gpuIndex = QString().setNum(ui->combo_gpus->currentIndex());
+
+    powerMethodFilePath = "/sys/class/drm/card"+gpuIndex+"/device/power_method",
+    profilePath = "/sys/class/drm/card"+gpuIndex+"/device/power_profile",
+    dpmStateFilePath = "/sys/class/drm/card"+gpuIndex+"/device/power_dpm_state",
+    clocksPath = "/sys/kernel/debug/dri/"+gpuIndex+"/radeon_pm_info",
+    forcePowerLevelFilePath = "/sys/class/drm/card"+gpuIndex+"/device/power_dpm_force_performance_level",
+    sysfsHwmonPath = "/sys/class/drm/card"+gpuIndex+"/device/hwmon/hwmon0/temp1_input",
+    moduleParamsPath = "/sys/class/drm/card"+gpuIndex+"/device/driver/module/holders/radeon/parameters/";
 }
 //========
 
@@ -426,11 +452,12 @@ QString radeon_profile::getGPUTemp() {
 
     switch (selectedTempSensor) {
     case SYSFS_HWMON: {
-        QFile hwmon("/sys/class/drm/card0/device/hwmon/hwmon0/temp1_input");
+        QFile hwmon(sysfsHwmonPath);
         hwmon.open(QIODevice::ReadOnly);
         temp = hwmon.readLine(20);
         hwmon.close();
-        temp.remove(temp.length()-2,3);  // remove three zeros at end of number
+        temp.remove(temp.length()-4,5);  // remove three zeros at end of number
+        break;
     }
     case PCI_SENSOR: {
         QStringList out = grabSystemInfo("sensors");
@@ -554,6 +581,17 @@ void radeon_profile::changeEvent(QEvent *event)
 
         event->ignore();
     }
+}
+
+void radeon_profile::on_combo_gpus_currentIndexChanged(int index)
+{
+    figureOutGPUDataPaths(); // resolve paths for newly selected card
+
+    // do initial stuff once again for new card
+    testSensor();
+    getModuleInfo();
+    getPowerMethod();
+    getCardConnectors();
 }
 
 void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
