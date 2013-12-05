@@ -222,7 +222,7 @@ void radeon_profile::getModuleInfo() {
 QStringList radeon_profile::getGLXInfo() {
     QStringList data;
 
-    data << "VGA:"+grabSystemInfo("lspci").filter("VGA",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[2];
+    data << "VGA:"+grabSystemInfo("lspci").filter("Radeon",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[2];
     data << "Driver:" +grabSystemInfo("xdriinfo").filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
     data << grabSystemInfo("glxinfo").filter(QRegExp("direct|OpenGL.+:.+"));
     return data;
