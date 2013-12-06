@@ -609,13 +609,17 @@ void radeon_profile::setValueToFile(const QString filePath, const QStringList pr
     bool ok;
     QString newProfile = QInputDialog::getItem(this, "Select new Radeon profile (ONLY ROOT)", "Profile",profiles,0,false,&ok);
 
-    if (ok) {
-        system(QString("echo "+ newProfile + " > "+ filePath ).toStdString().c_str());
-    }
+    if (ok)
+        setValueToFile(filePath, newProfile);
 }
 
 void radeon_profile::setValueToFile(const QString filePath, const QString newValue) {
-    system(QString("echo "+ newValue + " > "+ filePath ).toStdString().c_str());
+    QFile file(filePath);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream stream(&file);
+    stream << newValue + "\n";
+    file.flush();
+    file.close();
 }
 
 void radeon_profile::on_chProfile_clicked() {
