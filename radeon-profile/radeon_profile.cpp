@@ -27,14 +27,14 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131205;
+const int appVersion = 20131206;
 
 static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
 static char selectedPowerMethod, selectedTempSensor;
 
 static QString
-    powerMethodFilePath, profilePath,  dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath,
+    powerMethodFilePath, profilePath, dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath,
     err = "Err",
     noValues = "no values";
 
@@ -56,9 +56,10 @@ radeon_profile::radeon_profile(QWidget *parent) :
     ui(new Ui::radeon_profile)
 {
     ui->setupUi(this);
+    timer = new QTimer();
 
     detectCards();
-    figureOutGPUDataPaths();
+    figureOutGPUDataPaths(ui->combo_gpus->currentText());
 
     // setup ui elemensts
     ui->list_glxinfo->addItems(getGLXInfo());
@@ -77,11 +78,9 @@ radeon_profile::radeon_profile(QWidget *parent) :
     getCardConnectors();
 
    // timer init
-    QTimer *timer = new QTimer();
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
     connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
     timer->setInterval(1000);
-    timer->start();
 
     // dpm or profile tab enable
     switch (selectedPowerMethod) {
@@ -105,6 +104,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     }
 
     timerEvent();
+    timer->start();
     radeon_profile::setWindowTitle("Radeon Profile (v. "+QString().setNum(appVersion)+")");
 }
 
@@ -270,21 +270,19 @@ void radeon_profile::detectCards() {
         QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
         if (f.open(QIODevice::ReadOnly)) {
             if (f.readLine(50).contains("DRIVER=radeon"))
-                ui->combo_gpus->addItem("card"+QString().setNum(i));
+                ui->combo_gpus->addItem(f.fileName().split('/')[4]);
         }
     }
 }
 
-void radeon_profile::figureOutGPUDataPaths() {
-    QString gpuIndex = QString().setNum(ui->combo_gpus->currentIndex());
-
-    powerMethodFilePath = "/sys/class/drm/card"+gpuIndex+"/device/power_method",
-    profilePath = "/sys/class/drm/card"+gpuIndex+"/device/power_profile",
-    dpmStateFilePath = "/sys/class/drm/card"+gpuIndex+"/device/power_dpm_state",
-    clocksPath = "/sys/kernel/debug/dri/"+gpuIndex+"/radeon_pm_info",
-    forcePowerLevelFilePath = "/sys/class/drm/card"+gpuIndex+"/device/power_dpm_force_performance_level",
-    sysfsHwmonPath = "/sys/class/drm/card"+gpuIndex+"/device/hwmon/hwmon0/temp1_input",
-    moduleParamsPath = "/sys/class/drm/card"+gpuIndex+"/device/driver/module/holders/radeon/parameters/";
+void radeon_profile::figureOutGPUDataPaths(const QString gpuName) {
+    powerMethodFilePath = "/sys/class/drm/"+gpuName+"/device/power_method",
+    profilePath = "/sys/class/drm/"+gpuName+"/device/power_profile",
+    dpmStateFilePath = "/sys/class/drm/"+gpuName+"/device/power_dpm_state",
+    clocksPath = "/sys/kernel/debug/dri/"+QString(gpuName.at(gpuName.length()-1))+"/radeon_pm_info",  // this path contains only index
+    forcePowerLevelFilePath = "/sys/class/drm/"+gpuName+"/device/power_dpm_force_performance_level",
+    sysfsHwmonPath = "/sys/class/drm/"+gpuName+"/device/hwmon/hwmon0/temp1_input",
+    moduleParamsPath = "/sys/class/drm/"+gpuName+"/device/driver/module/holders/radeon/parameters/";
 }
 //========
 
@@ -583,9 +581,9 @@ void radeon_profile::changeEvent(QEvent *event)
     }
 }
 
-void radeon_profile::on_combo_gpus_currentIndexChanged(int index)
+void radeon_profile::on_combo_gpus_currentTextChanged(const QString &arg1)
 {
-    figureOutGPUDataPaths(); // resolve paths for newly selected card
+    figureOutGPUDataPaths(arg1); // resolve paths for newly selected card
 
     // do initial stuff once again for new card
     testSensor();

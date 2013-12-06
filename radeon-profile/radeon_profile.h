@@ -24,6 +24,7 @@ public:
     QSystemTrayIcon *trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
+    QTimer *timer;
 
 private slots:
     void on_chProfile_clicked();
@@ -45,7 +46,7 @@ private slots:
     void on_btn_forceAuto_clicked();
     void on_btn_forceHigh_clicked();
     void on_btn_forceLow_clicked();
-    void on_combo_gpus_currentIndexChanged(int index);
+    void on_combo_gpus_currentTextChanged(const QString &arg1);
 
 private:
     Ui::radeon_profile *ui;
@@ -68,7 +69,7 @@ private:
     QStringList grabSystemInfo(const QString cmd);
     void getCardConnectors();
     void detectCards();
-    void figureOutGPUDataPaths();
+    void figureOutGPUDataPaths(const QString gpuName);
 };
 
 #endif // RADEON_PROFILE_H
