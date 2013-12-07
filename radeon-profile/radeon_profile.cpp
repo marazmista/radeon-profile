@@ -21,6 +21,8 @@
 #include <QMenu>
 #include <QProcess>
 #include <QMessageBox>
+#include <QSettings>
+#include <QDir>
 
 #define startClocksScaleL 100
 #define startClocksScaleH 400
@@ -32,7 +34,7 @@ const int appVersion = 20131206;
 static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
 static char selectedPowerMethod, selectedTempSensor;
-
+bool closeFromTrayMenu;
 static QString
     powerMethodFilePath, profilePath, dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath,
     err = "Err",
@@ -71,6 +73,8 @@ radeon_profile::radeon_profile(QWidget *parent) :
     setupOptionsMenu();
     setupTrayIcon();
 
+    loadConfig();
+
     // first get some info about system
     testSensor();
     getModuleInfo();
@@ -80,7 +84,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
    // timer init
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
     connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
-    timer->setInterval(1000);
+    timer->setInterval(ui->spin_timerInterval->value()*1000);
 
     // dpm or profile tab enable
     switch (selectedPowerMethod) {
@@ -106,6 +110,17 @@ radeon_profile::radeon_profile(QWidget *parent) :
     timerEvent();
     timer->start();
     radeon_profile::setWindowTitle("Radeon Profile (v. "+QString().setNum(appVersion)+")");
+
+    if (ui->cb_startMinimized->isChecked()) {
+        this->window()->hide();
+    }
+    else
+        showNormal();
+
+    if (ui->cb_graphs->isChecked())
+        ui->mainTabs->setTabEnabled(1,true);
+    else
+        ui->mainTabs->setTabEnabled(1,false);
 }
 
 radeon_profile::~radeon_profile()
@@ -119,32 +134,43 @@ void radeon_profile::timerEvent() {
     if (!refreshWhenHidden->isChecked() && this->isHidden())
         return;
 
-    switch (selectedPowerMethod) {
-    case DPM:
-    case PROFILE:
-        ui->l_profile->setText(getCurrentPowerProfile()); break;
-    case PM_UNKNOWN: {
-        ui->tabs_pm->setEnabled(false);
-        ui->list_currentGPUData->addItem("Can't read data. Card not detected.");
-        return;
-        break;
+    if (ui->cb_gpuData->isChecked()) {
+        switch (selectedPowerMethod) {
+        case DPM:
+        case PROFILE: {
+            ui->l_profile->setText(getCurrentPowerProfile());
+            break;
+        }
+        case PM_UNKNOWN: {
+            ui->tabs_pm->setEnabled(false);
+            ui->list_currentGPUData->addItem("Can't read data. Card not detected.");
+            return;
+            break;
+        }
+        }
+
+        ui->list_currentGPUData->addItems(fillGpuDataTable());
+
+        if (ui->cb_graphs->isChecked()) {
+            // count seconds to move graph to right
+            i++;
+            ui->plotTemp->xAxis->setRange(i+20, rangeX,Qt::AlignRight);
+            ui->plotTemp->replot();
+
+            ui->plotColcks->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
+            ui->plotColcks->replot();
+
+            ui->plotVolts->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
+            ui->plotVolts->replot();
+        }
+        refreshTooltip();
     }
-    }
-
-    ui->list_currentGPUData->addItems(fillGpuDataTable());
-
-    // count seconds to move graph to right
-    i++;
-    ui->plotTemp->xAxis->setRange(i+20, rangeX,Qt::AlignRight);
-    ui->plotTemp->replot();
-
-    ui->plotColcks->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
-    ui->plotColcks->replot();
-
-    ui->plotVolts->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
-    ui->plotVolts->replot();
-
-    refreshTooltip();
+    if (ui->cb_glxInfo->isChecked())
+        ui->list_glxinfo->addItems(getGLXInfo());
+    if (ui->cb_connectors->isChecked())
+        getCardConnectors();
+    if (ui->cb_modParams->isChecked())
+        getModuleInfo();
 }
 //========
 
@@ -229,6 +255,7 @@ void radeon_profile::getModuleInfo() {
 }
 
 QStringList radeon_profile::getGLXInfo() {
+    ui->list_glxinfo->clear();
     QStringList data, gpus = grabSystemInfo("lspci").filter("Radeon",Qt::CaseInsensitive);
     gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
 
@@ -395,26 +422,27 @@ QStringList radeon_profile::getClocks() {
     }
     gpuData << "------------------------";
 
-    // update plots
-    if (memClock > ui->plotColcks->yAxis->range().upper && memClock != 0) // assume that mem clocks are often bigger than core
-        ui->plotColcks->yAxis->setRangeUpper(memClock + 150);
-    else if (coreClock != 0 && memClock == 0)
-        ui->plotColcks->yAxis->setRangeUpper(coreClock + 150);
+    if (ui->cb_graphs->isChecked()) {
+        // update plots
+        if (memClock > ui->plotColcks->yAxis->range().upper && memClock != 0) // assume that mem clocks are often bigger than core
+            ui->plotColcks->yAxis->setRangeUpper(memClock + 150);
+        else if (coreClock != 0 && memClock == 0)
+            ui->plotColcks->yAxis->setRangeUpper(coreClock + 150);
 
-    ui->plotColcks->graph(0)->addData(i,coreClock);
-    ui->plotColcks->graph(1)->addData(i,memClock);
-    ui->plotColcks->graph(2)->addData(i,uvdvclk);
-    ui->plotColcks->graph(3)->addData(i,uvddclk);
+        ui->plotColcks->graph(0)->addData(i,coreClock);
+        ui->plotColcks->graph(1)->addData(i,memClock);
+        ui->plotColcks->graph(2)->addData(i,uvdvclk);
+        ui->plotColcks->graph(3)->addData(i,uvddclk);
 
-    if (voltsGPU != 0)  {
-        if (voltsGPU > ui->plotVolts->yAxis->range().upper)
-            ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
+        if (voltsGPU != 0)  {
+            if (voltsGPU > ui->plotVolts->yAxis->range().upper)
+                ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
 
-        ui->plotVolts->graph(0)->addData(i,voltsGPU);
+            ui->plotVolts->graph(0)->addData(i,voltsGPU);
+        }
+        else
+            ui->cb_showVoltsGraph->setEnabled(false);
     }
-    else
-        ui->cb_showVoltsGraph->setEnabled(false);
-
     return gpuData;
 }
 
@@ -576,10 +604,14 @@ void radeon_profile::showLegend(bool checked) {
 
 void radeon_profile::changeEvent(QEvent *event)
 {
-    if(event->type() == QEvent::WindowStateChange) {
+    if(event->type() == QEvent::WindowStateChange && ui->cb_minimizeTray->isChecked()) {
         if(isMinimized())
             this->hide();
 
+        event->ignore();
+    }
+    if (event->type() == QEvent::Close && ui->cb_closeTray) {
+        this->hide();
         event->ignore();
     }
 }
@@ -597,10 +629,42 @@ void radeon_profile::on_combo_gpus_currentTextChanged(const QString &arg1)
 
 void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
     switch (reason) {
-        case QSystemTrayIcon::Trigger:
-        if (isHidden()) show(); else hide();
-            break;
+    case QSystemTrayIcon::Trigger: {
+        if (isHidden()) {
+            this->setWindowFlags(Qt::Window);
+            showNormal();
+        } else hide();
+        break;
     }
+    }
+}
+
+void radeon_profile::closeEvent(QCloseEvent *e) {
+    if (ui->cb_closeTray->isChecked() && !closeFromTrayMenu) {
+        this->hide();
+        e->ignore();
+    }
+    saveConfig();
+}
+
+void radeon_profile::closeFromTray() {
+    closeFromTrayMenu = true;
+    this->close();
+}
+
+void radeon_profile::on_spin_lineThick_valueChanged(int arg1)
+{
+    setupGraphsStyle();
+}
+
+void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
+{
+    timer->setInterval(arg1*1000);
+}
+
+void radeon_profile::on_cb_graphs_clicked(bool checked)
+{
+    ui->mainTabs->setTabEnabled(1,checked);
 }
 //========
 
@@ -635,6 +699,38 @@ void radeon_profile::refreshTooltip()
     }
     trayIcon->setToolTip(tooltipdata);
 }
+
+void radeon_profile::saveConfig() {
+    QSettings settings(QDir::homePath() + "/.radeon-profile-settings",QSettings::IniFormat);
+
+    settings.setValue("startMinimized",ui->cb_startMinimized->isChecked());
+    settings.setValue("minimizeToTray",ui->cb_minimizeTray->isChecked());
+    settings.setValue("closeToTray",ui->cb_closeTray->isChecked());
+    settings.setValue("updateInterval",ui->spin_timerInterval->value());
+    settings.setValue("updateGPUData",ui->cb_gpuData->isChecked());
+    settings.setValue("updateGraphs",ui->cb_graphs->isChecked());
+    settings.setValue("updateGLXInfo",ui->cb_glxInfo->isChecked());
+    settings.setValue("updateConnectors",ui->cb_connectors->isChecked());
+    settings.setValue("updateModParams",ui->cb_modParams->isChecked());
+
+    settings.setValue("graphLineThickness",ui->spin_lineThick->value());
+}
+
+void radeon_profile::loadConfig() {
+    QSettings settings(QDir::homePath() + "/.radeon-profile-settings",QSettings::IniFormat);
+
+    ui->cb_startMinimized->setChecked(settings.value("startMinimized",false).toBool());
+    ui->cb_minimizeTray->setChecked(settings.value("minimizeToTray",false).toBool());
+    ui->cb_closeTray->setChecked(settings.value("closeToTray",false).toBool());
+    ui->spin_timerInterval->setValue(settings.value("updateInterval",1).toDouble());
+    ui->cb_gpuData->setChecked(settings.value("updateGPUData",true).toBool());
+    ui->cb_graphs->setChecked(settings.value("updateGraphs",true).toBool());
+    ui->cb_glxInfo->setChecked(settings.value("updateGLXInfo",false).toBool());
+    ui->cb_connectors->setChecked(settings.value("updateConnectors",false).toBool());
+    ui->cb_modParams->setChecked(settings.value("updateModParams",false).toBool());
+
+    ui->spin_lineThick->setValue(settings.value("graphLineThickness",2).toInt());
+}
 //========
 
 //===================================
@@ -665,21 +761,7 @@ void radeon_profile::setupGraphs()
     ui->plotColcks->addGraph(); // uvd
     ui->plotVolts->addGraph(); // volts gpu
 
-    QPen pen;
-    pen.setWidth(2);
-    pen.setCapStyle(Qt::SquareCap);
-    pen.setColor(Qt::yellow);
-    ui->plotTemp->graph(0)->setPen(pen);
-    pen.setColor(Qt::black);
-    ui->plotColcks->graph(1)->setPen(pen);
-    pen.setColor(Qt::cyan);
-    ui->plotColcks->graph(0)->setPen(pen);
-    pen.setColor(Qt::red);
-    ui->plotColcks->graph(2)->setPen(pen);
-    pen.setColor(Qt::green);
-    ui->plotColcks->graph(3)->setPen(pen);
-    pen.setColor(Qt::blue);
-    ui->plotVolts->graph(0)->setPen(pen);
+    setupGraphsStyle();
 
     // legend clocks //
     ui->plotColcks->graph(0)->setName("GPU clock");
@@ -694,13 +776,32 @@ void radeon_profile::setupGraphs()
     ui->plotVolts->replot();
 }
 
+void radeon_profile::setupGraphsStyle()
+{
+    QPen pen;
+    pen.setWidth(ui->spin_lineThick->value());
+    pen.setCapStyle(Qt::SquareCap);
+    pen.setColor(Qt::yellow);
+    ui->plotTemp->graph(0)->setPen(pen);
+    pen.setColor(Qt::black);
+    ui->plotColcks->graph(1)->setPen(pen);
+    pen.setColor(Qt::cyan);
+    ui->plotColcks->graph(0)->setPen(pen);
+    pen.setColor(Qt::red);
+    ui->plotColcks->graph(2)->setPen(pen);
+    pen.setColor(Qt::green);
+    ui->plotColcks->graph(3)->setPen(pen);
+    pen.setColor(Qt::blue);
+    ui->plotVolts->graph(0)->setPen(pen);
+}
+
 void radeon_profile::setupTrayIcon() {
     trayMenu = new QMenu();
-
+    setWindowState(Qt::WindowMinimized);
     //close //
     closeApp = new QAction(this);
     closeApp->setText("Quit");
-    connect(closeApp,SIGNAL(triggered()),this,SLOT(close()));
+    connect(closeApp,SIGNAL(triggered()),this,SLOT(closeFromTray()));
 
     // standard profiles
     changeProfile = new QAction(this);
