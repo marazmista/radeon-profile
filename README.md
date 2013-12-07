@@ -7,12 +7,21 @@ Graph widget: http://www.qcustomplot.com/
 
 Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 
+# Dependencies
+Crucial:
+* qt4
+* opensource radeon drivers
+
+For full funcionality:
+* glxinfo - info about OpenGL, mesa
+* xdriinfo - driver info
+* xrandr - connected displays
+* lm_sensors - temperature (no need if hwmon for card is present in sysfs)
+
 
 # Troubleshooting
 
 
-* __"Err" instead of values:__ Try start app as root. Need to read system files.
-	
 * __"no values":__ Check `/sys/kernel/debug`. If it's empty, try `# mount -t debugfs none /sys/kernel/debug`
 
 
