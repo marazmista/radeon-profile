@@ -272,7 +272,7 @@ void radeon_profile::getCardConnectors() {
 
                 // Parse EDID
                 // See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
-                if(edid.size() == 256) {
+                if(edid.size() >= 256) {
                     QStringList hex;
                     bool found = false, ok = true;
                     int i2 = 108;
