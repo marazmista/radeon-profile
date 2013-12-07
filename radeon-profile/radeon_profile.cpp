@@ -111,16 +111,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     timer->start();
     radeon_profile::setWindowTitle("Radeon Profile (v. "+QString().setNum(appVersion)+")");
 
-    if (ui->cb_startMinimized->isChecked()) {
-        this->window()->hide();
-    }
-    else
-        showNormal();
-
-    if (ui->cb_graphs->isChecked())
-        ui->mainTabs->setTabEnabled(1,true);
-    else
-        ui->mainTabs->setTabEnabled(1,false);
+    applyStartUISettings();  //ui enable/disable elements, window state...
 }
 
 radeon_profile::~radeon_profile()
@@ -713,6 +704,13 @@ void radeon_profile::on_cb_graphs_clicked(bool checked)
 {
     ui->mainTabs->setTabEnabled(1,checked);
 }
+
+void radeon_profile::on_cb_gpuData_clicked(bool checked)
+{
+    ui->cb_graphs->setEnabled(checked);
+    if (ui->cb_graphs->isChecked())
+        ui->mainTabs->setTabEnabled(1,checked);
+}
 //========
 
 //===================================
@@ -777,6 +775,22 @@ void radeon_profile::loadConfig() {
     ui->cb_modParams->setChecked(settings.value("updateModParams",false).toBool());
 
     ui->spin_lineThick->setValue(settings.value("graphLineThickness",2).toInt());
+}
+
+void radeon_profile::applyStartUISettings()
+{
+    if (ui->cb_startMinimized->isChecked()) {
+        this->window()->hide();
+    }
+    else
+        showNormal();
+
+    ui->cb_graphs->setEnabled(ui->cb_gpuData->isChecked());
+
+    if (ui->cb_graphs->isChecked() && ui->cb_graphs->isEnabled())
+        ui->mainTabs->setTabEnabled(1,true);
+    else
+        ui->mainTabs->setTabEnabled(1,false);
 }
 //========
 
