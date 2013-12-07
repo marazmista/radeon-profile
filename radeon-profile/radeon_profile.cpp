@@ -236,7 +236,10 @@ QStringList radeon_profile::getGLXInfo() {
     for (int i = 0; i < gpus.count(); i++)
         data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
 
-    data << "Driver:" +grabSystemInfo("xdriinfo").filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
+    QStringList driver = grabSystemInfo("xdriinfo").filter("Screen 0:",Qt::CaseInsensitive);
+    if (!driver.isEmpty())  // because of segfault when no xdriinfo
+        data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
+
     data << grabSystemInfo("glxinfo").filter(QRegExp("direct|OpenGL.+:.+"));
     return data;
 }
