@@ -29,7 +29,7 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131206;
+const int appVersion = 20131207;
 
 static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -64,7 +64,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     figureOutGPUDataPaths(ui->combo_gpus->currentText());
 
     // setup ui elemensts
-    ui->list_glxinfo->addItems(getGLXInfo());
     ui->mainTabs->setCurrentIndex(0);
     ui->tabs_systemInfo->setCurrentIndex(0);
     ui->plotVolts->setVisible(false);
@@ -76,6 +75,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     loadConfig();
 
     // first get some info about system
+    getGLXInfo();
     testSensor();
     getModuleInfo();
     getPowerMethod();
@@ -166,7 +166,7 @@ void radeon_profile::timerEvent() {
         refreshTooltip();
     }
     if (ui->cb_glxInfo->isChecked())
-        ui->list_glxinfo->addItems(getGLXInfo());
+        getGLXInfo();
     if (ui->cb_connectors->isChecked())
         getCardConnectors();
     if (ui->cb_modParams->isChecked())
@@ -254,7 +254,7 @@ void radeon_profile::getModuleInfo() {
     }
 }
 
-QStringList radeon_profile::getGLXInfo() {
+void radeon_profile::getGLXInfo() {
     ui->list_glxinfo->clear();
     QStringList data, gpus = grabSystemInfo("lspci").filter("Radeon",Qt::CaseInsensitive);
     gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
@@ -268,7 +268,7 @@ QStringList radeon_profile::getGLXInfo() {
         data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
     data << grabSystemInfo("glxinfo").filter(QRegExp("direct|OpenGL.+:.+"));
-    return data;
+    ui->list_glxinfo->addItems(data);
 }
 
 void radeon_profile::getCardConnectors() {

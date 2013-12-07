@@ -64,7 +64,7 @@ private:
     void setValueToFile(const QString, const QString);
     QString getGPUTemp();
     QStringList fillGpuDataTable();
-    QStringList getGLXInfo();
+    void getGLXInfo();
     void setupGraphs();
     void setupTrayIcon();
     void setupOptionsMenu();
