@@ -258,35 +258,20 @@ void radeon_profile::getCardConnectors() {
                     res = out[i].split(' ')[2].split('+')[0];
 
             if(status == "connected") {
-                bool stop = false;
+                QString monitor, edid = monitor = "";
 
-                // Find EDID block
-                QString edid = "";
-                for(i++; i < out.size(); i++) {
-                    if(!out[i].startsWith("\t"))
+                // find EDID
+                for (int i = out.indexOf(QRegExp(".+EDID.+"))+1; i < out.count(); i++)
+                    if (out[i].startsWith(("\t\t")))
+                        edid += out[i].remove("\t\t");
+                    else
                         break;
-
-                    if(out[i].contains("EDID:")) {
-                        for(i++; i < out.size(); i++) {
-                            if(!out[i].startsWith("\t\t")) {
-                                stop = true;
-                                break;
-                            }
-
-                            edid += out[i].right(out[i].size() - 2);
-                        }
-                    }
-                    if(stop)
-                        break;
-                }
 
                 // Parse EDID
                 // See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
-                if(edid.size() < 256)
-                    status = "Unknown monitor";
-                else {
+                if(edid.size() == 256) {
                     QStringList hex;
-                    bool ok;
+                    bool found = false, ok = true;
                     int i2 = 108;
 
                     for(int i3 = 0; i3 < 4; i3++) {
@@ -297,6 +282,7 @@ void radeon_profile::getCardConnectors() {
                                 // Monitor name found
                                 for(int i4 = i2 + 10; i4 < i2 + 34; i4 += 2)
                                     hex << edid.mid(i4, 2);
+                                found = true;
                                 break;
                             }
                         }
@@ -304,21 +290,19 @@ void radeon_profile::getCardConnectors() {
                             break;
                         i2 += 36;
                     }
-
-                    if(ok) {
-                        status = "";
+                    if(ok && found) {
                         // Hex -> String
-                        for(i2 = 0; i2 < hex.size(); i2++)
-                            status += QString(hex[i2].toInt(&ok, 16));
+                        for(i2 = 0; i2 < hex.size(); i2++) {
+                            monitor += QString(hex[i2].toInt(&ok, 16));
+                            if(!ok)
+                                break;
+                        }
 
-                        // Remove line feed (if any)
-                        if(status.contains("\n"))
-                            status = status.mid(0, status.indexOf("\n") - 1);
-                    } else
-                        status = "Unknown monitor";
+                        if(ok)
+                            monitor = " (" + monitor.left(monitor.indexOf('\n')) + ")";
+                    }
                 }
-
-                status += " @ " + QString((res.contains('x')) ? res : "unknown");
+                status += monitor + " @ " + QString((res.contains('x')) ? res : "unknown");
             }
 
             QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << connector << status);
