@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QSystemTrayIcon>
 #include <QEvent>
+#include <QTreeWidgetItem>
 
 namespace Ui {
 class radeon_profile;
@@ -26,6 +27,7 @@ public:
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
     QTimer *timer;
 
+    void setupGraphsStyle();
 private slots:
     void on_chProfile_clicked();
     void timerEvent();
@@ -47,6 +49,11 @@ private slots:
     void on_btn_forceHigh_clicked();
     void on_btn_forceLow_clicked();
     void on_combo_gpus_currentTextChanged(const QString &arg1);
+    void closeEvent(QCloseEvent *);
+    void closeFromTray();
+    void on_spin_lineThick_valueChanged(int arg1);
+    void on_spin_timerInterval_valueChanged(double arg1);
+    void on_cb_graphs_clicked(bool checked);
 
 private:
     Ui::radeon_profile *ui;
@@ -70,6 +77,8 @@ private:
     void getCardConnectors();
     void detectCards();
     void figureOutGPUDataPaths(const QString gpuName);
+    void saveConfig();
+    void loadConfig();
 };
 
 #endif // RADEON_PROFILE_H
