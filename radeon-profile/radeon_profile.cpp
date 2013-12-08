@@ -29,11 +29,11 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131207;
+const int appVersion = 20131208;
 
 static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
-static char selectedPowerMethod, selectedTempSensor;
+static char selectedPowerMethod, selectedTempSensor, sensorsGPUtempIndex;
 bool closeFromTrayMenu;
 static QString
     powerMethodFilePath, profilePath, dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath,
@@ -47,7 +47,7 @@ enum powerMethod {
 };
 
 enum tempSensor {
-    SYSFS_HWMON = 0, // try to read temp from /sys/class/drm/card0/device/hwmon/hwmon0/temp1_input
+    SYSFS_HWMON = 0, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
     PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
     MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
     TS_UNKNOWN
@@ -213,10 +213,16 @@ void radeon_profile::testSensor() {
         }
     } else {
         QStringList out = grabSystemInfo("sensors");
-        if (!out.filter("radeon-pci").isEmpty())
+        if (out.indexOf(QRegExp("radeon-pci.+")) != -1) {
             selectedTempSensor = PCI_SENSOR;
-        else if (!out.filter("VGA").isEmpty())
+            sensorsGPUtempIndex = out.indexOf(QRegExp("radeon-pci.+"));  // in order to not search for it again in timer loop
+            return;
+        }
+        else if (out.indexOf(QRegExp("VGA_TEMP.+")) != -1) {
             selectedTempSensor = MB_SENSOR;
+            sensorsGPUtempIndex = out.indexOf(QRegExp("VGA_TEMP.+"));
+            return;
+        }
         else
             selectedTempSensor = TS_UNKNOWN;
     }
@@ -349,8 +355,10 @@ void radeon_profile::figureOutGPUDataPaths(const QString gpuName) {
     dpmStateFilePath = "/sys/class/drm/"+gpuName+"/device/power_dpm_state",
     clocksPath = "/sys/kernel/debug/dri/"+QString(gpuName.at(gpuName.length()-1))+"/radeon_pm_info",  // this path contains only index
     forcePowerLevelFilePath = "/sys/class/drm/"+gpuName+"/device/power_dpm_force_performance_level",
-    sysfsHwmonPath = "/sys/class/drm/"+gpuName+"/device/hwmon/hwmon0/temp1_input",
     moduleParamsPath = "/sys/class/drm/"+gpuName+"/device/driver/module/holders/radeon/parameters/";
+
+    QString hwmonDevice = grabSystemInfo("ls /sys/class/drm/"+gpuName+"/device/hwmon/")[0]; // look for hwmon devices in card dir
+    sysfsHwmonPath = "/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/temp1_input";
 }
 //========
 
@@ -523,19 +531,19 @@ QString radeon_profile::getGPUTemp() {
         hwmon.open(QIODevice::ReadOnly);
         temp = hwmon.readLine(20);
         hwmon.close();
-        temp.remove(temp.length()-4,5);  // remove three zeros at end of number
+        current = temp.toDouble() / 1000;
         break;
     }
     case PCI_SENSOR: {
         QStringList out = grabSystemInfo("sensors");
-        temp = out[out.indexOf("radeon-pci")+3];
-        temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
+        temp = out[sensorsGPUtempIndex+2].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
+        current = temp.toDouble();
         break;
     }
     case MB_SENSOR: {
         QStringList out = grabSystemInfo("sensors");
-        temp = out.filter("VGA")[0];
-        temp = temp.split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
+        temp = out[sensorsGPUtempIndex].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
+        current = temp.toDouble();
         break;
     }
     case TS_UNKNOWN: {
@@ -546,7 +554,6 @@ QString radeon_profile::getGPUTemp() {
     }
     }
 
-    current = temp.toDouble();
     tempSum += current;
 
     if (minT == 0)
@@ -560,7 +567,7 @@ QString radeon_profile::getGPUTemp() {
     ui->plotTemp->graph(0)->addData(i,current);
     ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
 
-    return "Current GPU temp: "+temp+"C";
+    return "Current GPU temp: "+QString().setNum(current) + QString::fromUtf8("\u00B0C");
 }
 //========
 
