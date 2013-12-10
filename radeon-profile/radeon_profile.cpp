@@ -39,6 +39,7 @@ static QString
     powerMethodFilePath, profilePath, dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath,
     err = "Err",
     noValues = "no values";
+static const QString settingsPath = QDir::homePath() + "/.radeon-profile-settings";
 
 enum powerMethod {
     DPM = 0,  // kernel >= 3.11
@@ -110,8 +111,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     timerEvent();
     timer->start();
     radeon_profile::setWindowTitle("Radeon Profile (v. "+QString().setNum(appVersion)+")");
-
-    applyStartUISettings();  //ui enable/disable elements, window state...
 
     // add button for manual refresh glx info, connectors, mod params
     QPushButton *refreshBtn = new QPushButton();
@@ -768,7 +767,7 @@ void radeon_profile::refreshTooltip()
 }
 
 void radeon_profile::saveConfig() {
-    QSettings settings(QDir::homePath() + "/.radeon-profile-settings",QSettings::IniFormat);
+    QSettings settings(settingsPath,QSettings::IniFormat);
 
     settings.setValue("startMinimized",ui->cb_startMinimized->isChecked());
     settings.setValue("minimizeToTray",ui->cb_minimizeTray->isChecked());
@@ -779,12 +778,14 @@ void radeon_profile::saveConfig() {
     settings.setValue("updateGLXInfo",ui->cb_glxInfo->isChecked());
     settings.setValue("updateConnectors",ui->cb_connectors->isChecked());
     settings.setValue("updateModParams",ui->cb_modParams->isChecked());
+    settings.setValue("saveWindowGeometry",ui->cb_saveWindowGeometry->isChecked());
+    settings.setValue("windowGeometry",this->geometry());
 
     settings.setValue("graphLineThickness",ui->spin_lineThick->value());
 }
 
 void radeon_profile::loadConfig() {
-    QSettings settings(QDir::homePath() + "/.radeon-profile-settings",QSettings::IniFormat);
+    QSettings settings(settingsPath,QSettings::IniFormat);
 
     ui->cb_startMinimized->setChecked(settings.value("startMinimized",false).toBool());
     ui->cb_minimizeTray->setChecked(settings.value("minimizeToTray",false).toBool());
@@ -795,15 +796,17 @@ void radeon_profile::loadConfig() {
     ui->cb_glxInfo->setChecked(settings.value("updateGLXInfo",false).toBool());
     ui->cb_connectors->setChecked(settings.value("updateConnectors",false).toBool());
     ui->cb_modParams->setChecked(settings.value("updateModParams",false).toBool());
+    ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
 
     ui->spin_lineThick->setValue(settings.value("graphLineThickness",2).toInt());
-}
 
-void radeon_profile::applyStartUISettings()
-{
-    if (ui->cb_startMinimized->isChecked()) {
+
+    // apply some settings to ui on start //
+    if (ui->cb_saveWindowGeometry->isChecked())
+        this->setGeometry(settings.value("windowGeometry").toRect());
+
+    if (ui->cb_startMinimized->isChecked())
         this->window()->hide();
-    }
     else
         showNormal();
 

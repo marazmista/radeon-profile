@@ -27,8 +27,6 @@ public:
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
     QTimer *timer;
 
-    void setupGraphsStyle();
-    void applyStartUISettings();
 private slots:
     void on_chProfile_clicked();
     void timerEvent();
@@ -82,6 +80,8 @@ private:
     void figureOutGPUDataPaths(const QString gpuName);
     void saveConfig();
     void loadConfig();
+    void setupGraphsStyle();
 };
+
 
 #endif // RADEON_PROFILE_H
