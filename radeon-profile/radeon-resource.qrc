@@ -4,5 +4,6 @@
         <file>arrow1.png</file>
         <file>arrow2.png</file>
         <file>arrow3.png</file>
+        <file>refresh.png</file>
     </qresource>
 </RCC>

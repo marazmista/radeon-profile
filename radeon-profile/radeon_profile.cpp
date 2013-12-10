@@ -29,7 +29,7 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131208;
+const int appVersion = 20131210;
 
 static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -112,7 +112,16 @@ radeon_profile::radeon_profile(QWidget *parent) :
     radeon_profile::setWindowTitle("Radeon Profile (v. "+QString().setNum(appVersion)+")");
 
     applyStartUISettings();  //ui enable/disable elements, window state...
+
+    // add button for manual refresh glx info, connectors, mod params
+    QPushButton *refreshBtn = new QPushButton();
+    refreshBtn->setIcon(QIcon(":/icon/refresh.png"));
+    ui->tabs_systemInfo->setCornerWidget(refreshBtn);
+    refreshBtn->setIconSize(QSize(20,20));
+    refreshBtn->show();
+    connect(refreshBtn,SIGNAL(clicked()),this,SLOT(refreshBtnClicked()));
 }
+
 
 radeon_profile::~radeon_profile()
 {
@@ -270,7 +279,7 @@ void radeon_profile::getGLXInfo() {
 
 void radeon_profile::getCardConnectors() {
     ui->list_connectors->clear();
-    QStringList out = grabSystemInfo("xrandr -q --verbose"), screens, connectors;
+    QStringList out = grabSystemInfo("xrandr -q --verbose"), screens;
     screens = out.filter(QRegExp("Screen\\s\\d"));
     for (int i = 0; i < screens.count(); i++) {
         QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << screens[i].split(':')[0] << screens[i].split(",")[1].remove(" current "));
@@ -717,6 +726,12 @@ void radeon_profile::on_cb_gpuData_clicked(bool checked)
     ui->cb_graphs->setEnabled(checked);
     if (ui->cb_graphs->isChecked())
         ui->mainTabs->setTabEnabled(1,checked);
+}
+
+void radeon_profile::refreshBtnClicked() {
+    getGLXInfo();
+    getCardConnectors();
+    getModuleInfo();
 }
 //========
 

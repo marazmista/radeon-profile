@@ -55,8 +55,8 @@ private slots:
     void on_spin_lineThick_valueChanged(int arg1);
     void on_spin_timerInterval_valueChanged(double arg1);
     void on_cb_graphs_clicked(bool checked);
-
     void on_cb_gpuData_clicked(bool checked);
+    void refreshBtnClicked();
 
 private:
     Ui::radeon_profile *ui;
