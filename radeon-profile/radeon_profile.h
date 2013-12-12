@@ -56,6 +56,8 @@ private slots:
     void on_cb_gpuData_clicked(bool checked);
     void refreshBtnClicked();
 
+    void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
 private:
     Ui::radeon_profile *ui;
     void getPowerMethod();

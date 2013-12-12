@@ -55,7 +55,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -1014,8 +1014,8 @@
          <rect>
           <x>320</x>
           <y>10</y>
-          <width>171</width>
-          <height>67</height>
+          <width>231</width>
+          <height>241</height>
          </rect>
         </property>
         <property name="frameShape">
@@ -1093,6 +1093,68 @@
             </widget>
            </item>
           </layout>
+         </item>
+         <item>
+          <widget class="QTreeWidget" name="graphColorsList">
+           <property name="indentation">
+            <number>5</number>
+           </property>
+           <column>
+            <property name="text">
+             <string>Property</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Color</string>
+            </property>
+           </column>
+           <item>
+            <property name="text">
+             <string>Temperature background</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Clocks background</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Voltage background</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Temperature line</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GPU clock line</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Mem clock line</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>UVD video core line</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>UVD decoder clock line</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Voltage line</string>
+            </property>
+           </item>
+          </widget>
          </item>
         </layout>
        </widget>
