@@ -25,48 +25,22 @@
 #include <QDir>
 #include <QColorDialog>
 
-
 #define startClocksScaleL 100
 #define startClocksScaleH 400
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131210;
+const int appVersion = 20131212;
 
 static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
 static char selectedPowerMethod, selectedTempSensor, sensorsGPUtempIndex;
-bool closeFromTrayMenu;
+static bool closeFromTrayMenu;
 static QString
     powerMethodFilePath, profilePath, dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath,
     err = "Err",
     noValues = "no values";
 static const QString settingsPath = QDir::homePath() + "/.radeon-profile-settings";
-
-enum powerMethod {
-    DPM = 0,  // kernel >= 3.11
-    PROFILE = 1,  // kernel <3.11
-    PM_UNKNOWN = 2
-};
-
-enum tempSensor {
-    SYSFS_HWMON = 0, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
-    PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
-    MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
-    TS_UNKNOWN
-};
-
-enum graphColors {
-    TEMP_BG = 0,
-    CLOCKS_BG,
-    VOLTS_BG,
-    TEMP_LINE,
-    GPU_CLOCK_LINE,
-    MEM_CLOCK_LINE,
-    UVD_VIDEO_LINE,
-    UVD_DECODER_LINE,
-    VOLTS_LINE
-};
 
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
@@ -133,10 +107,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     refreshBtn->setIconSize(QSize(20,20));
     refreshBtn->show();
     connect(refreshBtn,SIGNAL(clicked()),this,SLOT(refreshBtnClicked()));
-
-    ui->graphColorsList->itemAt(0,0)->setText(0,"adasdasd");
 }
-
 
 radeon_profile::~radeon_profile()
 {
@@ -748,6 +719,13 @@ void radeon_profile::refreshBtnClicked() {
     getCardConnectors();
     getModuleInfo();
 }
+
+void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    item->setBackgroundColor(1,QColorDialog::getColor(item->backgroundColor(1)));
+    // apply colors
+    setupGraphsStyle();
+}
 //========
 
 //===================================
@@ -798,15 +776,15 @@ void radeon_profile::saveConfig() {
     settings.setValue("windowGeometry",this->geometry());
 
     settings.setValue("graphLineThickness",ui->spin_lineThick->value());
-    settings.setValue("graphTempBackground",(ui->graphColorsList->itemAt(0,0)->backgroundColor(1)));
-    settings.setValue("graphClocksBackground",ui->graphColorsList->itemAt(1,0)->backgroundColor(1));
-    settings.setValue("graphVoltsBackground",ui->graphColorsList->itemAt(0,VOLTS_BG)->backgroundColor(1));
-    settings.setValue("graphTempLine",ui->graphColorsList->itemAt(0,TEMP_LINE)->backgroundColor(1));
-    settings.setValue("graphGPUClockLine",ui->graphColorsList->itemAt(0,GPU_CLOCK_LINE)->backgroundColor(1));
-    settings.setValue("graphMemClockLine",ui->graphColorsList->itemAt(0,MEM_CLOCK_LINE)->backgroundColor(1));
-    settings.setValue("graphUVDVideoLine",ui->graphColorsList->itemAt(0,UVD_VIDEO_LINE)->backgroundColor(1));
-    settings.setValue("graphUVDDecoderLine",ui->graphColorsList->itemAt(0,UVD_DECODER_LINE)->backgroundColor(1));
-    settings.setValue("graphVoltsLine",ui->graphColorsList->itemAt(0,VOLTS_LINE)->backgroundColor(1));
+    settings.setValue("graphTempBackground",ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1));
+    settings.setValue("graphClocksBackground",ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1));
+    settings.setValue("graphVoltsBackground",ui->graphColorsList->topLevelItem(VOLTS_BG)->backgroundColor(1));
+    settings.setValue("graphTempLine",ui->graphColorsList->topLevelItem(TEMP_LINE)->backgroundColor(1));
+    settings.setValue("graphGPUClockLine",ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->backgroundColor(1));
+    settings.setValue("graphMemClockLine",ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->backgroundColor(1));
+    settings.setValue("graphUVDVideoLine",ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->backgroundColor(1));
+    settings.setValue("graphUVDDecoderLine",ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
+    settings.setValue("graphVoltsLine",ui->graphColorsList->topLevelItem(VOLTS_LINE)->backgroundColor(1));
 }
 
 void radeon_profile::loadConfig() {
@@ -827,15 +805,17 @@ void radeon_profile::loadConfig() {
 
     // detalis: http://qt-project.org/doc/qt-4.8/qvariant.html#a-note-on-gui-types
     //ok, color is saved as QVariant, and read and convertsion it to QColor is below
-    ui->graphColorsList->itemAt(0,0)->setBackgroundColor(1,settings.value("graphTempBackground",Qt::darkGray).value<QColor>());
-    ui->graphColorsList->itemAt(1,0)->setBackgroundColor(1,settings.value("graphClocksBackground",Qt::darkGray).value<QColor>());
-    ui->graphColorsList->itemAt(2,VOLTS_BG)->setBackgroundColor(1,settings.value("graphVoltsBackground",Qt::darkGray).value<QColor>());
-    ui->graphColorsList->itemAt(3,TEMP_LINE)->setBackgroundColor(1,settings.value("graphTempLine").value<QColor>());
-    ui->graphColorsList->itemAt(4,GPU_CLOCK_LINE)->setBackgroundColor(1,settings.value("graphGPUClockLine").value<QColor>());
-    ui->graphColorsList->itemAt(5,MEM_CLOCK_LINE)->setBackgroundColor(1,settings.value("graphMemClockLine").value<QColor>());
-    ui->graphColorsList->itemAt(6,UVD_VIDEO_LINE)->setBackgroundColor(1,settings.value("graphUVDVideoLine").value<QColor>());
-    ui->graphColorsList->itemAt(7,UVD_DECODER_LINE)->setBackgroundColor(1,settings.value("graphUVDDecoderLine").value<QColor>());
-    ui->graphColorsList->itemAt(8,VOLTS_LINE)->setBackgroundColor(1,settings.value("graphVoltsLine").value<QColor>());
+    ui->graphColorsList->topLevelItem(TEMP_BG)->setBackgroundColor(1,settings.value("graphTempBackground",Qt::darkGray).value<QColor>());
+    ui->graphColorsList->topLevelItem(CLOCKS_BG)->setBackgroundColor(1,settings.value("graphClocksBackground",Qt::darkGray).value<QColor>());
+    ui->graphColorsList->topLevelItem(VOLTS_BG)->setBackgroundColor(1,settings.value("graphVoltsBackground",Qt::darkGray).value<QColor>());
+    ui->graphColorsList->topLevelItem(TEMP_LINE)->setBackgroundColor(1,settings.value("graphTempLine",Qt::yellow).value<QColor>());
+    ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->setBackgroundColor(1,settings.value("graphGPUClockLine",Qt::black).value<QColor>());
+    ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->setBackgroundColor(1,settings.value("graphMemClockLine",Qt::cyan).value<QColor>());
+    ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->setBackgroundColor(1,settings.value("graphUVDVideoLine",Qt::red).value<QColor>());
+    ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->setBackgroundColor(1,settings.value("graphUVDDecoderLine",Qt::green).value<QColor>());
+    ui->graphColorsList->topLevelItem(VOLTS_LINE)->setBackgroundColor(1,settings.value("graphVoltsLine",Qt::blue).value<QColor>());
+    setupGraphsStyle();
+
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
         this->setGeometry(settings.value("windowGeometry").toRect());
@@ -900,26 +880,22 @@ void radeon_profile::setupGraphsStyle()
     QPen pen;
     pen.setWidth(ui->spin_lineThick->value());
     pen.setCapStyle(Qt::SquareCap);
-    pen.setColor(ui->graphColorsList->itemAt(0,TEMP_LINE)->backgroundColor(1));
+    pen.setColor(ui->graphColorsList->topLevelItem(TEMP_LINE)->backgroundColor(1));
     ui->plotTemp->graph(0)->setPen(pen);
-    pen.setColor(ui->graphColorsList->itemAt(0,GPU_CLOCK_LINE)->backgroundColor(1));
+    pen.setColor(ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->backgroundColor(1));
     ui->plotColcks->graph(0)->setPen(pen);
-    pen.setColor(ui->graphColorsList->itemAt(0,MEM_CLOCK_LINE)->backgroundColor(1));
+    pen.setColor(ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->backgroundColor(1));
     ui->plotColcks->graph(1)->setPen(pen);
-    pen.setColor(ui->graphColorsList->itemAt(0,UVD_VIDEO_LINE)->backgroundColor(1));
+    pen.setColor(ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->backgroundColor(1));
     ui->plotColcks->graph(2)->setPen(pen);
-    pen.setColor(ui->graphColorsList->itemAt(0,UVD_DECODER_LINE)->backgroundColor(1));
+    pen.setColor(ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
     ui->plotColcks->graph(3)->setPen(pen);
-    pen.setColor(ui->graphColorsList->itemAt(0,VOLTS_LINE)->backgroundColor(1));
+    pen.setColor(ui->graphColorsList->topLevelItem(VOLTS_LINE)->backgroundColor(1));
     ui->plotVolts->graph(0)->setPen(pen);
 
-    QColor c;
-    c = ui->graphColorsList->itemAt(0,TEMP_BG)->backgroundColor(1);
-    ui->plotTemp->setBackground(QBrush(c));
-    c = ui->graphColorsList->itemAt(0,CLOCKS_BG)->backgroundColor(1);
-    ui->plotColcks->setBackground(QBrush(c));
-    c = ui->graphColorsList->itemAt(0,VOLTS_BG)->backgroundColor(1);
-    ui->plotVolts->setBackground(QBrush(c));
+    ui->plotTemp->setBackground(QBrush(ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1)));
+    ui->plotColcks->setBackground(QBrush(ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1)));
+    ui->plotVolts->setBackground(QBrush(ui->graphColorsList->topLevelItem(VOLTS_BG)->backgroundColor(1)));
 }
 
 void radeon_profile::setupTrayIcon() {
@@ -1031,10 +1007,3 @@ void radeon_profile::setupForcePowerLevelMenu() {
     connect(forceHigh,SIGNAL(triggered()),this,SLOT(forceHigh()));
 }
 //========
-
-void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
-{
-    item->setBackgroundColor(1,QColorDialog::getColor(item->backgroundColor(1)));
-    // apply colors
-    setupGraphsStyle();
-}

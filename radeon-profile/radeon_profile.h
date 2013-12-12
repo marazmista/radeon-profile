@@ -17,6 +17,31 @@ class radeon_profile : public QMainWindow
 {
     Q_OBJECT
     
+    enum powerMethod {
+        DPM = 0,  // kernel >= 3.11
+        PROFILE = 1,  // kernel <3.11
+        PM_UNKNOWN = 2
+    };
+
+    enum tempSensor {
+        SYSFS_HWMON = 0, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
+        PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
+        MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
+        TS_UNKNOWN
+    };
+
+    enum graphColors {
+        TEMP_BG = 0,
+        CLOCKS_BG,
+        VOLTS_BG,
+        TEMP_LINE,
+        GPU_CLOCK_LINE,
+        MEM_CLOCK_LINE,
+        UVD_VIDEO_LINE,
+        UVD_DECODER_LINE,
+        VOLTS_LINE
+    };
+
 public:
     explicit radeon_profile(QWidget *parent = 0);
     ~radeon_profile();
@@ -55,7 +80,6 @@ private slots:
     void on_cb_graphs_clicked(bool checked);
     void on_cb_gpuData_clicked(bool checked);
     void refreshBtnClicked();
-
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
 private:
