@@ -270,7 +270,6 @@ void radeon_profile::getGLXInfo() {
         data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    QString a = ui->combo_gpus->currentText().at(ui->combo_gpus->currentText().length()-1);
     env.insert("DRI_PRIME",ui->combo_gpus->currentText().at(ui->combo_gpus->currentText().length()-1));
     data << grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
     ui->list_glxinfo->addItems(data);
