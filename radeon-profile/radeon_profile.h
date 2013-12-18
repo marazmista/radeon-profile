@@ -8,6 +8,7 @@
 #include <QSystemTrayIcon>
 #include <QEvent>
 #include <QTreeWidgetItem>
+#include <QProcessEnvironment>
 
 namespace Ui {
 class radeon_profile;
@@ -101,6 +102,7 @@ private:
     void changeEvent(QEvent *event);
     void getModuleInfo();
     QStringList grabSystemInfo(const QString cmd);
+    QStringList grabSystemInfo(const QString cmd, const QProcessEnvironment env);
     void getCardConnectors();
     void detectCards();
     void figureOutGPUDataPaths(const QString gpuName);

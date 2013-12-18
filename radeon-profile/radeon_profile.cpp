@@ -171,6 +171,16 @@ QStringList radeon_profile::grabSystemInfo(const QString cmd) {
     return QString(p->readAllStandardOutput()).split('\n');
 }
 
+QStringList radeon_profile::grabSystemInfo(const QString cmd, const QProcessEnvironment env) {
+    QProcess *p = new QProcess();
+    p->setProcessChannelMode(QProcess::MergedChannels);
+    p->setProcessEnvironment(env);
+
+    p->start(cmd,QIODevice::ReadOnly);
+    p->waitForFinished();
+
+    return QString(p->readAllStandardOutput()).split('\n');
+}
 // === Fill the table with data
 QStringList radeon_profile::fillGpuDataTable() {
     ui->list_currentGPUData->clear();
@@ -259,7 +269,10 @@ void radeon_profile::getGLXInfo() {
     if (!driver.isEmpty())  // because of segfault when no xdriinfo
         data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
-    data << grabSystemInfo("glxinfo").filter(QRegExp("direct|OpenGL.+:.+"));
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    QString a = ui->combo_gpus->currentText().at(ui->combo_gpus->currentText().length()-1);
+    env.insert("DRI_PRIME",ui->combo_gpus->currentText().at(ui->combo_gpus->currentText().length()-1));
+    data << grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
     ui->list_glxinfo->addItems(data);
 }
 
