@@ -265,12 +265,13 @@ void radeon_profile::getGLXInfo() {
     for (int i = 0; i < gpus.count(); i++)
         data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
 
-    QStringList driver = grabSystemInfo("xdriinfo").filter("Screen 0:",Qt::CaseInsensitive);
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("DRI_PRIME",ui->combo_gpus->currentText().at(ui->combo_gpus->currentText().length()-1));
+
+    QStringList driver = grabSystemInfo("xdriinfo",env).filter("Screen 0:",Qt::CaseInsensitive);
     if (!driver.isEmpty())  // because of segfault when no xdriinfo
         data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("DRI_PRIME",ui->combo_gpus->currentText().at(ui->combo_gpus->currentText().length()-1));
     data << grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
     ui->list_glxinfo->addItems(data);
 }
