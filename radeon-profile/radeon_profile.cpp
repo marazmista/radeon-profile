@@ -30,7 +30,7 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131212;
+const int appVersion = 20131220;
 
 static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
