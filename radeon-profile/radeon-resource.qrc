@@ -1,9 +1,9 @@
 <RCC>
     <qresource prefix="/icon">
-        <file>icon.png</file>
-        <file>arrow1.png</file>
-        <file>arrow2.png</file>
-        <file>arrow3.png</file>
-        <file>refresh.png</file>
+        <file>extra/radeon-profile.png</file>
+        <file>symbols/arrow1.png</file>
+        <file>symbols/arrow2.png</file>
+        <file>symbols/arrow3.png</file>
+        <file>symbols/refresh.png</file>
     </qresource>
 </RCC>

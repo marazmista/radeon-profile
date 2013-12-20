@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=radeon-profile
+Comment=Monitor Radeon GPU parameters and switch power profiles
+Exec=radeon-profile
+Icon=radeon-profile
+Terminal=false
+Type=Application
+Categories=System;
+StartupNotify=false

@@ -102,7 +102,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     // add button for manual refresh glx info, connectors, mod params
     QPushButton *refreshBtn = new QPushButton();
-    refreshBtn->setIcon(QIcon(":/icon/refresh.png"));
+    refreshBtn->setIcon(QIcon(":/icon/symbols/refresh.png"));
     ui->tabs_systemInfo->setCornerWidget(refreshBtn);
     refreshBtn->setIconSize(QSize(20,20));
     refreshBtn->show();

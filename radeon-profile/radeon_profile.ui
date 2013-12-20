@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="radeon-resource.qrc">
-    <normaloff>:/icon/icon.png</normaloff>:/icon/icon.png</iconset>
+    <normaloff>:/icon/extra/radeon-profile.png</normaloff>:/icon/extra/radeon-profile.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_3">
@@ -232,7 +232,7 @@
                  </property>
                  <property name="icon">
                   <iconset resource="radeon-resource.qrc">
-                   <normaloff>:/icon/arrow1.png</normaloff>:/icon/arrow1.png</iconset>
+                   <normaloff>:/icon/symbols/arrow1.png</normaloff>:/icon/symbols/arrow1.png</iconset>
                  </property>
                  <property name="flat">
                   <bool>false</bool>
@@ -252,7 +252,7 @@
                  </property>
                  <property name="icon">
                   <iconset resource="radeon-resource.qrc">
-                   <normaloff>:/icon/arrow2.png</normaloff>:/icon/arrow2.png</iconset>
+                   <normaloff>:/icon/symbols/arrow2.png</normaloff>:/icon/symbols/arrow2.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -269,7 +269,7 @@
                  </property>
                  <property name="icon">
                   <iconset resource="radeon-resource.qrc">
-                   <normaloff>:/icon/arrow3.png</normaloff>:/icon/arrow3.png</iconset>
+                   <normaloff>:/icon/symbols/arrow3.png</normaloff>:/icon/symbols/arrow3.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -1099,6 +1099,9 @@
            <property name="indentation">
             <number>5</number>
            </property>
+           <attribute name="headerDefaultSectionSize">
+            <number>150</number>
+           </attribute>
            <column>
             <property name="text">
              <string>Property</string>
