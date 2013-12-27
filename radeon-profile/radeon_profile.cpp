@@ -30,7 +30,7 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-const int appVersion = 20131220;
+const int appVersion = 20131227;
 
 static int i = 0;
 static double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -939,11 +939,11 @@ void radeon_profile::setupTrayIcon() {
     dpmSetPerformance = new QAction(this);
 
     dpmSetBattery->setText("Battery");
-    dpmSetBattery->setIcon(QIcon(":/icon/arrow1.png"));
+    dpmSetBattery->setIcon(QIcon(":/icon/symbols/arrow1.png"));
     dpmSetBalanced->setText("Balanced");
-    dpmSetBalanced->setIcon(QIcon(":/icon/arrow2.png"));
+    dpmSetBalanced->setIcon(QIcon(":/icon/symbols/arrow2.png"));
     dpmSetPerformance->setText("Performance");
-    dpmSetPerformance->setIcon(QIcon(":/icon/arrow3.png"));
+    dpmSetPerformance->setIcon(QIcon(":/icon/symbols/arrow3.png"));
 
     connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(on_btn_dpmBattery_clicked()));
     connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(on_btn_dpmBalanced_clicked()));
@@ -964,7 +964,7 @@ void radeon_profile::setupTrayIcon() {
     trayMenu->addAction(closeApp);
 
     // setup icon finally //
-    QIcon appicon(":/icon/icon.png");
+    QIcon appicon(":/icon/extra/radeon-profile.png");
     trayIcon = new QSystemTrayIcon(appicon,this);
     trayIcon->show();
     trayIcon->setContextMenu(trayMenu);
