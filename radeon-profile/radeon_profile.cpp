@@ -98,7 +98,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     timerEvent();
     timer->start();
-    radeon_profile::setWindowTitle("Radeon Profile (v. "+QString().setNum(appVersion)+")");
 
     // add button for manual refresh glx info, connectors, mod params
     QPushButton *refreshBtn = new QPushButton();
@@ -107,6 +106,16 @@ radeon_profile::radeon_profile(QWidget *parent) :
     refreshBtn->setIconSize(QSize(20,20));
     refreshBtn->show();
     connect(refreshBtn,SIGNAL(clicked()),this,SLOT(refreshBtnClicked()));
+
+    // version label
+    QLabel *l = new QLabel("v. " +QString().setNum(appVersion),this);
+    QFont f;
+    f.setStretch(QFont::Expanded);
+    f.setWeight(QFont::Bold);
+    f.setPointSize(8);
+    l->setFont(f);
+    ui->mainTabs->setCornerWidget(l,Qt::BottomRightCorner);
+    l->show();
 }
 
 radeon_profile::~radeon_profile()
