@@ -10,6 +10,17 @@
 #include <QTreeWidgetItem>
 #include <QProcessEnvironment>
 
+#define startClocksScaleL 100
+#define startClocksScaleH 400
+#define startVoltsScaleL 500
+#define startVoltsScaleH 650
+
+extern int i;
+extern QString powerMethodFilePath, profilePath, dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath;
+extern char selectedPowerMethod, selectedTempSensor, sensorsGPUtempIndex;
+extern double maxT, minT, rangeX, current, tempSum;
+extern QTimer timer;
+
 namespace Ui {
 class radeon_profile;
 }
@@ -17,10 +28,10 @@ class radeon_profile;
 class radeon_profile : public QMainWindow
 {
     Q_OBJECT
-    
+
     enum powerMethod {
         DPM = 0,  // kernel >= 3.11
-        PROFILE = 1,  // kernel <3.11
+        PROFILE = 1,  // kernel <3.11 or dpm disabled
         PM_UNKNOWN = 2
     };
 
@@ -31,6 +42,7 @@ class radeon_profile : public QMainWindow
         TS_UNKNOWN
     };
 
+    // names in this enum equals indexes in Qtreewidged in ui for selecting clors
     enum graphColors {
         TEMP_BG = 0,
         CLOCKS_BG,

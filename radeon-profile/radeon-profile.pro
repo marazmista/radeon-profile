@@ -14,7 +14,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         radeon_profile.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
+    uiElements.cpp \
+    uiEvents.cpp
 
 HEADERS  += radeon_profile.h \
     qcustomplot.h
