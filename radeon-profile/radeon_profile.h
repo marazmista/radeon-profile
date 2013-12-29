@@ -36,7 +36,8 @@ class radeon_profile : public QMainWindow
     };
 
     enum tempSensor {
-        SYSFS_HWMON = 0, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
+        SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
+        CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
         PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
         MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
         TS_UNKNOWN
@@ -121,6 +122,7 @@ private:
     void saveConfig();
     void loadConfig();
     void setupGraphsStyle();
+    QString findSysfsHwmonForGPU();
 };
 
 

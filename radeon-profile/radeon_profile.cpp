@@ -212,27 +212,52 @@ void radeon_profile::getPowerMethod() {
 void radeon_profile::testSensor() {
     QFile hwmon(sysfsHwmonPath);
 
-    // first, try read temp from sysfs (no need for lm_sensors), if it fails, try other methods
+    // first method, try read temp from sysfs in card dir (path from figureOutGPUDataPaths())
     if (hwmon.open(QIODevice::ReadOnly)) {
         if (!QString(hwmon.readLine(20)).isEmpty()) {
-            selectedTempSensor = SYSFS_HWMON;
+            selectedTempSensor = CARD_HWMON;
             return;
         }
-    } else {
-        QStringList out = grabSystemInfo("sensors");
-        if (out.indexOf(QRegExp("radeon-pci.+")) != -1) {
-            selectedTempSensor = PCI_SENSOR;
-            sensorsGPUtempIndex = out.indexOf(QRegExp("radeon-pci.+"));  // in order to not search for it again in timer loop
-            return;
-        }
-        else if (out.indexOf(QRegExp("VGA_TEMP.+")) != -1) {
-            selectedTempSensor = MB_SENSOR;
-            sensorsGPUtempIndex = out.indexOf(QRegExp("VGA_TEMP.+"));
-            return;
-        }
-        else
-            selectedTempSensor = TS_UNKNOWN;
     }
+
+    // second method, try find in system hwmon dir for file labeled VGA_TEMP
+    sysfsHwmonPath = findSysfsHwmonForGPU();
+    if (!sysfsHwmonPath.isEmpty()) {
+        selectedPowerMethod = SYSFS_HWMON;
+        return;
+    }
+
+    // if above fails, use lm_sensors
+    QStringList out = grabSystemInfo("sensors");
+    if (out.indexOf(QRegExp("radeon-pci.+")) != -1) {
+        selectedTempSensor = PCI_SENSOR;
+        sensorsGPUtempIndex = out.indexOf(QRegExp("radeon-pci.+"));  // in order to not search for it again in timer loop
+        return;
+    }
+    else if (out.indexOf(QRegExp("VGA_TEMP.+")) != -1) {
+        selectedTempSensor = MB_SENSOR;
+        sensorsGPUtempIndex = out.indexOf(QRegExp("VGA_TEMP.+"));
+        return;
+    }
+    else
+        selectedTempSensor = TS_UNKNOWN;
+}
+// === method for finding hwmon in system path
+QString radeon_profile::findSysfsHwmonForGPU() {
+    QStringList hwmonDev = grabSystemInfo("ls /sys/class/hwmon/");
+    for (int i = 0; i < hwmonDev.count(); i++) {
+        QStringList temp = grabSystemInfo("ls /sys/class/hwmon/"+hwmonDev[i]+"/device/").filter("label");
+
+        for (int o = 0; o < temp.count(); o++) {
+            QFile f("/sys/class/hwmon/"+hwmonDev[i]+"/device/"+temp[o]);
+            if (f.open(QIODevice::ReadOnly))
+                if (f.readLine(20).contains("VGA_TEMP")) {
+                    f.close();
+                    return f.fileName().replace("label", "input");
+                }
+        }
+    }
+    return "";
 }
 
 void radeon_profile::getModuleInfo() {
@@ -536,7 +561,8 @@ QString radeon_profile::getGPUTemp() {
     QString temp;
 
     switch (selectedTempSensor) {
-    case SYSFS_HWMON: {
+    case SYSFS_HWMON:
+    case CARD_HWMON: {
         QFile hwmon(sysfsHwmonPath);
         hwmon.open(QIODevice::ReadOnly);
         temp = hwmon.readLine(20);
