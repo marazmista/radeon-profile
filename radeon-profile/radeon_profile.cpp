@@ -24,7 +24,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20131229;
+const int appVersion = 20140105;
 
 int i = 0;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -103,7 +103,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     // version label
     QLabel *l = new QLabel("v. " +QString().setNum(appVersion),this);
     QFont f;
-    f.setStretch(QFont::Expanded);
+    f.setStretch(QFont::Unstretched);
     f.setWeight(QFont::Bold);
     f.setPointSize(8);
     l->setFont(f);
@@ -655,6 +655,10 @@ void radeon_profile::saveConfig() {
     settings.setValue("saveWindowGeometry",ui->cb_saveWindowGeometry->isChecked());
     settings.setValue("windowGeometry",this->geometry());
 
+    settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
+    settings.setValue("graphRange",ui->timeSlider->value());
+
+    // Graph settings
     settings.setValue("graphLineThickness",ui->spin_lineThick->value());
     settings.setValue("graphTempBackground",ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1));
     settings.setValue("graphClocksBackground",ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1));
@@ -665,6 +669,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("graphUVDVideoLine",ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->backgroundColor(1));
     settings.setValue("graphUVDDecoderLine",ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
     settings.setValue("graphVoltsLine",ui->graphColorsList->topLevelItem(VOLTS_LINE)->backgroundColor(1));
+
+
 }
 
 void radeon_profile::loadConfig() {
@@ -681,8 +687,10 @@ void radeon_profile::loadConfig() {
     ui->cb_modParams->setChecked(settings.value("updateModParams",false).toBool());
     ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
 
+    optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
+    ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
+    // Graphs settings
     ui->spin_lineThick->setValue(settings.value("graphLineThickness",2).toInt());
-
     // detalis: http://qt-project.org/doc/qt-4.8/qvariant.html#a-note-on-gui-types
     //ok, color is saved as QVariant, and read and convertsion it to QColor is below
     ui->graphColorsList->topLevelItem(TEMP_BG)->setBackgroundColor(1,settings.value("graphTempBackground",Qt::darkGray).value<QColor>());
@@ -711,5 +719,8 @@ void radeon_profile::loadConfig() {
         ui->mainTabs->setTabEnabled(1,true);
     else
         ui->mainTabs->setTabEnabled(1,false);
+
+    showLegend(optionsMenu->actions().at(0)->isChecked());
+    changeTimeRange();
 }
 //========
