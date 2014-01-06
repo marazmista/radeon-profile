@@ -24,7 +24,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140105;
+const int appVersion = 20140106;
 
 int i = 0;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -48,7 +48,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     // setup ui elemensts
     ui->mainTabs->setCurrentIndex(0);
     ui->tabs_systemInfo->setCurrentIndex(0);
-    ui->plotVolts->setVisible(false);
     setupGraphs();
     setupForcePowerLevelMenu();
     setupOptionsMenu();
@@ -670,7 +669,9 @@ void radeon_profile::saveConfig() {
     settings.setValue("graphUVDDecoderLine",ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
     settings.setValue("graphVoltsLine",ui->graphColorsList->topLevelItem(VOLTS_LINE)->backgroundColor(1));
 
-
+    settings.setValue("showTempGraphOnStart",ui->cb_showTempsGraph->isChecked());
+    settings.setValue("showFreqGraphOnStart",ui->cb_showFreqGraph->isChecked());
+    settings.setValue("showVoltsGraphOnStart",ui->cb_showVoltsGraph->isChecked());
 }
 
 void radeon_profile::loadConfig() {
@@ -704,6 +705,10 @@ void radeon_profile::loadConfig() {
     ui->graphColorsList->topLevelItem(VOLTS_LINE)->setBackgroundColor(1,settings.value("graphVoltsLine",Qt::blue).value<QColor>());
     setupGraphsStyle();
 
+    ui->cb_showTempsGraph->setChecked(settings.value("showTempGraphOnStart",true).toBool());
+    ui->cb_showFreqGraph->setChecked(settings.value("showFreqGraphOnStart",true).toBool());
+    ui->cb_showVoltsGraph->setChecked(settings.value("showVoltsGraphOnStart",false).toBool());
+
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
         this->setGeometry(settings.value("windowGeometry").toRect());
@@ -722,5 +727,8 @@ void radeon_profile::loadConfig() {
 
     showLegend(optionsMenu->actions().at(0)->isChecked());
     changeTimeRange();
+    on_cb_showTempsGraph_clicked(ui->cb_showTempsGraph->isChecked());
+    on_cb_showFreqGraph_clicked(ui->cb_showFreqGraph->isChecked());
+    on_cb_showVoltsGraph_clicked(ui->cb_showVoltsGraph->isChecked());
 }
 //========
