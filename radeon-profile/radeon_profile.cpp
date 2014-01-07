@@ -266,6 +266,10 @@ void radeon_profile::getModuleInfo() {
 
     for (int i =0; i < modInfo.count(); i++) {
         if (modInfo[i].contains(":")) {
+            // show nothing in case of an error
+            if (modInfo[i].startsWith("modinfo: ERROR: ")) {
+                continue;
+            }
             // read module param name and description from modinfo command
             QString modName = modInfo[i].split(":",QString::SkipEmptyParts)[0],
                     modDesc = modInfo[i].split(":",QString::SkipEmptyParts)[1],
