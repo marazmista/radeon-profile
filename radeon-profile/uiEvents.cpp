@@ -166,8 +166,11 @@ void radeon_profile::refreshBtnClicked() {
 
 void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    item->setBackgroundColor(1,QColorDialog::getColor(item->backgroundColor(1)));
-    // apply colors
-    setupGraphsStyle();
+    QColor c = QColorDialog::getColor(item->backgroundColor(1));
+    if (c.isValid()) {
+        item->setBackgroundColor(1,c);
+        // apply colors
+        setupGraphsStyle();
+    }
 }
 //========

@@ -24,7 +24,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140106;
+const int appVersion = 20140108;
 
 int i = 0;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
