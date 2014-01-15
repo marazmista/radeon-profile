@@ -173,4 +173,10 @@ void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item,
         setupGraphsStyle();
     }
 }
+
+void radeon_profile::on_tabs_systemInfo_currentChanged(int index)
+{
+    if (index == 3)
+        updateStatsTable();
+}
 //========

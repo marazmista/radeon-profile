@@ -363,9 +363,9 @@
            </font>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
-          <widget class="QWidget" name="tab">
+          <widget class="QWidget" name="tab_glxInfo">
            <attribute name="title">
             <string>GLX info</string>
            </attribute>
@@ -395,11 +395,14 @@
               <property name="verticalScrollBarPolicy">
                <enum>Qt::ScrollBarAlwaysOn</enum>
               </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
              </widget>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_3">
+          <widget class="QWidget" name="tab_connectors">
            <attribute name="title">
             <string>Connectors</string>
            </attribute>
@@ -424,6 +427,9 @@
                 <bold>false</bold>
                </font>
               </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
               <attribute name="headerDefaultSectionSize">
                <number>150</number>
               </attribute>
@@ -444,7 +450,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_2">
+          <widget class="QWidget" name="tab_modInfo">
            <attribute name="title">
             <string>Radeon module info</string>
            </attribute>
@@ -490,6 +496,60 @@
               <column>
                <property name="text">
                 <string>Description</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_stats">
+           <attribute name="title">
+            <string>Stats</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QTreeWidget" name="list_stats">
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
+              <property name="tabKeyNavigation">
+               <bool>false</bool>
+              </property>
+              <property name="indentation">
+               <number>2</number>
+              </property>
+              <attribute name="headerDefaultSectionSize">
+               <number>200</number>
+              </attribute>
+              <attribute name="headerMinimumSectionSize">
+               <number>50</number>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>Power level</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Time</string>
                </property>
               </column>
              </widget>

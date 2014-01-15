@@ -15,7 +15,7 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-extern int i;
+extern int ticksCounter;
 extern QString powerMethodFilePath, profilePath, dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath;
 extern char selectedPowerMethod, selectedTempSensor, sensorsGPUtempIndex;
 extern double maxT, minT, rangeX, current, tempSum;
@@ -96,6 +96,8 @@ private slots:
     void refreshBtnClicked();
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
+    void on_tabs_systemInfo_currentChanged(int index);
+
 private:
     Ui::radeon_profile *ui;
     void getPowerMethod();
@@ -123,6 +125,8 @@ private:
     void loadConfig();
     void setupGraphsStyle();
     QString findSysfsHwmonForGPU();
+    void doTheStats(const double &coreClock,const double &memClock,const double &voltsGPU, const double &voltsMem);
+    void updateStatsTable();
 };
 
 

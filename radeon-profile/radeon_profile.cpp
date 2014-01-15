@@ -26,7 +26,7 @@
 
 const int appVersion = 20140108;
 
-int i = 0;
+int ticksCounter = 1;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
 char selectedPowerMethod, selectedTempSensor, sensorsGPUtempIndex;
 QString
@@ -34,6 +34,12 @@ QString
     err = "Err",
     noValues = "no values";
 static const QString settingsPath = QDir::homePath() + "/.radeon-profile-settings";
+
+struct pmLevel {
+    QString name;
+    float time;
+};
+QList<pmLevel> pmStats;
 
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
@@ -140,14 +146,14 @@ void radeon_profile::timerEvent() {
 
         if (ui->cb_graphs->isChecked()) {
             // count seconds to move graph to right
-            i++;
-            ui->plotTemp->xAxis->setRange(i+20, rangeX,Qt::AlignRight);
+            ticksCounter++;
+            ui->plotTemp->xAxis->setRange(ticksCounter+20, rangeX,Qt::AlignRight);
             ui->plotTemp->replot();
 
-            ui->plotColcks->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
+            ui->plotColcks->xAxis->setRange(ticksCounter+20,rangeX,Qt::AlignRight);
             ui->plotColcks->replot();
 
-            ui->plotVolts->xAxis->setRange(i+20,rangeX,Qt::AlignRight);
+            ui->plotVolts->xAxis->setRange(ticksCounter+20,rangeX,Qt::AlignRight);
             ui->plotVolts->replot();
         }
         refreshTooltip();
@@ -404,7 +410,7 @@ void radeon_profile::figureOutGPUDataPaths(const QString gpuName) {
 // === Core of the app, get clocks, power profile and temps ===//
 QStringList radeon_profile::getClocks() {
     QStringList gpuData;
-    double coreClock = 0,memClock= 0, voltsGPU = 0, uvdvclk = 0, uvddclk = 0;  // for plots
+    double coreClock = 0,memClock= 0, voltsGPU = 0, voltsMem = 0, uvdvclk = 0, uvddclk = 0;  // for plots
 
     if (QFile(clocksPath).exists()) {  // check for debugfs access
         QStringList out = grabSystemInfo("cat "+clocksPath);
@@ -453,8 +459,10 @@ QStringList radeon_profile::getClocks() {
 
             rx.setPattern("vddci:\\s\\d+");
             rx.indexIn(out[1]);
-            if (!rx.cap(0).isEmpty())
-                gpuData << "Voltage (vddci): " + rx.cap(0).split(' ',QString::SkipEmptyParts)[1] + " mV";
+            if (!rx.cap(0).isEmpty()) {
+                voltsMem = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
+                gpuData << "Voltage (vddci): " + QString().setNum(voltsMem) + " mV";
+            }
 
             break;
         }
@@ -495,6 +503,12 @@ QStringList radeon_profile::getClocks() {
             break;
         }
         }
+
+        doTheStats(coreClock,memClock,voltsGPU,voltsMem);
+
+        // do the math only when user looking at stats table
+        if (ui->tabs_systemInfo->currentIndex() == 3)
+            updateStatsTable();
     }
     else {
         gpuData << "Current GPU clock: " + noValues + " (root rights? debugfs mounted?)";
@@ -502,7 +516,7 @@ QStringList radeon_profile::getClocks() {
         gpuData << "------------------------";
         gpuData << "Voltage: "+ noValues + " (root rights? debugfs mounted?)";
         ui->cb_showFreqGraph->setChecked(false),ui->cb_showFreqGraph->setEnabled(false),ui->cb_showVoltsGraph->setEnabled(false),
-                ui->plotColcks->setVisible(false),ui->plotVolts->setVisible(false);
+                ui->plotColcks->setVisible(false),ui->plotVolts->setVisible(false),ui->tabs_systemInfo->setTabEnabled(3,false);
     }
     gpuData << "------------------------";
 
@@ -513,21 +527,63 @@ QStringList radeon_profile::getClocks() {
         else if (coreClock != 0 && memClock == 0)
             ui->plotColcks->yAxis->setRangeUpper(coreClock + 150);
 
-        ui->plotColcks->graph(0)->addData(i,coreClock);
-        ui->plotColcks->graph(1)->addData(i,memClock);
-        ui->plotColcks->graph(2)->addData(i,uvdvclk);
-        ui->plotColcks->graph(3)->addData(i,uvddclk);
+        ui->plotColcks->graph(0)->addData(ticksCounter,coreClock);
+        ui->plotColcks->graph(1)->addData(ticksCounter,memClock);
+        ui->plotColcks->graph(2)->addData(ticksCounter,uvdvclk);
+        ui->plotColcks->graph(3)->addData(ticksCounter,uvddclk);
 
         if (voltsGPU != 0)  {
             if (voltsGPU > ui->plotVolts->yAxis->range().upper)
                 ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
 
-            ui->plotVolts->graph(0)->addData(i,voltsGPU);
+            ui->plotVolts->graph(0)->addData(ticksCounter,voltsGPU);
         }
         else
             ui->cb_showVoltsGraph->setEnabled(false);
     }
+
     return gpuData;
+}
+
+void radeon_profile::doTheStats(const double &coreClock, const double &memClock, const double &voltsGPU, const double &voltsMem) {
+
+    // figure out pm level based on data provided
+    QString pmLevelName;
+    pmLevelName = (coreClock == 0) ? pmLevelName : pmLevelName + "Core: " + QString().setNum(coreClock) + "MHz";
+    pmLevelName = (memClock == 0) ? pmLevelName : pmLevelName + "|Mem: " + QString().setNum(memClock) + "MHz";
+    pmLevelName = (voltsGPU == 0) ? pmLevelName : pmLevelName + "|vddc: " + QString().setNum(voltsGPU)+ "mV";
+    pmLevelName = (voltsMem == 0) ? pmLevelName : pmLevelName + "|vddci: " + QString().setNum(voltsMem) + "mV";
+
+    // find index of current pm level in stats list
+    char index = -1;
+    for (int i = 0; i < pmStats.count(); i++) {
+        if (pmStats.at(i).name == pmLevelName) {
+            index = i;
+            break;
+        }
+    }
+
+    // if found, count this tick to current pm level, if not add to list and count tick
+    if (index != -1)
+        pmStats[index].time++;
+    else {
+        pmLevel p;
+        p.name = pmLevelName;
+        p.time = 1;
+        pmStats.append(p);
+
+        QTreeWidgetItem *t = new QTreeWidgetItem();
+        t->setText(0,p.name);
+        ui->list_stats->addTopLevelItem(t);
+    }
+}
+
+void radeon_profile::updateStatsTable() {
+
+    // do the math with percents
+    for (int i = 0;i < ui->list_stats->topLevelItemCount() ; i++) {
+        ui->list_stats->topLevelItem(i)->setText(1,QString().setNum(pmStats.at(i).time/ticksCounter * 100,'f',2)+"%");
+    }
 }
 
 QString radeon_profile::getCurrentPowerProfile() {
@@ -603,8 +659,8 @@ QString radeon_profile::getGPUTemp() {
     if (maxT >= ui->plotTemp->yAxis->range().upper || minT <= ui->plotTemp->yAxis->range().lower)
         ui->plotTemp->yAxis->setRange(minT - 5, maxT + 5);
 
-    ui->plotTemp->graph(0)->addData(i,current);
-    ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/i,'f',1));
+    ui->plotTemp->graph(0)->addData(ticksCounter,current);
+    ui->l_minMaxTemp->setText("Now: " + QString().setNum(current) + "C | Max: " + QString().setNum(maxT) + "C | Min: " + QString().setNum(minT) + "C | Avg: " + QString().setNum(tempSum/ticksCounter,'f',1));
 
     return "Current GPU temp: "+QString().setNum(current) + QString::fromUtf8("\u00B0C");
 }
