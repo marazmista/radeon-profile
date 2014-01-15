@@ -83,7 +83,9 @@ void radeon_profile::resetGraphs() {
 
 void radeon_profile::showLegend(bool checked) {
         ui->plotColcks->legend->setVisible(checked);
+        ui->plotVolts->legend->setVisible(checked);
         ui->plotColcks->replot();
+        ui->plotVolts->replot();
 }
 
 void radeon_profile::changeEvent(QEvent *event)
@@ -154,8 +156,10 @@ void radeon_profile::on_cb_graphs_clicked(bool checked)
 void radeon_profile::on_cb_gpuData_clicked(bool checked)
 {
     ui->cb_graphs->setEnabled(checked);
-    if (ui->cb_graphs->isChecked())
+    if (ui->cb_graphs->isChecked()) {
         ui->mainTabs->setTabEnabled(1,checked);
+        ui->tabs_systemInfo->setTabEnabled(3,checked);
+    }
 }
 
 void radeon_profile::refreshBtnClicked() {

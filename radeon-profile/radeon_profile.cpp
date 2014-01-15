@@ -24,7 +24,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140108;
+const int appVersion = 20140115;
 
 int ticksCounter = 1;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -537,6 +537,7 @@ QStringList radeon_profile::getClocks() {
                 ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
 
             ui->plotVolts->graph(0)->addData(ticksCounter,voltsGPU);
+            ui->plotVolts->graph(1)->addData(ticksCounter,voltsMem);
         }
         else
             ui->cb_showVoltsGraph->setEnabled(false);
@@ -727,7 +728,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("graphMemClockLine",ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->backgroundColor(1));
     settings.setValue("graphUVDVideoLine",ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->backgroundColor(1));
     settings.setValue("graphUVDDecoderLine",ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
-    settings.setValue("graphVoltsLine",ui->graphColorsList->topLevelItem(VOLTS_LINE)->backgroundColor(1));
+    settings.setValue("graphVoltsLine",ui->graphColorsList->topLevelItem(CORE_VOLTS_LINE)->backgroundColor(1));
+    settings.setValue("graphMemVoltsLine",ui->graphColorsList->topLevelItem(MEM_VOLTS_LINE)->backgroundColor(1));
 
     settings.setValue("showTempGraphOnStart",ui->cb_showTempsGraph->isChecked());
     settings.setValue("showFreqGraphOnStart",ui->cb_showFreqGraph->isChecked());
@@ -762,7 +764,8 @@ void radeon_profile::loadConfig() {
     ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->setBackgroundColor(1,settings.value("graphMemClockLine",Qt::cyan).value<QColor>());
     ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->setBackgroundColor(1,settings.value("graphUVDVideoLine",Qt::red).value<QColor>());
     ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->setBackgroundColor(1,settings.value("graphUVDDecoderLine",Qt::green).value<QColor>());
-    ui->graphColorsList->topLevelItem(VOLTS_LINE)->setBackgroundColor(1,settings.value("graphVoltsLine",Qt::blue).value<QColor>());
+    ui->graphColorsList->topLevelItem(CORE_VOLTS_LINE)->setBackgroundColor(1,settings.value("graphVoltsLine",Qt::blue).value<QColor>());
+    ui->graphColorsList->topLevelItem(MEM_VOLTS_LINE)->setBackgroundColor(1,settings.value("graphMemVoltsLine",Qt::cyan).value<QColor>());
     setupGraphsStyle();
 
     ui->cb_showTempsGraph->setChecked(settings.value("showTempGraphOnStart",true).toBool());

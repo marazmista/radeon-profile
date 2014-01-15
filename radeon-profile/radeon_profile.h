@@ -53,7 +53,8 @@ class radeon_profile : public QMainWindow
         MEM_CLOCK_LINE,
         UVD_VIDEO_LINE,
         UVD_DECODER_LINE,
-        VOLTS_LINE
+        CORE_VOLTS_LINE,
+        MEM_VOLTS_LINE
     };
 
 public:

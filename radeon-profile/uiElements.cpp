@@ -30,6 +30,7 @@ void radeon_profile::setupGraphs()
     ui->plotColcks->addGraph(); // uvd
     ui->plotColcks->addGraph(); // uvd
     ui->plotVolts->addGraph(); // volts gpu
+    ui->plotVolts->addGraph(); // volts mem
 
     setupGraphsStyle();
 
@@ -40,6 +41,11 @@ void radeon_profile::setupGraphs()
     ui->plotColcks->graph(3)->setName("Decoder clock");
     ui->plotColcks->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignLeft);
     ui->plotColcks->legend->setVisible(true);
+
+    ui->plotVolts->graph(0)->setName("GPU voltage");
+    ui->plotVolts->graph(1)->setName("Memory voltage");
+    ui->plotVolts->axisRect()->insetLayout()->setInsetAlignment(0,Qt::AlignTop|Qt::AlignLeft);
+    ui->plotVolts->legend->setVisible(true);
 
     ui->plotColcks->replot();
     ui->plotTemp->replot();
@@ -61,8 +67,10 @@ void radeon_profile::setupGraphsStyle()
     ui->plotColcks->graph(2)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
     ui->plotColcks->graph(3)->setPen(pen);
-    pen.setColor(ui->graphColorsList->topLevelItem(VOLTS_LINE)->backgroundColor(1));
+    pen.setColor(ui->graphColorsList->topLevelItem(CORE_VOLTS_LINE)->backgroundColor(1));
     ui->plotVolts->graph(0)->setPen(pen);
+    pen.setColor(ui->graphColorsList->topLevelItem(MEM_VOLTS_LINE)->backgroundColor(1));
+    ui->plotVolts->graph(1)->setPen(pen);
 
     ui->plotTemp->setBackground(QBrush(ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1)));
     ui->plotColcks->setBackground(QBrush(ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1)));
