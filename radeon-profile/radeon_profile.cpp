@@ -552,11 +552,12 @@ QStringList radeon_profile::getClocks() {
 void radeon_profile::doTheStats(const double &coreClock, const double &memClock, const double &voltsGPU, const double &voltsMem) {
 
     // figure out pm level based on data provided
-    QString pmLevelName;
-    pmLevelName = (coreClock == 0) ? pmLevelName : pmLevelName + "Core: " + QString().setNum(coreClock) + "MHz";
-    pmLevelName = (memClock == 0) ? pmLevelName : pmLevelName + "|Mem: " + QString().setNum(memClock) + "MHz";
-    pmLevelName = (voltsGPU == 0) ? pmLevelName : pmLevelName + "|vddc: " + QString().setNum(voltsGPU)+ "mV";
-    pmLevelName = (voltsMem == 0) ? pmLevelName : pmLevelName + "|vddci: " + QString().setNum(voltsMem) + "mV";
+    QString pmLevelName, volt;
+    volt = (voltsGPU == 0) ? "" : QString().setNum(voltsGPU) + "mV)";
+    pmLevelName = (coreClock == 0) ? pmLevelName : "Core:" +QString().setNum(coreClock) + "MHz(" + volt;
+
+    volt = (voltsMem == 0) ? "" : QString().setNum(voltsMem) + "mV)";
+    pmLevelName = (memClock == 0) ? pmLevelName : pmLevelName + " Mem:" + QString().setNum(memClock) + "MHz(" + volt;
 
     // find index of current pm level in stats list
     char index = -1;
