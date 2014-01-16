@@ -87,7 +87,7 @@ private slots:
     void on_btn_forceAuto_clicked();
     void on_btn_forceHigh_clicked();
     void on_btn_forceLow_clicked();
-    void on_combo_gpus_currentTextChanged(const QString &arg1);
+    void gpuChanged();
     void closeEvent(QCloseEvent *);
     void closeFromTray();
     void on_spin_lineThick_valueChanged(int arg1);
@@ -96,7 +96,6 @@ private slots:
     void on_cb_gpuData_clicked(bool checked);
     void refreshBtnClicked();
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
     void on_tabs_systemInfo_currentChanged(int index);
 
 private:

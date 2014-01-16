@@ -55,7 +55,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -536,11 +536,8 @@
               <property name="indentation">
                <number>2</number>
               </property>
-              <attribute name="headerDefaultSectionSize">
-               <number>200</number>
-              </attribute>
               <attribute name="headerMinimumSectionSize">
-               <number>50</number>
+               <number>200</number>
               </attribute>
               <column>
                <property name="text">

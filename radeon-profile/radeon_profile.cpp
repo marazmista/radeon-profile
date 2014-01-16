@@ -24,7 +24,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140115;
+const int appVersion = 20140116;
 
 int ticksCounter = 1;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -67,6 +67,9 @@ radeon_profile::radeon_profile(QWidget *parent) :
     getModuleInfo();
     getPowerMethod();
     getCardConnectors();
+
+    // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
+    connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
 
    // timer init
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));

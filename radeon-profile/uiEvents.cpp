@@ -102,9 +102,9 @@ void radeon_profile::changeEvent(QEvent *event)
     }
 }
 
-void radeon_profile::on_combo_gpus_currentTextChanged(const QString &arg1)
+void radeon_profile::gpuChanged()
 {
-    figureOutGPUDataPaths(arg1); // resolve paths for newly selected card
+    figureOutGPUDataPaths(ui->combo_gpus->currentText()); // resolve paths for newly selected card
 
     // do initial stuff once again for new card
     testSensor();
