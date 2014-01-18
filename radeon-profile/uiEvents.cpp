@@ -7,6 +7,7 @@
 
 #include <QTimer>
 #include <QColorDialog>
+#include <QClipboard>
 
 bool closeFromTrayMenu;
 
@@ -192,10 +193,21 @@ void radeon_profile::on_cb_stats_clicked(bool checked)
 
     // reset stats data
     statsTickCounter = 1;
-    if (!checked) {
-        pmStats.clear();
-        ui->list_stats->clear();
-    }
+    if (!checked)
+        resetStats();
 }
 
+void radeon_profile::copyGlxInfoToClipboard() {
+    QString clip;
+    for (int i = 0; i < ui->list_glxinfo->count(); i++)
+        clip += ui->list_glxinfo->item(i)->text() + "\n";
+
+    QApplication::clipboard()->setText(clip);
+}
+
+void radeon_profile::resetStats() {
+    statsTickCounter = 1;
+    pmStats.clear();
+    ui->list_stats->clear();
+}
 //========

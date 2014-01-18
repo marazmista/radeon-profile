@@ -104,6 +104,8 @@ private slots:
     void refreshBtnClicked();
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_cb_stats_clicked(bool checked);
+    void copyGlxInfoToClipboard();
+    void resetStats();
 
 private:
     Ui::radeon_profile *ui;
@@ -134,6 +136,7 @@ private:
     QString findSysfsHwmonForGPU();
     void doTheStats(const double &coreClock,const double &memClock,const double &voltsGPU, const double &voltsMem);
     void updateStatsTable();
+    void setupContextMenus();
 };
 
 

@@ -24,7 +24,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140116;
+const int appVersion = 20140118;
 
 int ticksCounter = 0, statsTickCounter = 1;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -53,6 +53,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     setupGraphs();
     setupForcePowerLevelMenu();
     setupOptionsMenu();
+    setupContextMenus();
     setupTrayIcon();
 
     loadConfig();
