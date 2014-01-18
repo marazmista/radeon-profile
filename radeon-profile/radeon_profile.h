@@ -11,8 +11,8 @@
 #include <QProcessEnvironment>
 #include <QList>
 
-#define startClocksScaleL 100
-#define startClocksScaleH 400
+#define startClocksScaleL 50
+#define startClocksScaleH 150
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 

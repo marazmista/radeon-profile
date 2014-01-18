@@ -510,6 +510,30 @@ QStringList radeon_profile::getClocks() {
             if (ui->tabs_systemInfo->currentIndex() == 3)
                 updateStatsTable();
         }
+
+        if (ui->cb_graphs->isChecked()) {
+            // choose bigger clock and adjust plot scale
+            if (int i = (memClock >= coreClock) ? memClock : coreClock) {
+                if (i > ui->plotColcks->yAxis->range().upper)
+                    ui->plotColcks->yAxis->setRangeUpper(i + 150);
+            }
+
+            // add data to plots
+            ui->plotColcks->graph(0)->addData(ticksCounter,coreClock);
+            ui->plotColcks->graph(1)->addData(ticksCounter,memClock);
+            ui->plotColcks->graph(2)->addData(ticksCounter,uvdvclk);
+            ui->plotColcks->graph(3)->addData(ticksCounter,uvddclk);
+
+            if (voltsGPU != 0)  {
+                if (voltsGPU > ui->plotVolts->yAxis->range().upper)
+                    ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
+
+                ui->plotVolts->graph(0)->addData(ticksCounter,voltsGPU);
+                ui->plotVolts->graph(1)->addData(ticksCounter,voltsMem);
+            }
+            else
+                ui->cb_showVoltsGraph->setEnabled(false);
+        }
     }
     else {
         gpuData << "Current GPU clock: " + noValues + " (root rights? debugfs mounted?)";
@@ -520,29 +544,6 @@ QStringList radeon_profile::getClocks() {
                 ui->plotColcks->setVisible(false),ui->plotVolts->setVisible(false),ui->tabs_systemInfo->setTabEnabled(3,false);
     }
     gpuData << "------------------------";
-
-    if (ui->cb_graphs->isChecked()) {
-        // update plots
-        if (memClock > ui->plotColcks->yAxis->range().upper && memClock != 0) // assume that mem clocks are often bigger than core
-            ui->plotColcks->yAxis->setRangeUpper(memClock + 150);
-        else if (coreClock != 0 && memClock == 0)
-            ui->plotColcks->yAxis->setRangeUpper(coreClock + 150);
-
-        ui->plotColcks->graph(0)->addData(ticksCounter,coreClock);
-        ui->plotColcks->graph(1)->addData(ticksCounter,memClock);
-        ui->plotColcks->graph(2)->addData(ticksCounter,uvdvclk);
-        ui->plotColcks->graph(3)->addData(ticksCounter,uvddclk);
-
-        if (voltsGPU != 0)  {
-            if (voltsGPU > ui->plotVolts->yAxis->range().upper)
-                ui->plotVolts->yAxis->setRangeUpper(voltsGPU + 100);
-
-            ui->plotVolts->graph(0)->addData(ticksCounter,voltsGPU);
-            ui->plotVolts->graph(1)->addData(ticksCounter,voltsMem);
-        }
-        else
-            ui->cb_showVoltsGraph->setEnabled(false);
-    }
 
     return gpuData;
 }
