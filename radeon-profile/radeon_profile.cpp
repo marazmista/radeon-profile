@@ -26,7 +26,7 @@
 
 const int appVersion = 20140116;
 
-int ticksCounter = 1;
+int ticksCounter = 0, statsTickCounter = 1;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
 char selectedPowerMethod, selectedTempSensor, sensorsGPUtempIndex;
 QString
@@ -35,10 +35,6 @@ QString
     noValues = "no values";
 static const QString settingsPath = QDir::homePath() + "/.radeon-profile-settings";
 
-struct pmLevel {
-    QString name;
-    float time;
-};
 QList<pmLevel> pmStats;
 
 radeon_profile::radeon_profile(QWidget *parent) :
@@ -149,7 +145,7 @@ void radeon_profile::timerEvent() {
 
         if (ui->cb_graphs->isChecked()) {
             // count seconds to move graph to right
-            ticksCounter++;
+            ticksCounter++, statsTickCounter++;
             ui->plotTemp->xAxis->setRange(ticksCounter+20, rangeX,Qt::AlignRight);
             ui->plotTemp->replot();
 
@@ -507,11 +503,13 @@ QStringList radeon_profile::getClocks() {
         }
         }
 
-        doTheStats(coreClock,memClock,voltsGPU,voltsMem);
+        if (ui->cb_stats->isChecked()) {
+            doTheStats(coreClock,memClock ,voltsGPU,voltsMem);
 
-        // do the math only when user looking at stats table
-        if (ui->tabs_systemInfo->currentIndex() == 3)
-            updateStatsTable();
+            // do the math only when user looking at stats table
+            if (ui->tabs_systemInfo->currentIndex() == 3)
+                updateStatsTable();
+        }
     }
     else {
         gpuData << "Current GPU clock: " + noValues + " (root rights? debugfs mounted?)";
@@ -587,7 +585,7 @@ void radeon_profile::updateStatsTable() {
 
     // do the math with percents
     for (int i = 0;i < ui->list_stats->topLevelItemCount() ; i++) {
-        ui->list_stats->topLevelItem(i)->setText(1,QString().setNum(pmStats.at(i).time/ticksCounter * 100,'f',2)+"%");
+        ui->list_stats->topLevelItem(i)->setText(1,QString().setNum(pmStats.at(i).time/statsTickCounter * 100,'f',2)+"%");
     }
 }
 
@@ -718,6 +716,7 @@ void radeon_profile::saveConfig() {
     settings.setValue("updateModParams",ui->cb_modParams->isChecked());
     settings.setValue("saveWindowGeometry",ui->cb_saveWindowGeometry->isChecked());
     settings.setValue("windowGeometry",this->geometry());
+    settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
 
     settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
     settings.setValue("graphRange",ui->timeSlider->value());
@@ -753,6 +752,7 @@ void radeon_profile::loadConfig() {
     ui->cb_connectors->setChecked(settings.value("updateConnectors",false).toBool());
     ui->cb_modParams->setChecked(settings.value("updateModParams",false).toBool());
     ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
+    ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
     ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
@@ -786,6 +786,15 @@ void radeon_profile::loadConfig() {
         showNormal();
 
     ui->cb_graphs->setEnabled(ui->cb_gpuData->isChecked());
+    ui->cb_stats->setEnabled(ui->cb_gpuData->isChecked());
+
+    if (ui->cb_gpuData->isChecked()) {
+        if (ui->cb_stats->isChecked())
+            ui->tabs_systemInfo->setTabEnabled(3,true);
+        else
+            ui->tabs_systemInfo->setTabEnabled(3,false);
+    } else
+        ui->list_currentGPUData->addItem("GPU data is disabled.");
 
     if (ui->cb_graphs->isChecked() && ui->cb_graphs->isEnabled())
         ui->mainTabs->setTabEnabled(1,true);

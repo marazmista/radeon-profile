@@ -9,17 +9,24 @@
 #include <QEvent>
 #include <QTreeWidgetItem>
 #include <QProcessEnvironment>
+#include <QList>
 
 #define startClocksScaleL 100
 #define startClocksScaleH 400
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-extern int ticksCounter;
+extern int ticksCounter, statsTickCounter;
 extern QString powerMethodFilePath, profilePath, dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath;
 extern char selectedPowerMethod, selectedTempSensor, sensorsGPUtempIndex;
 extern double maxT, minT, rangeX, current, tempSum;
 extern QTimer timer;
+
+struct pmLevel {
+    QString name;
+    float time;
+};
+extern QList<pmLevel> pmStats;
 
 namespace Ui {
 class radeon_profile;
@@ -96,7 +103,7 @@ private slots:
     void on_cb_gpuData_clicked(bool checked);
     void refreshBtnClicked();
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
-    void on_tabs_systemInfo_currentChanged(int index);
+    void on_cb_stats_clicked(bool checked);
 
 private:
     Ui::radeon_profile *ui;

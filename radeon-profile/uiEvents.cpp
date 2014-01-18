@@ -156,9 +156,17 @@ void radeon_profile::on_cb_graphs_clicked(bool checked)
 void radeon_profile::on_cb_gpuData_clicked(bool checked)
 {
     ui->cb_graphs->setEnabled(checked);
-    if (ui->cb_graphs->isChecked()) {
-        ui->mainTabs->setTabEnabled(1,checked);
+    ui->cb_stats->setEnabled(checked);
+
+    if (ui->cb_stats->isChecked())
         ui->tabs_systemInfo->setTabEnabled(3,checked);
+
+    if (ui->cb_graphs->isChecked())
+        ui->mainTabs->setTabEnabled(1,checked);
+
+    if (!checked) {
+        ui->list_currentGPUData->clear();
+        ui->list_currentGPUData->addItem("GPU data is disabled.");
     }
 }
 
@@ -178,9 +186,16 @@ void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item,
     }
 }
 
-void radeon_profile::on_tabs_systemInfo_currentChanged(int index)
+void radeon_profile::on_cb_stats_clicked(bool checked)
 {
-    if (index == 3)
-        updateStatsTable();
+    ui->tabs_systemInfo->setTabEnabled(3,checked);
+
+    // reset stats data
+    statsTickCounter = 1;
+    if (!checked) {
+        pmStats.clear();
+        ui->list_stats->clear();
+    }
 }
+
 //========

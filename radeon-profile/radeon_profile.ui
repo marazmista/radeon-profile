@@ -55,7 +55,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -827,7 +827,7 @@
           <x>10</x>
           <y>10</y>
           <width>301</width>
-          <height>240</height>
+          <height>271</height>
          </rect>
         </property>
         <property name="frameShape">
@@ -1024,6 +1024,16 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="cb_stats">
+             <property name="text">
+              <string>Power levels statistics</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="cb_glxInfo">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -1072,7 +1082,7 @@
           <x>320</x>
           <y>10</y>
           <width>231</width>
-          <height>241</height>
+          <height>271</height>
          </rect>
         </property>
         <property name="frameShape">
