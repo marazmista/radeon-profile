@@ -12,7 +12,6 @@
 void radeon_profile::setupGraphs()
 {
     ui->plotColcks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
-//    ui->plotColcks->yAxis->setRange(1000,1100);
     ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
 
     ui->plotTemp->xAxis->setLabel("time");

@@ -134,7 +134,7 @@ private:
     void loadConfig();
     void setupGraphsStyle();
     QString findSysfsHwmonForGPU();
-    void doTheStats(const double &coreClock,const double &memClock,const double &voltsGPU, const double &voltsMem);
+    void doTheStats(const short &currentPowerLevel, const double &coreClock,const double &memClock,const double &voltsGPU, const double &voltsMem);
     void updateStatsTable();
     void setupContextMenus();
 };

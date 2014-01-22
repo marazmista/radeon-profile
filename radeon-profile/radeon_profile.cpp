@@ -24,7 +24,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140118;
+const int appVersion = 20140122;
 
 int ticksCounter = 0, statsTickCounter = 1;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -411,6 +411,7 @@ void radeon_profile::figureOutGPUDataPaths(const QString gpuName) {
 QStringList radeon_profile::getClocks() {
     QStringList gpuData;
     double coreClock = 0,memClock= 0, voltsGPU = 0, voltsMem = 0, uvdvclk = 0, uvddclk = 0;  // for plots
+    short currentPowerLevel;
 
     if (QFile(clocksPath).exists()) {  // check for debugfs access
         QStringList out = grabSystemInfo("cat "+clocksPath);
@@ -418,6 +419,13 @@ QStringList radeon_profile::getClocks() {
         switch (selectedPowerMethod) {
         case DPM: {
             QRegExp rx;
+
+            rx.setPattern("power\\slevel\\s\\d");
+            rx.indexIn(out[1]);
+            if (!rx.cap(0).isEmpty()) {
+                currentPowerLevel = rx.cap(0).split(' ')[2].toShort();
+                gpuData << "Current power level: " + QString().setNum(currentPowerLevel);
+            }
 
             rx.setPattern("sclk:\\s\\d+");
             rx.indexIn(out[1]);
@@ -505,7 +513,7 @@ QStringList radeon_profile::getClocks() {
         }
 
         if (ui->cb_stats->isChecked()) {
-            doTheStats(coreClock,memClock ,voltsGPU,voltsMem);
+            doTheStats(currentPowerLevel,coreClock,memClock ,voltsGPU,voltsMem);
 
             // do the math only when user looking at stats table
             if (ui->tabs_systemInfo->currentIndex() == 3)
@@ -514,10 +522,10 @@ QStringList radeon_profile::getClocks() {
 
         if (ui->cb_graphs->isChecked()) {
             // choose bigger clock and adjust plot scale
-            if (int i = (memClock >= coreClock) ? memClock : coreClock) {
-                if (i > ui->plotColcks->yAxis->range().upper)
-                    ui->plotColcks->yAxis->setRangeUpper(i + 150);
-            }
+            int r = (memClock >= coreClock) ? memClock : coreClock;
+            if (r > ui->plotColcks->yAxis->range().upper)
+                ui->plotColcks->yAxis->setRangeUpper(r + 150);
+
 
             // add data to plots
             ui->plotColcks->graph(0)->addData(ticksCounter,coreClock);
@@ -549,12 +557,12 @@ QStringList radeon_profile::getClocks() {
     return gpuData;
 }
 
-void radeon_profile::doTheStats(const double &coreClock, const double &memClock, const double &voltsGPU, const double &voltsMem) {
+void radeon_profile::doTheStats(const short &currentPowerLevel, const double &coreClock, const double &memClock, const double &voltsGPU, const double &voltsMem) {
 
     // figure out pm level based on data provided
-    QString pmLevelName, volt;
+    QString pmLevelName = "Power level:" + QString().setNum(currentPowerLevel), volt;
     volt = (voltsGPU == 0) ? "" : "(" + QString().setNum(voltsGPU) + "mV)";
-    pmLevelName = (coreClock == 0) ? pmLevelName : "Core:" +QString().setNum(coreClock) + "MHz" + volt;
+    pmLevelName = (coreClock == 0) ? pmLevelName : pmLevelName + " Core:" +QString().setNum(coreClock) + "MHz" + volt;
 
     volt = (voltsMem == 0) ? "" : "(" + QString().setNum(voltsMem) + "mV)";
     pmLevelName = (memClock == 0) ? pmLevelName : pmLevelName + " Mem:" + QString().setNum(memClock) + "MHz" + volt;
