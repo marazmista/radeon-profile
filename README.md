@@ -29,6 +29,5 @@ For full functionality:
 Type: `qmake-qt4 && make` in source directory.
 
 # Screenshot
-[Main window](https://drive.google.com/file/d/0B7nxOyrvj2IiWVNabkRLenItajA/edit?usp=sharing)
-[Graphs](https://drive.google.com/file/d/0B7nxOyrvj2IibU5vMDBGM2ZoUHc/edit?usp=sharing)
-[Configuration](https://drive.google.com/file/d/0B7nxOyrvj2IiNDVMRlBuZWp0R0E/edit?usp=sharing)
+
+[Gallery](http://www.imgur.com/a/Aka7u)
