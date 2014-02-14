@@ -24,7 +24,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140122;
+const int appVersion = 20140214;
 
 int ticksCounter = 0, statsTickCounter = 1;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -144,9 +144,12 @@ void radeon_profile::timerEvent() {
 
         ui->list_currentGPUData->addItems(fillGpuDataTable());
 
+        // count ticks for stats
+        statsTickCounter++;
+
         if (ui->cb_graphs->isChecked()) {
-            // count seconds to move graph to right
-            ticksCounter++, statsTickCounter++;
+            // count ticks to move graph to right
+            ticksCounter++;
             ui->plotTemp->xAxis->setRange(ticksCounter+20, rangeX,Qt::AlignRight);
             ui->plotTemp->replot();
 
