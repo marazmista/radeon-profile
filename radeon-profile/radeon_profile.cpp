@@ -24,7 +24,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140214;
+const int appVersion = 20140215;
 
 int ticksCounter = 0, statsTickCounter = 1;
 double maxT = 0.0, minT = 0.0, current, tempSum = 0, rangeX = 180;
@@ -415,9 +415,10 @@ QStringList radeon_profile::getClocks() {
     QStringList gpuData;
     double coreClock = 0,memClock= 0, voltsGPU = 0, voltsMem = 0, uvdvclk = 0, uvddclk = 0;  // for plots
     short currentPowerLevel;
+    QFile clocksFile(clocksPath);
 
-    if (QFile(clocksPath).exists()) {  // check for debugfs access
-        QStringList out = grabSystemInfo("cat "+clocksPath);
+    if (clocksFile.open(QIODevice::ReadOnly)) {  // check for debugfs access
+        QStringList out = QString(clocksFile.readAll()).split('\n');
 
         switch (selectedPowerMethod) {
         case DPM: {
