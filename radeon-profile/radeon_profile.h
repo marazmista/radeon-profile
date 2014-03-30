@@ -1,6 +1,8 @@
 #ifndef RADEON_PROFILE_H
 #define RADEON_PROFILE_H
 
+#include "gpu.h"
+
 #include <QMainWindow>
 #include <QString>
 #include "qcustomplot.h"
@@ -36,20 +38,6 @@ class radeon_profile : public QMainWindow
 {
     Q_OBJECT
 
-    enum powerMethod {
-        DPM = 0,  // kernel >= 3.11
-        PROFILE = 1,  // kernel <3.11 or dpm disabled
-        PM_UNKNOWN = 2
-    };
-
-    enum tempSensor {
-        SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
-        CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
-        PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
-        MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
-        TS_UNKNOWN
-    };
-
     // names in this enum equals indexes in Qtreewidged in ui for selecting clors
     enum graphColors {
         TEMP_BG = 0,
@@ -75,7 +63,7 @@ public:
     QTimer *timer;
 
 private slots:
-    void on_chProfile_clicked();
+//    void on_chProfile_clicked();
     void timerEvent();
     void on_btn_dpmBattery_clicked();
     void on_btn_dpmBalanced_clicked();
@@ -108,6 +96,9 @@ private slots:
     void resetStats();
 
 private:
+    gpu device;
+    static const QString settingsPath;
+
     Ui::radeon_profile *ui;
     void getPowerMethod();
     QStringList getClocks();
@@ -134,9 +125,12 @@ private:
     void loadConfig();
     void setupGraphsStyle();
     QString findSysfsHwmonForGPU();
-    void doTheStats(const short &currentPowerLevel, const double &coreClock,const double &memClock,const double &voltsGPU, const double &voltsMem);
+    void doTheStats(const globalStuff::gpuClocksStruct &_gpuData);
     void updateStatsTable();
     void setupContextMenus();
+
+    void refreshGpuData();
+    void refreshGraphs(const globalStuff::gpuClocksStruct &, const globalStuff::gpuTemperatureStruct &);
 };
 
 
