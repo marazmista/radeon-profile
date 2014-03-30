@@ -169,7 +169,7 @@ void radeon_profile::refreshGraphs(const globalStuff::gpuClocksStruct &_gpuData,
     ui->plotVolts->replot();
 
     // choose bigger clock and adjust plot scale
-    int r = (_gpuData.memClk >= _gpuData.memClk) ? _gpuData.memClk : _gpuData.memClk;
+    int r = (_gpuData.memClk >= _gpuData.coreClk) ? _gpuData.memClk : _gpuData.coreClk;
     if (r > ui->plotColcks->yAxis->range().upper)
         ui->plotColcks->yAxis->setRangeUpper(r + 150);
 
@@ -215,7 +215,6 @@ void radeon_profile::doTheStats(const globalStuff::gpuClocksStruct &_gpuData) {
             break;
         }
     }
-
 
     // if found, count this tick to current pm level, if not add to list and count tick
     if (index != -1)
