@@ -131,6 +131,7 @@ private:
 
     void refreshGpuData();
     void refreshGraphs(const globalStuff::gpuClocksStruct &, const globalStuff::gpuTemperatureStruct &);
+    void setupUiEnabledFeatures(const globalStuff::driverFeatures &features);
 };
 
 

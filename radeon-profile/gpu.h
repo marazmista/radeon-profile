@@ -20,6 +20,7 @@ public:
     globalStuff::gpuTemperatureStruct gpuTemeperatureData;
     QStringList gpuList;
     char currentGpuIndex;
+    globalStuff::driverFeatures gpuFeatures;
 
     QList<QTreeWidgetItem *> getCardConnectors();
     QStringList getGLXInfo(QString gpuName);

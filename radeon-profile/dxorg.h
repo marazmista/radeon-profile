@@ -14,12 +14,14 @@
 class dXorg
 {
 public:
+
+
     dXorg() {}
 
     static globalStuff::gpuClocksStruct getClocks();
     static float getTemperature();
     static QList<QTreeWidgetItem *> getCardConnectors();
-    static QStringList getGLXInfo(QString gpuName);
+    static QStringList getGLXInfo(QString gpuName, QProcessEnvironment env);
     static QList<QTreeWidgetItem *> getModuleInfo();
     static QString getCurrentPowerProfile();
     static QStringList detectCards();
@@ -27,15 +29,9 @@ public:
     static void setForcePowerLevel(globalStuff::forcePowerLevels);
     static void figureOutGpuDataFilePaths(QString gpuName);
     static void configure(QString gpuName);
+    static globalStuff::driverFeatures figureOutDriverFeatures();
 
-    static globalStuff::driverFeatures xrogDriverFeatures;
 private:
-    enum powerMethod {
-        DPM = 0,  // kernel >= 3.11
-        PROFILE = 1,  // kernel <3.11 or dpm disabled
-        PM_UNKNOWN = 2
-    };
-
     enum tempSensor {
         SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
         CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
@@ -50,11 +46,11 @@ private:
     } filePaths;
 
     static QString findSysfsHwmonForGPU();
-    static powerMethod getPowerMethod();
+    static globalStuff::powerMethod getPowerMethod();
     static tempSensor testSensor();
     static int sensorsGPUtempIndex;
-    static  dXorg::tempSensor currentTempSensor;
-    static dXorg::powerMethod currentPowerMethod;
+    static dXorg::tempSensor currentTempSensor;
+    static globalStuff::powerMethod currentPowerMethod;
 
     static void setNewValue(const QString &filePath, const QString &newValue);
     static QString findSysFsHwmonForGpu();

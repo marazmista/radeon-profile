@@ -2,13 +2,13 @@
 
 #include "gpu.h"
 #include <QFile>
-#include <QDir>
 
 gpu::driver gpu::detectDriver() {
-    if (QDir("/sys/class/drm/").exists())
-        return XORG;
+    QStringList out = globalStuff::grabSystemInfo("lsmod");
 
-    if (QDir("/dev/ati").exists())
+    if (!out.filter("radeon").isEmpty())
+        return XORG;
+    if (!out.filter("fglrx").isEmpty())
         return FGLRX;
 
     return DRIVER_UNKNOWN;
@@ -21,14 +21,19 @@ QStringList gpu::initialize() {
     case XORG: {
         gpuList = dXorg::detectCards();
         dXorg::configure(gpuList[currentGpuIndex]);
+        gpuFeatures = dXorg::figureOutDriverFeatures();
         return gpuList;
         break;
     }
     case FGLRX:
         break;
-    case DRIVER_UNKNOWN:
-        break;
-    default: break;
+    case DRIVER_UNKNOWN: {
+        globalStuff::driverFeatures f;
+        f.pm = globalStuff::PM_UNKNOWN;
+        f.canChangeProfile = f.temperatureAvailable = f.voltAvailable = f.clocksAvailable = false;
+        gpuFeatures = f;
+        return QStringList() << "unknown";
+    }
     }
 }
 
@@ -36,9 +41,11 @@ void gpu::changeGpu(char index) {
     currentGpuIndex = index;
 
     switch (currentDriver) {
-    case XORG:
+    case XORG: {
         dXorg::configure(gpuList[currentGpuIndex]);
+        gpuFeatures = dXorg::figureOutDriverFeatures();
         break;
+    }
     default:
         break;
     }
@@ -79,17 +86,22 @@ void gpu::getTemperature() {
 }
 
 QList<QTreeWidgetItem *> gpu::getCardConnectors() {
-    switch (currentDriver) {
-    case XORG:
-        return dXorg::getCardConnectors();
-        break;
-    case FGLRX:
-        break;
-    case DRIVER_UNKNOWN:
-        break;
-    default:
-        break;
-    }
+
+    // looks like good implementation for everything, cause of questioning xrandr
+    // don't get wrong with dXorg class, just enjoy card connectors list
+    return dXorg::getCardConnectors();
+
+//    switch (currentDriver) {
+//    case XORG:
+//        return dXorg::getCardConnectors();
+//        break;
+//    case FGLRX:
+//        break;
+//    case DRIVER_UNKNOWN:
+//        QList<QTreeWidgetItem *> list;
+//        list.append(new QTreeWidgetItem(QStringList() <<"err"));
+//        return list;
+//    }
 }
 
 QList<QTreeWidgetItem *> gpu::getModuleInfo() {
@@ -99,25 +111,40 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() {
         break;
     case FGLRX:
         break;
-    case DRIVER_UNKNOWN:
-        break;
-    default:
-        break;
+    case DRIVER_UNKNOWN: {
+        QList<QTreeWidgetItem *> list;
+        list.append(new QTreeWidgetItem(QStringList() <<"err"));
+        return list;
+    }
     }
 }
 
 QStringList gpu::getGLXInfo(QString gpuName) {
+    QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter(QRegExp(".+VGA.+|.+3D.+"));
+    gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
+
+    // loop for multi gpu
+    for (int i = 0; i < gpus.count(); i++)
+        data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
+
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
+
+    QStringList driver = globalStuff::grabSystemInfo("xdriinfo",env).filter("Screen 0:",Qt::CaseInsensitive);
+    if (!driver.isEmpty())  // because of segfault when no xdriinfo
+        data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
+
     switch (currentDriver) {
     case XORG:
-        return dXorg::getGLXInfo(gpuName);
+        data << dXorg::getGLXInfo(gpuName, env);
         break;
     case FGLRX:
         break;
     case DRIVER_UNKNOWN:
         break;
-    default:
-        break;
     }
+
+    return data;
 }
 
 QString gpu::getCurrentPowerProfile() {
@@ -128,8 +155,7 @@ QString gpu::getCurrentPowerProfile() {
     case FGLRX:
         break;
     case DRIVER_UNKNOWN:
-        break;
-    default: break;
+        return "unknown";
     }
 }
 

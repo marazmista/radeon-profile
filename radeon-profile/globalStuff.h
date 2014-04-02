@@ -32,19 +32,6 @@ public:
         return QString(p->readAllStandardOutput()).split('\n');
     }
 
-    struct gpuClocksStruct{
-        int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
-        char powerLevel;
-    };
-
-    struct driverFeatures {
-        bool canChangeProfile, clocksAvailable, voltAvailable, temperatureaAvailable;
-    };
-
-    struct gpuTemperatureStruct{
-        float current, max, min, sum;
-    };
-
     enum powerProfiles {
         BATTERY, BALANCED, PERFORMANCE, AUTO, DEFAULT, LOW, MID, HIGH
     };
@@ -52,5 +39,26 @@ public:
     enum forcePowerLevels {
         F_AUTO, F_LOW, F_HIGH
     };
+
+    enum powerMethod {
+        DPM = 0,  // kernel >= 3.11
+        PROFILE = 1,  // kernel <3.11 or dpm disabled
+        PM_UNKNOWN = 2
+    };
+
+    struct gpuClocksStruct{
+        int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
+        char powerLevel;
+    };
+
+    struct driverFeatures {
+        bool canChangeProfile, clocksAvailable, voltAvailable, temperatureAvailable;
+        globalStuff::powerMethod pm;
+    };
+
+    struct gpuTemperatureStruct{
+        float current, max, min, sum;
+    };
+
 };
 #endif // PUBLICSTUFF_H

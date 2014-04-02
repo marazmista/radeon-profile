@@ -6,11 +6,10 @@
 
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
-dXorg::powerMethod dXorg::currentPowerMethod;
+globalStuff::powerMethod dXorg::currentPowerMethod;
 int dXorg::sensorsGPUtempIndex;
 
 dXorg::driverFilePaths dXorg::filePaths;
-globalStuff::driverFeatures dXorg::xrogDriverFeatures;
 // end //
 
 void dXorg::configure(QString gpuName) {
@@ -40,7 +39,7 @@ globalStuff::gpuClocksStruct dXorg::getClocks() {
         QStringList out = QString(clocksFile.readAll()).split('\n');
 
         switch (currentPowerMethod) {
-        case DPM: {
+        case globalStuff::DPM: {
             QRegExp rx;
 
             rx.setPattern("power\\slevel\\s\\d");
@@ -85,7 +84,7 @@ globalStuff::gpuClocksStruct dXorg::getClocks() {
             return tData;
             break;
         }
-        case PROFILE: {
+        case globalStuff::PROFILE: {
             for (int i=0; i< out.count(); i++) {
                 switch (i) {
                 case 1: {
@@ -111,7 +110,7 @@ globalStuff::gpuClocksStruct dXorg::getClocks() {
             return tData;
             break;
         }
-        case PM_UNKNOWN: {
+        case globalStuff::PM_UNKNOWN: {
             return tData;
             break;
         }
@@ -224,19 +223,19 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
 }
 
 
-dXorg::powerMethod dXorg::getPowerMethod() {
+globalStuff::powerMethod dXorg::getPowerMethod() {
     QFile powerMethodFile(filePaths.powerMethodFilePath);
     if (powerMethodFile.open(QIODevice::ReadOnly)) {
         QString s = powerMethodFile.readLine(20);
 
         if (s.contains("dpm",Qt::CaseInsensitive))
-            return DPM;
+            return globalStuff::DPM;
         else if (s.contains("profile",Qt::CaseInsensitive))
-            return PROFILE;
+            return globalStuff::PROFILE;
         else
-            return  PM_UNKNOWN;
+            return globalStuff::PM_UNKNOWN;
     } else
-        return PM_UNKNOWN;
+        return globalStuff::PM_UNKNOWN;
 }
 
 dXorg::tempSensor dXorg::testSensor() {
@@ -285,23 +284,8 @@ QString dXorg::findSysfsHwmonForGPU() {
     return "";
 }
 
-QStringList dXorg::getGLXInfo(QString gpuName) {
-    QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter("Radeon",Qt::CaseInsensitive);
-    gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
-
-    // loop for multi gpu
-    for (int i = 0; i < gpus.count(); i++)
-        data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
-
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
-
-    QStringList driver = globalStuff::grabSystemInfo("xdriinfo",env).filter("Screen 0:",Qt::CaseInsensitive);
-    if (!driver.isEmpty())  // because of segfault when no xdriinfo
-        data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
-
-    data << globalStuff::grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
-    return data;
+QStringList dXorg::getGLXInfo(QString gpuName, QProcessEnvironment env) {
+    return globalStuff::grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
 }
 
 QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
@@ -350,7 +334,7 @@ QString dXorg::getCurrentPowerProfile() {
     QString pp, err = "err";
 
     switch (currentPowerMethod) {
-    case DPM: {
+    case globalStuff::DPM: {
         QFile profile(filePaths.dpmStateFilePath);
         if (profile.open(QIODevice::ReadOnly)) {
             pp = profile.readLine(13);
@@ -360,13 +344,13 @@ QString dXorg::getCurrentPowerProfile() {
             pp = err;
         break;
     }
-    case PROFILE: {
+    case globalStuff::PROFILE: {
         QFile profile(filePaths.profilePath);
         if (profile.open(QIODevice::ReadOnly))
             pp = profile.readLine(13);
         break;
     }
-    case PM_UNKNOWN: {
+    case globalStuff::PM_UNKNOWN: {
         pp = err;
         break;
     }
@@ -418,3 +402,37 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
     }
     setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
+
+globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
+    globalStuff::driverFeatures features;
+
+    features.temperatureAvailable =  (currentTempSensor == dXorg::TS_UNKNOWN) ? false : true;
+
+    globalStuff::gpuClocksStruct test = dXorg::getClocks();
+    features.clocksAvailable = (test.coreClk == -1) ? false : true;
+    features.voltAvailable = (test.coreVolt == -1) ? false : true;
+
+    features.pm = currentPowerMethod;
+    features.canChangeProfile = false;
+    switch (currentPowerMethod) {
+    case globalStuff::DPM: {
+        QFile f(filePaths.dpmStateFilePath);
+        if (f.open(QIODevice::WriteOnly)){
+            features.canChangeProfile = true;
+            f.close();
+        }
+        break;
+    }
+    case globalStuff::PROFILE: {
+        QFile f(filePaths.profilePath);
+        if (f.open(QIODevice::WriteOnly)) {
+            features.canChangeProfile = true;
+            f.close();
+        }
+    }
+    case globalStuff::PM_UNKNOWN:
+        break;
+    }
+    return features;
+}
+

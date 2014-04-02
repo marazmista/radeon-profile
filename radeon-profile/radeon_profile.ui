@@ -20,7 +20,7 @@
    <string>Radeon Profile</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="radeon-resource.qrc">
+   <iconset>
     <normaloff>:/icon/extra/radeon-profile.png</normaloff>:/icon/extra/radeon-profile.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -231,7 +231,7 @@
                   <string>Battery</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="radeon-resource.qrc">
+                  <iconset>
                    <normaloff>:/icon/symbols/arrow1.png</normaloff>:/icon/symbols/arrow1.png</iconset>
                  </property>
                  <property name="flat">
@@ -251,7 +251,7 @@
                   <string>Balanced</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="radeon-resource.qrc">
+                  <iconset>
                    <normaloff>:/icon/symbols/arrow2.png</normaloff>:/icon/symbols/arrow2.png</iconset>
                  </property>
                 </widget>
@@ -268,7 +268,7 @@
                   <string>Performance</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="radeon-resource.qrc">
+                  <iconset>
                    <normaloff>:/icon/symbols/arrow3.png</normaloff>:/icon/symbols/arrow3.png</iconset>
                  </property>
                 </widget>
@@ -452,7 +452,7 @@
           </widget>
           <widget class="QWidget" name="tab_modInfo">
            <attribute name="title">
-            <string>Radeon module info</string>
+            <string>Module info</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_8">
             <property name="leftMargin">
@@ -1248,8 +1248,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="radeon-resource.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

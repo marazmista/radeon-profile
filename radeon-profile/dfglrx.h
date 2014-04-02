@@ -5,10 +5,25 @@
 #ifndef DFGLRX_H
 #define DFGLRX_H
 
+#include "globalStuff.h"
+
+#include <QTreeWidgetItem>
+
 class dFglrx
 {
 public:
-    dFglrx();
+    dFglrx() { }
+
+    static globalStuff::gpuClocksStruct getClocks();
+    static float getTemperature();
+    static QList<QTreeWidgetItem *> getCardConnectors();
+    static QStringList getGLXInfo();
+    static QStringList detectCards();
+    static void configure(char _gpuIndex);
+    static globalStuff::driverFeatures figureOutDriverFeatures();
+private:
+   static char gpuIndex;
+
 };
 
 #endif // DFGLRX_H

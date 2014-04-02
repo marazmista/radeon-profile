@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QDir>
+#include <QPushButton>
 
 const int appVersion = 20140330;
 
@@ -41,9 +42,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     ui->setupUi(this);
     timer = new QTimer();
 
-    // driver object detects cards in pc and fill the list in ui //
-    ui->combo_gpus->addItems(device.initialize());
-
     // setup ui elemensts
     ui->mainTabs->setCurrentIndex(0);
     ui->tabs_systemInfo->setCurrentIndex(0);
@@ -54,6 +52,11 @@ radeon_profile::radeon_profile(QWidget *parent) :
     setupTrayIcon();
 
     loadConfig();
+
+    // driver object detects cards in pc and fill the list in ui //
+    ui->combo_gpus->addItems(device.initialize());
+
+    setupUiEnabledFeatures(device.gpuFeatures);
 
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
@@ -94,6 +97,32 @@ radeon_profile::radeon_profile(QWidget *parent) :
 radeon_profile::~radeon_profile()
 {
     delete ui;
+}
+
+void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &features) {
+    if (features.canChangeProfile && features.pm < globalStuff::PM_UNKNOWN) {
+        ui->tabs_pm->setTabEnabled(0, (features.pm == globalStuff::PROFILE ? true : false));
+        ui->tabs_pm->setTabEnabled(1,((features.pm == globalStuff::DPM) ? true : false));
+    } else
+        ui->tabs_pm->setEnabled(false);
+
+    if (!features.clocksAvailable) {
+        ui->plotColcks->setVisible(false),
+        ui->cb_showFreqGraph->setEnabled(false);
+    }
+
+    if (!features.temperatureAvailable) {
+        ui->cb_showTempsGraph->setEnabled(false);
+        ui->plotTemp->setVisible(false);
+    }
+
+    if (!features.voltAvailable) {
+        ui->cb_showVoltsGraph->setEnabled(false);
+        ui->plotVolts->setVisible(false);
+    }
+
+    if (!features.clocksAvailable && !features.temperatureAvailable && !features.voltAvailable)
+        ui->mainTabs->setTabEnabled(1,false);
 }
 
 void radeon_profile::refreshGpuData() {

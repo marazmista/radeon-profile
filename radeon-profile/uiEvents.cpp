@@ -106,6 +106,7 @@ void radeon_profile::changeEvent(QEvent *event)
 void radeon_profile::gpuChanged()
 {
     device.changeGpu(ui->combo_gpus->currentIndex());
+    setupUiEnabledFeatures(device.gpuFeatures);
     timerEvent();
     refreshBtnClicked();
 }
