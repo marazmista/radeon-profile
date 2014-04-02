@@ -53,7 +53,7 @@ class radeon_profile : public QMainWindow
     };
 
 public:
-    explicit radeon_profile(QWidget *parent = 0);
+    explicit radeon_profile(QStringList, QWidget *parent = 0);
     ~radeon_profile();
     QString appHomePath;
 

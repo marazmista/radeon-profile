@@ -14,8 +14,9 @@ gpu::driver gpu::detectDriver() {
     return DRIVER_UNKNOWN;
 }
 
-QStringList gpu::initialize() {
-    currentDriver = detectDriver();
+QStringList gpu::initialize(bool skipDetectDriver) {
+    if (skipDetectDriver)
+        currentDriver = detectDriver();
 
     switch (currentDriver) {
     case XORG: {
@@ -35,6 +36,10 @@ QStringList gpu::initialize() {
         return QStringList() << "unknown";
     }
     }
+}
+
+void gpu::driverByParam(gpu::driver paramDriver) {
+    this->currentDriver = paramDriver;
 }
 
 void gpu::changeGpu(char index) {

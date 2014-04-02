@@ -35,7 +35,7 @@ QString err = "Err", noValues = "no values";
 
 QList<pmLevel> pmStats;
 
-radeon_profile::radeon_profile(QWidget *parent) :
+radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
 {
@@ -53,8 +53,18 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     loadConfig();
 
-    // driver object detects cards in pc and fill the list in ui //
-    ui->combo_gpus->addItems(device.initialize());
+    //figure out parameters
+    QString params = a.join(" ");
+    if (params.contains("--driver xorg")) {
+        device.driverByParam(gpu::XORG);
+        ui->combo_gpus->addItems(device.initialize(true));
+    }
+    else if (params.contains("--driver fglrx")) {
+        device.driverByParam(gpu::FGLRX);
+        ui->combo_gpus->addItems(device.initialize(true));
+    }
+    else // driver object detects cards in pc and fill the list in ui //
+        ui->combo_gpus->addItems(device.initialize());
 
     setupUiEnabledFeatures(device.gpuFeatures);
 
