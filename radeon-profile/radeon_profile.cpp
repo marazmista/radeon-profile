@@ -24,7 +24,6 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QDir>
-#include <QPushButton>
 
 const int appVersion = 20140330;
 
@@ -153,6 +152,9 @@ void radeon_profile::refreshGpuData() {
         ui->list_currentGPUData->addItem("Voltage (vddc): " + QString().setNum(device.gpuData.coreVolt) + " mV");
     if (device.gpuData.memVolt != -1)
         ui->list_currentGPUData->addItem("Voltage (vddci): " + QString().setNum(device.gpuData.memVolt) + " mV");
+
+    if (ui->list_currentGPUData->count() == 0)
+        ui->list_currentGPUData->addItem("no data");
 
     device.getTemperature();
     ui->list_currentGPUData->addItem("Current GPU temp: " + QString().setNum(device.gpuTemeperatureData.current) + QString::fromUtf8("\u00B0C"));

@@ -100,35 +100,18 @@ private:
     static const QString settingsPath;
 
     Ui::radeon_profile *ui;
-    void getPowerMethod();
-    QStringList getClocks();
-    QString getCurrentPowerProfile();
-    void setValueToFile(const QString, const QStringList);
-    void setValueToFile(const QString, const QString);
-    QString getGPUTemp();
-    QStringList fillGpuDataTable();
-    void getGLXInfo();
     void setupGraphs();
     void setupTrayIcon();
     void setupOptionsMenu();
     void refreshTooltip();
     void setupForcePowerLevelMenu();
-    void testSensor();
     void changeEvent(QEvent *event);
-    void getModuleInfo();
-    QStringList grabSystemInfo(const QString cmd);
-    QStringList grabSystemInfo(const QString cmd, const QProcessEnvironment env);
-    void getCardConnectors();
-    void detectCards();
-    void figureOutGPUDataPaths(const QString gpuName);
     void saveConfig();
     void loadConfig();
     void setupGraphsStyle();
-    QString findSysfsHwmonForGPU();
     void doTheStats(const globalStuff::gpuClocksStruct &_gpuData);
     void updateStatsTable();
     void setupContextMenus();
-
     void refreshGpuData();
     void refreshGraphs(const globalStuff::gpuClocksStruct &, const globalStuff::gpuTemperatureStruct &);
     void setupUiEnabledFeatures(const globalStuff::driverFeatures &features);

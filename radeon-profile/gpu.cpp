@@ -15,7 +15,7 @@ gpu::driver gpu::detectDriver() {
 }
 
 QStringList gpu::initialize(bool skipDetectDriver) {
-    if (skipDetectDriver)
+    if (!skipDetectDriver)
         currentDriver = detectDriver();
 
     switch (currentDriver) {
@@ -24,9 +24,13 @@ QStringList gpu::initialize(bool skipDetectDriver) {
         dXorg::configure(gpuList[currentGpuIndex]);
         gpuFeatures = dXorg::figureOutDriverFeatures();
         return gpuList;
-        break;
     }
-    case FGLRX:
+    case FGLRX: {
+        gpuList = dFglrx::detectCards();
+        dFglrx::configure(currentGpuIndex);
+        gpuFeatures = dFglrx::figureOutDriverFeatures();
+        return gpuList;
+    }
         break;
     case DRIVER_UNKNOWN: {
         globalStuff::driverFeatures f;
@@ -51,7 +55,12 @@ void gpu::changeGpu(char index) {
         gpuFeatures = dXorg::figureOutDriverFeatures();
         break;
     }
-    default:
+    case FGLRX: {
+        dFglrx::configure(currentGpuIndex);
+        gpuFeatures = dFglrx::figureOutDriverFeatures();
+        break;
+    }
+    case DRIVER_UNKNOWN:
         break;
     }
 }
@@ -62,10 +71,13 @@ void gpu::getClocks() {
         gpuData = dXorg::getClocks();
         break;
     case FGLRX:
+        gpuData = dFglrx::getClocks();
         break;
-    case DRIVER_UNKNOWN:
+    case DRIVER_UNKNOWN: {
+        globalStuff::gpuClocksStruct clk(-1);
+        gpuData = clk;
         break;
-    default: break;
+    }
     }
 }
 
@@ -75,10 +87,10 @@ void gpu::getTemperature() {
         gpuTemeperatureData.current = dXorg::getTemperature();
         break;
     case FGLRX:
+        gpuTemeperatureData.current = dFglrx::getTemperature();
         break;
     case DRIVER_UNKNOWN:
         return;
-    default: return;
     }
 
     // update rest of structure with temperature data //
@@ -90,7 +102,7 @@ void gpu::getTemperature() {
     gpuTemeperatureData.min = (gpuTemeperatureData.min > gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.min;
 }
 
-QList<QTreeWidgetItem *> gpu::getCardConnectors() {
+QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
     // looks like good implementation for everything, cause of questioning xrandr
     // don't get wrong with dXorg class, just enjoy card connectors list
@@ -109,13 +121,12 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() {
 //    }
 }
 
-QList<QTreeWidgetItem *> gpu::getModuleInfo() {
+QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
     switch (currentDriver) {
     case XORG:
         return dXorg::getModuleInfo();
         break;
     case FGLRX:
-        break;
     case DRIVER_UNKNOWN: {
         QList<QTreeWidgetItem *> list;
         list.append(new QTreeWidgetItem(QStringList() <<"err"));
@@ -124,7 +135,7 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() {
     }
 }
 
-QStringList gpu::getGLXInfo(QString gpuName) {
+QStringList gpu::getGLXInfo(QString gpuName) const {
     QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter(QRegExp(".+VGA.+|.+3D.+"));
     gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
 
@@ -144,6 +155,7 @@ QStringList gpu::getGLXInfo(QString gpuName) {
         data << dXorg::getGLXInfo(gpuName, env);
         break;
     case FGLRX:
+        data << dFglrx::getGLXInfo();
         break;
     case DRIVER_UNKNOWN:
         break;
@@ -152,42 +164,37 @@ QStringList gpu::getGLXInfo(QString gpuName) {
     return data;
 }
 
-QString gpu::getCurrentPowerProfile() {
+QString gpu::getCurrentPowerProfile() const {
     switch (currentDriver) {
     case XORG:
         return dXorg::getCurrentPowerProfile();
         break;
     case FGLRX:
+        return "Catalyst";
         break;
     case DRIVER_UNKNOWN:
         return "unknown";
     }
 }
 
-void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
+void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const {
     switch (currentDriver) {
     case XORG:
         dXorg::setPowerProfile(_newPowerProfile);
         break;
     case FGLRX:
-        break;
     case DRIVER_UNKNOWN:
-        break;
-    default:
         break;
     }
 }
 
-void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
+void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const {
     switch (currentDriver) {
     case XORG:
         dXorg::setForcePowerLevel(_newForcePowerLevel);
         break;
     case FGLRX:
-        break;
     case DRIVER_UNKNOWN:
-        break;
-    default:
         break;
     }
 }

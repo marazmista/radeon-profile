@@ -14,8 +14,6 @@
 class dXorg
 {
 public:
-
-
     dXorg() {}
 
     static globalStuff::gpuClocksStruct getClocks();
@@ -44,14 +42,13 @@ private:
     QString powerMethodFilePath, profilePath, dpmStateFilePath ,
     clocksPath , forcePowerLevelFilePath , sysfsHwmonPath, moduleParamsPath ;
     } filePaths;
-
-    static QString findSysfsHwmonForGPU();
-    static globalStuff::powerMethod getPowerMethod();
-    static tempSensor testSensor();
     static int sensorsGPUtempIndex;
     static dXorg::tempSensor currentTempSensor;
     static globalStuff::powerMethod currentPowerMethod;
 
+    static QString findSysfsHwmonForGPU();
+    static globalStuff::powerMethod getPowerMethod();
+    static tempSensor testSensor();
     static void setNewValue(const QString &filePath, const QString &newValue);
     static QString findSysFsHwmonForGpu();
 };

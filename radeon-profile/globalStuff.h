@@ -49,6 +49,23 @@ public:
     struct gpuClocksStruct{
         int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
         char powerLevel;
+
+        gpuClocksStruct() { }
+
+        gpuClocksStruct(int _coreClk, int _memClk, int _coreVolt, int _memVolt, int _uvdCClk, int _uvdDclk, char _pwrLevel ) {
+            coreClk = _coreClk,
+                    memClk = _memClk,
+                    coreVolt = _coreVolt,
+                    memVolt = _memVolt,
+                    uvdCClk = _uvdCClk,
+                    uvdDClk = _uvdDclk,
+                    powerLevel = _pwrLevel;
+        }
+
+        // initialize empty struct, so when we pass -1, only values that != -1 will show
+        gpuClocksStruct(int allValues) {
+            coreClk = memClk =  coreVolt =   memVolt = uvdCClk =  uvdDClk = powerLevel = allValues;
+        }
     };
 
     struct driverFeatures {

@@ -18,7 +18,7 @@ public:
         XORG, FGLRX, DRIVER_UNKNOWN
     };
 
-    gpu() { currentGpuIndex = 0; }
+    explicit gpu() { currentGpuIndex = 0; }
 
     globalStuff::gpuClocksStruct gpuData;
     globalStuff::gpuTemperatureStruct gpuTemeperatureData;
@@ -26,18 +26,18 @@ public:
     char currentGpuIndex;
     globalStuff::driverFeatures gpuFeatures;
 
-    QList<QTreeWidgetItem *> getCardConnectors();
-    QStringList getGLXInfo(QString gpuName);
-    QList<QTreeWidgetItem *> getModuleInfo();
-    QString getCurrentPowerProfile();
+    QList<QTreeWidgetItem *> getCardConnectors() const;
+    QStringList getGLXInfo(QString gpuName = "") const;
+    QList<QTreeWidgetItem *> getModuleInfo() const;
+    QString getCurrentPowerProfile() const;
     QStringList initialize(bool skipDetectDriver = false);
     void changeGpu(char index);
     void driverByParam(gpu::driver);
-    void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
-    void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel);
-
+    void setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const;
+    void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const;
     void getClocks();
     void getTemperature();
+
 private:
 
     driver currentDriver;

@@ -1,6 +1,7 @@
 // copyright marazmista @ 29.03.2014
 
 #include "dfglrx.h"
+//#include <QFile>
 
 // define static members //
 char dFglrx::gpuIndex = 0;
@@ -10,13 +11,12 @@ void dFglrx::configure(char _gpuIndex) {
     gpuIndex = _gpuIndex;
 }
 
-globalStuff::gpuClocksStruct dFglrx::getClocks() {
+globalStuff::gpuClocksStruct dFglrx::getClocks(){
     QStringList out = globalStuff::grabSystemInfo("aticonfig --odgc --adapter=" + gpuIndex);
-    // QFile f("/mnt/stuff/catalyst/odgc");
-
-    // f.open(QIODevice::ReadOnly);
-    // QStringList out = QString(f.readAll()).split('\n');
-    // f.close();
+//     QFile f("/home/mm/odgc");
+//     f.open(QIODevice::ReadOnly);
+//     QStringList out = QString(f.readAll()).split('\n');
+//     f.close();
 
     out = out.filter("Clocks");
 
@@ -24,37 +24,34 @@ globalStuff::gpuClocksStruct dFglrx::getClocks() {
     rx.setPattern("\\s+\\d+\\s+\\d+");
     rx.indexIn(out[0]);
 
-    QStringList gData = rx.cap(0).trimmed().split(" ");
-    globalStuff::gpuClocksStruct tData;
+    QStringList gData = rx.cap(0).trimmed().split("           ");
+    globalStuff::gpuClocksStruct tData(-1);
     tData.coreClk = gData[0].toInt();
     tData.memClk = gData[1].toInt();
-    tData.coreVolt = -1;
-    tData.memVolt = -1;
-    tData.powerLevel = -1;
-    tData.uvdCClk = -1;
-    tData.uvdDClk = -1;
     return tData;
 }
 
 float dFglrx::getTemperature() {
     QStringList out = globalStuff::grabSystemInfo("aticonfig --odgt --adapter=" + gpuIndex);
-// QFile f("/mnt/stuff/catalyst/odgt");
+//    QFile f("/home/mm/odgt");
+//    f.open(QIODevice::ReadOnly);
+//    QStringList out = QString(f.readAll()).split('\n');
+//    f.close();
 
-// f.open(QIODevice::ReadOnly);
-// QStringList out = QString(f.readAll()).split('\n');
-// f.close();
+    out = out.filter("Sensor");
 
-   out = out.filter("Sensor");
-
-   QRegExp rx;
-   rx.setPattern("\\d+\\.\\d+");
-   rx.indexIn(out[0]);
-   return rx.cap(0).toFloat();
+    QRegExp rx;
+    rx.setPattern("\\d+\\.\\d+");
+    rx.indexIn(out[0]);
+    return rx.cap(0).toFloat();
 }
 
 QStringList dFglrx::detectCards() {
     QStringList out = globalStuff::grabSystemInfo("aticonfig --list-adapters");
-
+//     QFile f("/home/mm/lsa");
+//    f.open(QIODevice::ReadOnly);
+//    QStringList out = QString(f.readAll()).split('\n');
+//    f.close();
     out = out.filter("Radeon");
     return out;
 }
@@ -73,7 +70,12 @@ QStringList dFglrx::getGLXInfo() {
 }
 
 globalStuff::driverFeatures dFglrx::figureOutDriverFeatures() {
+    globalStuff::driverFeatures features;
+    features.canChangeProfile = false;
+    features.clocksAvailable = true;
+    features.voltAvailable = false;
+    features.temperatureAvailable = true;
 
-
+    return features;
 }
 
