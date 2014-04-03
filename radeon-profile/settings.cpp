@@ -102,7 +102,7 @@ void radeon_profile::loadConfig() {
         else
             ui->tabs_systemInfo->setTabEnabled(3,false);
     } else
-        ui->list_currentGPUData->addItem("GPU data is disabled.");
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "GPU data is disabled."));
 
     if (ui->cb_graphs->isChecked() && ui->cb_graphs->isEnabled())
         ui->mainTabs->setTabEnabled(1,true);

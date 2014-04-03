@@ -139,25 +139,25 @@ void radeon_profile::refreshGpuData() {
 
     device.getClocks();
     if (device.gpuData.powerLevel != -1)
-        ui->list_currentGPUData->addItem("Current power level: " + QString().setNum(device.gpuData.powerLevel));
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current power level" << QString().setNum(device.gpuData.powerLevel)));
     if (device.gpuData.coreClk != -1)
-        ui->list_currentGPUData->addItem("Current GPU clock: " + QString().setNum(device.gpuData.coreClk) + " MHz");
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current GPU clock" << QString().setNum(device.gpuData.coreClk) + " MHz"));
     if (device.gpuData.memClk != -1)
-        ui->list_currentGPUData->addItem("Current mem clock: " + QString().setNum(device.gpuData.memClk) + " MHz");
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current mem clock" << QString().setNum(device.gpuData.memClk) + " MHz"));
     if (device.gpuData.uvdCClk != -1)
-        ui->list_currentGPUData->addItem("UVD video core clock (vclk): " + QString().setNum(device.gpuData.uvdCClk) + " MHz");
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "UVD video core clock (vclk)" << QString().setNum(device.gpuData.uvdCClk) + " MHz"));
     if (device.gpuData.uvdDClk != -1)
-        ui->list_currentGPUData->addItem("UVD decoder clock (dclk): " + QString().setNum(device.gpuData.uvdDClk) + " MHz");
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "UVD decoder clock (dclk)" << QString().setNum(device.gpuData.uvdDClk) + " MHz"));
     if (device.gpuData.coreVolt != -1)
-        ui->list_currentGPUData->addItem("Voltage (vddc): " + QString().setNum(device.gpuData.coreVolt) + " mV");
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Voltage (vddc)" << QString().setNum(device.gpuData.coreVolt) + " mV"));
     if (device.gpuData.memVolt != -1)
-        ui->list_currentGPUData->addItem("Voltage (vddci): " + QString().setNum(device.gpuData.memVolt) + " mV");
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Voltage (vddci)" << QString().setNum(device.gpuData.memVolt) + " mV"));
 
-    if (ui->list_currentGPUData->count() == 0)
-        ui->list_currentGPUData->addItem("no data");
+    if (ui->list_currentGPUData->topLevelItemCount() == 0)
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Can't read data. (root rights? debugfs mounted?)"));
 
     device.getTemperature();
-    ui->list_currentGPUData->addItem("Current GPU temp: " + QString().setNum(device.gpuTemeperatureData.current) + QString::fromUtf8("\u00B0C"));
+    ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current GPU temp" << QString().setNum(device.gpuTemeperatureData.current) + QString::fromUtf8("\u00B0C")));
 }
 
 //===================================
@@ -241,7 +241,7 @@ void radeon_profile::doTheStats(const globalStuff::gpuClocksStruct &_gpuData) {
     statsTickCounter++;
 
     // figure out pm level based on data provided
-    QString pmLevelName = "Power level:" + QString().setNum(_gpuData.powerLevel), volt;
+    QString pmLevelName = (_gpuData.powerLevel == -1) ? "" : "Power level:" + QString().setNum(_gpuData.powerLevel), volt;
     volt = (_gpuData.coreVolt == -1) ? "" : "(" + QString().setNum(_gpuData.coreVolt) + "mV)";
     pmLevelName = (_gpuData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +QString().setNum(_gpuData.coreClk) + "MHz" + volt;
 
@@ -283,8 +283,9 @@ void radeon_profile::updateStatsTable() {
 void radeon_profile::refreshTooltip()
 {
     QString tooltipdata = radeon_profile::windowTitle() + "\nCurrent profile: "+ui->l_profile->text() +"\n";
-    for (short i = 0; i < ui->list_currentGPUData->count(); i++) {
-        tooltipdata += ui->list_currentGPUData->item(i)->text() + '\n';
+    for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++) {
+        tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
     }
+    tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }

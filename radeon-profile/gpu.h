@@ -18,7 +18,8 @@ public:
         XORG, FGLRX, DRIVER_UNKNOWN
     };
 
-    explicit gpu() { currentGpuIndex = 0; }
+    explicit gpu() { currentGpuIndex = 0;
+                   gpuTemeperatureData.current  = gpuTemeperatureData.max = gpuTemeperatureData.min = gpuTemeperatureData.sum = 0; }
 
     globalStuff::gpuClocksStruct gpuData;
     globalStuff::gpuTemperatureStruct gpuTemeperatureData;

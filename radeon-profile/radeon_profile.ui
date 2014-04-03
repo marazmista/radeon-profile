@@ -112,7 +112,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QListWidget" name="list_currentGPUData">
+            <widget class="QTreeWidget" name="list_currentGPUData">
              <property name="minimumSize">
               <size>
                <width>261</width>
@@ -134,6 +134,34 @@
              <property name="editTriggers">
               <set>QAbstractItemView::NoEditTriggers</set>
              </property>
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <property name="indentation">
+              <number>5</number>
+             </property>
+             <property name="columnCount">
+              <number>2</number>
+             </property>
+             <attribute name="headerVisible">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="headerDefaultSectionSize">
+              <number>190</number>
+             </attribute>
+             <attribute name="headerMinimumSectionSize">
+              <number>50</number>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Property</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Value</string>
+              </property>
+             </column>
             </widget>
            </item>
            <item>

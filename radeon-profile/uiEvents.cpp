@@ -164,7 +164,7 @@ void radeon_profile::on_cb_gpuData_clicked(bool checked)
 
     if (!checked) {
         ui->list_currentGPUData->clear();
-        ui->list_currentGPUData->addItem("GPU data is disabled.");
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "GPU data is disabled."));
     }
 }
 
