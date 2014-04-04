@@ -95,6 +95,8 @@ private slots:
     void copyGlxInfoToClipboard();
     void resetStats();
 
+    void on_cb_alternateRow_clicked(bool checked);
+
 private:
     gpu device;
     static const QString settingsPath;

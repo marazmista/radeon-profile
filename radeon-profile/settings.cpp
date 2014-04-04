@@ -25,6 +25,7 @@ void radeon_profile::saveConfig() {
     settings.setValue("saveWindowGeometry",ui->cb_saveWindowGeometry->isChecked());
     settings.setValue("windowGeometry",this->geometry());
     settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
+    settings.setValue("aleternateRowColors",ui->cb_alternateRow->isChecked());
 
     settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
     settings.setValue("graphRange",ui->timeSlider->value());
@@ -61,6 +62,7 @@ void radeon_profile::loadConfig() {
     ui->cb_modParams->setChecked(settings.value("updateModParams",false).toBool());
     ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
     ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
+    ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
     ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
@@ -108,6 +110,12 @@ void radeon_profile::loadConfig() {
         ui->mainTabs->setTabEnabled(1,true);
     else
         ui->mainTabs->setTabEnabled(1,false);
+
+    ui->list_currentGPUData->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
+    ui->list_glxinfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
+    ui->list_modInfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
+    ui->list_connectors->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
+    ui->list_stats->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
 
     showLegend(optionsMenu->actions().at(0)->isChecked());
     changeTimeRange();

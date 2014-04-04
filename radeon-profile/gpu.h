@@ -28,7 +28,7 @@ public:
     globalStuff::driverFeatures gpuFeatures;
 
     QList<QTreeWidgetItem *> getCardConnectors() const;
-    QStringList getGLXInfo(QString gpuName = "") const;
+    QStringList getGLXInfo(QString gpuName) const;
     QList<QTreeWidgetItem *> getModuleInfo() const;
     QString getCurrentPowerProfile() const;
     QStringList initialize(bool skipDetectDriver = false);

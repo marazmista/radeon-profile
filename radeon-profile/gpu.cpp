@@ -144,8 +144,8 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
         data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
 
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
-
+    if (!gpuName.isEmpty())
+        env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
     QStringList driver = globalStuff::grabSystemInfo("xdriinfo",env).filter("Screen 0:",Qt::CaseInsensitive);
     if (!driver.isEmpty())  // because of segfault when no xdriinfo
         data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
@@ -160,7 +160,7 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
     case DRIVER_UNKNOWN:
         break;
     }
-
+    data.removeDuplicates();
     return data;
 }
 

@@ -212,4 +212,12 @@ void radeon_profile::resetStats() {
     pmStats.clear();
     ui->list_stats->clear();
 }
+
+void radeon_profile::on_cb_alternateRow_clicked(bool checked) {
+    ui->list_currentGPUData->setAlternatingRowColors(checked);
+    ui->list_glxinfo->setAlternatingRowColors(checked);
+    ui->list_modInfo->setAlternatingRowColors(checked);
+    ui->list_connectors->setAlternatingRowColors(checked);
+    ui->list_stats->setAlternatingRowColors(checked);
+}
 //========

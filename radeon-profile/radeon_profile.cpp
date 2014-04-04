@@ -44,6 +44,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     // setup ui elemensts
     ui->mainTabs->setCurrentIndex(0);
     ui->tabs_systemInfo->setCurrentIndex(0);
+    ui->list_currentGPUData->setHeaderHidden(false);
     setupGraphs();
     setupForcePowerLevelMenu();
     setupOptionsMenu();
