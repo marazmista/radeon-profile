@@ -108,10 +108,16 @@ radeon_profile::~radeon_profile()
 
 void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &features) {
     if (features.canChangeProfile && features.pm < globalStuff::PM_UNKNOWN) {
-        ui->tabs_pm->setTabEnabled(0, (features.pm == globalStuff::PROFILE ? true : false));
-        ui->tabs_pm->setTabEnabled(1,((features.pm == globalStuff::DPM) ? true : false));
-    } else
+        ui->tabs_pm->setTabEnabled(0,features.pm == globalStuff::PROFILE ? true : false);
+
+        ui->tabs_pm->setTabEnabled(1,features.pm == globalStuff::DPM ? true : false);
+        changeProfile->setEnabled(features.pm == globalStuff::PROFILE ? true : false);
+        dpmMenu->setEnabled(features.pm == globalStuff::DPM ? true : false);
+    } else {
         ui->tabs_pm->setEnabled(false);
+        changeProfile->setEnabled(false);
+        dpmMenu->setEnabled(false);
+    }
 
     if (!features.clocksAvailable) {
         ui->plotColcks->setVisible(false),
