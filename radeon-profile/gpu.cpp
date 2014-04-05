@@ -1,7 +1,6 @@
 // copyright marazmista @ 29.03.2014
 
 #include "gpu.h"
-#include <QFile>
 
 gpu::driver gpu::detectDriver() {
     QStringList out = globalStuff::grabSystemInfo("lsmod");

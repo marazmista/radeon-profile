@@ -48,26 +48,15 @@ float dFglrx::getTemperature() {
 }
 
 QStringList dFglrx::detectCards() {
-    QStringList out = globalStuff::grabSystemInfo("aticonfig --list-adapters");
 //     QFile f("/home/mm/lsa");
 //    f.open(QIODevice::ReadOnly);
 //    QStringList out = QString(f.readAll()).split('\n');
 //    f.close();
-    out = out.filter("Radeon");
-    return out;
+    return globalStuff::grabSystemInfo("aticonfig --list-adapters").filter("Radeon");;
 }
 
 QStringList dFglrx::getGLXInfo() {
-    QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter("Radeon",Qt::CaseInsensitive);
-    gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
-
-    // loop for multi gpu
-    for (int i = 0; i < gpus.count(); i++)
-        data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
-
-    QStringList out = globalStuff::grabSystemInfo("fglrxinfo");
-    data << out.filter(QRegExp("\\.+"));
-    return data;
+    return globalStuff::grabSystemInfo("fglrxinfo").filter(QRegExp("\\.+"));
 }
 
 globalStuff::driverFeatures dFglrx::figureOutDriverFeatures() {

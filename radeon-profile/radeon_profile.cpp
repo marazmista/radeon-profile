@@ -25,13 +25,10 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140330;
+const int appVersion = 20140405;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
-
-QString err = "Err", noValues = "no values";
-
 QList<pmLevel> pmStats;
 
 radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
