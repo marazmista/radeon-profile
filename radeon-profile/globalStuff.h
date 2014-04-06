@@ -68,6 +68,8 @@ public:
         }
     };
 
+    // structure which holds what can be display on ui and on its base
+    // we enable ui elements
     struct driverFeatures {
         bool canChangeProfile, clocksAvailable, voltAvailable, temperatureAvailable;
         globalStuff::powerMethod pm;

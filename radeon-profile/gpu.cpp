@@ -13,6 +13,8 @@ gpu::driver gpu::detectDriver() {
     return DRIVER_UNKNOWN;
 }
 
+// method for resolve which driver gpu instance will use
+// and call some things that need to be done before read data
 QStringList gpu::initialize(bool skipDetectDriver) {
     if (!skipDetectDriver)
         currentDriver = detectDriver();
@@ -159,7 +161,6 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
     case DRIVER_UNKNOWN:
         break;
     }
-    data.removeDuplicates();
     return data;
 }
 

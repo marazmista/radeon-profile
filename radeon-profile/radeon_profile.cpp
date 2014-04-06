@@ -10,6 +10,11 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
+//==================
+// the logic is simple. radeon-profile create object based on gpu class.
+// gpu class decides what driver is used (device.initialize()). Later, based
+// on structure driverFeatures, program activate some ui features.
+
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
 #include "gpu.h"
@@ -106,6 +111,7 @@ radeon_profile::~radeon_profile()
     delete ui;
 }
 
+// based on driverFeatures structure returned by gpu class, adjust ui elements
 void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &features) {
     if (features.canChangeProfile && features.pm < globalStuff::PM_UNKNOWN) {
         ui->tabs_pm->setTabEnabled(0,features.pm == globalStuff::PROFILE ? true : false);
@@ -138,6 +144,8 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->mainTabs->setTabEnabled(1,false);
 }
 
+// -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
+// did not alter it, it stays and in result will be not displayed
 void radeon_profile::refreshGpuData() {
     ui->list_currentGPUData->clear();
 

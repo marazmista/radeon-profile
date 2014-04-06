@@ -32,7 +32,7 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
 
 globalStuff::gpuClocksStruct dXorg::getClocks() {
     QFile clocksFile(filePaths.clocksPath);
-    globalStuff::gpuClocksStruct tData(-1);
+    globalStuff::gpuClocksStruct tData(-1); // empty struct
 
     if (clocksFile.open(QIODevice::ReadOnly)) {  // check for debugfs access
         QStringList out = QString(clocksFile.readAll()).split('\n');

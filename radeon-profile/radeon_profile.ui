@@ -363,7 +363,7 @@
           </property>
           <property name="font">
            <font>
-            <family>Droid Sans Mono</family>
+            <family>Monospace</family>
             <pointsize>10</pointsize>
             <weight>50</weight>
             <bold>false</bold>
