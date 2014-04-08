@@ -30,7 +30,7 @@
 #include <QSettings>
 #include <QDir>
 
-const int appVersion = 20140405;
+const int appVersion = 20140408;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;

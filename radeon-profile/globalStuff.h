@@ -18,7 +18,9 @@ public:
         p->start(cmd,QIODevice::ReadOnly);
         p->waitForFinished();
 
-        return QString(p->readAllStandardOutput()).split('\n');
+        QString a = p->readAllStandardOutput();
+        delete p;
+        return a.split('\n');
     }
 
     static QStringList grabSystemInfo(const QString cmd, const QProcessEnvironment env) {
@@ -29,7 +31,9 @@ public:
         p->start(cmd,QIODevice::ReadOnly);
         p->waitForFinished();
 
-        return QString(p->readAllStandardOutput()).split('\n');
+        QString a = p->readAllStandardOutput();
+        delete p;
+        return a.split('\n');
     }
 
     enum powerProfiles {
