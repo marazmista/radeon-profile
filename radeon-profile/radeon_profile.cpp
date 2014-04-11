@@ -128,6 +128,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     if (!features.clocksAvailable) {
         ui->plotColcks->setVisible(false),
         ui->cb_showFreqGraph->setEnabled(false);
+        ui->tabs_systemInfo->setTabEnabled(3,false);
     }
 
     if (!features.temperatureAvailable) {
@@ -182,7 +183,8 @@ void radeon_profile::timerEvent() {
         refreshGpuData();
         ui->l_profile->setText(device.getCurrentPowerProfile());
 
-        if (ui->cb_stats->isChecked()) {
+        // lets say coreClk is essential to get stats (it is disabled in ui anyway when features.clocksAvailable is false)
+        if (ui->cb_stats->isChecked() && device.gpuData.coreClk != -1) {
             doTheStats(device.gpuData);
 
             // do the math only when user looking at stats table
