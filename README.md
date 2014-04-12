@@ -1,23 +1,29 @@
-Simple application to read current clocks of ATi Radeon cards (xf86-video-ati).
+Simple application to read current clocks of ATi Radeon cards (xf86-video-ati and fglrx).
 
+# xf86-video-ati driver
 App need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`. Here is tip for run app as normal user but involves change permissions to system files: http://bit.ly/1dvQMhS
 
-Graph widget: http://www.qcustomplot.com/
-
-Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
-
-Sort of official thread: http://phoronix.com/forums/showthread.php?83602-radeon-profile-tool-for-changing-profiles-and-monitoring-some-GPU-parameters
+# fglrx driver
+Normal user can run it. Data is read from `ati-config` output. No support for power settings.
 
 # Dependencies
 Crucial:
 * qt4
-* opensource radeon drivers
+* radeon card
 
 For full functionality:
 * glxinfo - info about OpenGL, mesa
 * xdriinfo - driver info
 * xrandr - connected displays
-* lm_sensors - temperature (no need if hwmon for card is present in sysfs)
+* lm_sensors - temperature (no need if hwmon for card is present in sysfs and if catalyst is installed)
+
+# Links
+
+Sort of official thread: http://phoronix.com/forums/showthread.php?83602-radeon-profile-tool-for-changing-profiles-and-monitoring-some-GPU-parameters
+
+Graph widget: http://www.qcustomplot.com/
+
+Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 
 # Troubleshooting
 
