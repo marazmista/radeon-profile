@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QColorDialog>
 #include <QClipboard>
+#include <QInputDialog>
 
 bool closeFromTrayMenu;
 
@@ -15,15 +16,15 @@ bool closeFromTrayMenu;
 // === GUI events === //
 // == menu forcePowerLevel
 void radeon_profile::forceAuto() {
-    setValueToFile(forcePowerLevelFilePath,"auto");
+    device.setForcePowerLevel(globalStuff::F_AUTO);
 }
 
 void radeon_profile::forceLow() {
-    setValueToFile(forcePowerLevelFilePath,"low");
+    device.setForcePowerLevel(globalStuff::F_LOW);
 }
 
 void radeon_profile::forceHigh() {
-    setValueToFile(forcePowerLevelFilePath,"high");
+    device.setForcePowerLevel(globalStuff::F_HIGH);
 }
 
 // == buttons for forcePowerLevel
@@ -44,18 +45,18 @@ void radeon_profile::on_btn_forceLow_clicked()
 
 // == others
 void radeon_profile::on_btn_dpmBattery_clicked() {
-    setValueToFile(dpmStateFilePath,"battery");
+    device.setPowerProfile(globalStuff::BATTERY);
 }
 
 void radeon_profile::on_btn_dpmBalanced_clicked() {
-    setValueToFile(dpmStateFilePath,"balanced");
+    device.setPowerProfile(globalStuff::BALANCED);
 }
 
 void radeon_profile::on_btn_dpmPerformance_clicked() {
-    setValueToFile(dpmStateFilePath,"performance");
+    device.setPowerProfile(globalStuff::PERFORMANCE);
 }
 
-void radeon_profile::resetMinMax() { minT = 0; maxT = 0; }
+void radeon_profile::resetMinMax() { device.gpuTemeperatureData.min = 0; device.gpuTemeperatureData.max = 0; }
 
 void radeon_profile::changeTimeRange() {
     rangeX = ui->timeSlider->value();
@@ -77,16 +78,16 @@ void radeon_profile::on_cb_showVoltsGraph_clicked(bool checked)
 }
 
 void radeon_profile::resetGraphs() {
-        ui->plotColcks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
-        ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
-        ui->plotTemp->yAxis->setRange(10,20);
+    ui->plotColcks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
+    ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
+    ui->plotTemp->yAxis->setRange(10,20);
 }
 
 void radeon_profile::showLegend(bool checked) {
-        ui->plotColcks->legend->setVisible(checked);
-        ui->plotVolts->legend->setVisible(checked);
-        ui->plotColcks->replot();
-        ui->plotVolts->replot();
+    ui->plotColcks->legend->setVisible(checked);
+    ui->plotVolts->legend->setVisible(checked);
+    ui->plotColcks->replot();
+    ui->plotVolts->replot();
 }
 
 void radeon_profile::changeEvent(QEvent *event)
@@ -105,13 +106,10 @@ void radeon_profile::changeEvent(QEvent *event)
 
 void radeon_profile::gpuChanged()
 {
-    figureOutGPUDataPaths(ui->combo_gpus->currentText()); // resolve paths for newly selected card
-
-    // do initial stuff once again for new card
-    testSensor();
-    getModuleInfo();
-    getPowerMethod();
-    getCardConnectors();
+    device.changeGpu(ui->combo_gpus->currentIndex());
+    setupUiEnabledFeatures(device.gpuFeatures);
+    timerEvent();
+    refreshBtnClicked();
 }
 
 void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
@@ -123,6 +121,7 @@ void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
         } else hide();
         break;
     }
+    default: break;
     }
 }
 
@@ -131,7 +130,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
         this->hide();
         e->ignore();
     }
-    saveConfig();
+        saveConfig();
 }
 
 void radeon_profile::closeFromTray() {
@@ -167,14 +166,19 @@ void radeon_profile::on_cb_gpuData_clicked(bool checked)
 
     if (!checked) {
         ui->list_currentGPUData->clear();
-        ui->list_currentGPUData->addItem("GPU data is disabled.");
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "GPU data is disabled."));
     }
 }
 
 void radeon_profile::refreshBtnClicked() {
-    getGLXInfo();
-    getCardConnectors();
-    getModuleInfo();
+    ui->list_glxinfo->clear();
+    ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
+
+    ui->list_connectors->clear();
+    ui->list_connectors->addTopLevelItems(device.getCardConnectors());
+
+    ui->list_modInfo->clear();
+    ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
 }
 
 void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -192,7 +196,7 @@ void radeon_profile::on_cb_stats_clicked(bool checked)
     ui->tabs_systemInfo->setTabEnabled(3,checked);
 
     // reset stats data
-    statsTickCounter = 1;
+    statsTickCounter = 0;
     if (!checked)
         resetStats();
 }
@@ -206,8 +210,38 @@ void radeon_profile::copyGlxInfoToClipboard() {
 }
 
 void radeon_profile::resetStats() {
-    statsTickCounter = 1;
+    statsTickCounter = 0;
     pmStats.clear();
     ui->list_stats->clear();
+}
+
+void radeon_profile::on_cb_alternateRow_clicked(bool checked) {
+    ui->list_currentGPUData->setAlternatingRowColors(checked);
+    ui->list_glxinfo->setAlternatingRowColors(checked);
+    ui->list_modInfo->setAlternatingRowColors(checked);
+    ui->list_connectors->setAlternatingRowColors(checked);
+    ui->list_stats->setAlternatingRowColors(checked);
+}
+
+void radeon_profile::on_chProfile_clicked()
+{
+    bool ok;
+    QStringList profiles;
+    profiles << "default" << "auto" << "high" << "mid" << "low";
+
+    QString selection = QInputDialog::getItem(this,"Select new power profile", "Profile selection",profiles,0,false,&ok);
+
+    if (ok) {
+        if (selection == "default")
+            device.setPowerProfile(globalStuff::DEFAULT);
+        else if (selection == "auto")
+            device.setPowerProfile(globalStuff::AUTO);
+        else if (selection == "high")
+            device.setPowerProfile(globalStuff::HIGH);
+        else if (selection == "mid")
+            device.setPowerProfile(globalStuff::MID);
+        else if (selection == "low")
+            device.setPowerProfile(globalStuff::LOW);
+    }
 }
 //========

@@ -16,10 +16,18 @@ SOURCES += main.cpp\
         radeon_profile.cpp \
     qcustomplot.cpp \
     uiElements.cpp \
-    uiEvents.cpp
+    uiEvents.cpp \
+    gpu.cpp \
+    dxorg.cpp \
+    dfglrx.cpp \
+    settings.cpp
 
 HEADERS  += radeon_profile.h \
-    qcustomplot.h
+    qcustomplot.h \
+    gpu.h \
+    dxorg.h \
+    dfglrx.h \
+    globalStuff.h
 
 FORMS    += radeon_profile.ui
 
