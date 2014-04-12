@@ -63,7 +63,6 @@ public:
     QTimer *timer;
 
 private slots:
-//    void on_chProfile_clicked();
     void timerEvent();
     void on_btn_dpmBattery_clicked();
     void on_btn_dpmBalanced_clicked();
@@ -94,9 +93,7 @@ private slots:
     void on_cb_stats_clicked(bool checked);
     void copyGlxInfoToClipboard();
     void resetStats();
-
     void on_cb_alternateRow_clicked(bool checked);
-
     void on_chProfile_clicked();
 
 private:

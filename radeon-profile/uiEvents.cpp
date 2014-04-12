@@ -121,6 +121,7 @@ void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
         } else hide();
         break;
     }
+    default: break;
     }
 }
 
