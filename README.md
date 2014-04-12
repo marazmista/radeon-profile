@@ -3,8 +3,12 @@ Simple application to read current clocks of ATi Radeon cards (xf86-video-ati an
 # xf86-video-ati driver
 App need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`. Here is tip for run app as normal user but involves change permissions to system files: http://bit.ly/1dvQMhS
 
+Can be forced by `--driver xorg` parameter.
+
 # fglrx driver
 Normal user can run it. Data is read from `ati-config` output. No support for power settings.
+
+Can be forced by `--driver fglrx` parameter.
 
 # Dependencies
 Crucial:
@@ -26,7 +30,6 @@ Graph widget: http://www.qcustomplot.com/
 Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 
 # Troubleshooting
-
 
 * __"no values":__ Check `/sys/kernel/debug`. If it's empty, try `# mount -t debugfs none /sys/kernel/debug`
 
