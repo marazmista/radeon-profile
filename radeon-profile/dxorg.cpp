@@ -263,7 +263,6 @@ dXorg::tempSensor dXorg::testSensor() {
         } else
             return TS_UNKNOWN;
     }
-
 }
 
 QString dXorg::findSysfsHwmonForGPU() {
@@ -357,8 +356,7 @@ QString dXorg::getCurrentPowerProfile() {
     return pp.remove('\n');
 }
 
-void dXorg::setNewValue(const QString &filePath, const QString &newValue)
-{
+void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
     QFile file(filePath);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream stream(&file);
@@ -379,10 +377,29 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     case globalStuff::PERFORMANCE:
         newValue = "performance";
         break;
+    case globalStuff::AUTO:
+        newValue = "auto";
+        break;
+    case globalStuff::DEFAULT:
+        newValue = "default";
+        break;
+    case globalStuff::HIGH:
+        newValue = "high";
+        break;
+    case globalStuff::MID:
+        newValue = "mid";
+        break;
+    case globalStuff::LOW:
+        newValue = "low";
+        break;
     default: break;
     }
 
-    setNewValue(filePaths.dpmStateFilePath,newValue);
+    // enum is int, so first three values are dpm, rest are profile
+    if (_newPowerProfile <= globalStuff::PERFORMANCE)
+        setNewValue(filePaths.dpmStateFilePath,newValue);
+    else
+        setNewValue(filePaths.profilePath,newValue);
 }
 
 void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
@@ -434,4 +451,3 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     }
     return features;
 }
-

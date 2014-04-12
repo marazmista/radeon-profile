@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QColorDialog>
 #include <QClipboard>
+#include <QInputDialog>
 
 bool closeFromTrayMenu;
 
@@ -219,5 +220,27 @@ void radeon_profile::on_cb_alternateRow_clicked(bool checked) {
     ui->list_modInfo->setAlternatingRowColors(checked);
     ui->list_connectors->setAlternatingRowColors(checked);
     ui->list_stats->setAlternatingRowColors(checked);
+}
+
+void radeon_profile::on_chProfile_clicked()
+{
+    bool ok;
+    QStringList profiles;
+    profiles << "default" << "auto" << "high" << "mid" << "low";
+
+    QString selection = QInputDialog::getItem(this,"Select new power profile", "Profile selection",profiles,0,false,&ok);
+
+    if (ok) {
+        if (selection == "default")
+            device.setPowerProfile(globalStuff::DEFAULT);
+        else if (selection == "auto")
+            device.setPowerProfile(globalStuff::AUTO);
+        else if (selection == "high")
+            device.setPowerProfile(globalStuff::HIGH);
+        else if (selection == "mid")
+            device.setPowerProfile(globalStuff::MID);
+        else if (selection == "low")
+            device.setPowerProfile(globalStuff::LOW);
+    }
 }
 //========

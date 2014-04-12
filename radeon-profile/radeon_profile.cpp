@@ -20,14 +20,8 @@
 #include "gpu.h"
 
 #include <QTimer>
-#include <QInputDialog>
-#include <QFile>
 #include <QTextStream>
-#include <QSystemTrayIcon>
 #include <QMenu>
-#include <QProcess>
-#include <QMessageBox>
-#include <QSettings>
 #include <QDir>
 
 const int appVersion = 20140408;

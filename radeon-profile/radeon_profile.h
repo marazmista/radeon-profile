@@ -97,6 +97,8 @@ private slots:
 
     void on_cb_alternateRow_clicked(bool checked);
 
+    void on_chProfile_clicked();
+
 private:
     gpu device;
     static const QString settingsPath;
