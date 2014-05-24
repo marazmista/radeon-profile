@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
@@ -20,14 +20,16 @@ SOURCES += main.cpp\
     gpu.cpp \
     dxorg.cpp \
     dfglrx.cpp \
-    settings.cpp
+    settings.cpp \
+    daemonComm.cpp
 
 HEADERS  += radeon_profile.h \
     qcustomplot.h \
     gpu.h \
     dxorg.h \
     dfglrx.h \
-    globalStuff.h
+    globalStuff.h \
+    daemonComm.h
 
 FORMS    += radeon_profile.ui
 

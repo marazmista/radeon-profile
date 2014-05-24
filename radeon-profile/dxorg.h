@@ -6,10 +6,12 @@
 #define DXORG_H
 
 #include "globalStuff.h"
+#include "daemonComm.h"
 
 #include <QString>
 #include <QList>
 #include <QTreeWidgetItem>
+#include <QSharedMemory>
 
 class dXorg
 {
@@ -17,6 +19,7 @@ public:
     dXorg() {}
 
     static globalStuff::gpuClocksStruct getClocks();
+    static QString getClocksRawData();
     static float getTemperature();
     static QList<QTreeWidgetItem *> getCardConnectors();
     static QStringList getGLXInfo(QString gpuName, QProcessEnvironment env);
@@ -37,6 +40,9 @@ private:
         MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
         TS_UNKNOWN
     };
+
+    static QChar gpuSysIndex;
+    static QSharedMemory sharedMem;
 
     static struct driverFilePaths {
     QString powerMethodFilePath, profilePath, dpmStateFilePath ,

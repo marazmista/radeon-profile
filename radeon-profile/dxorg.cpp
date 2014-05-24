@@ -8,21 +8,32 @@
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
 globalStuff::powerMethod dXorg::currentPowerMethod;
 int dXorg::sensorsGPUtempIndex;
-
+QChar dXorg::gpuSysIndex;
+QSharedMemory dXorg::sharedMem;
 dXorg::driverFilePaths dXorg::filePaths;
 // end //
+
+daemonComm *dcomm = new daemonComm();
 
 void dXorg::configure(QString gpuName) {
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
-}
 
+    // create the shared mem block. The if comes from that configure method
+    // is called on every change gpu, so later, shared mem already exists
+    if (!sharedMem.isAttached()) {
+        sharedMem.setKey("radeon-profile");
+        sharedMem.create(128);
+        sharedMem.attach();
+    }
+}
 void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
+    gpuSysIndex = gpuName.at(gpuName.length()-1);
     filePaths.powerMethodFilePath = "/sys/class/drm/"+gpuName+"/device/power_method",
             filePaths.profilePath = "/sys/class/drm/"+gpuName+"/device/power_profile",
             filePaths.dpmStateFilePath = "/sys/class/drm/"+gpuName+"/device/power_dpm_state",
-            filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuName.at(gpuName.length()-1))+"/radeon_pm_info", // this path contains only index
+            filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info", // this path contains only index
             filePaths.forcePowerLevelFilePath = "/sys/class/drm/"+gpuName+"/device/power_dpm_force_performance_level",
             filePaths.moduleParamsPath = "/sys/class/drm/"+gpuName+"/device/driver/module/holders/radeon/parameters/";
 
@@ -30,90 +41,114 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     filePaths.sysfsHwmonPath = "/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/temp1_input";
 }
 
-globalStuff::gpuClocksStruct dXorg::getClocks() {
+// method for gather info about clocks from deamon or from debugfs if root
+QString dXorg::getClocksRawData() {
     QFile clocksFile(filePaths.clocksPath);
+    QString data;
+
+    dcomm->setSignalParams('1',gpuSysIndex);
+    dcomm->connectToDaemon();
+    if (dcomm->signalSender->state() == QLocalSocket::ConnectedState) {
+        sharedMem.lock();
+        char *to = (char*)sharedMem.constData();
+        char a[128] = {0};
+        strncpy(a,to,sizeof(a));
+        sharedMem.unlock();
+        data  = QString::fromAscii(a).trimmed();
+    }
+    else if (clocksFile.open(QIODevice::ReadOnly))  // check for debugfs access
+        data = QString(clocksFile.readAll());
+
+    if (data == "")
+        data = "null\n";
+
+    return data;
+}
+
+globalStuff::gpuClocksStruct dXorg::getClocks() {
     globalStuff::gpuClocksStruct tData(-1); // empty struct
+    QStringList out = getClocksRawData().split('\n');
 
-    if (clocksFile.open(QIODevice::ReadOnly)) {  // check for debugfs access
-        QStringList out = QString(clocksFile.readAll()).split('\n');
+    // if nothing is there returns empty (-1) struct
+    if (out[0] == "null")
+        return tData;
 
-        switch (currentPowerMethod) {
-        case globalStuff::DPM: {
-            QRegExp rx;
+    switch (currentPowerMethod) {
+    case globalStuff::DPM: {
+        QRegExp rx;
 
-            rx.setPattern("power\\slevel\\s\\d");
-            rx.indexIn(out[1]);
-            if (!rx.cap(0).isEmpty())
-                tData.powerLevel = rx.cap(0).split(' ')[2].toShort();
+        rx.setPattern("power\\slevel\\s\\d");
+        rx.indexIn(out[1]);
+        if (!rx.cap(0).isEmpty())
+            tData.powerLevel = rx.cap(0).split(' ')[2].toShort();
 
-            rx.setPattern("sclk:\\s\\d+");
-            rx.indexIn(out[1]);
-            if (!rx.cap(0).isEmpty())
-                tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
+        rx.setPattern("sclk:\\s\\d+");
+        rx.indexIn(out[1]);
+        if (!rx.cap(0).isEmpty())
+            tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
 
-            rx.setPattern("mclk:\\s\\d+");
-            rx.indexIn(out[1]);
-            if (!rx.cap(0).isEmpty())
-                tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
+        rx.setPattern("mclk:\\s\\d+");
+        rx.indexIn(out[1]);
+        if (!rx.cap(0).isEmpty())
+            tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
 
-            rx.setPattern("vclk:\\s\\d+");
-            rx.indexIn(out[0]);
-            if (!rx.cap(0).isEmpty()) {
-                tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
-                tData.uvdCClk  = (tData.uvdCClk  == 0) ? -1 :  tData.uvdCClk;
-            }
-
-            rx.setPattern("dclk:\\s\\d+");
-            rx.indexIn(out[0]);
-            if (!rx.cap(0).isEmpty()) {
-                tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
-                tData.uvdDClk = (tData.uvdDClk == 0) ? -1 : tData.uvdDClk;
-            }
-
-            rx.setPattern("vddc:\\s\\d+");
-            rx.indexIn(out[1]);
-            if (!rx.cap(0).isEmpty())
-                tData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
-
-            rx.setPattern("vddci:\\s\\d+");
-            rx.indexIn(out[1]);
-            if (!rx.cap(0).isEmpty())
-                tData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
-
-            return tData;
-            break;
+        rx.setPattern("vclk:\\s\\d+");
+        rx.indexIn(out[0]);
+        if (!rx.cap(0).isEmpty()) {
+            tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
+            tData.uvdCClk  = (tData.uvdCClk  == 0) ? -1 :  tData.uvdCClk;
         }
-        case globalStuff::PROFILE: {
-            for (int i=0; i< out.count(); i++) {
-                switch (i) {
-                case 1: {
-                    if (out[i].contains("current engine clock")) {
-                        tData.coreClk = QString().setNum(out[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
-                        break;
-                    }
-                };
-                case 3: {
-                    if (out[i].contains("current memory clock")) {
-                        tData.memClk = QString().setNum(out[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
-                        break;
-                    }
+
+        rx.setPattern("dclk:\\s\\d+");
+        rx.indexIn(out[0]);
+        if (!rx.cap(0).isEmpty()) {
+            tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
+            tData.uvdDClk = (tData.uvdDClk == 0) ? -1 : tData.uvdDClk;
+        }
+
+        rx.setPattern("vddc:\\s\\d+");
+        rx.indexIn(out[1]);
+        if (!rx.cap(0).isEmpty())
+            tData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
+
+        rx.setPattern("vddci:\\s\\d+");
+        rx.indexIn(out[1]);
+        if (!rx.cap(0).isEmpty())
+            tData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
+
+        return tData;
+        break;
+    }
+    case globalStuff::PROFILE: {
+        for (int i=0; i< out.count(); i++) {
+            switch (i) {
+            case 1: {
+                if (out[i].contains("current engine clock")) {
+                    tData.coreClk = QString().setNum(out[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
+                    break;
                 }
-                case 4: {
-                    if (out[i].contains("voltage")) {
-                        tData.coreVolt = QString().setNum(out[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toDouble();
-                        break;
-                    }
-                }
+            };
+            case 3: {
+                if (out[i].contains("current memory clock")) {
+                    tData.memClk = QString().setNum(out[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
+                    break;
                 }
             }
-            return tData;
-            break;
+            case 4: {
+                if (out[i].contains("voltage")) {
+                    tData.coreVolt = QString().setNum(out[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toDouble();
+                    break;
+                }
+            }
+            }
         }
-        case globalStuff::PM_UNKNOWN: {
-            return tData;
-            break;
-        }
-        }
+        return tData;
+        break;
+    }
+    case globalStuff::PM_UNKNOWN: {
+        return tData;
+        break;
+    }
     }
     return tData;
 }
@@ -395,11 +430,16 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     default: break;
     }
 
-    // enum is int, so first three values are dpm, rest are profile
-    if (_newPowerProfile <= globalStuff::PERFORMANCE)
-        setNewValue(filePaths.dpmStateFilePath,newValue);
-    else
-        setNewValue(filePaths.profilePath,newValue);
+    if (dcomm->signalSender->state() == QLocalSocket::ConnectedState) {
+        dcomm->setSignalParams('2',gpuSysIndex,newValue); // signal specs are in daemon sources
+        dcomm->connectToDaemon();
+    } else {
+        // enum is int, so first three values are dpm, rest are profile
+        if (_newPowerProfile <= globalStuff::PERFORMANCE)
+            setNewValue(filePaths.dpmStateFilePath,newValue);
+        else
+            setNewValue(filePaths.profilePath,newValue);
+    }
 }
 
 void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
@@ -416,7 +456,12 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
     default:
         break;
     }
-    setNewValue(filePaths.forcePowerLevelFilePath, newValue);
+
+    if (dcomm->signalSender->state() == QLocalSocket::ConnectedState) {
+        dcomm->setSignalParams('3',gpuSysIndex,newValue); // signal specs are in daemon sources
+        dcomm->connectToDaemon();
+    } else
+        setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
 globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
