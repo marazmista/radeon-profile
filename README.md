@@ -1,7 +1,7 @@
 Simple application to read current clocks of ATi Radeon cards (xf86-video-ati and fglrx).
 
 # xf86-video-ati driver
-App need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`. Here is tip for run app as normal user but involves change permissions to system files: http://bit.ly/1dvQMhS
+Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-profile-daemon) for using this app as normal user. Otherwise app need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`. Here is tip for run app as normal user but involves change permissions to system files: http://bit.ly/1dvQMhS
 
 Can be forced by `--driver xorg` parameter.
 
@@ -23,11 +23,12 @@ For full functionality:
 
 # Links
 
-Sort of official thread: http://phoronix.com/forums/showthread.php?83602-radeon-profile-tool-for-changing-profiles-and-monitoring-some-GPU-parameters
-
-Graph widget: http://www.qcustomplot.com/
-
-Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
+* AUR package: https://aur.archlinux.org/packages/radeon-profile-git/
+* System daemon: https://github.com/marazmista/radeon-profile-daemon
+* System daemon AUR package: https://aur.archlinux.org/packages/radeon-profile-daemon-git/
+* Sort of official thread: http://phoronix.com/forums/showthread.php?83602-radeon-profile-tool-for-changing-profiles-and-monitoring-some-GPU-parameters
+* Graph widget: http://www.qcustomplot.com/
+* Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 
 # Troubleshooting
 
