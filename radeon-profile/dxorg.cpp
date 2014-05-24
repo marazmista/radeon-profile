@@ -477,10 +477,14 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     features.canChangeProfile = false;
     switch (currentPowerMethod) {
     case globalStuff::DPM: {
-        QFile f(filePaths.dpmStateFilePath);
-        if (f.open(QIODevice::WriteOnly)){
+        if (dcomm->signalSender->state() == QLocalSocket::ConnectedState)
             features.canChangeProfile = true;
-            f.close();
+        else {
+            QFile f(filePaths.dpmStateFilePath);
+            if (f.open(QIODevice::WriteOnly)){
+                features.canChangeProfile = true;
+                f.close();
+            }
         }
         break;
     }

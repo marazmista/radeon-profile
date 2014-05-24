@@ -62,7 +62,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     else // driver object detects cards in pc and fill the list in ui //
         ui->combo_gpus->addItems(device.initialize());
 
-   // setupUiEnabledFeatures(device.gpuFeatures);
+    setupUiEnabledFeatures(device.gpuFeatures);
 
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
