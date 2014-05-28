@@ -5,8 +5,15 @@
 
 daemonComm::daemonComm() {
     signalSender = new QLocalSocket();
+    connect(signalSender,SIGNAL(connected()),this,SLOT(onConnect()));
 
-    connect(signalSender,SIGNAL(connected()),this,SLOT(sendRequest()));
+    // init of signals
+    daemonComm::daemonSignal.config = '0';
+    daemonComm::daemonSignal.read_clocks = '1';
+    daemonComm::daemonSignal.set_profile = '2';
+    daemonComm::daemonSignal.force_pl = '3';
+    daemonComm::daemonSignal.timer_on = '4';
+    daemonComm::daemonSignal.timer_off = '5';
 }
 
 daemonComm::~daemonComm() {
@@ -18,13 +25,10 @@ void daemonComm::connectToDaemon() {
     signalSender->connectToServer("radeon-profile-daemon-server");
 }
 
-void daemonComm::sendRequest() {
-    QString request = QString(this->req) + QString(this->cardIndex) + this->profile;
-    signalSender->write(request.toAscii(),request.length());
+void daemonComm::sendCommand(const QString command) {
+    signalSender->write(command.toAscii(),command.length());
 }
 
-void daemonComm::setSignalParams(const QChar &_req, const QChar &_cardIndex, const QString &_profile) {
-    this->req = _req;
-    this->cardIndex = _cardIndex;
-    this->profile = _profile;
+void daemonComm::onConnect() {
+
 }

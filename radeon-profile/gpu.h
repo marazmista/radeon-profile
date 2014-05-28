@@ -38,9 +38,10 @@ public:
     void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const;
     void getClocks();
     void getTemperature();
+    void reconfigureDaemon();
+    bool daemonConnected();
 
 private:
-
     driver currentDriver;
     driver detectDriver();
 

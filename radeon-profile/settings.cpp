@@ -10,6 +10,9 @@
 
 const QString radeon_profile::settingsPath = QDir::homePath() + "/.radeon-profile-settings";
 
+// init of static struct with setting exposed to global scope
+globalStuff::globalCfgStruct globalStuff::globalConfig;
+
 void radeon_profile::saveConfig() {
     QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
 
@@ -29,6 +32,7 @@ void radeon_profile::saveConfig() {
 
     settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
     settings.setValue("graphRange",ui->timeSlider->value());
+    settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
 
     // Graph settings
     settings.setValue("graphLineThickness",ui->spin_lineThick->value());
@@ -63,6 +67,7 @@ void radeon_profile::loadConfig() {
     ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
     ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
+    ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",false).toBool());
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
     ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
@@ -122,4 +127,7 @@ void radeon_profile::loadConfig() {
     on_cb_showTempsGraph_clicked(ui->cb_showTempsGraph->isChecked());
     on_cb_showFreqGraph_clicked(ui->cb_showFreqGraph->isChecked());
     on_cb_showVoltsGraph_clicked(ui->cb_showVoltsGraph->isChecked());
+
+    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
+    globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
 }

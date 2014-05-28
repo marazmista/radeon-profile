@@ -8,23 +8,29 @@
 
 #include <QLocalSocket>
 
-
 class daemonComm : public QObject
 {
     Q_OBJECT
 public:
     daemonComm();
     ~daemonComm();
-    void setSignalParams(const QChar &_req, const QChar &_cardIndex, const QString &_profile = "");
     void connectToDaemon();
+    void sendCommand(const QString command);
+
+    inline bool connected() {
+        if (signalSender->state() == QLocalSocket::ConnectedState)
+            return true;
+        else return false;
+    }
 
     QLocalSocket *signalSender;
 
-    QChar cardIndex, req;
-    QString profile;
+    struct {
+            QString config,read_clocks,set_profile,force_pl,timer_on,timer_off;
+        } daemonSignal;
 
 public slots:
-    void sendRequest();
+    void onConnect();
 
 };
 

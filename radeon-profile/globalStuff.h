@@ -83,5 +83,12 @@ public:
         float current, max, min, sum;
     };
 
+    // settings from config used across the source
+    static struct globalCfgStruct{
+        float interval;
+        bool daemonAutoRefresh;
+    } globalConfig;
 };
+
+
 #endif // PUBLICSTUFF_H

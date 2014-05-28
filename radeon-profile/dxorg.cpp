@@ -27,7 +27,28 @@ void dXorg::configure(QString gpuName) {
         sharedMem.create(128);
         sharedMem.attach();
     }
+
+    dcomm->connectToDaemon();
+    if (dcomm->connected()) {
+        dcomm->sendCommand(dcomm->daemonSignal.config + gpuSysIndex);
+        if (globalStuff::globalConfig.daemonAutoRefresh)
+            dcomm->sendCommand(dcomm->daemonSignal.timer_on + QString().setNum(globalStuff::globalConfig.interval));
+    }
 }
+
+void dXorg::reconfigureDaemon() {
+    if (dcomm->connected()) {
+        if (globalStuff::globalConfig.daemonAutoRefresh)
+            dcomm->sendCommand(dcomm->daemonSignal.timer_on + QString().setNum(globalStuff::globalConfig.interval));
+        else
+            dcomm->sendCommand(dcomm->daemonSignal.timer_off);
+    }
+}
+
+bool dXorg::daemonConnected() {
+    return dcomm->connected();
+}
+
 void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     filePaths.powerMethodFilePath = "/sys/class/drm/"+gpuName+"/device/power_method",
@@ -46,17 +67,17 @@ QString dXorg::getClocksRawData() {
     QFile clocksFile(filePaths.clocksPath);
     QString data;
 
-    dcomm->setSignalParams('1',gpuSysIndex);
-    dcomm->connectToDaemon();
-    if (dcomm->signalSender->state() == QLocalSocket::ConnectedState) {
+    if (dcomm->connected()) {
+        if (!globalStuff::globalConfig.daemonAutoRefresh)
+            dcomm->sendCommand(dcomm->daemonSignal.read_clocks);
+
         sharedMem.lock();
         char *to = (char*)sharedMem.constData();
         char a[128] = {0};
         strncpy(a,to,sizeof(a));
         sharedMem.unlock();
         data  = QString::fromAscii(a).trimmed();
-    }
-    else if (clocksFile.open(QIODevice::ReadOnly))  // check for debugfs access
+    } else if (clocksFile.open(QIODevice::ReadOnly))  // check for debugfs access
         data = QString(clocksFile.readAll());
 
     if (data == "")
@@ -67,6 +88,7 @@ QString dXorg::getClocksRawData() {
 
 globalStuff::gpuClocksStruct dXorg::getClocks() {
     globalStuff::gpuClocksStruct tData(-1); // empty struct
+
     QStringList out = getClocksRawData().split('\n');
 
     // if nothing is there returns empty (-1) struct
@@ -430,10 +452,9 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     default: break;
     }
 
-    if (dcomm->signalSender->state() == QLocalSocket::ConnectedState) {
-        dcomm->setSignalParams('2',gpuSysIndex,newValue); // signal specs are in daemon sources
-        dcomm->connectToDaemon();
-    } else {
+    if (dcomm->connected())
+        dcomm->sendCommand(dcomm->daemonSignal.set_profile + newValue);
+    else {
         // enum is int, so first three values are dpm, rest are profile
         if (_newPowerProfile <= globalStuff::PERFORMANCE)
             setNewValue(filePaths.dpmStateFilePath,newValue);
@@ -457,10 +478,9 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
         break;
     }
 
-    if (dcomm->signalSender->state() == QLocalSocket::ConnectedState) {
-        dcomm->setSignalParams('3',gpuSysIndex,newValue); // signal specs are in daemon sources
-        dcomm->connectToDaemon();
-    } else
+    if (dcomm->connected())
+        dcomm->sendCommand(dcomm->daemonSignal.force_pl + newValue);
+    else
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
@@ -477,7 +497,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     features.canChangeProfile = false;
     switch (currentPowerMethod) {
     case globalStuff::DPM: {
-        if (dcomm->signalSender->state() == QLocalSocket::ConnectedState)
+        if (dcomm->connected())
             features.canChangeProfile = true;
         else {
             QFile f(filePaths.dpmStateFilePath);

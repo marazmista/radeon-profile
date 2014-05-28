@@ -2,6 +2,7 @@
 #define RADEON_PROFILE_H
 
 #include "gpu.h"
+#include "daemonComm.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -95,6 +96,8 @@ private slots:
     void resetStats();
     void on_cb_alternateRow_clicked(bool checked);
     void on_chProfile_clicked();
+
+    void on_btn_reconfigureDaemon_clicked();
 
 private:
     gpu device;

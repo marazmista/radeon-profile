@@ -13,6 +13,14 @@ gpu::driver gpu::detectDriver() {
     return DRIVER_UNKNOWN;
 }
 
+void gpu::reconfigureDaemon() {
+    dXorg::reconfigureDaemon();
+}
+
+bool gpu::daemonConnected() {
+    return dXorg::daemonConnected();
+}
+
 // method for resolve which driver gpu instance will use
 // and call some things that need to be done before read data
 QStringList gpu::initialize(bool skipDetectDriver) {
@@ -42,6 +50,7 @@ QStringList gpu::initialize(bool skipDetectDriver) {
     }
     }
 }
+
 
 void gpu::driverByParam(gpu::driver paramDriver) {
     this->currentDriver = paramDriver;

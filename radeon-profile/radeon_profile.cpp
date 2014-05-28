@@ -17,14 +17,13 @@
 
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
-#include "gpu.h"
 
 #include <QTimer>
 #include <QTextStream>
 #include <QMenu>
 #include <QDir>
 
-const int appVersion = 20140524;
+const int appVersion = 20140528;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
@@ -40,6 +39,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     // setup ui elemensts
     ui->mainTabs->setCurrentIndex(0);
     ui->tabs_systemInfo->setCurrentIndex(0);
+    ui->configGroups->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
     setupGraphs();
     setupForcePowerLevelMenu();
@@ -63,6 +63,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
         ui->combo_gpus->addItems(device.initialize());
 
     setupUiEnabledFeatures(device.gpuFeatures);
+    ui->configGroups->setTabEnabled(2,device.daemonConnected());
 
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
@@ -297,3 +298,5 @@ void radeon_profile::refreshTooltip()
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
+
+

@@ -31,6 +31,8 @@ public:
     static void figureOutGpuDataFilePaths(QString gpuName);
     static void configure(QString gpuName);
     static globalStuff::driverFeatures figureOutDriverFeatures();
+    static void reconfigureDaemon();
+    static bool daemonConnected();
 
 private:
     enum tempSensor {
@@ -46,7 +48,7 @@ private:
 
     static struct driverFilePaths {
     QString powerMethodFilePath, profilePath, dpmStateFilePath ,
-    clocksPath , forcePowerLevelFilePath , sysfsHwmonPath, moduleParamsPath ;
+            clocksPath , forcePowerLevelFilePath , sysfsHwmonPath, moduleParamsPath ;
     } filePaths;
     static int sensorsGPUtempIndex;
     static dXorg::tempSensor currentTempSensor;

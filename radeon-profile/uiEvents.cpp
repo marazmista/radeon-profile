@@ -244,4 +244,11 @@ void radeon_profile::on_chProfile_clicked()
             device.setPowerProfile(globalStuff::LOW);
     }
 }
+
+void radeon_profile::on_btn_reconfigureDaemon_clicked()
+{
+    globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
+    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
+    device.reconfigureDaemon();
+}
 //========
