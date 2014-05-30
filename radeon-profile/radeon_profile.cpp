@@ -23,7 +23,7 @@
 #include <QMenu>
 #include <QDir>
 
-const int appVersion = 20140528;
+const int appVersion = 20140530;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;

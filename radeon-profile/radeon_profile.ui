@@ -1248,7 +1248,7 @@
            </attribute>
            <widget class="QCheckBox" name="cb_daemonAutoRefresh">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="geometry">
              <rect>
@@ -1267,7 +1267,7 @@
            </widget>
            <widget class="QPushButton" name="btn_reconfigureDaemon">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="geometry">
              <rect>
