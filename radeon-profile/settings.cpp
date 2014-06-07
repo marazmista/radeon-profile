@@ -7,8 +7,10 @@
 #include <QSettings>
 #include <QMenu>
 #include <QDir>
+#include <QTreeWidgetItem>
 
 const QString radeon_profile::settingsPath = QDir::homePath() + "/.radeon-profile-settings";
+const QString execProfilesPath = QDir::homePath() + "/.radeon-profile-execProfiles";
 
 // init of static struct with setting exposed to global scope
 globalStuff::globalCfgStruct globalStuff::globalConfig;
@@ -50,6 +52,21 @@ void radeon_profile::saveConfig() {
     settings.setValue("showTempGraphOnStart",ui->cb_showTempsGraph->isChecked());
     settings.setValue("showFreqGraphOnStart",ui->cb_showFreqGraph->isChecked());
     settings.setValue("showVoltsGraphOnStart",ui->cb_showVoltsGraph->isChecked());
+
+    // save profiles from Exec tab
+    QFile ef(execProfilesPath);
+    if (ef.open(QIODevice::WriteOnly)) {
+        for (int i = 0; i < ui->list_execProfiles->topLevelItemCount(); i++) {
+            QString profile = ui->list_execProfiles->topLevelItem(i)->text(0) + "###" +
+                    ui->list_execProfiles->topLevelItem(i)->text(1) + "###" +
+                    ui->list_execProfiles->topLevelItem(i)->text(2) + "###" +
+                    ui->list_execProfiles->topLevelItem(i)->text(3) + "###" +
+                    ui->list_execProfiles->topLevelItem(i)->text(4) + "\n";
+
+            ef.write(profile.toAscii());
+        }
+        ef.close();
+    }
 }
 
 void radeon_profile::loadConfig() {
@@ -130,4 +147,15 @@ void radeon_profile::loadConfig() {
 
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
+
+    QFile ef(execProfilesPath);
+    if (ef.open(QIODevice::ReadOnly)) {
+        QStringList profiles = QString(ef.readAll()).split('\n');
+
+        for (int i=0;i <profiles.count(); i++) {
+            if (!profiles[i].isEmpty())
+                ui->list_execProfiles->addTopLevelItem(new QTreeWidgetItem(QStringList() << profiles[i].split("###")));
+        }
+
+    }
 }

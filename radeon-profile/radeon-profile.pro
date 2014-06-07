@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     dxorg.cpp \
     dfglrx.cpp \
     settings.cpp \
-    daemonComm.cpp
+    daemonComm.cpp \
+    execTab.cpp
 
 HEADERS  += radeon_profile.h \
     qcustomplot.h \

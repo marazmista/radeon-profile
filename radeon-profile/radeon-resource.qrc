@@ -6,4 +6,7 @@
         <file>symbols/arrow3.png</file>
         <file>symbols/refresh.png</file>
     </qresource>
+    <qresource prefix="/var">
+        <file>variables/envVars</file>
+    </qresource>
 </RCC>

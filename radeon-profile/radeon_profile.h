@@ -13,6 +13,7 @@
 #include <QTreeWidgetItem>
 #include <QProcessEnvironment>
 #include <QList>
+#include <QListWidgetItem>
 
 #define startClocksScaleL 50
 #define startClocksScaleH 150
@@ -96,12 +97,33 @@ private slots:
     void resetStats();
     void on_cb_alternateRow_clicked(bool checked);
     void on_chProfile_clicked();
-
     void on_btn_reconfigureDaemon_clicked();
+    void on_btn_cancel_clicked();
+    void on_btn_addExecProfile_clicked();
+    void on_list_vaules_itemClicked(QListWidgetItem *item);
+    void on_list_variables_itemClicked(QListWidgetItem *item);
+    void on_btn_modifyExecProfile_clicked();
+    void on_btn_ok_clicked();
+    void on_btn_removeExecProfile_clicked();
+    void on_btn_selectBinary_clicked();
+    void on_btn_selectLog_clicked();
+    void on_cb_manualEdit_clicked(bool checked);
+    void on_btn_runExecProfile_clicked();
+    void execProcesStart();
+    void execProcesFinished();
+    void execProcessReadOutput();
+    void on_btn_viewOutput_clicked();
+    void on_btn_backToProfiles_clicked();
 
 private:
     gpu device;
     static const QString settingsPath;
+
+    QProcess *execProcess = new QProcess();
+    struct {
+        QString logFilename, launchTiem;
+        QStringList log;
+    } execData;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
@@ -119,6 +141,7 @@ private:
     void refreshGpuData();
     void refreshGraphs(const globalStuff::gpuClocksStruct &, const globalStuff::gpuTemperatureStruct &);
     void setupUiEnabledFeatures(const globalStuff::driverFeatures &features);
+    void loadVariables();
 };
 
 

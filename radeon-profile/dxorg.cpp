@@ -30,6 +30,7 @@ void dXorg::configure(QString gpuName) {
 
     dcomm->connectToDaemon();
     if (dcomm->connected()) {
+        // sending card index and timer interval if selected
         dcomm->sendCommand(dcomm->daemonSignal.config + gpuSysIndex + ((globalStuff::globalConfig.daemonAutoRefresh) ? dcomm->daemonSignal.timer_on + QString().setNum(globalStuff::globalConfig.interval) : ""));
     }
 }

@@ -22,8 +22,9 @@
 #include <QTextStream>
 #include <QMenu>
 #include <QDir>
+#include <QDateTime>
 
-const int appVersion = 20140530;
+const int appVersion = 20140607;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
@@ -41,6 +42,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->tabs_systemInfo->setCurrentIndex(0);
     ui->configGroups->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
+    ui->execPages->setCurrentIndex(0);
     setupGraphs();
     setupForcePowerLevelMenu();
     setupOptionsMenu();
@@ -99,10 +101,16 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     l->setFont(f);
     ui->mainTabs->setCornerWidget(l,Qt::BottomRightCorner);
     l->show();
+
+    if (globalStuff::grabSystemInfo("whoami")[0] == "root")
+        ui->label_rootWarrning->setVisible(true);
+    else
+        ui->label_rootWarrning->setVisible(false);
 }
 
 radeon_profile::~radeon_profile()
 {
+    delete execProcess;
     delete ui;
 }
 
@@ -166,6 +174,18 @@ void radeon_profile::refreshGpuData() {
 
     device.getTemperature();
     ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current GPU temp" << QString().setNum(device.gpuTemeperatureData.current) + QString::fromUtf8("\u00B0C")));
+
+    if (execProcess->state() == QProcess::Running && !execData.logFilename.isEmpty()) {
+        QString logData = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") +";" + QString().setNum(device.gpuData.powerLevel) + ";" +
+                                QString().setNum(device.gpuData.coreClk) + ";"+
+                                QString().setNum(device.gpuData.memClk) + ";"+
+                                QString().setNum(device.gpuData.uvdCClk) + ";"+
+                                QString().setNum(device.gpuData.uvdDClk) + ";"+
+                                QString().setNum(device.gpuData.coreVolt) + ";"+
+                                QString().setNum(device.gpuData.memVolt) + ";"+
+                                QString().setNum(device.gpuTemeperatureData.current);
+        execData.log.append(logData);
+    }
 }
 
 //===================================
@@ -298,5 +318,3 @@ void radeon_profile::refreshTooltip()
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
-
-
