@@ -10,9 +10,9 @@ DRAW_USE_LLVM|1
 ST_DEBUG|mesa#tgsi#constants#pipe#tex#fallback#screen#query
 -------Mesa-------
 MESA_GL_VERSION_OVERRIDE|user_input
+MESA_GLSL|dump#log#nopt#opt#uniform#nopvert#nopfrag#useprog
 MESA_GLSL_VERSION_OVERRIDE|user_input
 MESA_EXTENSION_OVERRIDE|user_input
-MESA_GLSL|dump#log#nopt#opt#uniform#nopvert#nopfrag#useprog
 MESA_NO_ASM|1
 MESA_NO_MMX|1
 MESA_NO_3DNOW|1
