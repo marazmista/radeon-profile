@@ -297,3 +297,14 @@ void radeon_profile::on_btn_backToProfiles_clicked()
 {
     ui->execPages->setCurrentIndex(0);
 }
+
+void radeon_profile::on_btn_saveToFile_clicked()
+{
+    QString filename = QFileDialog::getSaveFileName(this, "Save",QDir::homePath());
+    if (!filename.isEmpty()) {
+        QFile f(filename);
+        f.open(QIODevice::WriteOnly);
+        f.write(ui->txt_consoleOutput->toPlainText().toAscii());
+        f.close();
+    }
+}

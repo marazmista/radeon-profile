@@ -115,6 +115,8 @@ private slots:
     void on_btn_viewOutput_clicked();
     void on_btn_backToProfiles_clicked();
 
+    void on_btn_saveToFile_clicked();
+
 private:
     gpu device;
     static const QString settingsPath;
