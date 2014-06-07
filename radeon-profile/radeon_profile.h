@@ -121,7 +121,7 @@ private:
     gpu device;
     static const QString settingsPath;
 
-    QProcess *execProcess = new QProcess();
+    QProcess *execProcess;
     struct {
         QString logFilename, launchTiem;
         QStringList log;

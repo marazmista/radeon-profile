@@ -36,6 +36,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 {
     ui->setupUi(this);
     timer = new QTimer();
+    execProcess = new QProcess();
 
     // setup ui elemensts
     ui->mainTabs->setCurrentIndex(0);

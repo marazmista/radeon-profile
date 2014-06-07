@@ -1,5 +1,5 @@
 -------Gallium-------
-GALLIUM_HUD|fps#cpu#samples-passed#primitives-generated#ia-vertices#ia-primitives#vs-invocations#gs-invocations#gs-primitives#clipper-invocations#clipper-primitives-generated#ps-invocations#hs-invocations#ds-invocations#cs-invocations#draw-calls#requested-VRAM#equested-GTT#buffer-wait-time
+GALLIUM_HUD|fps#cpu#samples-passed#primitives-generated#ia-vertices#ia-primitives#vs-invocations#gs-invocations#gs-primitives#clipper-invocations#clipper-primitives-generated#ps-invocations#hs-invocations#ds-invocations#cs-invocations#draw-calls#requested-VRAM#requested-GTT#buffer-wait-time
 GALLIUM_LOG_FILE|user_input
 GALLIUM_PRINT_OPTIONS|1
 GALLIUM_DUMP_CPU|1
