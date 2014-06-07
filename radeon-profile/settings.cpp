@@ -138,6 +138,9 @@ void radeon_profile::loadConfig() {
     ui->list_modInfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_connectors->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_stats->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
+    ui->list_execProfiles->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
+    ui->list_variables->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
+    ui->list_vaules->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
 
     showLegend(optionsMenu->actions().at(0)->isChecked());
     changeTimeRange();
