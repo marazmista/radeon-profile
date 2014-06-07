@@ -91,13 +91,13 @@ void radeon_profile::on_btn_addExecProfile_clicked()
 
 void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
 {
+    ui->list_vaules->clear();
+
     if (item->text().contains("----")) // the separator
         return;
 
     if (envVars.isEmpty())
         return;
-
-    ui->list_vaules->clear();
 
     // read variable possible values from file
     QStringList values = envVars.filter(ui->list_variables->currentItem()->text())[0].remove(ui->list_variables->currentItem()->text()+"|").split("#",QString::SkipEmptyParts);
