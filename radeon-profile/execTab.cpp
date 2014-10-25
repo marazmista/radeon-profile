@@ -62,9 +62,13 @@ void radeon_profile::on_btn_ok_clicked()
         return;
     }
 
+    int modIndex = -1;
+
     if (ui->list_execProfiles->selectedItems().count() != 0) {
-        if (ui->list_execProfiles->currentItem()->text(0) == ui->txt_profileName->text())
+        if (ui->list_execProfiles->currentItem()->text(0) == ui->txt_profileName->text()) {
+            modIndex = ui->list_execProfiles->indexOfTopLevelItem(ui->list_execProfiles->currentItem());
             delete ui->list_execProfiles->currentItem();
+        }
     }
 
     QTreeWidgetItem *item = new QTreeWidgetItem();
@@ -73,7 +77,11 @@ void radeon_profile::on_btn_ok_clicked()
     item->setText(2,ui->txt_summary->text());
     item->setText(3,ui->txt_logFile->text());
     item->setText(4,((ui->cb_appendDateTime->isChecked()) ? "1" : "0"));
-    ui->list_execProfiles->addTopLevelItem(item);
+
+    if (modIndex == -1)
+        ui->list_execProfiles->addTopLevelItem(item);
+    else
+        ui->list_execProfiles->insertTopLevelItem(modIndex,item);
 
     ui->list_execProfiles->setCurrentItem(item);
 
@@ -181,7 +189,10 @@ void radeon_profile::on_btn_removeExecProfile_clicked()
     if (ui->list_execProfiles->selectedItems().count() == 0)
         return;
 
-    delete ui->list_execProfiles->selectedItems()[0];
+   if (QMessageBox::question(this,"Remove", "Remove this item?",QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+        delete ui->list_execProfiles->selectedItems()[0];
+   else
+       return;
 }
 
 void radeon_profile::on_btn_selectBinary_clicked()

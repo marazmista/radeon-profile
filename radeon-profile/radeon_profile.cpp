@@ -24,7 +24,7 @@
 #include <QDir>
 #include <QDateTime>
 
-const int appVersion = 20140607;
+const int appVersion = 20141025;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;

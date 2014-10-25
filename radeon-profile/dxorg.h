@@ -12,6 +12,7 @@
 #include <QList>
 #include <QTreeWidgetItem>
 #include <QSharedMemory>
+#include <QThread>
 
 class dXorg
 {
@@ -60,7 +61,5 @@ private:
     static void setNewValue(const QString &filePath, const QString &newValue);
     static QString findSysFsHwmonForGpu();
 };
-
-
 
 #endif // DXORG_H

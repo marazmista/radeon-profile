@@ -55,7 +55,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -1301,6 +1301,11 @@
             </item>
             <item>
              <widget class="QTreeWidget" name="list_execProfiles">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
               <property name="indentation">
                <number>5</number>
               </property>

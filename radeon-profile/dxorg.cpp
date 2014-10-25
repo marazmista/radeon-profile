@@ -67,6 +67,7 @@ QString dXorg::getClocksRawData() {
     QString data;
 
     if (dcomm->connected()) {
+//    if (0) {
         if (!globalStuff::globalConfig.daemonAutoRefresh)
             dcomm->sendCommand(dcomm->daemonSignal.read_clocks);
 
