@@ -2404,9 +2404,6 @@
               <height>24</height>
              </rect>
             </property>
-            <property name="currentText">
-             <string>Run</string>
-            </property>
             <item>
              <property name="text">
               <string>Run</string>
