@@ -117,6 +117,8 @@ private slots:
 
     void on_btn_saveToFile_clicked();
 
+    void on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
 private:
     gpu device;
     static const QString settingsPath;

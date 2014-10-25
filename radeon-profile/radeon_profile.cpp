@@ -23,6 +23,7 @@
 #include <QMenu>
 #include <QDir>
 #include <QDateTime>
+#include <QMessageBox>
 
 const int appVersion = 20141025;
 

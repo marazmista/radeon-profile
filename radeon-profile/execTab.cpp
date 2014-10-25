@@ -319,3 +319,17 @@ void radeon_profile::on_btn_saveToFile_clicked()
         f.close();
     }
 }
+
+void radeon_profile::on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+        switch (ui->cb_execDbcAction->currentIndex()) {
+        default:
+        case 0:
+            if (QMessageBox::question(this,"Run","Run: \""+item->text(0)+"\"?",QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+                ui->btn_runExecProfile->click();
+            break;
+        case 1:
+            ui->btn_modifyExecProfile->click();
+            break;
+        }
+}

@@ -52,6 +52,7 @@ void radeon_profile::saveConfig() {
     settings.setValue("showTempGraphOnStart",ui->cb_showTempsGraph->isChecked());
     settings.setValue("showFreqGraphOnStart",ui->cb_showFreqGraph->isChecked());
     settings.setValue("showVoltsGraphOnStart",ui->cb_showVoltsGraph->isChecked());
+    settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
 
     // save profiles from Exec tab
     QFile ef(execProfilesPath);
@@ -85,6 +86,7 @@ void radeon_profile::loadConfig() {
     ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
     ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",false).toBool());
+    ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
     ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
@@ -107,6 +109,7 @@ void radeon_profile::loadConfig() {
     ui->cb_showTempsGraph->setChecked(settings.value("showTempGraphOnStart",true).toBool());
     ui->cb_showFreqGraph->setChecked(settings.value("showFreqGraphOnStart",true).toBool());
     ui->cb_showVoltsGraph->setChecked(settings.value("showVoltsGraphOnStart",false).toBool());
+
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
