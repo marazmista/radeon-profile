@@ -30,12 +30,11 @@ MESA_GLX_FORCE_CI|user_input
 MESA_GLX_FORCE_ALPHA|user_input
 MESA_GLX_DEPTH_BITS|user_input
 MESA_GLX_ALPHA_BITS|user_input
--------LibGL-------|user_input
+-------LibGL-------
 LIBGL_DEBUG|user_input
 LIBGL_DRIVERS_PATH|user_input
 LIBGL_ALWAYS_INDIRECT|1
 LIBGL_ALWAYS_SOFTWARE|1
-LIBGL_NO_DRAWARRAYS|1
 LIBGL_NO_DRAWARRAYS|1
 -------LLVMpipe-------
 LP_NO_RAST|1
@@ -43,7 +42,7 @@ LP_DEBUG|user_input
 LP_PERF|user_input
 LP_NUM_THREADS|user_input
 -------Driver-------
-R600_DEBUG|sb#nosb#sbcl#sbstat#nollvm#nohyperz#hyprez#bostats
+R600_DEBUG|sb#nosb#sbcl#sbstat#nollvm#llvm#nohyperz#hyprez#bostats
 -------Other-------
 vblank_mode|0
 LC_ALL|user_input
