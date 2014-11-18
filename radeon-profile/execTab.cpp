@@ -62,6 +62,17 @@ void radeon_profile::on_btn_ok_clicked()
         return;
     }
 
+    // if only name given, assume it is in /usr/bin
+    if (!ui->txt_binary->text().contains('/')) {
+        QString tmpS = "/usr/bin/"+ui->txt_binary->text();
+        if (QFile::exists(tmpS))
+            ui->txt_binary->setText(tmpS);
+        else {
+            QMessageBox::critical(this,"Error","Binary \""+ui->txt_binary->text()+"\" not found in /usr/bin.");
+            return;
+        }
+    }
+
     int modIndex = -1;
 
     if (ui->list_execProfiles->selectedItems().count() != 0) {
