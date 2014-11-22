@@ -58,11 +58,12 @@ void radeon_profile::saveConfig() {
     QFile ef(execProfilesPath);
     if (ef.open(QIODevice::WriteOnly)) {
         for (int i = 0; i < ui->list_execProfiles->topLevelItemCount(); i++) {
-            QString profile = ui->list_execProfiles->topLevelItem(i)->text(0) + "###" +
-                    ui->list_execProfiles->topLevelItem(i)->text(1) + "###" +
-                    ui->list_execProfiles->topLevelItem(i)->text(2) + "###" +
-                    ui->list_execProfiles->topLevelItem(i)->text(3) + "###" +
-                    ui->list_execProfiles->topLevelItem(i)->text(4) + "\n";
+            QString profile = ui->list_execProfiles->topLevelItem(i)->text(PROFILE_NAME) + "###" +
+                    ui->list_execProfiles->topLevelItem(i)->text(BINARY) + "###" +
+                    ui->list_execProfiles->topLevelItem(i)->text(BINARY_PARAMS) + "###" +
+                    ui->list_execProfiles->topLevelItem(i)->text(ENV_SETTINGS) + "###" +
+                    ui->list_execProfiles->topLevelItem(i)->text(LOG_FILE) + "###" +
+                    ui->list_execProfiles->topLevelItem(i)->text(LOG_FILE_DATE_APPEND) + "\n";
 
             ef.write(profile.toAscii());
         }

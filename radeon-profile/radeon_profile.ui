@@ -1327,6 +1327,11 @@
               </column>
               <column>
                <property name="text">
+                <string>Params</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
                 <string>Setting</string>
                </property>
               </column>
@@ -1461,6 +1466,20 @@
                  </widget>
                 </item>
                </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_12">
+              <item>
+               <widget class="QLabel" name="label_17">
+                <property name="text">
+                 <string>Binary parameters:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="txt_binParams"/>
               </item>
              </layout>
             </item>

@@ -39,11 +39,12 @@ void radeon_profile::on_btn_modifyExecProfile_clicked()
     if (ui->list_execProfiles->selectedItems().count() == 0)
         return;
 
-    ui->txt_profileName->setText(ui->list_execProfiles->currentItem()->text(0));
-    ui->txt_binary->setText(ui->list_execProfiles->currentItem()->text(1));
-    ui->txt_logFile->setText(ui->list_execProfiles->currentItem()->text(3));
-    ui->txt_summary->setText(ui->list_execProfiles->currentItem()->text(2));
-    ui->cb_appendDateTime->setChecked(((ui->list_execProfiles->currentItem()->text(4) == "1") ? true : false));
+    ui->txt_profileName->setText(ui->list_execProfiles->currentItem()->text(PROFILE_NAME));
+    ui->txt_binary->setText(ui->list_execProfiles->currentItem()->text(BINARY));
+    ui->txt_binParams->setText(ui->list_execProfiles->currentItem()->text(BINARY_PARAMS));
+    ui->txt_logFile->setText(ui->list_execProfiles->currentItem()->text(LOG_FILE));
+    ui->txt_summary->setText(ui->list_execProfiles->currentItem()->text(ENV_SETTINGS));
+    ui->cb_appendDateTime->setChecked(((ui->list_execProfiles->currentItem()->text(LOG_FILE_DATE_APPEND) == "1") ? true : false));
 
     selectedVariableVaules = ui->txt_summary->text().split(" ");
     ui->execPages->setCurrentIndex(1);
@@ -76,18 +77,19 @@ void radeon_profile::on_btn_ok_clicked()
     int modIndex = -1;
 
     if (ui->list_execProfiles->selectedItems().count() != 0) {
-        if (ui->list_execProfiles->currentItem()->text(0) == ui->txt_profileName->text()) {
+        if (ui->list_execProfiles->currentItem()->text(PROFILE_NAME) == ui->txt_profileName->text()) {
             modIndex = ui->list_execProfiles->indexOfTopLevelItem(ui->list_execProfiles->currentItem());
             delete ui->list_execProfiles->currentItem();
         }
     }
 
     QTreeWidgetItem *item = new QTreeWidgetItem();
-    item->setText(0, ui->txt_profileName->text());
-    item->setText(1, ui->txt_binary->text());
-    item->setText(2,ui->txt_summary->text());
-    item->setText(3,ui->txt_logFile->text());
-    item->setText(4,((ui->cb_appendDateTime->isChecked()) ? "1" : "0"));
+    item->setText(PROFILE_NAME, ui->txt_profileName->text());
+    item->setText(BINARY, ui->txt_binary->text());
+    item->setText(BINARY_PARAMS, ui->txt_binParams->text());
+    item->setText(ENV_SETTINGS,ui->txt_summary->text());
+    item->setText(LOG_FILE,ui->txt_logFile->text());
+    item->setText(LOG_FILE_DATE_APPEND,((ui->cb_appendDateTime->isChecked()) ? "1" : "0"));
 
     if (modIndex == -1)
         ui->list_execProfiles->addTopLevelItem(item);
@@ -249,8 +251,8 @@ void radeon_profile::on_btn_runExecProfile_clicked()
     // sets the env for binary
     penv = QProcessEnvironment::systemEnvironment();
     QStringList variables;
-    if (!item->text(2).isEmpty()) {
-       variables = item->text(2).split(' ');
+    if (!item->text(BINARY).isEmpty()) {
+       variables = item->text(ENV_SETTINGS).split(' ');
 
         for (int i = 0; i < variables.count(); i++) {
             QString varible = variables[i].split('=')[0],
@@ -266,15 +268,15 @@ void radeon_profile::on_btn_runExecProfile_clicked()
     connect(execProcess,SIGNAL(finished(int)),this,SLOT(execProcesFinished()));
     connect(execProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(execProcessReadOutput()));
 
-    if (QFile::exists(item->text(1))) {
-        execProcess->start("\""+item->text(1)+"\"");
+    if (QFile::exists(item->text(BINARY))) {
+        execProcess->start("\""+item->text(BINARY) +"\" " +item->text(BINARY_PARAMS));
         ui->execPages->setCurrentIndex(2);
 
         // check if there will be log
-        if (!item->text(3).isEmpty()) {
-            execData.logFilename = item->text(3) +
-                    ((item->text(4) == "1") ? QDateTime::currentDateTime().toString("_yyyy-MM-dd_hh-mm-ss") : "");
-            execData.log.append("Profile: " +item->text(0) +"; App: " + item->text(1) + "; Env: " + item->text(2));
+        if (!item->text(LOG_FILE).isEmpty()) {
+            execData.logFilename = item->text(LOG_FILE) +
+                    ((item->text(LOG_FILE_DATE_APPEND) == "1") ? QDateTime::currentDateTime().toString("_yyyy-MM-dd_hh-mm-ss") : "");
+            execData.log.append("Profile: " +item->text(PROFILE_NAME) +"; App: " + item->text(BINARY) + "; Params: " + item->text(BINARY_PARAMS) + "; Env: " + item->text(ENV_SETTINGS));
             execData.log.append("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci); temp");
         }
     }

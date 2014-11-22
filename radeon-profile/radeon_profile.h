@@ -54,6 +54,15 @@ class radeon_profile : public QMainWindow
         MEM_VOLTS_LINE
     };
 
+    enum itemValues {
+        PROFILE_NAME,
+        BINARY,
+        BINARY_PARAMS,
+        ENV_SETTINGS,
+        LOG_FILE,
+        LOG_FILE_DATE_APPEND
+    };
+
 public:
     explicit radeon_profile(QStringList, QWidget *parent = 0);
     ~radeon_profile();
