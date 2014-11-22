@@ -266,8 +266,8 @@ void radeon_profile::on_btn_runExecProfile_clicked()
     connect(execProcess,SIGNAL(finished(int)),this,SLOT(execProcesFinished()));
     connect(execProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(execProcessReadOutput()));
 
-    if (QFile(item->text(1)).exists()) {
-        execProcess->start(item->text(1));
+    if (QFile::exists(item->text(1))) {
+        execProcess->start("\""+item->text(1)+"\"");
         ui->execPages->setCurrentIndex(2);
 
         // check if there will be log
