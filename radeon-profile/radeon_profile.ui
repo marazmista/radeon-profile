@@ -55,7 +55,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -2214,7 +2214,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>150</y>
+              <y>180</y>
               <width>161</width>
               <height>24</height>
              </rect>
@@ -2227,7 +2227,7 @@
             <property name="geometry">
              <rect>
               <x>210</x>
-              <y>150</y>
+              <y>180</y>
               <width>61</width>
               <height>24</height>
              </rect>
@@ -2249,7 +2249,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>190</y>
+              <y>220</y>
               <width>289</width>
               <height>12</height>
              </rect>
@@ -2268,7 +2268,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>210</y>
+              <y>240</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2290,7 +2290,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>230</y>
+              <y>260</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2312,7 +2312,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>250</y>
+              <y>280</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2328,7 +2328,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>270</y>
+              <y>300</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2347,7 +2347,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>290</y>
+              <y>320</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2366,7 +2366,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>310</y>
+              <y>340</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2412,6 +2412,19 @@
             </property>
             <property name="text">
              <string>Double click action on exec item</string>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="cb_execSysEnv">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>142</y>
+              <width>291</width>
+              <height>21</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Explicit append system env to exec command</string>
             </property>
            </widget>
           </widget>

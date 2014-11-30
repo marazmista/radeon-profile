@@ -53,6 +53,7 @@ void radeon_profile::saveConfig() {
     settings.setValue("showFreqGraphOnStart",ui->cb_showFreqGraph->isChecked());
     settings.setValue("showVoltsGraphOnStart",ui->cb_showVoltsGraph->isChecked());
     settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
+    settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
 
     // save profiles from Exec tab
     QFile ef(execProfilesPath);
@@ -110,7 +111,7 @@ void radeon_profile::loadConfig() {
     ui->cb_showTempsGraph->setChecked(settings.value("showTempGraphOnStart",true).toBool());
     ui->cb_showFreqGraph->setChecked(settings.value("showFreqGraphOnStart",true).toBool());
     ui->cb_showVoltsGraph->setChecked(settings.value("showVoltsGraphOnStart",false).toBool());
-
+    ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",false).toBool());
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())

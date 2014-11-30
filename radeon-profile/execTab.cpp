@@ -14,7 +14,6 @@
 #include <QInputDialog>
 
 QStringList selectedVariableVaules,envVars;
-QProcessEnvironment penv;
 
 void radeon_profile::on_btn_cancel_clicked()
 {
@@ -249,7 +248,10 @@ void radeon_profile::on_btn_runExecProfile_clicked()
     QTreeWidgetItem *item = ui->list_execProfiles->currentItem();
 
     // sets the env for binary
-    penv = QProcessEnvironment::systemEnvironment();
+    QProcessEnvironment penv;
+    if (ui->cb_execSysEnv->isChecked())
+        penv = QProcessEnvironment::systemEnvironment();
+
     QStringList variables;
     if (!item->text(ENV_SETTINGS).isEmpty()) {
             variables = item->text(ENV_SETTINGS).split(' ');
