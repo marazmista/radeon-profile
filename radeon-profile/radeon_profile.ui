@@ -2426,6 +2426,9 @@
             <property name="text">
              <string>Explicit append system env to exec command</string>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </widget>
           <widget class="QWidget" name="tab_graphsConfig">

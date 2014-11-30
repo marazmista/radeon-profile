@@ -111,7 +111,7 @@ void radeon_profile::loadConfig() {
     ui->cb_showTempsGraph->setChecked(settings.value("showTempGraphOnStart",true).toBool());
     ui->cb_showFreqGraph->setChecked(settings.value("showFreqGraphOnStart",true).toBool());
     ui->cb_showVoltsGraph->setChecked(settings.value("showVoltsGraphOnStart",false).toBool());
-    ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",false).toBool());
+    ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
