@@ -9,6 +9,7 @@
 #include <QColorDialog>
 #include <QClipboard>
 #include <QInputDialog>
+#include <QMessageBox>
 
 bool closeFromTrayMenu;
 
@@ -253,5 +254,19 @@ void radeon_profile::on_btn_reconfigureDaemon_clicked()
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
     device.reconfigureDaemon();
+}
+
+void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
+{
+    if (execsRunning->at(index)->getExecState() == QProcess::Running) {
+        if (QMessageBox::question(this,"","Process is still running. Close tab?",QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
+            return;
+    }
+
+    ui->tabs_execOutputs->removeTab(index);
+    execsRunning->removeAt(index);
+
+    if (ui->tabs_execOutputs->count() == 0)
+        on_btn_backToProfiles_clicked();
 }
 //========

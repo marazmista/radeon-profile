@@ -865,7 +865,7 @@
         <item row="0" column="0">
          <widget class="QStackedWidget" name="execPages">
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="page_profiles">
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -2076,60 +2076,27 @@
           </widget>
           <widget class="QWidget" name="page_output">
            <layout class="QVBoxLayout" name="verticalLayout_11">
+            <property name="spacing">
+             <number>3</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_10">
-              <item>
-               <widget class="QLabel" name="label_14">
-                <property name="text">
-                 <string>Console output:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPlainTextEdit" name="txt_consoleOutput">
-                <property name="font">
-                 <font>
-                  <family>Monospace</family>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_7">
-              <item>
-               <widget class="QPushButton" name="btn_backToProfiles">
-                <property name="text">
-                 <string>Back to profiles</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btn_saveToFile">
-                <property name="text">
-                 <string>Save to file</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QTabWidget" name="tabs_execOutputs">
+              <property name="tabsClosable">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>

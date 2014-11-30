@@ -29,14 +29,14 @@ void dXorg::configure(QString gpuName) {
     }
 
     dcomm->connectToDaemon();
-    if (dcomm->connected()) {
+    if (daemonConnected()) {
         // sending card index and timer interval if selected
         dcomm->sendCommand(dcomm->daemonSignal.config + gpuSysIndex + ((globalStuff::globalConfig.daemonAutoRefresh) ? dcomm->daemonSignal.timer_on + QString().setNum(globalStuff::globalConfig.interval) : ""));
     }
 }
 
 void dXorg::reconfigureDaemon() {
-    if (dcomm->connected()) {
+    if (daemonConnected()) {
         if (globalStuff::globalConfig.daemonAutoRefresh)
             dcomm->sendCommand(dcomm->daemonSignal.timer_on + QString().setNum(globalStuff::globalConfig.interval));
         else
@@ -66,7 +66,7 @@ QString dXorg::getClocksRawData() {
     QFile clocksFile(filePaths.clocksPath);
     QString data;
 
-    if (dcomm->connected()) {
+    if (daemonConnected()) {
 //    if (0) {
         if (!globalStuff::globalConfig.daemonAutoRefresh)
             dcomm->sendCommand(dcomm->daemonSignal.read_clocks);
@@ -452,7 +452,7 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     default: break;
     }
 
-    if (dcomm->connected())
+    if (daemonConnected())
         dcomm->sendCommand(dcomm->daemonSignal.set_profile + newValue);
     else {
         // enum is int, so first three values are dpm, rest are profile
@@ -478,7 +478,7 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
         break;
     }
 
-    if (dcomm->connected())
+    if (daemonConnected())
         dcomm->sendCommand(dcomm->daemonSignal.force_pl + newValue);
     else
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
@@ -497,7 +497,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     features.canChangeProfile = false;
     switch (currentPowerMethod) {
     case globalStuff::DPM: {
-        if (dcomm->connected())
+        if (daemonConnected())
             features.canChangeProfile = true;
         else {
             QFile f(filePaths.dpmStateFilePath);

@@ -3,6 +3,7 @@
 
 #include "gpu.h"
 #include "daemonComm.h"
+#include "execbin.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -118,25 +119,16 @@ private slots:
     void on_btn_selectLog_clicked();
     void on_cb_manualEdit_clicked(bool checked);
     void on_btn_runExecProfile_clicked();
-    void execProcesStart();
-    void execProcesFinished();
-    void execProcessReadOutput();
     void on_btn_viewOutput_clicked();
     void on_btn_backToProfiles_clicked();
-
-    void on_btn_saveToFile_clicked();
-
     void on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
+    void on_tabs_execOutputs_tabCloseRequested(int index);
 
 private:
     gpu device;
     static const QString settingsPath;
-
-    QProcess *execProcess;
-    struct {
-        QString logFilename, launchTiem;
-        QStringList log;
-    } execData;
+    QList<execBin*> *execsRunning;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
@@ -155,7 +147,9 @@ private:
     void refreshGraphs(const globalStuff::gpuClocksStruct &, const globalStuff::gpuTemperatureStruct &);
     void setupUiEnabledFeatures(const globalStuff::driverFeatures &features);
     void loadVariables();
-};
+    void updateExecLogs();
+    void addRuntimeWidgets();
 
+};
 
 #endif // RADEON_PROFILE_H

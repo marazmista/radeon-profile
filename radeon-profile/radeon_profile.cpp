@@ -25,11 +25,13 @@
 #include <QDateTime>
 #include <QMessageBox>
 
-const int appVersion = 20141122;
+const int appVersion = 20141130;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
 QList<pmLevel> pmStats;
+
+
 
 radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QMainWindow(parent),
@@ -37,7 +39,8 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 {
     ui->setupUi(this);
     timer = new QTimer();
-    execProcess = new QProcess();
+    execsRunning = new QList<execBin*>();
+
 
     // setup ui elemensts
     ui->mainTabs->setCurrentIndex(0);
@@ -85,7 +88,21 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->l_profile->setText(device.getCurrentPowerProfile());
 
     timer->start();
+    addRuntimeWidgets();
 
+    // checks if running as root
+    if (globalStuff::grabSystemInfo("whoami")[0] == "root")
+        ui->label_rootWarrning->setVisible(true);
+    else
+        ui->label_rootWarrning->setVisible(false);
+}
+
+radeon_profile::~radeon_profile()
+{
+    delete ui;
+}
+
+void radeon_profile::addRuntimeWidgets() {
     // add button for manual refresh glx info, connectors, mod params
     QPushButton *refreshBtn = new QPushButton();
     refreshBtn->setIcon(QIcon(":/icon/symbols/refresh.png"));
@@ -104,16 +121,12 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->mainTabs->setCornerWidget(l,Qt::BottomRightCorner);
     l->show();
 
-    if (globalStuff::grabSystemInfo("whoami")[0] == "root")
-        ui->label_rootWarrning->setVisible(true);
-    else
-        ui->label_rootWarrning->setVisible(false);
-}
-
-radeon_profile::~radeon_profile()
-{
-    delete execProcess;
-    delete ui;
+    // button on exec pages
+    QPushButton *btnBackProfiles = new QPushButton();
+    btnBackProfiles->setText("Back to profiles");
+    ui->tabs_execOutputs->setCornerWidget(btnBackProfiles);
+    btnBackProfiles->show();
+    connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(on_btn_backToProfiles_clicked()));
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
@@ -177,19 +190,24 @@ void radeon_profile::refreshGpuData() {
     device.getTemperature();
     ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current GPU temp" << QString().setNum(device.gpuTemeperatureData.current) + QString::fromUtf8("\u00B0C")));
 
-    if (execProcess->state() == QProcess::Running && !execData.logFilename.isEmpty()) {
-        QString logData = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") +";" + QString().setNum(device.gpuData.powerLevel) + ";" +
-                                QString().setNum(device.gpuData.coreClk) + ";"+
-                                QString().setNum(device.gpuData.memClk) + ";"+
-                                QString().setNum(device.gpuData.uvdCClk) + ";"+
-                                QString().setNum(device.gpuData.uvdDClk) + ";"+
-                                QString().setNum(device.gpuData.coreVolt) + ";"+
-                                QString().setNum(device.gpuData.memVolt) + ";"+
-                                QString().setNum(device.gpuTemeperatureData.current);
-        execData.log.append(logData);
-    }
+    updateExecLogs();
 }
 
+void radeon_profile::updateExecLogs() {
+    for (int i = 0; i < execsRunning->count(); i++) {
+        if (execsRunning->at(i)->getExecState() == QProcess::Running && execsRunning->at(i)->logEnabled) {
+            QString logData = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") +";" + QString().setNum(device.gpuData.powerLevel) + ";" +
+                    QString().setNum(device.gpuData.coreClk) + ";"+
+                    QString().setNum(device.gpuData.memClk) + ";"+
+                    QString().setNum(device.gpuData.uvdCClk) + ";"+
+                    QString().setNum(device.gpuData.uvdDClk) + ";"+
+                    QString().setNum(device.gpuData.coreVolt) + ";"+
+                    QString().setNum(device.gpuData.memVolt) + ";"+
+                    QString().setNum(device.gpuTemeperatureData.current);
+            execsRunning->at(i)->appendToLog(logData);
+        }
+    }
+}
 //===================================
 // === Main timer loop  === //
 void radeon_profile::timerEvent() {
@@ -320,3 +338,4 @@ void radeon_profile::refreshTooltip()
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
+

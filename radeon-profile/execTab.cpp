@@ -3,6 +3,7 @@
 
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
+#include "execbin.h"
 
 #include <QFile>
 #include <QRegExp>
@@ -27,6 +28,7 @@ void radeon_profile::on_btn_cancel_clicked()
     ui->txt_logFile->clear();
     ui->txt_profileName->clear();
     ui->txt_summary->clear();
+    ui->txt_binParams->clear();
 }
 
 void radeon_profile::on_btn_modifyExecProfile_clicked()
@@ -244,65 +246,45 @@ void radeon_profile::on_btn_runExecProfile_clicked()
     if (ui->list_execProfiles->selectedItems().count() == 0)
         return;
 
-    ui->txt_consoleOutput->clear();
-
     QTreeWidgetItem *item = ui->list_execProfiles->currentItem();
 
     // sets the env for binary
     penv = QProcessEnvironment::systemEnvironment();
     QStringList variables;
-    if (!item->text(BINARY).isEmpty()) {
-       variables = item->text(ENV_SETTINGS).split(' ');
+    if (!item->text(ENV_SETTINGS).isEmpty()) {
+            variables = item->text(ENV_SETTINGS).split(' ');
 
-        for (int i = 0; i < variables.count(); i++) {
-            QString varible = variables[i].split('=')[0],
-                    value =variables[i].split('=')[1];
-            penv.insert(varible,value);
-        }
+            for (int i = 0; i < variables.count(); i++) {
+                QString varible = variables[i].split('=')[0],
+                        value = variables[i].split('=')[1];
+                penv.insert(varible,value);
+            }
     }
 
-    execProcess->setProcessEnvironment(penv);
-    execProcess->setProcessChannelMode(QProcess::MergedChannels);
+    execBin *exe = new execBin();
+    exe->name = item->text((PROFILE_NAME));
+    ui->tabs_execOutputs->addTab(exe->tab,exe->name);
 
-    connect(execProcess,SIGNAL(started()),this,SLOT(execProcesStart()));
-    connect(execProcess,SIGNAL(finished(int)),this,SLOT(execProcesFinished()));
-    connect(execProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(execProcessReadOutput()));
+    exe->setEnv(penv);
 
     if (QFile::exists(item->text(BINARY))) {
-        execProcess->start("\""+item->text(BINARY) +"\" " +item->text(BINARY_PARAMS));
+        exe->runBin("\""+item->text(BINARY) +"\" " +item->text(BINARY_PARAMS));
         ui->execPages->setCurrentIndex(2);
 
-        // check if there will be log
+        //  check if there will be log
         if (!item->text(LOG_FILE).isEmpty()) {
-            execData.logFilename = item->text(LOG_FILE) +
-                    ((item->text(LOG_FILE_DATE_APPEND) == "1") ? QDateTime::currentDateTime().toString("_yyyy-MM-dd_hh-mm-ss") : "");
-            execData.log.append("Profile: " +item->text(PROFILE_NAME) +"; App: " + item->text(BINARY) + "; Params: " + item->text(BINARY_PARAMS) + "; Env: " + item->text(ENV_SETTINGS));
-            execData.log.append("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci); temp");
+            exe->logEnabled = true;
+            exe->setLogFilename(item->text(LOG_FILE) +
+                    ((item->text(LOG_FILE_DATE_APPEND) == "1") ? QDateTime::currentDateTime().toString("_yyyy-MM-dd_hh-mm-ss") : ""));
+            exe->appendToLog("Profile: " +item->text(PROFILE_NAME) +"; App: " + item->text(BINARY) + "; Params: " + item->text(BINARY_PARAMS) + "; Env: " + item->text(ENV_SETTINGS));
+            exe->appendToLog("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci); temp");
         }
+        execsRunning->append(exe);
+        ui->tabs_execOutputs->setCurrentIndex(ui->tabs_execOutputs->count() - 1);
     }
-    else
+    else {
         QMessageBox::critical(this,"Error","Can't run something that not exists!");
-}
-
-void radeon_profile::execProcessReadOutput() {
-    QString o = execProcess->readAllStandardOutput();
-
-    if (!o.isEmpty())
-        ui->txt_consoleOutput->appendPlainText(o);
-}
-
-void radeon_profile::execProcesStart() {
-    ui->btn_runExecProfile->setEnabled(false);
-}
-void radeon_profile::execProcesFinished() {
-    ui->btn_runExecProfile->setEnabled(true);
-
-    if (!execData.logFilename.isEmpty() && execData.log.count() > 0) {
-        QFile f(execData.logFilename);
-        f.open(QIODevice::WriteOnly);
-        f.write(execData.log.join("\n").toAscii());
-        f.close();
-        execData.log.clear();
+        delete exe;
     }
 }
 
@@ -314,6 +296,9 @@ void radeon_profile::on_cb_manualEdit_clicked(bool checked)
 
 void radeon_profile::on_btn_viewOutput_clicked()
 {
+    if (ui->tabs_execOutputs->count() == 0)
+        return;
+
     ui->execPages->setCurrentIndex(2);
 }
 
@@ -322,19 +307,7 @@ void radeon_profile::on_btn_backToProfiles_clicked()
     ui->execPages->setCurrentIndex(0);
 }
 
-void radeon_profile::on_btn_saveToFile_clicked()
-{
-    QString filename = QFileDialog::getSaveFileName(this, "Save",QDir::homePath());
-    if (!filename.isEmpty()) {
-        QFile f(filename);
-        f.open(QIODevice::WriteOnly);
-        f.write(ui->txt_consoleOutput->toPlainText().toAscii());
-        f.close();
-    }
-}
-
-void radeon_profile::on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column)
-{
+void radeon_profile::on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column) {
         switch (ui->cb_execDbcAction->currentIndex()) {
         default:
         case 0:

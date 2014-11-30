@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     dfglrx.cpp \
     settings.cpp \
     daemonComm.cpp \
-    execTab.cpp
+    execTab.cpp \
+    execbin.cpp
 
 HEADERS  += radeon_profile.h \
     qcustomplot.h \
@@ -30,7 +31,8 @@ HEADERS  += radeon_profile.h \
     dxorg.h \
     dfglrx.h \
     globalStuff.h \
-    daemonComm.h
+    daemonComm.h \
+    execbin.h
 
 FORMS    += radeon_profile.ui
 
