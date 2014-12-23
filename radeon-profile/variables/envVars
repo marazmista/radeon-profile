@@ -7,7 +7,7 @@ TGSI_PRINT_SANITY|1
 DRAW_FSE|user_input
 DRAW_NO_FSE|user_input
 DRAW_USE_LLVM|1
-ST_DEBUG|mesa#tgsi#constants#pipe#tex#fallback#screen#query
+ST_DEBUG|mesa#tgsi#constants#pipe#tex#fallback#screen#query#wf
 -------Mesa-------
 MESA_GL_VERSION_OVERRIDE|user_input
 MESA_GLSL|dump#log#nopt#opt#uniform#nopvert#nopfrag#useprog
@@ -36,6 +36,8 @@ LIBGL_DRIVERS_PATH|user_input
 LIBGL_ALWAYS_INDIRECT|1
 LIBGL_ALWAYS_SOFTWARE|1
 LIBGL_NO_DRAWARRAYS|1
+-------EGL-------
+EGL_LOG_LEVEL=debug#info#warning#fatal
 -------LLVMpipe-------
 LP_NO_RAST|1
 LP_DEBUG|user_input
