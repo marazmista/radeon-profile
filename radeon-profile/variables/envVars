@@ -37,7 +37,7 @@ LIBGL_ALWAYS_INDIRECT|1
 LIBGL_ALWAYS_SOFTWARE|1
 LIBGL_NO_DRAWARRAYS|1
 -------EGL-------
-EGL_LOG_LEVEL=debug#info#warning#fatal
+EGL_LOG_LEVEL|debug#info#warning#fatal
 -------LLVMpipe-------
 LP_NO_RAST|1
 LP_DEBUG|user_input
