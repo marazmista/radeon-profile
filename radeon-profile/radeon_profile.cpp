@@ -338,4 +338,3 @@ void radeon_profile::refreshTooltip()
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
-

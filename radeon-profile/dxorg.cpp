@@ -27,8 +27,10 @@ void dXorg::configure(QString gpuName) {
         // is called on every change gpu, so later, shared mem already exists
         if (!sharedMem.isAttached()) {
             sharedMem.setKey("radeon-profile");
-            sharedMem.create(128);
-            sharedMem.attach();
+           if (!sharedMem.create(128))
+               qDebug() << sharedMem.errorString();
+           if (!sharedMem.attach())
+               qDebug() << sharedMem.errorString();
         }
 
         dcomm->connectToDaemon();
@@ -70,8 +72,8 @@ QString dXorg::getClocksRawData() {
     QFile clocksFile(filePaths.clocksPath);
     QString data;
 
-    if (!globalStuff::globalConfig.rootMode && clocksFile.open(QIODevice::ReadOnly))  // check for debugfs access
-        data = QString(clocksFile.readAll());
+    if (globalStuff::globalConfig.rootMode && clocksFile.open(QIODevice::ReadOnly)) // check for debugfs access
+            data = QString(clocksFile.readAll());
     else if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh)
             dcomm->sendCommand(dcomm->daemonSignal.read_clocks);
