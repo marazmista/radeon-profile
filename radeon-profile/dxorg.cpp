@@ -1,7 +1,7 @@
 // copyright marazmista @ 29.03.2014
 
 #include "dxorg.h"
-#include "radeon_profile.h"
+#include "globalStuff.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -22,7 +22,7 @@ void dXorg::configure(QString gpuName) {
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
 
-    if (!radeon_profile::rootMode) {
+    if (!globalStuff::globalConfig.rootMode) {
         // create the shared mem block. The if comes from that configure method
         // is called on every change gpu, so later, shared mem already exists
         if (!sharedMem.isAttached()) {
@@ -70,7 +70,7 @@ QString dXorg::getClocksRawData() {
     QFile clocksFile(filePaths.clocksPath);
     QString data;
 
-    if (!radeon_profile::rootMode && clocksFile.open(QIODevice::ReadOnly))  // check for debugfs access
+    if (!globalStuff::globalConfig.rootMode && clocksFile.open(QIODevice::ReadOnly))  // check for debugfs access
         data = QString(clocksFile.readAll());
     else if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh)

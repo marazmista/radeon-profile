@@ -73,7 +73,6 @@ public:
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
     QTimer *timer;
-    static bool rootMode;
 
 private slots:
     void timerEvent();

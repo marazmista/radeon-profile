@@ -86,7 +86,7 @@ public:
     // settings from config used across the source
     static struct globalCfgStruct{
         float interval;
-        bool daemonAutoRefresh;
+        bool daemonAutoRefresh, rootMode;
     } globalConfig;
 };
 

@@ -30,8 +30,6 @@ const int appVersion = 20150110;
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
 QList<pmLevel> pmStats;
-bool radeon_profile::rootMode;
-
 
 radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QMainWindow(parent),
@@ -43,11 +41,11 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     // checks if running as root
     if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
-        radeon_profile::rootMode = true;
+         globalStuff::globalConfig.rootMode = true;
         ui->label_rootWarrning->setVisible(true);
     }
     else {
-        radeon_profile::rootMode  = false;
+        globalStuff::globalConfig.rootMode = false;
         ui->label_rootWarrning->setVisible(false);
     }
 
