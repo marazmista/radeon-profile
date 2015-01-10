@@ -25,12 +25,12 @@
 #include <QDateTime>
 #include <QMessageBox>
 
-const int appVersion = 20141130;
+const int appVersion = 20150110;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
 QList<pmLevel> pmStats;
-
+bool radeon_profile::rootMode;
 
 
 radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
@@ -41,6 +41,15 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     timer = new QTimer();
     execsRunning = new QList<execBin*>();
 
+    // checks if running as root
+    if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
+        radeon_profile::rootMode = true;
+        ui->label_rootWarrning->setVisible(true);
+    }
+    else {
+        radeon_profile::rootMode  = false;
+        ui->label_rootWarrning->setVisible(false);
+    }
 
     // setup ui elemensts
     ui->mainTabs->setCurrentIndex(0);
@@ -89,12 +98,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     timer->start();
     addRuntimeWidgets();
-
-    // checks if running as root
-    if (globalStuff::grabSystemInfo("whoami")[0] == "root")
-        ui->label_rootWarrning->setVisible(true);
-    else
-        ui->label_rootWarrning->setVisible(false);
 }
 
 radeon_profile::~radeon_profile()
@@ -322,7 +325,6 @@ void radeon_profile::doTheStats(const globalStuff::gpuClocksStruct &_gpuData) {
 }
 
 void radeon_profile::updateStatsTable() {
-
     // do the math with percents
     for (int i = 0;i < ui->list_stats->topLevelItemCount() ; i++) {
         ui->list_stats->topLevelItem(i)->setText(1,QString().setNum(pmStats.at(i).time/statsTickCounter * 100,'f',2)+"%");

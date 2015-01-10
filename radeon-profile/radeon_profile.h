@@ -73,6 +73,7 @@ public:
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
     QTimer *timer;
+    static bool rootMode;
 
 private slots:
     void timerEvent();
@@ -122,7 +123,6 @@ private slots:
     void on_btn_viewOutput_clicked();
     void on_btn_backToProfiles_clicked();
     void on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
     void on_tabs_execOutputs_tabCloseRequested(int index);
 
 private:

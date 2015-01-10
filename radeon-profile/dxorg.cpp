@@ -1,6 +1,8 @@
 // copyright marazmista @ 29.03.2014
 
 #include "dxorg.h"
+#include "radeon_profile.h"
+
 #include <QFile>
 #include <QTextStream>
 
@@ -20,18 +22,20 @@ void dXorg::configure(QString gpuName) {
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
 
-    // create the shared mem block. The if comes from that configure method
-    // is called on every change gpu, so later, shared mem already exists
-    if (!sharedMem.isAttached()) {
-        sharedMem.setKey("radeon-profile");
-        sharedMem.create(128);
-        sharedMem.attach();
-    }
+    if (!radeon_profile::rootMode) {
+        // create the shared mem block. The if comes from that configure method
+        // is called on every change gpu, so later, shared mem already exists
+        if (!sharedMem.isAttached()) {
+            sharedMem.setKey("radeon-profile");
+            sharedMem.create(128);
+            sharedMem.attach();
+        }
 
-    dcomm->connectToDaemon();
-    if (daemonConnected()) {
-        // sending card index and timer interval if selected
-        dcomm->sendCommand(dcomm->daemonSignal.config + gpuSysIndex + ((globalStuff::globalConfig.daemonAutoRefresh) ? dcomm->daemonSignal.timer_on + QString().setNum(globalStuff::globalConfig.interval) : ""));
+        dcomm->connectToDaemon();
+        if (daemonConnected()) {
+            // sending card index and timer interval if selected
+            dcomm->sendCommand(dcomm->daemonSignal.config + gpuSysIndex + ((globalStuff::globalConfig.daemonAutoRefresh) ? dcomm->daemonSignal.timer_on + QString().setNum(globalStuff::globalConfig.interval) : ""));
+        }
     }
 }
 
@@ -66,19 +70,22 @@ QString dXorg::getClocksRawData() {
     QFile clocksFile(filePaths.clocksPath);
     QString data;
 
-    if (daemonConnected()) {
-//    if (0) {
+    if (!radeon_profile::rootMode && clocksFile.open(QIODevice::ReadOnly))  // check for debugfs access
+        data = QString(clocksFile.readAll());
+    else if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh)
             dcomm->sendCommand(dcomm->daemonSignal.read_clocks);
 
-        sharedMem.lock();
-        char *to = (char*)sharedMem.constData();
-        char a[128] = {0};
-        strncpy(a,to,sizeof(a));
-        sharedMem.unlock();
-        data  = QString::fromAscii(a).trimmed();
-    } else if (clocksFile.open(QIODevice::ReadOnly))  // check for debugfs access
-        data = QString(clocksFile.readAll());
+       if (sharedMem.lock()) {
+//     if (sharedMem.error() == QSharedMemory::NoError) {
+            char *to = (char*)sharedMem.constData();
+            char a[128] = {0};
+            strncpy(a,to,sizeof(a));
+            sharedMem.unlock();
+            data  = QString::fromAscii(a).trimmed();
+        } else
+            qDebug() << sharedMem.errorString();
+    }
 
     if (data == "")
         data = "null\n";
