@@ -47,7 +47,8 @@ void radeon_profile::on_btn_modifyExecProfile_clicked()
     ui->txt_summary->setText(ui->list_execProfiles->currentItem()->text(ENV_SETTINGS));
     ui->cb_appendDateTime->setChecked(((ui->list_execProfiles->currentItem()->text(LOG_FILE_DATE_APPEND) == "1") ? true : false));
 
-    selectedVariableVaules = ui->txt_summary->text().split(" ");
+    if (!ui->txt_summary->text().isEmpty())
+        selectedVariableVaules = ui->txt_summary->text().split(" ");
     ui->execPages->setCurrentIndex(1);
 }
 
@@ -151,7 +152,7 @@ void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
     }
 
     // go through list from file and check if it is selected (exists in summary)
-    for (int i= 0 ; i< values.count(); i++ ){
+    for (int i= 0 ; i< values.count(); i++ ) {
         // look for selected variable in list with variables and its values
         int varIndex = selectedVariableVaules.indexOf(QRegExp(ui->list_variables->currentItem()->text()+".+",Qt::CaseInsensitive),0);
 
@@ -191,7 +192,6 @@ void radeon_profile::on_list_vaules_itemClicked(QListWidgetItem *item)
             selectedVariableVaules.removeAt(varIndex);
 
     }
-    // if nothing is selected, remove variable from summary
     if (selectedValues.count() != 0)
         selectedVariableVaules.append(ui->list_variables->currentItem()->text()+"="+selectedValues.join(","));
 
@@ -254,7 +254,7 @@ void radeon_profile::on_btn_runExecProfile_clicked()
 
     QStringList variables;
     if (!item->text(ENV_SETTINGS).isEmpty()) {
-            variables = item->text(ENV_SETTINGS).split(' ');
+            variables = item->text(ENV_SETTINGS).split(' ',QString::SkipEmptyParts);
 
             for (int i = 0; i < variables.count(); i++) {
                 QString varible = variables[i].split('=')[0],

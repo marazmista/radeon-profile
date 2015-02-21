@@ -72,7 +72,7 @@ QString dXorg::getClocksRawData() {
     QFile clocksFile(filePaths.clocksPath);
     QString data;
 
-    if (globalStuff::globalConfig.rootMode && clocksFile.open(QIODevice::ReadOnly)) // check for debugfs access
+    if (clocksFile.open(QIODevice::ReadOnly)) // check for debugfs access
             data = QString(clocksFile.readAll());
     else if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh)

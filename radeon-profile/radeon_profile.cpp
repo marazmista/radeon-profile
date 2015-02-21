@@ -43,8 +43,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
          globalStuff::globalConfig.rootMode = true;
         ui->label_rootWarrning->setVisible(true);
-    }
-    else {
+    } else {
         globalStuff::globalConfig.rootMode = false;
         ui->label_rootWarrning->setVisible(false);
     }
