@@ -191,6 +191,12 @@ void radeon_profile::refreshGpuData() {
     ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current GPU temp" << QString().setNum(device.gpuTemeperatureData.current) + QString::fromUtf8("\u00B0C")));
 
     updateExecLogs();
+
+    ui->l_temp->setText(QString().setNum(device.gpuTemeperatureData.current));
+    ui->l_cClk->setText(QString().setNum(device.gpuData.coreClk));
+    ui->l_mClk->setText(QString().setNum(device.gpuData.memClk));
+    ui->l_mVolt->setText(QString().setNum(device.gpuData.memVolt));
+    ui->l_cVolt->setText(QString().setNum(device.gpuData.coreVolt));
 }
 
 void radeon_profile::updateExecLogs() {
