@@ -44,6 +44,35 @@ void radeon_profile::on_btn_forceLow_clicked()
     forceLow();
 }
 
+// == fan control
+void radeon_profile::on_btn_pwmFixedApply_clicked()
+{
+    device.setPwmValue(ui->pwmSlider->value());
+}
+
+void radeon_profile::on_btn_pwmFixed_clicked()
+{
+    ui->fanModesTabs->setCurrentIndex(0);
+    ui->fanModesTabs->setEnabled(true);
+
+    device.setPwmManualControl(true);
+    device.setPwmValue(ui->pwmSlider->value());
+}
+
+void radeon_profile::on_btn_pwmAuto_clicked()
+{
+    ui->fanModesTabs->setEnabled(false);
+
+    device.setPwmManualControl(false);
+}
+
+void radeon_profile::on_btn_pwmProfile_clicked()
+{
+    ui->fanModesTabs->setEnabled(true);
+    ui->fanModesTabs->setCurrentIndex(1);
+}
+
+
 // == others
 void radeon_profile::on_btn_dpmBattery_clicked() {
     device.setPowerProfile(globalStuff::BATTERY);

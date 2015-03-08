@@ -26,14 +26,20 @@ public:
     static QStringList getGLXInfo(QString gpuName, QProcessEnvironment env);
     static QList<QTreeWidgetItem *> getModuleInfo();
     static QString getCurrentPowerProfile();
-    static QStringList detectCards();
+    static int getPwmSpeed();
+
     static void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
     static void setForcePowerLevel(globalStuff::forcePowerLevels);
+    static void setPwmManuaControl(bool manual);
+    static void setPwmValue(int value);
+
+    static QStringList detectCards();
     static void figureOutGpuDataFilePaths(QString gpuName);
     static void configure(QString gpuName);
     static globalStuff::driverFeatures figureOutDriverFeatures();
     static void reconfigureDaemon();
     static bool daemonConnected();
+
 
 private:
     enum tempSensor {
@@ -49,7 +55,7 @@ private:
 
     static struct driverFilePaths {
     QString powerMethodFilePath, profilePath, dpmStateFilePath ,
-            clocksPath , forcePowerLevelFilePath , sysfsHwmonPath, moduleParamsPath ;
+            clocksPath , forcePowerLevelFilePath , sysfsHwmonPath, moduleParamsPath, pwmEnablePath, pwmSpeedPath;
     } filePaths;
     static int sensorsGPUtempIndex;
     static dXorg::tempSensor currentTempSensor;

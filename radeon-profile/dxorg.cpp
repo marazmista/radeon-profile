@@ -65,6 +65,14 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
 
     QString hwmonDevice = globalStuff::grabSystemInfo("ls /sys/class/drm/"+gpuName+"/device/hwmon/")[0]; // look for hwmon devices in card dir
     filePaths.sysfsHwmonPath = "/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/temp1_input";
+
+    if (QFile::exists("/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/pwm1_enable"))
+        filePaths.pwmEnablePath = "/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/pwm1_enable";
+    else
+        filePaths.pwmEnablePath = "";
+
+    if (QFile::exists("/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/pwm1"))
+        filePaths.pwmSpeedPath = "/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/pwm1";
 }
 
 // method for gather info about clocks from deamon or from debugfs if root
@@ -493,6 +501,28 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
+void dXorg::setPwmValue(int value) {
+//    if (daemonConnected())  {
+//        ;//TODO
+//    } else {
+        setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
+  //  }
+}
+
+void dXorg::setPwmManuaControl(bool manual) {
+    if (manual)
+       setNewValue(filePaths.pwmEnablePath,"1");
+    else
+        setNewValue(filePaths.pwmEnablePath,"2");
+}
+
+int dXorg::getPwmSpeed() {
+    QFile f(filePaths.pwmSpeedPath);
+
+    if (f.open(QIODevice::ReadOnly))
+        return QString(f.readLine(4)).toInt();
+}
+
 globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     globalStuff::driverFeatures features;
 
@@ -526,6 +556,14 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     }
     case globalStuff::PM_UNKNOWN:
         break;
+    }
+
+    features.pwmAvailable = false;
+    if (filePaths.pwmEnablePath != "") {
+        QFile f(filePaths.pwmEnablePath);
+        f.open(QIODevice::ReadOnly);
+        if (QString(f.readLine(1)) != "0")
+            features.pwmAvailable = true;
     }
     return features;
 }

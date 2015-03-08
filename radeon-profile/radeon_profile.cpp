@@ -127,6 +127,12 @@ void radeon_profile::addRuntimeWidgets() {
     ui->tabs_execOutputs->setCornerWidget(btnBackProfiles);
     btnBackProfiles->show();
     connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(on_btn_backToProfiles_clicked()));
+
+    // set pwm buttons in group
+    QButtonGroup *pwmGroup = new QButtonGroup();
+    pwmGroup->addButton(ui->btn_pwmAuto);
+    pwmGroup->addButton(ui->btn_pwmFixed);
+    pwmGroup->addButton(ui->btn_pwmProfile);
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
@@ -137,17 +143,22 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->tabs_pm->setTabEnabled(1,features.pm == globalStuff::DPM ? true : false);
         changeProfile->setEnabled(features.pm == globalStuff::PROFILE ? true : false);
         dpmMenu->setEnabled(features.pm == globalStuff::DPM ? true : false);
+        ui->combo_pLevel->setEnabled(features.pm == globalStuff::DPM ? true : false);
     } else {
         ui->tabs_pm->setEnabled(false);
         changeProfile->setEnabled(false);
         dpmMenu->setEnabled(false);
+        ui->combo_pLevel->setEnabled(false);
+        ui->combo_pProfile->setEnabled(false);
     }
 
-    if (!features.clocksAvailable) {
-        ui->plotColcks->setVisible(false),
-        ui->cb_showFreqGraph->setEnabled(false);
-        ui->tabs_systemInfo->setTabEnabled(3,false);
-    }
+//    if (!features.clocksAvailable) {
+//        ui->plotColcks->setVisible(false),
+//        ui->cb_showFreqGraph->setEnabled(false);
+//        ui->l_cClk->setEnabled(false);
+//        ui->l_mClk->setEnabled(false);
+//        ui->tabs_systemInfo->setTabEnabled(3,false);
+//    }
 
     if (!features.temperatureAvailable) {
         ui->cb_showTempsGraph->setEnabled(false);
@@ -155,12 +166,20 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     }
 
     if (!features.voltAvailable) {
+        ui->l_cVolt->setEnabled(false);
+        ui->l_mVolt->setEnabled(false);
         ui->cb_showVoltsGraph->setEnabled(false);
         ui->plotVolts->setVisible(false);
     }
 
     if (!features.clocksAvailable && !features.temperatureAvailable && !features.voltAvailable)
         ui->mainTabs->setTabEnabled(1,false);
+
+    if (!features.pwmAvailable) {
+        ui->mainTabs->setTabEnabled(2,false);
+        ui->l_fanSpeed->setEnabled(false);
+        ui->combo_fanProfile->setEnabled(false);
+    }
 }
 
 // -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
@@ -197,6 +216,11 @@ void radeon_profile::refreshGpuData() {
     ui->l_mClk->setText(QString().setNum(device.gpuData.memClk));
     ui->l_mVolt->setText(QString().setNum(device.gpuData.memVolt));
     ui->l_cVolt->setText(QString().setNum(device.gpuData.coreVolt));
+
+    if (device.gpuFeatures.pwmAvailable) {
+        device.getPwmSpeed();
+        ui->l_fanSpeed->setText(QString().setNum(device.gpuTemeperatureData.pwmSpeed));
+    }
 }
 
 void radeon_profile::updateExecLogs() {
@@ -343,3 +367,4 @@ void radeon_profile::refreshTooltip()
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
+

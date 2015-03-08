@@ -124,6 +124,14 @@ private slots:
     void on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_tabs_execOutputs_tabCloseRequested(int index);
 
+    void on_btn_pwmFixedApply_clicked();
+
+    void on_btn_pwmFixed_clicked();
+
+    void on_btn_pwmAuto_clicked();
+
+    void on_btn_pwmProfile_clicked();
+
 private:
     gpu device;
     static const QString settingsPath;

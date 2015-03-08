@@ -207,3 +207,36 @@ void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) 
         break;
     }
 }
+
+void gpu::setPwmValue(int value) const {
+    switch (currentDriver) {
+    case XORG:
+        dXorg::setPwmValue(value);
+        break;
+    case FGLRX:
+    case DRIVER_UNKNOWN:
+        break;
+    }
+}
+
+void gpu::setPwmManualControl(bool manual) const {
+    switch (currentDriver) {
+    case XORG:
+        dXorg::setPwmManuaControl(manual);
+        break;
+    case FGLRX:
+    case DRIVER_UNKNOWN:
+        break;
+    }
+}
+
+void gpu::getPwmSpeed() {
+    switch (currentDriver) {
+    case XORG:
+            gpuTemeperatureData.pwmSpeed = ((float)dXorg::getPwmSpeed() / 255 ) * 100;
+        break;
+    case FGLRX:
+    case DRIVER_UNKNOWN:
+        break;
+    }
+}

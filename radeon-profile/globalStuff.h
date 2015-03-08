@@ -75,12 +75,13 @@ public:
     // structure which holds what can be display on ui and on its base
     // we enable ui elements
     struct driverFeatures {
-        bool canChangeProfile, clocksAvailable, voltAvailable, temperatureAvailable;
+        bool canChangeProfile, clocksAvailable, voltAvailable, temperatureAvailable, pwmAvailable;
         globalStuff::powerMethod pm;
     };
 
     struct gpuTemperatureStruct{
         float current, max, min, sum;
+        int pwmSpeed;
     };
 
     // settings from config used across the source

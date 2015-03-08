@@ -31,15 +31,21 @@ public:
     QStringList getGLXInfo(QString gpuName) const;
     QList<QTreeWidgetItem *> getModuleInfo() const;
     QString getCurrentPowerProfile() const;
-    QStringList initialize(bool skipDetectDriver = false);
+    void getClocks();
+    void getTemperature();
+    void getPwmSpeed();
+
     void changeGpu(char index);
     void driverByParam(gpu::driver);
     void setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const;
     void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const;
-    void getClocks();
-    void getTemperature();
+    void setPwmManualControl(bool manual) const;
+    void setPwmValue(int value) const;
+
+    QStringList initialize(bool skipDetectDriver = false);
     void reconfigureDaemon();
     bool daemonConnected();
+
 
 private:
     driver currentDriver;
