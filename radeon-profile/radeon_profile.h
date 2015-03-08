@@ -131,6 +131,8 @@ private slots:
     void changeProfileFromCombo();
     void changePowerLevelFromCombo();
 
+    void on_btn_fanInfo_clicked();
+
 private:
     gpu device;
     static const QString settingsPath;

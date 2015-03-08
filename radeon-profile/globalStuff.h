@@ -22,6 +22,7 @@
 #define profile_mid "mid"
 #define profile_low "low"
 
+#define pwm_disabled "0"
 #define pwm_manual "1"
 #define pwm_auto "2"
 
@@ -95,7 +96,7 @@ public:
     // structure which holds what can be display on ui and on its base
     // we enable ui elements
     struct driverFeatures {
-        bool canChangeProfile, clocksAvailable, voltAvailable, temperatureAvailable, pwmAvailable;
+        bool canChangeProfile, coreClockAvailable, memClockAvailable, coreVoltAvailable, memVoltAvailable, temperatureAvailable, pwmAvailable;
         globalStuff::powerMethod pm;
     };
 

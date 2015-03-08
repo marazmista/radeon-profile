@@ -57,6 +57,18 @@
          <height>22</height>
         </rect>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>41</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>41</width>
+         <height>22</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <family>Monospace</family>
@@ -84,6 +96,18 @@
          <width>41</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>41</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>41</width>
+         <height>22</height>
+        </size>
        </property>
        <property name="font">
         <font>
@@ -151,6 +175,18 @@
          <height>22</height>
         </rect>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>41</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>41</width>
+         <height>22</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <family>Monospace</family>
@@ -197,6 +233,18 @@
          <width>41</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>41</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>41</width>
+         <height>22</height>
+        </size>
        </property>
        <property name="font">
         <font>
@@ -245,6 +293,18 @@
          <height>41</height>
         </rect>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>51</width>
+         <height>41</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>51</width>
+         <height>41</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <family>Monospace</family>
@@ -291,6 +351,18 @@
          <width>51</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>51</width>
+         <height>41</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>51</width>
+         <height>41</height>
+        </size>
        </property>
        <property name="font">
         <font>
@@ -382,6 +454,18 @@
          <height>24</height>
         </rect>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>201</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>201</width>
+         <height>24</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <family>Monospace</family>
@@ -397,6 +481,18 @@
          <width>141</width>
          <height>24</height>
         </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>141</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>141</width>
+         <height>24</height>
+        </size>
        </property>
        <property name="font">
         <font>
@@ -448,7 +544,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -1256,6 +1352,13 @@
             </property>
            </spacer>
           </item>
+          <item>
+           <widget class="QPushButton" name="btn_fanInfo">
+            <property name="text">
+             <string>Info</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -1267,7 +1370,7 @@
            <widget class="QPushButton" name="btn_pwmFixedApply">
             <property name="geometry">
              <rect>
-              <x>370</x>
+              <x>190</x>
               <y>70</y>
               <width>161</width>
               <height>27</height>
@@ -1296,14 +1399,14 @@
                 </font>
                </property>
                <property name="text">
-                <string>15%</string>
+                <string>20%</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QSlider" name="pwmSlider">
                <property name="minimum">
-                <number>38</number>
+                <number>51</number>
                </property>
                <property name="maximum">
                 <number>255</number>
@@ -1330,19 +1433,6 @@
               </widget>
              </item>
             </layout>
-           </widget>
-           <widget class="QLabel" name="label_8">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>70</y>
-              <width>341</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Card won't apply too low values due its internal protection</string>
-            </property>
            </widget>
           </widget>
           <widget class="QWidget" name="page_profile"/>

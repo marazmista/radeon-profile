@@ -5,6 +5,8 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QTime>
+#include <QCoreApplication>
 
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
@@ -533,12 +535,21 @@ int dXorg::getPwmSpeed() {
 
 globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     globalStuff::driverFeatures features;
-
     features.temperatureAvailable =  (currentTempSensor == dXorg::TS_UNKNOWN) ? false : true;
 
     globalStuff::gpuClocksStruct test = dXorg::getClocks();
-    features.clocksAvailable = (test.coreClk == -1) ? false : true;
-    features.voltAvailable = (test.coreVolt == -1) ? false : true;
+
+    // waiting for daemon to fill shared memory
+    // see: https://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
+    QTime delayTime = QTime::currentTime().addMSecs(1500);
+    while (QTime::currentTime() < delayTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+
+    features.coreClockAvailable = (test.coreClk == -1) ? false : true;
+    features.memClockAvailable = (test.memClk == -1) ? false : true;
+    features.coreVoltAvailable = (test.coreVolt == -1) ? false : true;
+    features.memVoltAvailable = (test.memVolt == -1) ? false : true;
+
 
     features.pm = currentPowerMethod;
     features.canChangeProfile = false;
@@ -570,7 +581,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     if (filePaths.pwmEnablePath != "") {
         QFile f(filePaths.pwmEnablePath);
         f.open(QIODevice::ReadOnly);
-        if (QString(f.readLine(1)) != "0")
+        if (QString(f.readLine(1)) != pwm_disabled)
             features.pwmAvailable = true;
     }
     return features;

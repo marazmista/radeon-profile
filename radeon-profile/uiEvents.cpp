@@ -187,7 +187,11 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
         this->hide();
         e->ignore();
     }
-        saveConfig();
+
+    saveConfig();
+
+    if (device.features.pwmAvailable)
+        device.setPwmManualControl(false);
 }
 
 void radeon_profile::closeFromTray() {
@@ -324,5 +328,12 @@ void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 
     if (ui->tabs_execOutputs->count() == 0)
         on_btn_backToProfiles_clicked();
+}
+
+
+void radeon_profile::on_btn_fanInfo_clicked()
+{
+    QMessageBox::information(this,"Fan control information",
+    "Don't overheat your card! Be careful! \n\nHovewer, card won't apply too low values due its internal protection. Closing application will restore fan state to Auto. If application crashes, the fan state will remain, so you have been warned.");
 }
 //========

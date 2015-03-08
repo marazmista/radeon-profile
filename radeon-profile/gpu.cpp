@@ -44,7 +44,7 @@ QStringList gpu::initialize(bool skipDetectDriver) {
     case DRIVER_UNKNOWN: {
         globalStuff::driverFeatures f;
         f.pm = globalStuff::PM_UNKNOWN;
-        f.canChangeProfile = f.temperatureAvailable = f.voltAvailable = f.clocksAvailable = false;
+        f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
         features = f;
         return QStringList() << "unknown";
     }

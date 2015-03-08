@@ -153,33 +153,35 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->combo_pProfile->setEnabled(false);
     }
 
-//    if (!features.clocksAvailable) {
-//        ui->plotColcks->setVisible(false),
-//        ui->cb_showFreqGraph->setEnabled(false);
-//        ui->l_cClk->setEnabled(false);
-//        ui->l_mClk->setEnabled(false);
-//        ui->tabs_systemInfo->setTabEnabled(3,false);
-//    }
+    ui->l_cClk->setVisible(features.coreClockAvailable);
+    ui->cb_showFreqGraph->setEnabled(features.coreClockAvailable);
+    ui->tabs_systemInfo->setTabEnabled(3,features.coreClockAvailable);
+    ui->l_cClk->setVisible(features.coreClockAvailable);
+    ui->label_14->setVisible(features.coreClockAvailable);
+
+
+    ui->cb_showVoltsGraph->setEnabled(features.coreVoltAvailable);
+    ui->l_cVolt->setVisible(features.coreVoltAvailable);
+    ui->label_20->setVisible(features.coreVoltAvailable);
+
+    ui->l_mClk->setVisible(features.memClockAvailable);
+    ui->label_18->setVisible(features.memClockAvailable);
+
+    ui->l_mVolt->setVisible(features.memVoltAvailable);
+    ui->label_19->setVisible(features.memVoltAvailable);
 
     if (!features.temperatureAvailable) {
         ui->cb_showTempsGraph->setEnabled(false);
         ui->plotTemp->setVisible(false);
+        ui->l_temp->setVisible(false);
+        ui->label_21->setVisible(false);
     }
 
-    if (!features.voltAvailable) {
-        ui->l_cVolt->setEnabled(false);
-        ui->l_mVolt->setEnabled(false);
-        ui->cb_showVoltsGraph->setEnabled(false);
-        ui->plotVolts->setVisible(false);
-    }
-
-    if (!features.clocksAvailable && !features.temperatureAvailable && !features.voltAvailable)
+    if (!features.coreClockAvailable && !features.temperatureAvailable && !features.coreVoltAvailable)
         ui->mainTabs->setTabEnabled(1,false);
 
-    if (!features.pwmAvailable) {
-        ui->mainTabs->setTabEnabled(2,false);
-        ui->l_fanSpeed->setEnabled(false);
-    }
+    ui->mainTabs->setTabEnabled(2,features.pwmAvailable);
+    ui->l_fanSpeed->setVisible(features.pwmAvailable);
 
     if (features.pm == globalStuff::DPM) {
         ui->combo_pProfile->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
@@ -188,7 +190,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->combo_pProfile->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
         ui->combo_pLevel->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerLevel));
 
-   } else {
+    } else {
         ui->combo_pLevel->setEnabled(false);
         ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
     }
@@ -279,7 +281,7 @@ void radeon_profile::timerEvent() {
             doTheStats(device.gpuData);
 
             // do the math only when user looking at stats table
-            if (ui->tabs_systemInfo->currentIndex() == 3)
+            if (ui->tabs_systemInfo->currentIndex() == 3 && ui->mainTabs->currentIndex() == 0)
                 updateStatsTable();
         }
     }
@@ -393,3 +395,4 @@ void radeon_profile::refreshTooltip()
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
+
