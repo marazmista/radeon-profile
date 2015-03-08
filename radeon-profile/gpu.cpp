@@ -31,13 +31,13 @@ QStringList gpu::initialize(bool skipDetectDriver) {
     case XORG: {
         gpuList = dXorg::detectCards();
         dXorg::configure(gpuList[currentGpuIndex]);
-        gpuFeatures = dXorg::figureOutDriverFeatures();
+        features = dXorg::figureOutDriverFeatures();
         return gpuList;
     }
     case FGLRX: {
         gpuList = dFglrx::detectCards();
         dFglrx::configure(currentGpuIndex);
-        gpuFeatures = dFglrx::figureOutDriverFeatures();
+        features = dFglrx::figureOutDriverFeatures();
         return gpuList;
     }
         break;
@@ -45,7 +45,7 @@ QStringList gpu::initialize(bool skipDetectDriver) {
         globalStuff::driverFeatures f;
         f.pm = globalStuff::PM_UNKNOWN;
         f.canChangeProfile = f.temperatureAvailable = f.voltAvailable = f.clocksAvailable = false;
-        gpuFeatures = f;
+        features = f;
         return QStringList() << "unknown";
     }
     }
@@ -62,12 +62,12 @@ void gpu::changeGpu(char index) {
     switch (currentDriver) {
     case XORG: {
         dXorg::configure(gpuList[currentGpuIndex]);
-        gpuFeatures = dXorg::figureOutDriverFeatures();
+        features = dXorg::figureOutDriverFeatures();
         break;
     }
     case FGLRX: {
         dFglrx::configure(currentGpuIndex);
-        gpuFeatures = dFglrx::figureOutDriverFeatures();
+        features = dFglrx::figureOutDriverFeatures();
         break;
     }
     case DRIVER_UNKNOWN:
@@ -173,17 +173,29 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
     return data;
 }
 
+QString gpu::getCurrentPowerLevel() const {
+    switch (currentDriver) {
+    case XORG:
+        return dXorg::getCurrentPowerLevel().trimmed();
+        break;
+    default:
+        break;
+    }
+}
+
 QString gpu::getCurrentPowerProfile() const {
     switch (currentDriver) {
     case XORG:
-        return dXorg::getCurrentPowerProfile();
+        return dXorg::getCurrentPowerProfile().trimmed();
         break;
-    case FGLRX:
-        return "Catalyst";
+    default:
         break;
-    case DRIVER_UNKNOWN:
-        return "unknown";
     }
+}
+
+void gpu::refreshPowerLevel() {
+    currentPowerLevel = getCurrentPowerLevel();
+    currentPowerProfile = getCurrentPowerProfile();
 }
 
 void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const {

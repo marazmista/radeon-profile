@@ -63,6 +63,9 @@
          <pointsize>8</pointsize>
         </font>
        </property>
+       <property name="toolTip">
+        <string>GPU core clock</string>
+       </property>
        <property name="frame">
         <bool>false</bool>
        </property>
@@ -87,6 +90,9 @@
          <family>Monospace</family>
          <pointsize>8</pointsize>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>GPU memory clock</string>
        </property>
        <property name="frame">
         <bool>false</bool>
@@ -151,6 +157,9 @@
          <pointsize>8</pointsize>
         </font>
        </property>
+       <property name="toolTip">
+        <string>GPU memory voltage</string>
+       </property>
        <property name="frame">
         <bool>false</bool>
        </property>
@@ -195,6 +204,9 @@
          <pointsize>8</pointsize>
         </font>
        </property>
+       <property name="toolTip">
+        <string>GPU core volatage</string>
+       </property>
        <property name="frame">
         <bool>false</bool>
        </property>
@@ -227,7 +239,7 @@
       <widget class="QLineEdit" name="l_temp">
        <property name="geometry">
         <rect>
-         <x>440</x>
+         <x>450</x>
          <y>5</y>
          <width>51</width>
          <height>41</height>
@@ -238,6 +250,9 @@
          <family>Monospace</family>
          <pointsize>16</pointsize>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>GPU temperature</string>
        </property>
        <property name="frame">
         <bool>false</bool>
@@ -252,7 +267,7 @@
       <widget class="QLabel" name="label_21">
        <property name="geometry">
         <rect>
-         <x>490</x>
+         <x>498</x>
          <y>18</y>
          <width>31</width>
          <height>16</height>
@@ -271,7 +286,7 @@
       <widget class="QLineEdit" name="l_fanSpeed">
        <property name="geometry">
         <rect>
-         <x>630</x>
+         <x>530</x>
          <y>5</y>
          <width>51</width>
          <height>41</height>
@@ -282,6 +297,9 @@
          <family>Monospace</family>
          <pointsize>16</pointsize>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>GPU fan speed</string>
        </property>
        <property name="text">
         <string/>
@@ -299,7 +317,7 @@
       <widget class="QLabel" name="label_24">
        <property name="geometry">
         <rect>
-         <x>682</x>
+         <x>580</x>
          <y>18</y>
          <width>21</width>
          <height>16</height>
@@ -355,13 +373,13 @@
         </font>
        </property>
       </widget>
-      <widget class="QLineEdit" name="l_profile">
+      <widget class="QComboBox" name="combo_pProfile">
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>5</y>
+         <y>0</y>
          <width>201</width>
-         <height>22</height>
+         <height>24</height>
         </rect>
        </property>
        <property name="font">
@@ -369,44 +387,15 @@
          <family>Monospace</family>
          <pointsize>8</pointsize>
         </font>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="combo_pProfile">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>25</y>
-         <width>131</width>
-         <height>24</height>
-        </rect>
        </property>
       </widget>
       <widget class="QComboBox" name="combo_pLevel">
        <property name="geometry">
         <rect>
-         <x>220</x>
+         <x>150</x>
          <y>25</y>
-         <width>71</width>
+         <width>141</width>
          <height>24</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_23">
-       <property name="geometry">
-        <rect>
-         <x>530</x>
-         <y>5</y>
-         <width>91</width>
-         <height>16</height>
         </rect>
        </property>
        <property name="font">
@@ -415,34 +404,24 @@
          <pointsize>8</pointsize>
         </font>
        </property>
-       <property name="text">
-        <string>Fan profile</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="combo_fanProfile">
-       <property name="geometry">
-        <rect>
-         <x>530</x>
-         <y>20</y>
-         <width>101</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <item>
-        <property name="text">
-         <string>Auto</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Fixed</string>
-        </property>
-       </item>
       </widget>
       <widget class="Line" name="line">
        <property name="geometry">
         <rect>
-         <x>515</x>
+         <x>432</x>
+         <y>10</y>
+         <width>16</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+      <widget class="Line" name="line_2">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
          <y>10</y>
          <width>16</width>
          <height>31</height>
@@ -1357,12 +1336,12 @@
              <rect>
               <x>10</x>
               <y>70</y>
-              <width>271</width>
+              <width>341</width>
               <height>16</height>
              </rect>
             </property>
             <property name="text">
-             <string>Card won't apply too low values due its protection</string>
+             <string>Card won't apply too low values due its internal protection</string>
             </property>
            </widget>
           </widget>

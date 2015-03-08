@@ -25,12 +25,16 @@ public:
     globalStuff::gpuTemperatureStruct gpuTemeperatureData;
     QStringList gpuList;
     char currentGpuIndex;
-    globalStuff::driverFeatures gpuFeatures;
+    globalStuff::driverFeatures features;
+    QString currentPowerProfile, currentPowerLevel;
 
     QList<QTreeWidgetItem *> getCardConnectors() const;
     QStringList getGLXInfo(QString gpuName) const;
     QList<QTreeWidgetItem *> getModuleInfo() const;
+    QString getCurrentPowerLevel() const;
     QString getCurrentPowerProfile() const;
+    void refreshPowerLevel();
+
     void getClocks();
     void getTemperature();
     void getPwmSpeed();

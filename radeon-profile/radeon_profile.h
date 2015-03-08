@@ -74,6 +74,7 @@ public:
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
     QTimer *timer;
 
+    void refreshUI();
 private slots:
     void timerEvent();
     void on_btn_dpmBattery_clicked();
@@ -123,14 +124,12 @@ private slots:
     void on_btn_backToProfiles_clicked();
     void on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_tabs_execOutputs_tabCloseRequested(int index);
-
     void on_btn_pwmFixedApply_clicked();
-
     void on_btn_pwmFixed_clicked();
-
     void on_btn_pwmAuto_clicked();
-
     void on_btn_pwmProfile_clicked();
+    void changeProfileFromCombo();
+    void changePowerLevelFromCombo();
 
 private:
     gpu device;

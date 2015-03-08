@@ -25,6 +25,7 @@ public:
     static QList<QTreeWidgetItem *> getCardConnectors();
     static QStringList getGLXInfo(QString gpuName, QProcessEnvironment env);
     static QList<QTreeWidgetItem *> getModuleInfo();
+    static QString getCurrentPowerLevel();
     static QString getCurrentPowerProfile();
     static int getPwmSpeed();
 

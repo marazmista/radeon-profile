@@ -9,6 +9,22 @@
 #include <QProcessEnvironment>
 #include <QStringList>
 
+#define dpm_battery "battery"
+#define dpm_performance "performance"
+#define dpm_balanced "balanced"
+#define dpm_high "high"
+#define dpm_auto "auto"
+#define dpm_low "low"
+
+#define profile_auto "auto"
+#define profile_default "default"
+#define profile_high "high"
+#define profile_mid "mid"
+#define profile_low "low"
+
+#define pwm_manual "1"
+#define pwm_auto "2"
+
 class globalStuff {
 public:
     static QStringList grabSystemInfo(const QString cmd) {
@@ -43,6 +59,10 @@ public:
     enum forcePowerLevels {
         F_AUTO, F_LOW, F_HIGH
     };
+
+//    enum pwmControl {
+//        PWM_DISABLED, PWM_MANUAL, PWM_AUTO
+//    };
 
     enum powerMethod {
         DPM = 0,  // kernel >= 3.11

@@ -402,32 +402,33 @@ QStringList dXorg::detectCards() {
 }
 
 QString dXorg::getCurrentPowerProfile() {
-    QFile forceProfile(filePaths.forcePowerLevelFilePath);
-    QString pp, err = "err";
-
     switch (currentPowerMethod) {
     case globalStuff::DPM: {
-        QFile profile(filePaths.dpmStateFilePath);
-        if (profile.open(QIODevice::ReadOnly)) {
-            pp = profile.readLine(13);
-            if (forceProfile.open(QIODevice::ReadOnly))
-                pp += " | " + forceProfile.readLine(5);
-        } else
-            pp = err;
+        QFile dpmProfile(filePaths.dpmStateFilePath);
+        if (dpmProfile.open(QIODevice::ReadOnly))
+           return QString(dpmProfile.readLine(13));
+        else
+            return "err";
         break;
     }
     case globalStuff::PROFILE: {
         QFile profile(filePaths.profilePath);
         if (profile.open(QIODevice::ReadOnly))
-            pp = profile.readLine(13);
+            return QString(profile.readLine(13));
         break;
     }
-    case globalStuff::PM_UNKNOWN: {
-        pp = err;
-        break;
+    case globalStuff::PM_UNKNOWN:
+        return "err";
     }
-    }
-    return pp.remove('\n');
+}
+
+
+QString dXorg::getCurrentPowerLevel() {
+    QFile forceProfile(filePaths.forcePowerLevelFilePath);
+    if (forceProfile.open(QIODevice::ReadOnly))
+        return QString(forceProfile.readLine(13));
+    else
+        return "err";
 }
 
 void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
@@ -443,28 +444,28 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     QString newValue;
     switch (_newPowerProfile) {
     case globalStuff::BATTERY:
-        newValue = "battery";
+        newValue = dpm_battery;
         break;
     case globalStuff::BALANCED:
-        newValue = "balanced";
+        newValue = dpm_balanced;
         break;
     case globalStuff::PERFORMANCE:
-        newValue = "performance";
+        newValue = dpm_performance;
         break;
     case globalStuff::AUTO:
-        newValue = "auto";
+        newValue = profile_auto;
         break;
     case globalStuff::DEFAULT:
-        newValue = "default";
+        newValue = profile_default;
         break;
     case globalStuff::HIGH:
-        newValue = "high";
+        newValue = profile_high;
         break;
     case globalStuff::MID:
-        newValue = "mid";
+        newValue = profile_mid;
         break;
     case globalStuff::LOW:
-        newValue = "low";
+        newValue = profile_low;
         break;
     default: break;
     }
@@ -484,13 +485,13 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
     QString newValue;
     switch (_newForcePowerLevel) {
     case globalStuff::F_AUTO:
-        newValue = "auto";
+        newValue = dpm_auto;
         break;
     case globalStuff::F_HIGH:
-        newValue = "high";
+        newValue = dpm_high;
         break;
     case globalStuff::F_LOW:
-        newValue = "low";
+        newValue = dpm_low;
     default:
         break;
     }
@@ -511,9 +512,9 @@ void dXorg::setPwmValue(int value) {
 
 void dXorg::setPwmManuaControl(bool manual) {
     if (manual)
-       setNewValue(filePaths.pwmEnablePath,"1");
+       setNewValue(filePaths.pwmEnablePath,pwm_manual);
     else
-        setNewValue(filePaths.pwmEnablePath,"2");
+        setNewValue(filePaths.pwmEnablePath,pwm_auto);
 }
 
 int dXorg::getPwmSpeed() {

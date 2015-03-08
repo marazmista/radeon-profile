@@ -17,15 +17,20 @@ bool closeFromTrayMenu;
 // === GUI events === //
 // == menu forcePowerLevel
 void radeon_profile::forceAuto() {
-    device.setForcePowerLevel(globalStuff::F_AUTO);
+    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_auto));
+
+   // device.setForcePowerLevel(globalStuff::F_AUTO);
 }
 
 void radeon_profile::forceLow() {
-    device.setForcePowerLevel(globalStuff::F_LOW);
+    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_low));
+
+  //  device.setForcePowerLevel(globalStuff::F_LOW);
 }
 
 void radeon_profile::forceHigh() {
-    device.setForcePowerLevel(globalStuff::F_HIGH);
+    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_high));
+//    device.setForcePowerLevel(globalStuff::F_HIGH);
 }
 
 // == buttons for forcePowerLevel
@@ -72,18 +77,40 @@ void radeon_profile::on_btn_pwmProfile_clicked()
     ui->fanModesTabs->setCurrentIndex(1);
 }
 
+void radeon_profile::changeProfileFromCombo() {
+    int index = ui->combo_pProfile->currentIndex();
+
+    globalStuff::powerProfiles newPP = (globalStuff::powerProfiles)index;
+
+    if (device.features.pm == globalStuff::DPM)
+        device.setPowerProfile(newPP);
+    else {
+        index = index + 3; // frist three in enum is dpm so we need to increase
+        device.setPowerProfile(newPP);
+    }
+}
+
+void radeon_profile::changePowerLevelFromCombo() {
+    device.setForcePowerLevel((globalStuff::forcePowerLevels)ui->combo_pLevel->currentIndex());
+}
 
 // == others
 void radeon_profile::on_btn_dpmBattery_clicked() {
-    device.setPowerProfile(globalStuff::BATTERY);
+    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_battery));
+
+   // device.setPowerProfile(globalStuff::BATTERY);
 }
 
 void radeon_profile::on_btn_dpmBalanced_clicked() {
-    device.setPowerProfile(globalStuff::BALANCED);
+    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_balanced));
+
+//    device.setPowerProfile(globalStuff::BALANCED);
 }
 
 void radeon_profile::on_btn_dpmPerformance_clicked() {
-    device.setPowerProfile(globalStuff::PERFORMANCE);
+    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_performance));
+
+//    device.setPowerProfile(globalStuff::PERFORMANCE);
 }
 
 void radeon_profile::resetMinMax() { device.gpuTemeperatureData.min = 0; device.gpuTemeperatureData.max = 0; }
@@ -137,7 +164,7 @@ void radeon_profile::changeEvent(QEvent *event)
 void radeon_profile::gpuChanged()
 {
     device.changeGpu(ui->combo_gpus->currentIndex());
-    setupUiEnabledFeatures(device.gpuFeatures);
+    setupUiEnabledFeatures(device.features);
     timerEvent();
     refreshBtnClicked();
 }
@@ -260,20 +287,20 @@ void radeon_profile::on_chProfile_clicked()
 {
     bool ok;
     QStringList profiles;
-    profiles << "default" << "auto" << "high" << "mid" << "low";
+    profiles << profile_auto << profile_default << profile_high << profile_mid << profile_low;
 
     QString selection = QInputDialog::getItem(this,"Select new power profile", "Profile selection",profiles,0,false,&ok);
 
     if (ok) {
-        if (selection == "default")
+        if (selection == profile_default)
             device.setPowerProfile(globalStuff::DEFAULT);
-        else if (selection == "auto")
+        else if (selection == profile_auto)
             device.setPowerProfile(globalStuff::AUTO);
-        else if (selection == "high")
+        else if (selection == profile_high)
             device.setPowerProfile(globalStuff::HIGH);
-        else if (selection == "mid")
+        else if (selection == profile_mid)
             device.setPowerProfile(globalStuff::MID);
-        else if (selection == "low")
+        else if (selection == profile_low)
             device.setPowerProfile(globalStuff::LOW);
     }
 }

@@ -75,11 +75,13 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     else // driver object detects cards in pc and fill the list in ui //
         ui->combo_gpus->addItems(device.initialize());
 
-    setupUiEnabledFeatures(device.gpuFeatures);
+    setupUiEnabledFeatures(device.features);
     ui->configGroups->setTabEnabled(2,device.daemonConnected());
 
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
+    connect(ui->combo_pProfile,SIGNAL(currentIndexChanged(int)),this,SLOT(changeProfileFromCombo()));
+    connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(changePowerLevelFromCombo()));
 
     // timer init
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
@@ -91,7 +93,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
     ui->list_connectors->addTopLevelItems(device.getCardConnectors());
     ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
-    ui->l_profile->setText(device.getCurrentPowerProfile());
 
     timer->start();
     addRuntimeWidgets();
@@ -178,38 +179,61 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     if (!features.pwmAvailable) {
         ui->mainTabs->setTabEnabled(2,false);
         ui->l_fanSpeed->setEnabled(false);
-        ui->combo_fanProfile->setEnabled(false);
     }
+
+    if (features.pm == globalStuff::DPM) {
+        ui->combo_pProfile->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
+        ui->combo_pLevel->addItems(QStringList() << dpm_auto << dpm_low << dpm_high);
+
+        ui->combo_pProfile->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
+        ui->combo_pLevel->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerLevel));
+
+   } else {
+        ui->combo_pLevel->setEnabled(false);
+        ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
+    }
+}
+
+void radeon_profile::refreshGpuData() {
+    device.refreshPowerLevel();
+    device.getClocks();
+    device.getTemperature();
+
+    if (device.features.pwmAvailable)
+        device.getPwmSpeed();
+
+    refreshUI();
+
+    updateExecLogs();
 }
 
 // -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
 // did not alter it, it stays and in result will be not displayed
-void radeon_profile::refreshGpuData() {
-    ui->list_currentGPUData->clear();
+void radeon_profile::refreshUI()
+{
+    if (ui->mainTabs->currentIndex() == 0) {
+        ui->list_currentGPUData->clear();
 
-    device.getClocks();
-    if (device.gpuData.powerLevel != -1)
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current power level" << QString().setNum(device.gpuData.powerLevel)));
-    if (device.gpuData.coreClk != -1)
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current GPU clock" << QString().setNum(device.gpuData.coreClk) + " MHz"));
-    if (device.gpuData.memClk != -1)
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current mem clock" << QString().setNum(device.gpuData.memClk) + " MHz"));
-    if (device.gpuData.uvdCClk != -1)
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "UVD video core clock (vclk)" << QString().setNum(device.gpuData.uvdCClk) + " MHz"));
-    if (device.gpuData.uvdDClk != -1)
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "UVD decoder clock (dclk)" << QString().setNum(device.gpuData.uvdDClk) + " MHz"));
-    if (device.gpuData.coreVolt != -1)
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Voltage (vddc)" << QString().setNum(device.gpuData.coreVolt) + " mV"));
-    if (device.gpuData.memVolt != -1)
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Voltage (vddci)" << QString().setNum(device.gpuData.memVolt) + " mV"));
+        if (device.gpuData.powerLevel != -1)
+            ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current power level" << QString().setNum(device.gpuData.powerLevel)));
+        if (device.gpuData.coreClk != -1)
+            ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current GPU clock" << QString().setNum(device.gpuData.coreClk) + " MHz"));
+        if (device.gpuData.memClk != -1)
+            ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current mem clock" << QString().setNum(device.gpuData.memClk) + " MHz"));
+        if (device.gpuData.uvdCClk != -1)
+            ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "UVD video core clock (vclk)" << QString().setNum(device.gpuData.uvdCClk) + " MHz"));
+        if (device.gpuData.uvdDClk != -1)
+            ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "UVD decoder clock (dclk)" << QString().setNum(device.gpuData.uvdDClk) + " MHz"));
+        if (device.gpuData.coreVolt != -1)
+            ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Voltage (vddc)" << QString().setNum(device.gpuData.coreVolt) + " mV"));
+        if (device.gpuData.memVolt != -1)
+            ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Voltage (vddci)" << QString().setNum(device.gpuData.memVolt) + " mV"));
 
-    if (ui->list_currentGPUData->topLevelItemCount() == 0)
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Can't read data. (debugfs mounted? daemon is running? root rights?)"));
+        if (ui->list_currentGPUData->topLevelItemCount() == 0)
+            ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Can't read data. (debugfs mounted? daemon is running? root rights?)"));
 
-    device.getTemperature();
-    ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current GPU temp" << QString().setNum(device.gpuTemeperatureData.current) + QString::fromUtf8("\u00B0C")));
-
-    updateExecLogs();
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "Current GPU temp" << QString().setNum(device.gpuTemeperatureData.current) + QString::fromUtf8("\u00B0C")));
+    }
 
     ui->l_temp->setText(QString().setNum(device.gpuTemeperatureData.current));
     ui->l_cClk->setText(QString().setNum(device.gpuData.coreClk));
@@ -217,8 +241,7 @@ void radeon_profile::refreshGpuData() {
     ui->l_mVolt->setText(QString().setNum(device.gpuData.memVolt));
     ui->l_cVolt->setText(QString().setNum(device.gpuData.coreVolt));
 
-    if (device.gpuFeatures.pwmAvailable) {
-        device.getPwmSpeed();
+    if (device.features.pwmAvailable) {
         ui->l_fanSpeed->setText(QString().setNum(device.gpuTemeperatureData.pwmSpeed));
     }
 }
@@ -246,7 +269,10 @@ void radeon_profile::timerEvent() {
 
     if (ui->cb_gpuData->isChecked()) {
         refreshGpuData();
-        ui->l_profile->setText(device.getCurrentPowerProfile());
+
+        ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerProfile));
+        if (device.features.pm == globalStuff::DPM)
+            ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
 
         // lets say coreClk is essential to get stats (it is disabled in ui anyway when features.clocksAvailable is false)
         if (ui->cb_stats->isChecked() && device.gpuData.coreClk != -1) {
@@ -310,7 +336,7 @@ void radeon_profile::refreshGraphs(const globalStuff::gpuClocksStruct &_gpuData,
         ui->plotTemp->yAxis->setRange(_gpuTemperatureData.min - 5, _gpuTemperatureData.max + 5);
 
     ui->plotTemp->graph(0)->addData(ticksCounter,_gpuTemperatureData.current);
-    ui->l_minMaxTemp->setText("Now: " + QString().setNum(_gpuTemperatureData.current) + "C | Max: " + QString().setNum(_gpuTemperatureData.max) + "C | Min: " +
+    ui->l_minMaxTemp->setText("Max: " + QString().setNum(_gpuTemperatureData.max) + "C | Min: " +
                               QString().setNum(_gpuTemperatureData.min) + "C | Avg: " + QString().setNum(_gpuTemperatureData.sum/ticksCounter,'f',1));
 
 }
@@ -360,11 +386,10 @@ void radeon_profile::updateStatsTable() {
 
 void radeon_profile::refreshTooltip()
 {
-    QString tooltipdata = radeon_profile::windowTitle() + "\nCurrent profile: "+ui->l_profile->text() +"\n";
+    QString tooltipdata = radeon_profile::windowTitle() + "\nCurrent profile: "+ device.currentPowerProfile + "  " + device.currentPowerLevel +"\n";
     for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++) {
         tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
     }
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
-
