@@ -26,7 +26,7 @@ public:
     QLocalSocket *signalSender;
 
     struct {
-            QString config,read_clocks,set_profile,force_pl,timer_on,timer_off;
+            QString config,read_clocks,setValue,timer_on,timer_off;
         } daemonSignal;
 
 public slots:
