@@ -19,8 +19,8 @@ class dXorg
 public:
     dXorg() {}
 
-    static globalStuff::gpuClocksStruct getClocks();
-    static QString getClocksRawData();
+    static globalStuff::gpuClocksStruct getClocks(bool forFeatures = false);
+    static QString getClocksRawData(bool forFeatures);
     static float getTemperature();
     static QList<QTreeWidgetItem *> getCardConnectors();
     static QStringList getGLXInfo(QString gpuName, QProcessEnvironment env);
@@ -56,7 +56,7 @@ private:
 
     static struct driverFilePaths {
     QString powerMethodFilePath, profilePath, dpmStateFilePath ,
-            clocksPath , forcePowerLevelFilePath , sysfsHwmonPath, moduleParamsPath, pwmEnablePath, pwmSpeedPath;
+            clocksPath , forcePowerLevelFilePath , sysfsHwmonTempPath, moduleParamsPath, pwmEnablePath, pwmSpeedPath, pwmMaxSpeedPath;
     } filePaths;
     static int sensorsGPUtempIndex;
     static dXorg::tempSensor currentTempSensor;

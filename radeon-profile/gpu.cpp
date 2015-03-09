@@ -245,7 +245,7 @@ void gpu::setPwmManualControl(bool manual) const {
 void gpu::getPwmSpeed() {
     switch (currentDriver) {
     case XORG:
-            gpuTemeperatureData.pwmSpeed = ((float)dXorg::getPwmSpeed() / 255 ) * 100;
+            gpuTemeperatureData.pwmSpeed = ((float)dXorg::getPwmSpeed() / features.pwmMaxSpeed ) * 100;
         break;
     case FGLRX:
     case DRIVER_UNKNOWN:

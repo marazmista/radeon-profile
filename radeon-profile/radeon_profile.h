@@ -75,6 +75,7 @@ public:
     QTimer *timer;
 
     void refreshUI();
+    void connectSignals();
 private slots:
     void timerEvent();
     void on_btn_dpmBattery_clicked();
@@ -130,7 +131,6 @@ private slots:
     void on_btn_pwmProfile_clicked();
     void changeProfileFromCombo();
     void changePowerLevelFromCombo();
-
     void on_btn_fanInfo_clicked();
 
 private:

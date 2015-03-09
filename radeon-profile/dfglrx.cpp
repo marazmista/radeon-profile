@@ -61,9 +61,7 @@ QStringList dFglrx::getGLXInfo() {
 
 globalStuff::driverFeatures dFglrx::figureOutDriverFeatures() {
     globalStuff::driverFeatures features;
-    features.canChangeProfile = false;
     features.coreClockAvailable = true;
-    features.coreVoltAvailable = false;
     features.temperatureAvailable = true;
 
     return features;

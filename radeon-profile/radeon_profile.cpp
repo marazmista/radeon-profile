@@ -31,6 +31,7 @@ int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
 QList<pmLevel> pmStats;
 
+
 radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
@@ -75,17 +76,12 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     else // driver object detects cards in pc and fill the list in ui //
         ui->combo_gpus->addItems(device.initialize());
 
-    setupUiEnabledFeatures(device.features);
     ui->configGroups->setTabEnabled(2,device.daemonConnected());
+    setupUiEnabledFeatures(device.features);
 
-    // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
-    connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
-    connect(ui->combo_pProfile,SIGNAL(currentIndexChanged(int)),this,SLOT(changeProfileFromCombo()));
-    connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(changePowerLevelFromCombo()));
+    connectSignals();
 
     // timer init
-    connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
-    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
     timer->setInterval(ui->spin_timerInterval->value()*1000);
 
     // fill tables with data at the start //
@@ -101,6 +97,17 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 radeon_profile::~radeon_profile()
 {
     delete ui;
+}
+
+void radeon_profile::connectSignals()
+{
+    // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
+    connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
+    connect(ui->combo_pProfile,SIGNAL(currentIndexChanged(int)),this,SLOT(changeProfileFromCombo()));
+    connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(changePowerLevelFromCombo()));
+
+    connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
+    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
 }
 
 void radeon_profile::addRuntimeWidgets() {
@@ -159,7 +166,6 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     ui->l_cClk->setVisible(features.coreClockAvailable);
     ui->label_14->setVisible(features.coreClockAvailable);
 
-
     ui->cb_showVoltsGraph->setEnabled(features.coreVoltAvailable);
     ui->l_cVolt->setVisible(features.coreVoltAvailable);
     ui->label_20->setVisible(features.coreVoltAvailable);
@@ -182,6 +188,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 
     ui->mainTabs->setTabEnabled(2,features.pwmAvailable);
     ui->l_fanSpeed->setVisible(features.pwmAvailable);
+    ui->pwmSlider->setMaximum(features.pwmMaxSpeed);
 
     if (features.pm == globalStuff::DPM) {
         ui->combo_pProfile->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
@@ -213,7 +220,7 @@ void radeon_profile::refreshGpuData() {
 // did not alter it, it stays and in result will be not displayed
 void radeon_profile::refreshUI()
 {
-    if (ui->mainTabs->currentIndex() == 0) {
+    if (ui->mainTabs->currentIndex() == 0  && !isMinimized()) {
         ui->list_currentGPUData->clear();
 
         if (device.gpuData.powerLevel != -1)

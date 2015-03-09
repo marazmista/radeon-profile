@@ -26,6 +26,11 @@
 #define pwm_manual "1"
 #define pwm_auto "2"
 
+#define file_PowerMethod "power_method"
+#define file_powerProfile "power_profile"
+#define file_powerDpmState "power_dpm_state"
+#define file_powerDpmForcePerformanceLevel "power_dpm_force_performance_level"
+
 class globalStuff {
 public:
     static QStringList grabSystemInfo(const QString cmd) {
@@ -98,6 +103,14 @@ public:
     struct driverFeatures {
         bool canChangeProfile, coreClockAvailable, memClockAvailable, coreVoltAvailable, memVoltAvailable, temperatureAvailable, pwmAvailable;
         globalStuff::powerMethod pm;
+        int pwmMaxSpeed;
+
+        driverFeatures() {
+            canChangeProfile = coreClockAvailable = memClockAvailable = coreVoltAvailable = memVoltAvailable = temperatureAvailable= pwmAvailable = false;
+            pm = PM_UNKNOWN;
+            pwmMaxSpeed = 0;
+        }
+
     };
 
     struct gpuTemperatureStruct{

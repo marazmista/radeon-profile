@@ -58,27 +58,38 @@ bool dXorg::daemonConnected() {
 
 void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     gpuSysIndex = gpuName.at(gpuName.length()-1);
-    filePaths.powerMethodFilePath = "/sys/class/drm/"+gpuName+"/device/power_method",
-            filePaths.profilePath = "/sys/class/drm/"+gpuName+"/device/power_profile",
-            filePaths.dpmStateFilePath = "/sys/class/drm/"+gpuName+"/device/power_dpm_state",
-            filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info", // this path contains only index
-            filePaths.forcePowerLevelFilePath = "/sys/class/drm/"+gpuName+"/device/power_dpm_force_performance_level",
-            filePaths.moduleParamsPath = "/sys/class/drm/"+gpuName+"/device/driver/module/holders/radeon/parameters/";
+    QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
 
-    QString hwmonDevice = globalStuff::grabSystemInfo("ls /sys/class/drm/"+gpuName+"/device/hwmon/")[0]; // look for hwmon devices in card dir
-    filePaths.sysfsHwmonPath = "/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/temp1_input";
+    filePaths.powerMethodFilePath = devicePath + file_PowerMethod,
+            filePaths.profilePath = devicePath + file_powerProfile,
+            filePaths.dpmStateFilePath = devicePath + file_powerDpmState,
+            filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel,
+            filePaths.moduleParamsPath = devicePath + "driver/module/holders/radeon/parameters/",
+            filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info"; // this path contains only index
 
-    if (QFile::exists("/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/pwm1_enable"))
-        filePaths.pwmEnablePath = "/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/pwm1_enable";
-    else
+
+    QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
+    hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0" : hwmonDevicePath));
+
+    filePaths.sysfsHwmonTempPath = hwmonDevicePath  + "/temp1_input";
+
+    if (QFile::exists(hwmonDevicePath + "/pwm1_enable")) {
+        filePaths.pwmEnablePath = hwmonDevicePath + "/pwm1_enable";
+
+        if (QFile::exists(hwmonDevicePath + "/pwm1"))
+            filePaths.pwmSpeedPath = hwmonDevicePath + "/pwm1";
+
+        if (QFile::exists(hwmonDevicePath + "/pwm1_max"))
+            filePaths.pwmMaxSpeedPath = hwmonDevicePath + "/pwm1_max";
+    } else {
         filePaths.pwmEnablePath = "";
-
-    if (QFile::exists("/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/pwm1"))
-        filePaths.pwmSpeedPath = "/sys/class/drm/"+gpuName+"/device/hwmon/" + QString((hwmonDevice.isEmpty()) ? "hwmon0" : hwmonDevice) + "/pwm1";
+        filePaths.pwmSpeedPath = "";
+        filePaths.pwmMaxSpeedPath = "";
+    }
 }
 
 // method for gather info about clocks from deamon or from debugfs if root
-QString dXorg::getClocksRawData() {
+QString dXorg::getClocksRawData(bool resolvingGpuFeatures = false) {
     QFile clocksFile(filePaths.clocksPath);
     QString data;
 
@@ -87,6 +98,15 @@ QString dXorg::getClocksRawData() {
     else if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh)
             dcomm->sendCommand(dcomm->daemonSignal.read_clocks);
+
+        // fist call, so notihing is in sharedmem and we need to wait for data
+        // because we need correctly figure out what is available
+        // see: https://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
+        if (resolvingGpuFeatures) {
+            QTime delayTime = QTime::currentTime().addMSecs(1000);
+            while (QTime::currentTime() < delayTime);
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        }
 
        if (sharedMem.lock()) {
 //     if (sharedMem.error() == QSharedMemory::NoError) {
@@ -105,10 +125,10 @@ QString dXorg::getClocksRawData() {
     return data;
 }
 
-globalStuff::gpuClocksStruct dXorg::getClocks() {
+globalStuff::gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
     globalStuff::gpuClocksStruct tData(-1); // empty struct
 
-    QStringList out = getClocksRawData().split('\n');
+    QStringList out = getClocksRawData(resolvingGpuFeatures).split('\n');
 
     // if nothing is there returns empty (-1) struct
     if (out[0] == "null")
@@ -200,7 +220,7 @@ float dXorg::getTemperature() {
     switch (currentTempSensor) {
     case SYSFS_HWMON:
     case CARD_HWMON: {
-        QFile hwmon(filePaths.sysfsHwmonPath);
+        QFile hwmon(filePaths.sysfsHwmonTempPath);
         hwmon.open(QIODevice::ReadOnly);
         temp = hwmon.readLine(20);
         hwmon.close();
@@ -297,7 +317,6 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
     return cardConnectorsList;
 }
 
-
 globalStuff::powerMethod dXorg::getPowerMethod() {
     QFile powerMethodFile(filePaths.powerMethodFilePath);
     if (powerMethodFile.open(QIODevice::ReadOnly)) {
@@ -314,7 +333,7 @@ globalStuff::powerMethod dXorg::getPowerMethod() {
 }
 
 dXorg::tempSensor dXorg::testSensor() {
-    QFile hwmon(filePaths.sysfsHwmonPath);
+    QFile hwmon(filePaths.sysfsHwmonTempPath);
 
     // first method, try read temp from sysfs in card dir (path from figureOutGPUDataPaths())
     if (hwmon.open(QIODevice::ReadOnly)) {
@@ -323,8 +342,8 @@ dXorg::tempSensor dXorg::testSensor() {
     } else {
 
         // second method, try find in system hwmon dir for file labeled VGA_TEMP
-        filePaths.sysfsHwmonPath = findSysfsHwmonForGPU();
-        if (!filePaths.sysfsHwmonPath.isEmpty())
+        filePaths.sysfsHwmonTempPath = findSysfsHwmonForGPU();
+        if (!filePaths.sysfsHwmonTempPath.isEmpty())
             return SYSFS_HWMON;
 
         // if above fails, use lm_sensors
@@ -537,13 +556,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     globalStuff::driverFeatures features;
     features.temperatureAvailable =  (currentTempSensor == dXorg::TS_UNKNOWN) ? false : true;
 
-    globalStuff::gpuClocksStruct test = dXorg::getClocks();
-
-    // waiting for daemon to fill shared memory
-    // see: https://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
-    QTime delayTime = QTime::currentTime().addMSecs(1500);
-    while (QTime::currentTime() < delayTime)
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    globalStuff::gpuClocksStruct test = dXorg::getClocks(true);
 
     features.coreClockAvailable = (test.coreClk == -1) ? false : true;
     features.memClockAvailable = (test.memClk == -1) ? false : true;
@@ -552,7 +565,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
 
 
     features.pm = currentPowerMethod;
-    features.canChangeProfile = false;
+
     switch (currentPowerMethod) {
     case globalStuff::DPM: {
         if (daemonConnected())
@@ -577,12 +590,19 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
         break;
     }
 
-    features.pwmAvailable = false;
     if (filePaths.pwmEnablePath != "") {
         QFile f(filePaths.pwmEnablePath);
         f.open(QIODevice::ReadOnly);
-        if (QString(f.readLine(1)) != pwm_disabled)
+        if (QString(f.readLine(1)) != pwm_disabled) {
             features.pwmAvailable = true;
+
+            QFile fPwmMax(filePaths.pwmMaxSpeedPath);
+            if (fPwmMax.open(QIODevice::ReadOnly)) {
+                features.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
+                fPwmMax.close();
+            }
+        }
+        f.close();
+        return features;
     }
-    return features;
 }
