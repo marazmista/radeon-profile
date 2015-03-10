@@ -167,6 +167,7 @@ private:
     void addRuntimeWidgets();
     void loadFanProfiles();
     void saveFanProfiles();
+    int askNumber(const int value, const int min, const int max, const QString label);
 
 };
 

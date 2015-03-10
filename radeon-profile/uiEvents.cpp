@@ -19,18 +19,18 @@ bool closeFromTrayMenu;
 void radeon_profile::forceAuto() {
     ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_auto));
 
-   // device.setForcePowerLevel(globalStuff::F_AUTO);
+    // device.setForcePowerLevel(globalStuff::F_AUTO);
 }
 
 void radeon_profile::forceLow() {
     ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_low));
 
-  //  device.setForcePowerLevel(globalStuff::F_LOW);
+    //  device.setForcePowerLevel(globalStuff::F_LOW);
 }
 
 void radeon_profile::forceHigh() {
     ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_high));
-//    device.setForcePowerLevel(globalStuff::F_HIGH);
+    //    device.setForcePowerLevel(globalStuff::F_HIGH);
 }
 
 // == buttons for forcePowerLevel
@@ -100,19 +100,19 @@ void radeon_profile::changePowerLevelFromCombo() {
 void radeon_profile::on_btn_dpmBattery_clicked() {
     ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_battery));
 
-   // device.setPowerProfile(globalStuff::BATTERY);
+    // device.setPowerProfile(globalStuff::BATTERY);
 }
 
 void radeon_profile::on_btn_dpmBalanced_clicked() {
     ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_balanced));
 
-//    device.setPowerProfile(globalStuff::BALANCED);
+    //    device.setPowerProfile(globalStuff::BALANCED);
 }
 
 void radeon_profile::on_btn_dpmPerformance_clicked() {
     ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_performance));
 
-//    device.setPowerProfile(globalStuff::PERFORMANCE);
+    //    device.setPowerProfile(globalStuff::PERFORMANCE);
 }
 
 void radeon_profile::resetMinMax() { device.gpuTemeperatureData.min = 0; device.gpuTemeperatureData.max = 0; }
@@ -338,18 +338,17 @@ void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 void radeon_profile::on_btn_fanInfo_clicked()
 {
     QMessageBox::information(this,"Fan control information",
-    "Don't overheat your card! Be careful! Don't use this if you don't know what you're doing! \n\nHovewer, looks like card won't apply too low values due its internal protection. Closing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned.");
+                             "Don't overheat your card! Be careful! Don't use this if you don't know what you're doing! \n\nHovewer, looks like card won't apply too low values due its internal protection. Closing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned.");
 }
 
 void radeon_profile::on_btn_addFanStep_clicked()
 {
-    bool ok;
-    int temperature = QInputDialog::getInt(this,"Temperature","Temperature:",0,0,100,1, &ok);
-    if (!ok)
+    int temperature = askNumber(0,0,100, "TemperatureL");
+    if (temperature == -1)
         return;
 
-    int fanSpeed = QInputDialog::getInt(this,"Fan Speed","Speed [%]:",0,20,100,1, &ok);
-    if (!ok)
+    int fanSpeed = askNumber(0,20,100, "Speed [%] (20-100):");
+    if (fanSpeed == -1)
         return;
 
     fanStepPair fp;
@@ -367,8 +366,10 @@ void radeon_profile::on_btn_removeFanStep_clicked()
     int temperature = current->text(0).toInt();
 
     for (int i = 0; i < fanSteps.count(); ++i) {
-        if (fanSteps.at(i).temperature == temperature)
+        if (fanSteps.at(i).temperature == temperature) {
             fanSteps.removeAt(i);
+            break;
+        }
     }
 
     delete ui->list_fanSteps->currentItem();
@@ -376,7 +377,46 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 
 void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    item->setFlags(item->flags() | Qt::ItemIsEditable);
+    switch (column) {
+    case 0: {
+        int value = askNumber(item->text(column).toInt(),0,100,"Temperature:");
+
+        if (value == -1)
+            return;
+
+        for (int i =0; i < fanSteps.count(); ++i) {
+            if (fanSteps.at(i).temperature == value) {
+                fanSteps[i].temperature = value;
+                break;
+            }
+        }
+        break;
+    }
+    case 1: {
+        int value = askNumber(item->text(column).toInt(),20,100, "Speed [%] (20-100):");
+        if (value == -1)
+            return;
+
+        for (int i =0; i < fanSteps.count(); ++i) {
+            if (fanSteps.at(i).speed == value) {
+                fanSteps[i].speed = value;
+                break;
+            }
+        }
+        break;
+    }
+    }
+
+    item->setText(column,QString().setNum(value));
 }
 
+int radeon_profile::askNumber(const int value, const int min, const int max, const QString label) {
+    bool ok;
+    int number = QInputDialog::getInt(this,"",label,value,min,max,1, &ok);
+
+    if (!ok)
+        return -1;
+
+    return number;
+}
 //========

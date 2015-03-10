@@ -189,7 +189,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     if (features.pwmAvailable) {
         ui->mainTabs->setTabEnabled(2,true);
         ui->l_fanSpeed->setVisible(true);
-        ui->pwmSlider->setMaximum(true);
+        ui->pwmSlider->setMaximum(device.features.pwmMaxSpeed);
 
         loadFanProfiles();
     }
@@ -292,8 +292,10 @@ void radeon_profile::timerEvent() {
         if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked())
             if (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore)
                 for (int i =0; i < fanSteps.count(); ++i)
-                    if (fanSteps.at(i).temperature <= device.gpuTemeperatureData.current)
+                    if (fanSteps.at(i).temperature <= device.gpuTemeperatureData.current) {
                         device.setPwmValue(fanSteps.at(i).speed);
+                        break;
+                    }
 
         // lets say coreClk is essential to get stats (it is disabled in ui anyway when features.clocksAvailable is false)
         if (ui->cb_stats->isChecked() && device.gpuClocksData.coreClk != -1) {
