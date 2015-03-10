@@ -21,8 +21,10 @@ public:
     explicit gpu() { currentGpuIndex = 0;
                    gpuTemeperatureData.current  = gpuTemeperatureData.max = gpuTemeperatureData.min = gpuTemeperatureData.sum = 0; }
 
-    globalStuff::gpuClocksStruct gpuData;
+    globalStuff::gpuClocksStruct gpuClocksData;
+    globalStuff::gpuClocksStructString gpuClocksDataString;
     globalStuff::gpuTemperatureStruct gpuTemeperatureData;
+    globalStuff::gpuTemperatureStructString gpuTemeperatureDataString;
     QStringList gpuList;
     char currentGpuIndex;
     globalStuff::driverFeatures features;
@@ -34,6 +36,8 @@ public:
     QString getCurrentPowerLevel() const;
     QString getCurrentPowerProfile() const;
     void refreshPowerLevel();
+    globalStuff::gpuClocksStructString convertClocks(const globalStuff::gpuClocksStruct &data);
+    globalStuff::gpuTemperatureStructString convertTemperature(const globalStuff::gpuTemperatureStruct &data);
 
     void getClocks();
     void getTemperature();

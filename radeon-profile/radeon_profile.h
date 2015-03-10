@@ -64,6 +64,10 @@ class radeon_profile : public QMainWindow
         LOG_FILE_DATE_APPEND
     };
 
+    struct fanStepPair {
+        int temperature, speed;
+    };
+
 public:
     explicit radeon_profile(QStringList, QWidget *parent = 0);
     ~radeon_profile();
@@ -132,11 +136,15 @@ private slots:
     void changeProfileFromCombo();
     void changePowerLevelFromCombo();
     void on_btn_fanInfo_clicked();
+    void on_btn_addFanStep_clicked();
+    void on_btn_removeFanStep_clicked();
+    void on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
 private:
     gpu device;
     static const QString settingsPath;
     QList<execBin*> *execsRunning;
+    QList<fanStepPair> fanSteps;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
@@ -157,6 +165,8 @@ private:
     void loadVariables();
     void updateExecLogs();
     void addRuntimeWidgets();
+    void loadFanProfiles();
+    void saveFanProfiles();
 
 };
 

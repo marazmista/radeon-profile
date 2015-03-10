@@ -75,6 +75,8 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 {
     ui->fanModesTabs->setEnabled(true);
     ui->fanModesTabs->setCurrentIndex(1);
+
+    device.setPwmManualControl(true);
 }
 
 void radeon_profile::changeProfileFromCombo() {
@@ -190,8 +192,10 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
 
     saveConfig();
 
-    if (device.features.pwmAvailable)
+    if (device.features.pwmAvailable) {
         device.setPwmManualControl(false);
+        saveFanProfiles();
+    }
 }
 
 void radeon_profile::closeFromTray() {
@@ -334,6 +338,45 @@ void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 void radeon_profile::on_btn_fanInfo_clicked()
 {
     QMessageBox::information(this,"Fan control information",
-    "Don't overheat your card! Be careful! \n\nHovewer, card won't apply too low values due its internal protection. Closing application will restore fan state to Auto. If application crashes, the fan state will remain, so you have been warned.");
+    "Don't overheat your card! Be careful! Don't use this if you don't know what you're doing! \n\nHovewer, looks like card won't apply too low values due its internal protection. Closing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned.");
 }
+
+void radeon_profile::on_btn_addFanStep_clicked()
+{
+    bool ok;
+    int temperature = QInputDialog::getInt(this,"Temperature","Temperature:",0,0,100,1, &ok);
+    if (!ok)
+        return;
+
+    int fanSpeed = QInputDialog::getInt(this,"Fan Speed","Speed [%]:",0,20,100,1, &ok);
+    if (!ok)
+        return;
+
+    fanStepPair fp;
+    fp.temperature = temperature;
+    fp.speed = device.features.pwmMaxSpeed * ((float)fanSpeed / 100);
+    fanSteps.append(fp);
+
+    ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString().setNum(temperature) << QString().setNum(fanSpeed)));
+}
+
+void radeon_profile::on_btn_removeFanStep_clicked()
+{
+    QTreeWidgetItem *current = ui->list_fanSteps->currentItem();
+
+    int temperature = current->text(0).toInt();
+
+    for (int i = 0; i < fanSteps.count(); ++i) {
+        if (fanSteps.at(i).temperature == temperature)
+            fanSteps.removeAt(i);
+    }
+
+    delete ui->list_fanSteps->currentItem();
+}
+
+void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+}
+
 //========

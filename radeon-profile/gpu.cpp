@@ -51,6 +51,30 @@ QStringList gpu::initialize(bool skipDetectDriver) {
     }
 }
 
+globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuClocksStruct &data) {
+    globalStuff::gpuClocksStructString tmp;
+
+    tmp.coreClk = QString().setNum(data.coreClk);
+    tmp.coreVolt = QString().setNum(data.coreVolt);
+    tmp.memClk = QString().setNum(data.memClk);
+    tmp.memVolt = QString().setNum(data.memVolt);
+    tmp.powerLevel = QString().setNum(data.powerLevel);
+    tmp.uvdCClk = QString().setNum(data.uvdCClk);
+    tmp.uvdDClk = QString().setNum(data.uvdDClk);
+
+    return tmp;
+}
+
+globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuff::gpuTemperatureStruct &data) {
+    globalStuff::gpuTemperatureStructString tmp;
+
+    tmp.current = QString().setNum(data.current) + QString::fromUtf8("\u00B0C");
+    tmp.max = QString().setNum(data.max) + QString::fromUtf8("\u00B0C");
+    tmp.min = QString().setNum(data.min) + QString::fromUtf8("\u00B0C");
+    tmp.pwmSpeed = QString().setNum(data.pwmSpeed);
+
+    return tmp;
+}
 
 void gpu::driverByParam(gpu::driver paramDriver) {
     this->currentDriver = paramDriver;
@@ -78,20 +102,24 @@ void gpu::changeGpu(char index) {
 void gpu::getClocks() {
     switch (currentDriver) {
     case XORG:
-        gpuData = dXorg::getClocks();
+        gpuClocksData = dXorg::getClocks();
         break;
     case FGLRX:
-        gpuData = dFglrx::getClocks();
+        gpuClocksData = dFglrx::getClocks();
         break;
     case DRIVER_UNKNOWN: {
         globalStuff::gpuClocksStruct clk(-1);
-        gpuData = clk;
+        gpuClocksData = clk;
         break;
     }
     }
+    gpuClocksDataString = convertClocks(gpuClocksData);
 }
 
 void gpu::getTemperature() {
+
+    gpuTemeperatureData.currentBefore = gpuTemeperatureData.current;
+
     switch (currentDriver) {
     case XORG:
         gpuTemeperatureData.current = dXorg::getTemperature();
@@ -110,6 +138,8 @@ void gpu::getTemperature() {
 
     gpuTemeperatureData.max = (gpuTemeperatureData.max < gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.max;
     gpuTemeperatureData.min = (gpuTemeperatureData.min > gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.min;
+
+    gpuTemeperatureDataString = convertTemperature(gpuTemeperatureData);
 }
 
 QList<QTreeWidgetItem *> gpu::getCardConnectors() const {

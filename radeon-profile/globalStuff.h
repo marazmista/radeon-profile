@@ -31,6 +31,19 @@
 #define file_powerDpmState "power_dpm_state"
 #define file_powerDpmForcePerformanceLevel "power_dpm_force_performance_level"
 
+#define label_currentPowerLevel "Current power level"
+#define label_currentGPUClock "Current GPU clock"
+#define label_currentMemClock "Current mem clock"
+#define label_uvdVideoCoreClock "Current mem clock"
+#define label_uvdDecoderClock "UVD decoder clock (dclk)"
+#define label_vddc "Voltage (vddc)"
+#define label_vddci "Voltage (vddci)"
+#define label_currentGPUTemperature "Current GPU temp"
+#define label_errorReadingData "Can't read data. (debugfs mounted? daemon is running? root rights?)"
+
+#define logDateFormat "yyyy-MM-dd_hh-mm-ss"
+
+
 class globalStuff {
 public:
     static QStringList grabSystemInfo(const QString cmd) {
@@ -76,7 +89,7 @@ public:
         PM_UNKNOWN = 2
     };
 
-    struct gpuClocksStruct{
+    struct gpuClocksStruct {
         int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
         char powerLevel;
 
@@ -98,6 +111,11 @@ public:
         }
     };
 
+    struct gpuClocksStructString {
+      QString powerLevel, coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
+    };
+
+
     // structure which holds what can be display on ui and on its base
     // we enable ui elements
     struct driverFeatures {
@@ -114,8 +132,12 @@ public:
     };
 
     struct gpuTemperatureStruct{
-        float current, max, min, sum;
+        float current, currentBefore, max, min, sum;
         int pwmSpeed;
+    };
+
+    struct gpuTemperatureStructString {
+        QString current, max, min, pwmSpeed;
     };
 
     // settings from config used across the source

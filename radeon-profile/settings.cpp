@@ -11,6 +11,7 @@
 
 const QString radeon_profile::settingsPath = QDir::homePath() + "/.radeon-profile-settings";
 const QString execProfilesPath = QDir::homePath() + "/.radeon-profile-execProfiles";
+const QString fanStepsPath = QDir::homePath() + "/.radeon-profile-fanSteps";
 
 // init of static struct with setting exposed to global scope
 globalStuff::globalCfgStruct globalStuff::globalConfig;
@@ -165,5 +166,38 @@ void radeon_profile::loadConfig() {
                 ui->list_execProfiles->addTopLevelItem(new QTreeWidgetItem(QStringList() << profiles[i].split("###")));
         }
 
+    }
+}
+
+void radeon_profile::loadFanProfiles() {
+    QFile fsPath(fanStepsPath);
+    if (fsPath.open(QIODevice::ReadOnly)) {
+        QString profile = QString(fsPath.readAll());
+
+        QStringList steps = profile.split("|",QString::SkipEmptyParts);
+
+        if (steps.count() > 0)
+            for (int i = 1; i < steps.count(); ++i) {
+                QStringList pair = steps[i].split("#");
+                ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << pair[0] << pair[1]));
+
+                fanStepPair fp;
+                fp.temperature = pair[0].toInt();
+                fp.speed = device.features.pwmMaxSpeed * ((float)pair[1].toInt() / 100);
+                fanSteps.append(fp);
+            }
+        fsPath.close();
+    }
+}
+
+void radeon_profile::saveFanProfiles() {
+    QFile fsPath(fanStepsPath);
+    if (fsPath.open(QIODevice::WriteOnly)) {
+        QString profile = "default|";
+        for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i)
+            profile.append(ui->list_fanSteps->topLevelItem(i)->text(0) + "#" + ui->list_fanSteps->topLevelItem(i)->text(1) + "|");
+
+        fsPath.write(profile.toAscii());
+        fsPath.close();
     }
 }

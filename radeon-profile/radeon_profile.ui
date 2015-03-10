@@ -1364,7 +1364,7 @@
         <item>
          <widget class="QStackedWidget" name="fanModesTabs">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="page_fixed">
            <widget class="QPushButton" name="btn_pwmFixedApply">
@@ -1435,7 +1435,57 @@
             </layout>
            </widget>
           </widget>
-          <widget class="QWidget" name="page_profile"/>
+          <widget class="QWidget" name="page_profile">
+           <widget class="QTreeWidget" name="list_fanSteps">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>10</y>
+              <width>241</width>
+              <height>201</height>
+             </rect>
+            </property>
+            <property name="indentation">
+             <number>2</number>
+            </property>
+            <column>
+             <property name="text">
+              <string>Temperature</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Fan Speed [%]</string>
+             </property>
+            </column>
+           </widget>
+           <widget class="QPushButton" name="btn_addFanStep">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>220</y>
+              <width>101</width>
+              <height>27</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Add step</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="btn_removeFanStep">
+            <property name="geometry">
+             <rect>
+              <x>150</x>
+              <y>220</y>
+              <width>101</width>
+              <height>27</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Remove step</string>
+            </property>
+           </widget>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -2820,8 +2870,8 @@
            <widget class="QLabel" name="label_2">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>180</y>
+              <x>320</x>
+              <y>10</y>
               <width>161</width>
               <height>24</height>
              </rect>
@@ -2833,8 +2883,8 @@
            <widget class="QDoubleSpinBox" name="spin_timerInterval">
             <property name="geometry">
              <rect>
-              <x>210</x>
-              <y>180</y>
+              <x>520</x>
+              <y>10</y>
               <width>61</width>
               <height>24</height>
              </rect>
@@ -2855,8 +2905,8 @@
            <widget class="QLabel" name="label_5">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>220</y>
+              <x>320</x>
+              <y>50</y>
               <width>289</width>
               <height>12</height>
              </rect>
@@ -2874,8 +2924,8 @@
            <widget class="QCheckBox" name="cb_gpuData">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>240</y>
+              <x>320</x>
+              <y>70</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2896,8 +2946,8 @@
            <widget class="QCheckBox" name="cb_graphs">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>260</y>
+              <x>320</x>
+              <y>90</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2918,8 +2968,8 @@
            <widget class="QCheckBox" name="cb_stats">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>280</y>
+              <x>320</x>
+              <y>110</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2934,8 +2984,8 @@
            <widget class="QCheckBox" name="cb_glxInfo">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>300</y>
+              <x>320</x>
+              <y>130</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2953,8 +3003,8 @@
            <widget class="QCheckBox" name="cb_connectors">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>320</y>
+              <x>320</x>
+              <y>150</y>
               <width>289</width>
               <height>21</height>
              </rect>
@@ -2972,8 +3022,8 @@
            <widget class="QCheckBox" name="cb_modParams">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>340</y>
+              <x>320</x>
+              <y>170</y>
               <width>289</width>
               <height>21</height>
              </rect>
