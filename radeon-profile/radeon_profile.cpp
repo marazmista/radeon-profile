@@ -55,6 +55,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->configGroups->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
     ui->execPages->setCurrentIndex(0);
+    ui->fanModesTabs->setEnabled(false);
     setupGraphs();
     setupForcePowerLevelMenu();
     setupOptionsMenu();
@@ -92,6 +93,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     timer->start();
     addRuntimeWidgets();
+
 }
 
 radeon_profile::~radeon_profile()
@@ -291,9 +293,14 @@ void radeon_profile::timerEvent() {
 
         if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked())
             if (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore)
-                for (int i =0; i < fanSteps.count(); ++i)
-                    if (fanSteps.at(i).temperature <= device.gpuTemeperatureData.current) {
-                        device.setPwmValue(fanSteps.at(i).speed);
+                for (int i =1; i < fanSteps.count()-1; ++i)
+                    if (fanSteps.at(i-1).temperature <= device.gpuTemeperatureData.current && fanSteps.at(i+1).temperature > device.gpuTemeperatureData.current) {
+
+                        int h = fanSteps.at(i+1).speed , l = fanSteps.at(i-1).speed;
+                        int diff = h - l;
+
+                        int speed = l + ((float)diff / 2);
+                        device.setPwmValue(device.features.pwmMaxSpeed * ((float)speed / 100));
                         break;
                     }
 

@@ -176,26 +176,41 @@ void radeon_profile::loadFanProfiles() {
 
         QStringList steps = profile.split("|",QString::SkipEmptyParts);
 
-        if (steps.count() > 0)
+        if (steps.count() > 1) {
             for (int i = 1; i < steps.count(); ++i) {
                 QStringList pair = steps[i].split("#");
                 ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << pair[0] << pair[1]));
 
-                fanStepPair fp;
-                fp.temperature = pair[0].toInt();
-                fp.speed = device.features.pwmMaxSpeed * ((float)pair[1].toInt() / 100);
-                fanSteps.append(fp);
+                fanSteps.append(fanStepPair(pair[0].toInt(),pair[1].toInt()));
+
+                ui->plotFanProfile->graph(0)->addData(pair[0].toInt(), pair[1].toInt());
             }
+        } else {
+            fanSteps.append(fanStepPair(0,20));
+            fanSteps.append(fanStepPair(65,100));
+            fanSteps.append(fanStepPair(90,100));
+        }
+        makeFanProfileGraph(fanSteps);
+
         fsPath.close();
     }
+}
+
+void radeon_profile::makeFanProfileGraph(const QList<fanStepPair> &steps) {
+    ui->plotFanProfile->graph(0)->clearData();
+
+    for (int i = 0; i < steps.count(); ++i)
+        ui->plotFanProfile->graph(0)->addData(steps[i].temperature,steps[i].speed);
+
+    ui->plotFanProfile->replot();
 }
 
 void radeon_profile::saveFanProfiles() {
     QFile fsPath(fanStepsPath);
     if (fsPath.open(QIODevice::WriteOnly)) {
         QString profile = "default|";
-        for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i)
-            profile.append(ui->list_fanSteps->topLevelItem(i)->text(0) + "#" + ui->list_fanSteps->topLevelItem(i)->text(1) + "|");
+        for (int i = 0; i < fanSteps.count(); ++i)
+            profile.append(QString().setNum(fanSteps[i].temperature)+ "#" + QString().setNum(fanSteps[i].speed)  + "|");
 
         fsPath.write(profile.toAscii());
         fsPath.close();

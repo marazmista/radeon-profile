@@ -343,7 +343,7 @@ void radeon_profile::on_btn_fanInfo_clicked()
 
 void radeon_profile::on_btn_addFanStep_clicked()
 {
-    int temperature = askNumber(0,0,100, "TemperatureL");
+    int temperature = askNumber(0,0,100, "Temperature:");
     if (temperature == -1)
         return;
 
@@ -351,17 +351,18 @@ void radeon_profile::on_btn_addFanStep_clicked()
     if (fanSpeed == -1)
         return;
 
-    fanStepPair fp;
-    fp.temperature = temperature;
-    fp.speed = device.features.pwmMaxSpeed * ((float)fanSpeed / 100);
-    fanSteps.append(fp);
+    fanSteps.insert(fanSteps.count()-1,fanStepPair(temperature,fanSpeed));
+    ui->list_fanSteps->insertTopLevelItem(ui->list_fanSteps->topLevelItemCount()-1,new QTreeWidgetItem(QStringList() << QString().setNum(temperature) << QString().setNum(fanSpeed)));
 
-    ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString().setNum(temperature) << QString().setNum(fanSpeed)));
+    makeFanProfileGraph(fanSteps);
 }
 
 void radeon_profile::on_btn_removeFanStep_clicked()
 {
     QTreeWidgetItem *current = ui->list_fanSteps->currentItem();
+
+    if (ui->list_fanSteps->indexOfTopLevelItem(current) == 0 || ui->list_fanSteps->indexOfTopLevelItem(current) == ui->list_fanSteps->topLevelItemCount()-1)
+            return;
 
     int temperature = current->text(0).toInt();
 
@@ -373,41 +374,45 @@ void radeon_profile::on_btn_removeFanStep_clicked()
     }
 
     delete ui->list_fanSteps->currentItem();
+    makeFanProfileGraph(fanSteps);
 }
 
 void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
+    if (ui->list_fanSteps->indexOfTopLevelItem(item) == 0 || ui->list_fanSteps->indexOfTopLevelItem(item) == ui->list_fanSteps->topLevelItemCount()-1)
+        return;
+
+    int value;
     switch (column) {
-    case 0: {
-        int value = askNumber(item->text(column).toInt(),0,100,"Temperature:");
+    case 0:
+        value = askNumber(item->text(0).toInt(),0,100,"Temperature:");
 
         if (value == -1)
             return;
 
         for (int i =0; i < fanSteps.count(); ++i) {
-            if (fanSteps.at(i).temperature == value) {
+            if (fanSteps.at(i).temperature == item->text(0).toInt()) {
                 fanSteps[i].temperature = value;
                 break;
             }
         }
         break;
-    }
-    case 1: {
-        int value = askNumber(item->text(column).toInt(),20,100, "Speed [%] (20-100):");
+    case 1:
+        value = askNumber(item->text(1).toInt(),20,100, "Speed [%] (20-100):");
         if (value == -1)
             return;
 
         for (int i =0; i < fanSteps.count(); ++i) {
-            if (fanSteps.at(i).speed == value) {
+            if (fanSteps.at(i).speed == item->text(1).toInt()) {
                 fanSteps[i].speed = value;
                 break;
             }
         }
         break;
     }
-    }
 
     item->setText(column,QString().setNum(value));
+    makeFanProfileGraph(fanSteps);
 }
 
 int radeon_profile::askNumber(const int value, const int min, const int max, const QString label) {

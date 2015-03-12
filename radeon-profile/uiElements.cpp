@@ -32,6 +32,12 @@ void radeon_profile::setupGraphs()
     ui->plotVolts->addGraph(); // volts gpu
     ui->plotVolts->addGraph(); // volts mem
 
+    ui->plotFanProfile->addGraph();
+    ui->plotFanProfile->yAxis->setRange(0,100);
+    ui->plotFanProfile->xAxis->setRange(0,110);
+    ui->plotFanProfile->xAxis->setLabel("Temperature");
+    ui->plotFanProfile->yAxis->setLabel("Fan speed [%]");
+
     setupGraphsStyle();
 
     // legend clocks //
@@ -59,6 +65,7 @@ void radeon_profile::setupGraphsStyle()
     pen.setCapStyle(Qt::SquareCap);
     pen.setColor(ui->graphColorsList->topLevelItem(TEMP_LINE)->backgroundColor(1));
     ui->plotTemp->graph(0)->setPen(pen);
+    ui->plotFanProfile->graph(0)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->backgroundColor(1));
     ui->plotColcks->graph(0)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->backgroundColor(1));
@@ -75,6 +82,7 @@ void radeon_profile::setupGraphsStyle()
     ui->plotTemp->setBackground(QBrush(ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1)));
     ui->plotColcks->setBackground(QBrush(ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1)));
     ui->plotVolts->setBackground(QBrush(ui->graphColorsList->topLevelItem(VOLTS_BG)->backgroundColor(1)));
+    ui->plotFanProfile->setBackground(QBrush(ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1)));
 }
 
 void radeon_profile::setupTrayIcon() {

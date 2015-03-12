@@ -1364,7 +1364,7 @@
         <item>
          <widget class="QStackedWidget" name="fanModesTabs">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="page_fixed">
            <widget class="QPushButton" name="btn_pwmFixedApply">
@@ -1436,55 +1436,90 @@
            </widget>
           </widget>
           <widget class="QWidget" name="page_profile">
-           <widget class="QTreeWidget" name="list_fanSteps">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>241</width>
-              <height>201</height>
-             </rect>
-            </property>
-            <property name="indentation">
-             <number>2</number>
-            </property>
-            <column>
-             <property name="text">
-              <string>Temperature</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Fan Speed [%]</string>
-             </property>
-            </column>
-           </widget>
-           <widget class="QPushButton" name="btn_addFanStep">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>220</y>
-              <width>101</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Add step</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="btn_removeFanStep">
-            <property name="geometry">
-             <rect>
-              <x>150</x>
-              <y>220</y>
-              <width>101</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Remove step</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_15">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetDefaultConstraint</enum>
+              </property>
+              <item>
+               <widget class="QTreeWidget" name="list_fanSteps">
+                <property name="maximumSize">
+                 <size>
+                  <width>211</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="indentation">
+                 <number>2</number>
+                </property>
+                <column>
+                 <property name="text">
+                  <string>Temperature</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Fan Speed [%]</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <item>
+                 <widget class="QPushButton" name="btn_addFanStep">
+                  <property name="minimumSize">
+                   <size>
+                    <width>101</width>
+                    <height>27</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>101</width>
+                    <height>27</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Add step</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_removeFanStep">
+                  <property name="minimumSize">
+                   <size>
+                    <width>101</width>
+                    <height>27</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>101</width>
+                    <height>27</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Remove step</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QCustomPlot" name="plotFanProfile" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>300</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>

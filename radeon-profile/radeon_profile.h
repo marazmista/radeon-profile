@@ -66,6 +66,11 @@ class radeon_profile : public QMainWindow
 
     struct fanStepPair {
         int temperature, speed;
+
+        fanStepPair(int _temperature, int _speed) {
+            temperature = _temperature;
+            speed = _speed;
+        }
     };
 
 public:
@@ -168,6 +173,7 @@ private:
     void loadFanProfiles();
     void saveFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
+    void makeFanProfileGraph(const QList<fanStepPair> &steps);
 
 };
 
