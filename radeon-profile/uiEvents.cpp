@@ -391,7 +391,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
             return;
 
         for (int i =0; i < fanSteps.count(); ++i) {
-            if (fanSteps.at(i).temperature == item->text(0).toInt()) {
+            if (fanSteps.at(i).speed == item->text(1).toInt()) {
                 fanSteps[i].temperature = value;
                 break;
             }
@@ -403,7 +403,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
             return;
 
         for (int i =0; i < fanSteps.count(); ++i) {
-            if (fanSteps.at(i).speed == item->text(1).toInt()) {
+            if (fanSteps.at(i).temperature == item->text(0).toInt()) {
                 fanSteps[i].speed = value;
                 break;
             }
