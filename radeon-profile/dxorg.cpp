@@ -66,6 +66,7 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
             filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel,
             filePaths.moduleParamsPath = devicePath + "driver/module/holders/radeon/parameters/",
             filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info"; // this path contains only index
+          //  filePaths.clocksPath = "/tmp/radeon_pm_info"; // testing
 
 
     QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
@@ -558,11 +559,16 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
 
     globalStuff::gpuClocksStruct test = dXorg::getClocks(true);
 
+    // still, sometimes there is miscomunication between daemon,
+    // but vales are there, so look again in the file which daemon has
+    // copied to /tmp/
+    if (test.coreClk == -1)
+        test = getFeaturesFallback();
+
     features.coreClockAvailable = (test.coreClk == -1) ? false : true;
     features.memClockAvailable = (test.memClk == -1) ? false : true;
     features.coreVoltAvailable = (test.coreVolt == -1) ? false : true;
     features.memVoltAvailable = (test.memVolt == -1) ? false : true;
-
 
     features.pm = currentPowerMethod;
 
@@ -603,6 +609,28 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
             }
         }
         f.close();
-        return features;
     }
+    return features;
+}
+
+globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
+    QFile f("/tmp/radeon_pm_info");
+    if (f.open(QIODevice::ReadOnly)) {
+        globalStuff::gpuClocksStruct fallbackFeatures;
+        QString s = QString(f.readAll());
+
+        // just look for it, if it is, the value is not important at this point
+        if (s.contains("sclk"));
+            fallbackFeatures.coreClk = 0;
+        if (s.contains("mclk"))
+            fallbackFeatures.memClk = 0;
+        if (s.contains("vddc"));
+            fallbackFeatures.coreClk = 0;
+        if (s.contains("vddci"))
+            fallbackFeatures.memClk = 0;
+
+        f.close();
+        return fallbackFeatures;
+    } else
+        return globalStuff::gpuClocksStruct(-1);
 }

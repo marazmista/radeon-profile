@@ -1274,7 +1274,7 @@
            <widget class="QPushButton" name="btn_pwmAuto">
             <property name="minimumSize">
              <size>
-              <width>200</width>
+              <width>170</width>
               <height>0</height>
              </size>
             </property>
@@ -1299,7 +1299,7 @@
            <widget class="QPushButton" name="btn_pwmFixed">
             <property name="minimumSize">
              <size>
-              <width>200</width>
+              <width>170</width>
               <height>0</height>
              </size>
             </property>
@@ -1321,7 +1321,7 @@
            <widget class="QPushButton" name="btn_pwmProfile">
             <property name="minimumSize">
              <size>
-              <width>200</width>
+              <width>170</width>
               <height>0</height>
              </size>
             </property>
@@ -1332,7 +1332,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Profile</string>
+             <string>Custom profile</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -1385,7 +1385,7 @@
              <rect>
               <x>10</x>
               <y>20</y>
-              <width>521</width>
+              <width>561</width>
               <height>41</height>
              </rect>
             </property>
@@ -1404,7 +1404,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QSlider" name="pwmSlider">
+              <widget class="QSlider" name="fanSpeedSlider">
                <property name="minimum">
                 <number>51</number>
                </property>
@@ -1412,10 +1412,23 @@
                 <number>255</number>
                </property>
                <property name="value">
-                <number>60</number>
+                <number>80</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="labelFixedSpeed">
+               <property name="font">
+                <font>
+                 <family>Monospace</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>20%</string>
                </property>
               </widget>
              </item>
@@ -1428,7 +1441,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>100%</string>
+                <string> / 100%</string>
                </property>
               </widget>
              </item>

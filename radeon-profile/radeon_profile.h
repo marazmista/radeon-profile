@@ -83,8 +83,6 @@ public:
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
     QTimer *timer;
 
-    void refreshUI();
-    void connectSignals();
 private slots:
     void timerEvent();
     void on_btn_dpmBattery_clicked();
@@ -145,6 +143,8 @@ private slots:
     void on_btn_removeFanStep_clicked();
     void on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
+    void on_fanSpeedSlidern_valueChanged(int value);
+
 private:
     gpu device;
     static const QString settingsPath;
@@ -161,11 +161,11 @@ private:
     void saveConfig();
     void loadConfig();
     void setupGraphsStyle();
-    void doTheStats(const globalStuff::gpuClocksStruct &_gpuData);
+    void doTheStats();
     void updateStatsTable();
     void setupContextMenus();
     void refreshGpuData();
-    void refreshGraphs(const globalStuff::gpuClocksStruct &, const globalStuff::gpuTemperatureStruct &);
+    void refreshGraphs();
     void setupUiEnabledFeatures(const globalStuff::driverFeatures &features);
     void loadVariables();
     void updateExecLogs();
@@ -174,6 +174,9 @@ private:
     void saveFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
     void makeFanProfileGraph(const QList<fanStepPair> &steps);
+    void refreshUI();
+    void connectSignals();
+    void adjustFanSpeed();
 
 };
 

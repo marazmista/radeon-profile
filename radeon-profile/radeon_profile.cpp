@@ -25,7 +25,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 
-const int appVersion = 20150110;
+const int appVersion = 20150315;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
@@ -90,10 +90,10 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
     ui->list_connectors->addTopLevelItems(device.getCardConnectors());
     ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
+    refreshUI();
 
     timer->start();
     addRuntimeWidgets();
-
 }
 
 radeon_profile::~radeon_profile()
@@ -188,12 +188,15 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     if (!features.coreClockAvailable && !features.temperatureAvailable && !features.coreVoltAvailable)
         ui->mainTabs->setTabEnabled(1,false);
 
-    if (features.pwmAvailable) {
-        ui->mainTabs->setTabEnabled(2,true);
-        ui->l_fanSpeed->setVisible(true);
-        ui->pwmSlider->setMaximum(device.features.pwmMaxSpeed);
+    if (!features.pwmAvailable) {
+        ui->mainTabs->setTabEnabled(2,false);
+        ui->l_fanSpeed->setVisible(false);
+        ui->label_24->setVisible(false);
+    } else {
+        ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
 
         loadFanProfiles();
+        on_fanSpeedSlidern_valueChanged(ui->fanSpeedSlider->value());
     }
 
     if (features.pm == globalStuff::DPM) {
@@ -217,17 +220,12 @@ void radeon_profile::refreshGpuData() {
     if (device.features.pwmAvailable)
         device.getPwmSpeed();
 
-    refreshUI();
-
     updateExecLogs();
 }
 
 // -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
 // did not alter it, it stays and in result will be not displayed
 void radeon_profile::refreshUI() {
-    if (isMinimized())
-        return;
-
      ui->l_temp->setText(QString().setNum(device.gpuTemeperatureData.current));
      ui->l_cClk->setText(device.gpuClocksDataString.coreClk);
      ui->l_mClk->setText(device.gpuClocksDataString.memClk);
@@ -281,8 +279,12 @@ void radeon_profile::updateExecLogs() {
 //===================================
 // === Main timer loop  === //
 void radeon_profile::timerEvent() {
-    if (!refreshWhenHidden->isChecked() && this->isHidden())
+    if (!refreshWhenHidden->isChecked() && this->isHidden()) {
+        // even if in tray, keep the fan control active (if enabled)
+        device.getTemperature();
+        adjustFanSpeed();
         return;
+    }
 
     if (ui->cb_gpuData->isChecked()) {
         refreshGpuData();
@@ -291,39 +293,21 @@ void radeon_profile::timerEvent() {
         if (device.features.pm == globalStuff::DPM)
             ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
 
-        if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked())
-            if (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore) {
-
-                // find bounds of current temperature
-                for (int i = 1; i < fanSteps.count(); i++)
-                    if (fanSteps.at(i-1).temperature <= device.gpuTemeperatureData.current && fanSteps.at(i).temperature > device.gpuTemeperatureData.current) {
-                        fanStepPair h = fanSteps.at(i), l = fanSteps.at(i-1);
-
-                        // calculate two point stright line equation based on boundaries of current temperature
-                        // y = mx + b
-                        float m = (float)(h.speed - l.speed) / (float)(h.temperature - l.temperature);
-                        float b = (float)(h.speed - (m * h.temperature));
-
-                        // apply current temperature to calculated equation to figure out fan speed on slope
-                        int speed = device.gpuTemeperatureData.current * m + b;
-
-                        device.setPwmValue(device.features.pwmMaxSpeed * ((float)speed / 100));
-                        break;
-                    }
-            }
+        adjustFanSpeed();
 
         // lets say coreClk is essential to get stats (it is disabled in ui anyway when features.clocksAvailable is false)
         if (ui->cb_stats->isChecked() && device.gpuClocksData.coreClk != -1) {
-            doTheStats(device.gpuClocksData);
+            doTheStats();
 
             // do the math only when user looking at stats table
             if (ui->tabs_systemInfo->currentIndex() == 3 && ui->mainTabs->currentIndex() == 0)
                 updateStatsTable();
         }
+        refreshUI();
     }
 
     if (ui->cb_graphs->isChecked())
-        refreshGraphs(device.gpuClocksData, device.gpuTemeperatureData);
+        refreshGraphs();
 
     if (ui->cb_glxInfo->isChecked()) {
         ui->list_glxinfo->clear();
@@ -337,10 +321,35 @@ void radeon_profile::timerEvent() {
         ui->list_modInfo->clear();
         ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
     }
+
     refreshTooltip();
 }
 
-void radeon_profile::refreshGraphs(const globalStuff::gpuClocksStruct &_gpuData, const globalStuff::gpuTemperatureStruct &_gpuTemperatureData) {
+void radeon_profile::adjustFanSpeed()
+{
+    if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked())
+        if (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore) {
+
+            // find bounds of current temperature
+            for (int i = 1; i < fanSteps.count(); i++)
+                if (fanSteps.at(i-1).temperature <= device.gpuTemeperatureData.current && fanSteps.at(i).temperature > device.gpuTemeperatureData.current) {
+                    fanStepPair h = fanSteps.at(i), l = fanSteps.at(i-1);
+
+                    // calculate two point stright line equation based on boundaries of current temperature
+                    // y = mx + b
+                    float m = (float)(h.speed - l.speed) / (float)(h.temperature - l.temperature);
+                    float b = (float)(h.speed - (m * h.temperature));
+
+                    // apply current temperature to calculated equation to figure out fan speed on slope
+                    int speed = device.gpuTemeperatureData.current * m + b;
+
+                    device.setPwmValue(device.features.pwmMaxSpeed * ((float)speed / 100));
+                    break;
+                }
+        }
+}
+
+void radeon_profile::refreshGraphs() {
     // count the tick and move graph to right
     ticksCounter++;
     ui->plotTemp->xAxis->setRange(ticksCounter+20, rangeX,Qt::AlignRight);
@@ -353,43 +362,42 @@ void radeon_profile::refreshGraphs(const globalStuff::gpuClocksStruct &_gpuData,
     ui->plotVolts->replot();
 
     // choose bigger clock and adjust plot scale
-    int r = (_gpuData.memClk >= _gpuData.coreClk) ? _gpuData.memClk : _gpuData.coreClk;
+    int r = (device.gpuClocksData.memClk >= device.gpuClocksData.coreClk) ? device.gpuClocksData.memClk : device.gpuClocksData.coreClk;
     if (r > ui->plotColcks->yAxis->range().upper)
         ui->plotColcks->yAxis->setRangeUpper(r + 150);
 
     // add data to plots
-    ui->plotColcks->graph(0)->addData(ticksCounter,_gpuData.coreClk);
-    ui->plotColcks->graph(1)->addData(ticksCounter,_gpuData.memClk);
-    ui->plotColcks->graph(2)->addData(ticksCounter,_gpuData.uvdCClk);
-    ui->plotColcks->graph(3)->addData(ticksCounter,_gpuData.uvdDClk);
+    ui->plotColcks->graph(0)->addData(ticksCounter,device.gpuClocksData.coreClk);
+    ui->plotColcks->graph(1)->addData(ticksCounter,device.gpuClocksData.memClk);
+    ui->plotColcks->graph(2)->addData(ticksCounter,device.gpuClocksData.uvdCClk);
+    ui->plotColcks->graph(3)->addData(ticksCounter,device.gpuClocksData.uvdDClk);
 
-    if (_gpuData.coreVolt > ui->plotVolts->yAxis->range().upper)
-        ui->plotVolts->yAxis->setRangeUpper(_gpuData.coreVolt + 100);
+    if (device.gpuClocksData.coreVolt > ui->plotVolts->yAxis->range().upper)
+        ui->plotVolts->yAxis->setRangeUpper(device.gpuClocksData.coreVolt + 100);
 
-    ui->plotVolts->graph(0)->addData(ticksCounter,_gpuData.coreVolt);
-    ui->plotVolts->graph(1)->addData(ticksCounter,_gpuData.memVolt);
+    ui->plotVolts->graph(0)->addData(ticksCounter,device.gpuClocksData.coreVolt);
+    ui->plotVolts->graph(1)->addData(ticksCounter,device.gpuClocksData.memVolt);
 
     // temperature graph
-    if (_gpuTemperatureData.max >= ui->plotTemp->yAxis->range().upper || _gpuTemperatureData.min <= ui->plotTemp->yAxis->range().lower)
-        ui->plotTemp->yAxis->setRange(_gpuTemperatureData.min - 5, _gpuTemperatureData.max + 5);
+    if (device.gpuTemeperatureData.max >= ui->plotTemp->yAxis->range().upper || device.gpuTemeperatureData.min <= ui->plotTemp->yAxis->range().lower)
+        ui->plotTemp->yAxis->setRange(device.gpuTemeperatureData.min - 5, device.gpuTemeperatureData.max + 5);
 
-    ui->plotTemp->graph(0)->addData(ticksCounter,_gpuTemperatureData.current);
+    ui->plotTemp->graph(0)->addData(ticksCounter,device.gpuTemeperatureData.current);
     ui->l_minMaxTemp->setText("Max: " + device.gpuTemeperatureDataString.max  + "C | Min: " +
-                              device.gpuTemeperatureDataString.min + "C | Avg: " + QString().setNum(_gpuTemperatureData.sum/ticksCounter,'f',1));
-
+                              device.gpuTemeperatureDataString.min + "C | Avg: " + QString().setNum(device.gpuTemeperatureData.sum/ticksCounter,'f',1));
 }
 
-void radeon_profile::doTheStats(const globalStuff::gpuClocksStruct &_gpuData) {
+void radeon_profile::doTheStats() {
     // count ticks for stats //
     statsTickCounter++;
 
     // figure out pm level based on data provided
-    QString pmLevelName = (_gpuData.powerLevel == -1) ? "" : "Power level:" + QString().setNum(_gpuData.powerLevel), volt;
-    volt = (_gpuData.coreVolt == -1) ? "" : "(" + QString().setNum(_gpuData.coreVolt) + "mV)";
-    pmLevelName = (_gpuData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +QString().setNum(_gpuData.coreClk) + "MHz" + volt;
+    QString pmLevelName = (device.gpuClocksData.powerLevel == -1) ? "" : "Power level:" + device.gpuClocksDataString.powerLevel, volt;
+    volt = (device.gpuClocksData.coreVolt == -1) ? "" : "(" + device.gpuClocksDataString.coreVolt + "mV)";
+    pmLevelName = (device.gpuClocksData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +device.gpuClocksDataString.coreClk + "MHz" + volt;
 
-    volt = (_gpuData.memVolt == -1) ? "" : "(" + QString().setNum(_gpuData.memVolt) + "mV)";
-    pmLevelName = (_gpuData.memClk == -1) ? pmLevelName : pmLevelName + " Mem:" + QString().setNum(_gpuData.memClk) + "MHz" + volt;
+    volt = (device.gpuClocksData.memVolt == -1) ? "" : "(" + device.gpuClocksDataString.memVolt + "mV)";
+    pmLevelName = (device.gpuClocksData.memClk == -1) ? pmLevelName : pmLevelName + " Mem:" + device.gpuClocksDataString.memClk + "MHz" + volt;
 
     // find index of current pm level in stats list
     char index = -1;
@@ -431,3 +439,4 @@ void radeon_profile::refreshTooltip()
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
+

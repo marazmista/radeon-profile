@@ -52,7 +52,7 @@ void radeon_profile::on_btn_forceLow_clicked()
 // == fan control
 void radeon_profile::on_btn_pwmFixedApply_clicked()
 {
-    device.setPwmValue(ui->pwmSlider->value());
+    device.setPwmValue(ui->fanSpeedSlider->value());
 }
 
 void radeon_profile::on_btn_pwmFixed_clicked()
@@ -61,7 +61,7 @@ void radeon_profile::on_btn_pwmFixed_clicked()
     ui->fanModesTabs->setEnabled(true);
 
     device.setPwmManualControl(true);
-    device.setPwmValue(ui->pwmSlider->value());
+    device.setPwmValue(ui->fanSpeedSlider->value());
 }
 
 void radeon_profile::on_btn_pwmAuto_clicked()
@@ -77,6 +77,10 @@ void radeon_profile::on_btn_pwmProfile_clicked()
     ui->fanModesTabs->setCurrentIndex(1);
 
     device.setPwmManualControl(true);
+
+    // we only figure out if there is a need of counting all the math
+    // if temperature has changed, so reset
+    device.gpuTemeperatureData.currentBefore = 0;
 }
 
 void radeon_profile::changeProfileFromCombo() {
@@ -343,7 +347,7 @@ void radeon_profile::on_btn_fanInfo_clicked()
 
 void radeon_profile::on_btn_addFanStep_clicked()
 {
-    int temperature = askNumber(0,0,100, "Temperature:");
+    int temperature = askNumber(0,10,100, "Temperature:");
     if (temperature == -1)
         return;
 
@@ -385,7 +389,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
     int value;
     switch (column) {
     case 0:
-        value = askNumber(item->text(0).toInt(),0,100,"Temperature:");
+        value = askNumber(item->text(0).toInt(),10,100,"Temperature:");
 
         if (value == -1)
             return;
@@ -424,4 +428,10 @@ int radeon_profile::askNumber(const int value, const int min, const int max, con
 
     return number;
 }
+
+void radeon_profile::on_fanSpeedSlidern_valueChanged(int value)
+{
+    ui->labelFixedSpeed->setText(QString().setNum(((float)value / device.features.pwmMaxSpeed) * 100,'f',0));
+}
+
 //========

@@ -36,6 +36,7 @@ void radeon_profile::saveConfig() {
     settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
     settings.setValue("graphRange",ui->timeSlider->value());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
+    settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
 
     // Graph settings
     settings.setValue("graphLineThickness",ui->spin_lineThick->value());
@@ -90,6 +91,7 @@ void radeon_profile::loadConfig() {
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
     ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",false).toBool());
     ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
+    ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",80).toInt());
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
     ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
@@ -185,15 +187,20 @@ void radeon_profile::loadFanProfiles() {
 
                 ui->plotFanProfile->graph(0)->addData(pair[0].toInt(), pair[1].toInt());
             }
-        } else {
-            fanSteps.append(fanStepPair(0,20));
-            fanSteps.append(fanStepPair(65,100));
-            fanSteps.append(fanStepPair(90,100));
-        }
-        makeFanProfileGraph(fanSteps);
 
-        fsPath.close();
+            fsPath.close();
+        }
+    } else {
+        //default profile if no file found
+        fanSteps.append(fanStepPair(0,20));
+        fanSteps.append(fanStepPair(65,100));
+        fanSteps.append(fanStepPair(90,100));
+
+        for (short i = 0;  i < fanSteps.count(); ++i)
+            ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString().setNum(fanSteps[i].temperature) <<  QString().setNum(fanSteps[i].speed)));
     }
+
+    makeFanProfileGraph(fanSteps);
 }
 
 void radeon_profile::makeFanProfileGraph(const QList<fanStepPair> &steps) {

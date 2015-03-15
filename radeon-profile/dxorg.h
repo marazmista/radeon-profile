@@ -40,6 +40,7 @@ public:
     static globalStuff::driverFeatures figureOutDriverFeatures();
     static void reconfigureDaemon();
     static bool daemonConnected();
+    static globalStuff::gpuClocksStruct getFeaturesFallback();
 
 
 private:
