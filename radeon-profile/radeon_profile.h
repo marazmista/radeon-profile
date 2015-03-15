@@ -142,8 +142,7 @@ private slots:
     void on_btn_addFanStep_clicked();
     void on_btn_removeFanStep_clicked();
     void on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
-    void on_fanSpeedSlidern_valueChanged(int value);
+    void on_fanSpeedSlider_valueChanged(int value);
 
 private:
     gpu device;

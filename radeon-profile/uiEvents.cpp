@@ -429,7 +429,7 @@ int radeon_profile::askNumber(const int value, const int min, const int max, con
     return number;
 }
 
-void radeon_profile::on_fanSpeedSlidern_valueChanged(int value)
+void radeon_profile::on_fanSpeedSlider_valueChanged(int value)
 {
     ui->labelFixedSpeed->setText(QString().setNum(((float)value / device.features.pwmMaxSpeed) * 100,'f',0));
 }

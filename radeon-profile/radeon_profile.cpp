@@ -196,7 +196,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
 
         loadFanProfiles();
-        on_fanSpeedSlidern_valueChanged(ui->fanSpeedSlider->value());
+        on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
     }
 
     if (features.pm == globalStuff::DPM) {
