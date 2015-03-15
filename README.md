@@ -40,4 +40,4 @@ Type: `qmake-qt4 && make` in source directory.
 
 # Screenshot
 
-[Gallery](http://www.imgur.com/a/Aka7u)
+[Gallery](https://imgur.com/a/vWEIl)
