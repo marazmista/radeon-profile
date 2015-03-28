@@ -25,7 +25,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 
-const int appVersion = 20150315;
+const int appVersion = 20150328;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
@@ -383,8 +383,8 @@ void radeon_profile::refreshGraphs() {
         ui->plotTemp->yAxis->setRange(device.gpuTemeperatureData.min - 5, device.gpuTemeperatureData.max + 5);
 
     ui->plotTemp->graph(0)->addData(ticksCounter,device.gpuTemeperatureData.current);
-    ui->l_minMaxTemp->setText("Max: " + device.gpuTemeperatureDataString.max  + "C | Min: " +
-                              device.gpuTemeperatureDataString.min + "C | Avg: " + QString().setNum(device.gpuTemeperatureData.sum/ticksCounter,'f',1));
+    ui->l_minMaxTemp->setText("Max: " + device.gpuTemeperatureDataString.max  + " | Min: " +
+                              device.gpuTemeperatureDataString.min + " | Avg: " + QString().setNum(device.gpuTemeperatureData.sum/ticksCounter,'f',1) + QString::fromUtf8("\u00B0C"));
 }
 
 void radeon_profile::doTheStats() {
