@@ -209,6 +209,7 @@ QString gpu::getCurrentPowerLevel() const {
         return dXorg::getCurrentPowerLevel().trimmed();
         break;
     default:
+        return "";
         break;
     }
 }
@@ -219,6 +220,7 @@ QString gpu::getCurrentPowerProfile() const {
         return dXorg::getCurrentPowerProfile().trimmed();
         break;
     default:
+        return "";
         break;
     }
 }
