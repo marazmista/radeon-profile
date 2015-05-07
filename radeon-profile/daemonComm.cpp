@@ -25,7 +25,7 @@ void daemonComm::connectToDaemon() {
 }
 
 void daemonComm::sendCommand(const QString command) {
-    signalSender->write(command.toAscii(),command.length());
+    signalSender->write(command.toLatin1(),command.length());
 }
 
 void daemonComm::onConnect() {

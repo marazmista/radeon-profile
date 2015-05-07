@@ -115,7 +115,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures = false) {
             char a[128] = {0};
             strncpy(a,to,sizeof(a));
             sharedMem.unlock();
-            data  = QString::fromAscii(a).trimmed();
+            data  = QString::fromLatin1(a).trimmed();
         } else
             qDebug() << sharedMem.errorString();
     }

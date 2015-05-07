@@ -12,7 +12,7 @@ Can be forced by `--driver fglrx` parameter.
 
 # Dependencies
 Crucial:
-* qt4
+* Qt4 or Qt5  (see build below)
 * radeon card
 
 For full functionality:
@@ -36,7 +36,9 @@ For full functionality:
 
 # Bulid
 
-Type: `qmake-qt4 && make` in source directory.
+Qt4: `qmake-qt4 && make` in source directory.
+Qt5: `qmake && make` in source directory.
+
 
 # Screenshot
 

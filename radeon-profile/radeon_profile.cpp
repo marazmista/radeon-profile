@@ -25,7 +25,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 
-const int appVersion = 20150501;
+const int appVersion = 20150507;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;

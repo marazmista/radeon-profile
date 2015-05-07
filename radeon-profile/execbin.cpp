@@ -80,7 +80,7 @@ void execBin::execProcesFinished() {
     if (!this->logData.logFilename.isEmpty() && this->logData.log.count() > 0) {
         QFile f(logData.logFilename);
         f.open(QIODevice::WriteOnly);
-        f.write(this->logData.log.join("\n").toAscii());
+        f.write(this->logData.log.join("\n").toLatin1());
         f.close();
         this->logData.log.clear();
     }
@@ -93,7 +93,7 @@ void execBin::saveToFile() {
         if (!filename.isEmpty()) {
             QFile f(filename);
             f.open(QIODevice::WriteOnly);
-            f.write(this->output->toPlainText().toAscii());
+            f.write(this->output->toPlainText().toLatin1());
             f.close();
         }
 }
