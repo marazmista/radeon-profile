@@ -1,5 +1,6 @@
 -------Gallium-------
-GALLIUM_HUD|fps#cpu#samples-passed#primitives-generated#ia-vertices#ia-primitives#vs-invocations#gs-invocations#gs-primitives#clipper-invocations#clipper-primitives-generated#ps-invocations#hs-invocations#ds-invocations#cs-invocations#draw-calls#requested-VRAM#requested-GTT#buffer-wait-time
+GALLIUM_HUD|fps#cpu#samples-passed#primitives-generated#ia-vertices#ia-primitives#vs-invocations#gs-invocations#gs-primitives#clipper-invocations#clipper-primitives-generated#ps-invocations#hs-invocations#ds-invocations#cs-invocations#draw-calls#requested-VRAM#requested-GTT#buffer-wait-time#num-cs-flushes#num-bytes-moved#VRAM-usage#GTT-usage#temperature#shader-clock#memory-clock#GPU-load
+GALLIUM_HUD_PERIOD|user_input
 GALLIUM_LOG_FILE|user_input
 GALLIUM_PRINT_OPTIONS|1
 GALLIUM_DUMP_CPU|1
@@ -44,7 +45,7 @@ LP_DEBUG|user_input
 LP_PERF|user_input
 LP_NUM_THREADS|user_input
 -------Driver-------
-R600_DEBUG|sb#nosb#sbcl#sbstat#nollvm#llvm#nohyperz#hyprez#bostats
+R600_DEBUG|sb#nosb#sbcl#sbstat#nollvm#llvm#nohyperz#hyprez#bostats#tex#texmip#compute#vm#trace_cs#info#fs#vs#gs#ps#cs#nodma#forcedma#noinvalrange#no2d#notiling#switch_on_eop#precompile
 -------Other-------
 vblank_mode|0
 LC_ALL|user_input

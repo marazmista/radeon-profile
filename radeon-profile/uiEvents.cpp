@@ -192,6 +192,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     if (ui->cb_closeTray->isChecked() && !closeFromTrayMenu) {
         this->hide();
         e->ignore();
+        return;
     }
 
     saveConfig();
