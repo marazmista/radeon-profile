@@ -231,20 +231,19 @@ float dXorg::getTemperature() {
     case PCI_SENSOR: {
         QStringList out = globalStuff::grabSystemInfo("sensors");
         temp = out[sensorsGPUtempIndex+2].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
-        return temp.toDouble();
         break;
     }
     case MB_SENSOR: {
         QStringList out = globalStuff::grabSystemInfo("sensors");
         temp = out[sensorsGPUtempIndex].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
-        return temp.toDouble();
         break;
     }
     case TS_UNKNOWN: {
-        return -1;
+        temp = "-1";
         break;
     }
     }
+    return temp.toDouble();
 }
 
 QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
@@ -356,9 +355,9 @@ dXorg::tempSensor dXorg::testSensor() {
         else if (out.indexOf(QRegExp("VGA_TEMP.+")) != -1) {
             sensorsGPUtempIndex = out.indexOf(QRegExp("VGA_TEMP.+"));
             return MB_SENSOR;
-        } else
-            return TS_UNKNOWN;
+        }
     }
+    return TS_UNKNOWN;
 }
 
 QString dXorg::findSysfsHwmonForGPU() {
@@ -440,8 +439,10 @@ QString dXorg::getCurrentPowerProfile() {
         break;
     }
     case globalStuff::PM_UNKNOWN:
-        return "err";
+        break;
     }
+
+    return "err";
 }
 
 
@@ -449,8 +450,8 @@ QString dXorg::getCurrentPowerLevel() {
     QFile forceProfile(filePaths.forcePowerLevelFilePath);
     if (forceProfile.open(QIODevice::ReadOnly))
         return QString(forceProfile.readLine(13));
-    else
-        return "err";
+
+    return "err";
 }
 
 void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
@@ -549,8 +550,11 @@ void dXorg::setPwmManuaControl(bool manual) {
 int dXorg::getPwmSpeed() {
     QFile f(filePaths.pwmSpeedPath);
 
+    int val = 0;
     if (f.open(QIODevice::ReadOnly))
-        return QString(f.readLine(4)).toInt();
+       val = QString(f.readLine(4)).toInt();
+
+    return val;
 }
 
 globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {

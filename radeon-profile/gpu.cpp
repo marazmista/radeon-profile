@@ -27,28 +27,30 @@ QStringList gpu::initialize(bool skipDetectDriver) {
     if (!skipDetectDriver)
         currentDriver = detectDriver();
 
+    QStringList gpuList;
+
     switch (currentDriver) {
     case XORG: {
         gpuList = dXorg::detectCards();
         dXorg::configure(gpuList[currentGpuIndex]);
         features = dXorg::figureOutDriverFeatures();
-        return gpuList;
+        break;
     }
     case FGLRX: {
         gpuList = dFglrx::detectCards();
         dFglrx::configure(currentGpuIndex);
         features = dFglrx::figureOutDriverFeatures();
-        return gpuList;
-    }
         break;
+    }
     case DRIVER_UNKNOWN: {
         globalStuff::driverFeatures f;
         f.pm = globalStuff::PM_UNKNOWN;
         f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
         features = f;
-        return QStringList() << "unknown";
+        gpuList << "unknown";
     }
     }
+    return gpuList;
 }
 
 globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuClocksStruct &data) {
@@ -162,17 +164,19 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 }
 
 QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
+    QList<QTreeWidgetItem *> list;
+
     switch (currentDriver) {
     case XORG:
-        return dXorg::getModuleInfo();
+        list = dXorg::getModuleInfo();
         break;
     case FGLRX:
     case DRIVER_UNKNOWN: {
-        QList<QTreeWidgetItem *> list;
         list.append(new QTreeWidgetItem(QStringList() <<"err"));
-        return list;
     }
     }
+
+    return list;
 }
 
 QStringList gpu::getGLXInfo(QString gpuName) const {

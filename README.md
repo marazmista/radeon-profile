@@ -30,16 +30,13 @@ For full functionality:
 * Graph widget: http://www.qcustomplot.com/
 * Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 
-# Troubleshooting
-
-* __"no values":__ Check `/sys/kernel/debug`. If it's empty, try `# mount -t debugfs none /sys/kernel/debug`
-
 # Bulid
-
 Qt4: `qmake-qt4 && make` in source directory.
+
 Qt5: `qmake && make` in source directory.
 
+# Troubleshooting
+* __"no values":__ Check `/sys/kernel/debug`. If it's empty, try `# mount -t debugfs none /sys/kernel/debug`
 
 # Screenshot
-
 [Gallery](https://imgur.com/a/vWEIl)
