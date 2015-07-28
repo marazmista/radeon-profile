@@ -5,7 +5,7 @@
 gpu::driver gpu::detectDriver() {
     QStringList out = globalStuff::grabSystemInfo("lsmod");
 
-    if (!out.filter("radeon").isEmpty())
+    if (!out.filter("radeon").isEmpty() || !out.filter("amdgpu").isEmpty())
         return XORG;
     if (!out.filter("fglrx").isEmpty())
         return FGLRX;

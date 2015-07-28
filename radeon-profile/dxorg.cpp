@@ -415,7 +415,7 @@ QStringList dXorg::detectCards() {
     for (char i = 0; i < out.count(); i++) {
         QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
         if (f.open(QIODevice::ReadOnly)) {
-            if (f.readLine(50).contains("DRIVER=radeon"))
+            if (f.readLine(50).contains("DRIVER=radeon") || f.readLine(50).contains("DRIVER=amdgpu"))
                 data.append(f.fileName().split('/')[4]);
         }
     }
