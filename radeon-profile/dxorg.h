@@ -19,6 +19,8 @@ class dXorg
 public:
     dXorg() {}
 
+    static QString driverName;
+
     static globalStuff::gpuClocksStruct getClocks(bool forFeatures = false);
     static QString getClocksRawData(bool forFeatures);
     static float getTemperature();

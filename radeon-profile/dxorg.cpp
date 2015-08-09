@@ -15,6 +15,7 @@ int dXorg::sensorsGPUtempIndex;
 QChar dXorg::gpuSysIndex;
 QSharedMemory dXorg::sharedMem;
 dXorg::driverFilePaths dXorg::filePaths;
+QString dXorg::driverName;
 // end //
 
 daemonComm *dcomm = new daemonComm();
@@ -64,8 +65,8 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
             filePaths.profilePath = devicePath + file_powerProfile,
             filePaths.dpmStateFilePath = devicePath + file_powerDpmState,
             filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel,
-            filePaths.moduleParamsPath = devicePath + "driver/module/holders/radeon/parameters/",
-            filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info"; // this path contains only index
+            filePaths.moduleParamsPath = devicePath + "driver/module/holders/"+dXorg::driverName+"/parameters/",
+            filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+dXorg::driverName+"_pm_info"; // this path contains only index
           //  filePaths.clocksPath = "/tmp/radeon_pm_info"; // testing
 
 
