@@ -19,8 +19,8 @@ class dXorg
 public:
     dXorg() {}
 
-    static globalStuff::gpuClocksStruct getClocks(bool forFeatures = false);
-    static QString getClocksRawData(bool forFeatures);
+    static globalStuff::gpuClocksStruct getClocks(const QString &data);
+    static QString getClocksRawData(bool forFeatures = false);
     static float getTemperature();
     static QList<QTreeWidgetItem *> getCardConnectors();
     static QStringList getGLXInfo(QString gpuName, QProcessEnvironment env);

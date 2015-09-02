@@ -103,9 +103,10 @@ void gpu::changeGpu(char index) {
 
 void gpu::getClocks() {
     switch (currentDriver) {
-    case XORG:
-        gpuClocksData = dXorg::getClocks();
+    case XORG: {
+        gpuClocksData = dXorg::getClocks(dXorg::getClocksRawData());
         break;
+    }
     case FGLRX:
         gpuClocksData = dFglrx::getClocks();
         break;
