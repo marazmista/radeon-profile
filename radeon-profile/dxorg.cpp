@@ -90,7 +90,7 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
 }
 
 // method for gather info about clocks from deamon or from debugfs if root
-QString dXorg::getClocksRawData(bool resolvingGpuFeatures = false) {
+QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     QFile clocksFile(filePaths.clocksPath);
     QString data;
 
@@ -121,18 +121,16 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures = false) {
     }
 
     if (data == "")
-        data = "null\n";
+        data = "null";
 
     return data;
 }
 
-globalStuff::gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
+globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
     globalStuff::gpuClocksStruct tData(-1); // empty struct
 
-    QStringList out = getClocksRawData(resolvingGpuFeatures).split('\n');
-
     // if nothing is there returns empty (-1) struct
-    if (out[0] == "null")
+    if (data == "null")
         return tData;
 
     switch (currentPowerMethod) {
@@ -140,41 +138,41 @@ globalStuff::gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
         QRegExp rx;
 
         rx.setPattern("power\\slevel\\s\\d");
-        rx.indexIn(out[1]);
+        rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.powerLevel = rx.cap(0).split(' ')[2].toShort();
 
         rx.setPattern("sclk:\\s\\d+");
-        rx.indexIn(out[1]);
+        rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
 
         rx.setPattern("mclk:\\s\\d+");
-        rx.indexIn(out[1]);
+        rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
 
         rx.setPattern("vclk:\\s\\d+");
-        rx.indexIn(out[0]);
+        rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
             tData.uvdCClk  = (tData.uvdCClk  == 0) ? -1 :  tData.uvdCClk;
         }
 
         rx.setPattern("dclk:\\s\\d+");
-        rx.indexIn(out[0]);
+        rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
             tData.uvdDClk = (tData.uvdDClk == 0) ? -1 : tData.uvdDClk;
         }
 
         rx.setPattern("vddc:\\s\\d+");
-        rx.indexIn(out[1]);
+        rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
 
         rx.setPattern("vddci:\\s\\d+");
-        rx.indexIn(out[1]);
+        rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
 
@@ -182,23 +180,24 @@ globalStuff::gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
         break;
     }
     case globalStuff::PROFILE: {
-        for (int i=0; i< out.count(); i++) {
+        QStringList clocksData = data.split("\n");
+        for (int i=0; i< clocksData.count(); i++) {
             switch (i) {
             case 1: {
-                if (out[i].contains("current engine clock")) {
-                    tData.coreClk = QString().setNum(out[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
+                if (clocksData[i].contains("current engine clock")) {
+                    tData.coreClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
                     break;
                 }
             };
             case 3: {
-                if (out[i].contains("current memory clock")) {
-                    tData.memClk = QString().setNum(out[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
+                if (clocksData[i].contains("current memory clock")) {
+                    tData.memClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
                     break;
                 }
             }
             case 4: {
-                if (out[i].contains("voltage")) {
-                    tData.coreVolt = QString().setNum(out[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toDouble();
+                if (clocksData[i].contains("voltage")) {
+                    tData.coreVolt = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toDouble();
                     break;
                 }
             }
@@ -551,8 +550,10 @@ int dXorg::getPwmSpeed() {
     QFile f(filePaths.pwmSpeedPath);
 
     int val = 0;
-    if (f.open(QIODevice::ReadOnly))
+    if (f.open(QIODevice::ReadOnly)) {
        val = QString(f.readLine(4)).toInt();
+       f.close();
+    }
 
     return val;
 }
@@ -561,7 +562,8 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     globalStuff::driverFeatures features;
     features.temperatureAvailable =  (currentTempSensor == dXorg::TS_UNKNOWN) ? false : true;
 
-    globalStuff::gpuClocksStruct test = dXorg::getClocks(true);
+    QString data = getClocksRawData(true);
+    globalStuff::gpuClocksStruct test = dXorg::getClocks(data);
 
     // still, sometimes there is miscomunication between daemon,
     // but vales are there, so look again in the file which daemon has
@@ -600,7 +602,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
         break;
     }
 
-    if (filePaths.pwmEnablePath != "") {
+    if (!filePaths.pwmEnablePath.isEmpty()) {
         QFile f(filePaths.pwmEnablePath);
         f.open(QIODevice::ReadOnly);
         if (QString(f.readLine(1)) != pwm_disabled) {
@@ -624,11 +626,11 @@ globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
         QString s = QString(f.readAll());
 
         // just look for it, if it is, the value is not important at this point
-        if (s.contains("sclk"));
+        if (s.contains("sclk"))
             fallbackFeatures.coreClk = 0;
         if (s.contains("mclk"))
             fallbackFeatures.memClk = 0;
-        if (s.contains("vddc"));
+        if (s.contains("vddc"))
             fallbackFeatures.coreClk = 0;
         if (s.contains("vddci"))
             fallbackFeatures.memClk = 0;
