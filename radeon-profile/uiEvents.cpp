@@ -57,8 +57,7 @@ void radeon_profile::on_btn_pwmFixedApply_clicked()
 
 void radeon_profile::on_btn_pwmFixed_clicked()
 {
-    ui->fanModesTabs->setCurrentIndex(0);
-    ui->fanModesTabs->setEnabled(true);
+    ui->fanModesTabs->setCurrentIndex(1);
 
     device.setPwmManualControl(true);
     device.setPwmValue(ui->fanSpeedSlider->value());
@@ -66,15 +65,13 @@ void radeon_profile::on_btn_pwmFixed_clicked()
 
 void radeon_profile::on_btn_pwmAuto_clicked()
 {
-    ui->fanModesTabs->setEnabled(false);
-
     device.setPwmManualControl(false);
+    ui->fanModesTabs->setCurrentIndex(0);
 }
 
 void radeon_profile::on_btn_pwmProfile_clicked()
 {
-    ui->fanModesTabs->setEnabled(true);
-    ui->fanModesTabs->setCurrentIndex(1);
+    ui->fanModesTabs->setCurrentIndex(2);
 
     device.setPwmManualControl(true);
 

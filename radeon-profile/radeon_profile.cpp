@@ -25,7 +25,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 
-const int appVersion = 20150617;
+const int appVersion = 20150905;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
@@ -55,7 +55,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->configGroups->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
     ui->execPages->setCurrentIndex(0);
-    ui->fanModesTabs->setEnabled(false);
     setupGraphs();
     setupForcePowerLevelMenu();
     setupOptionsMenu();
@@ -189,10 +188,14 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->mainTabs->setTabEnabled(1,false);
 
     if (!features.pwmAvailable) {
-        ui->mainTabs->setTabEnabled(2,false);
-        ui->l_fanSpeed->setVisible(false);
-        ui->label_24->setVisible(false);
+        actuallyFanControlNotAvaible:
+            ui->mainTabs->setTabEnabled(2,false);
+            ui->l_fanSpeed->setVisible(false);
+            ui->label_24->setVisible(false);
     } else {
+        if (!globalStuff::globalConfig.rootMode && (!device.daemonConnected() && !globalStuff::globalConfig.rootMode))
+            goto actuallyFanControlNotAvaible;
+
         ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
 
         loadFanProfiles();
