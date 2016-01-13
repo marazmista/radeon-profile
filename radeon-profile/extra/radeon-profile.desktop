@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Radeon Profile
 Comment=Monitor Radeon GPU parameters and switch power profiles
-Exec=gksudo radeon-profile
+Exec=radeon-profile
 Icon=radeon-profile
 Terminal=false
 Type=Application
