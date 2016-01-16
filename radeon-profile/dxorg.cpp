@@ -38,11 +38,11 @@ void dXorg::configure(QString gpuName) {
         dcomm->connectToDaemon();
         if (daemonConnected()) {
             //  Configure the daeomon to read the data
-            dcomm->sendCommand(DAEMON_SIGNAL_CONFIG +"#" + filePaths.clocksPath);
+            dcomm->sendCommand(DAEMON_SIGNAL_CONFIG + '#' + filePaths.clocksPath);
 
             if(globalStuff::globalConfig.daemonAutoRefresh) //  If autoRefresh is enabled
                 //  Tell the daemon to auto-refresh
-                dcomm->sendCommand(DAEMON_SIGNAL_TIMER_ON + "#" + QString().setNum(globalStuff::globalConfig.interval));
+                dcomm->sendCommand(DAEMON_SIGNAL_TIMER_ON + '#' + QString().setNum(globalStuff::globalConfig.interval));
         }
     }
 }
@@ -497,7 +497,7 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     }
 
     if (daemonConnected())
-        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + newValue +"#" + filePaths.dpmStateFilePath + "#");
+        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + newValue + '#' + filePaths.dpmStateFilePath + '#');
     else {
         // enum is int, so first three values are dpm, rest are profile
         if (_newPowerProfile <= globalStuff::PERFORMANCE)
@@ -523,27 +523,27 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
     }
 
     if (daemonConnected())
-        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + newValue + "#" + filePaths.forcePowerLevelFilePath + "#");
+        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + newValue + '#' + filePaths.forcePowerLevelFilePath + '#');
     else
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
 void dXorg::setPwmValue(int value) {
     if (daemonConnected())  {
-        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + QString().setNum(value) + "#" + filePaths.pwmSpeedPath+ "#");
+        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + QString().setNum(value) + '#' + filePaths.pwmSpeedPath + '#');
     } else {
         setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
     }
 }
 
 void dXorg::setPwmManuaControl(bool manual) {
-    QString mode = manual ? pwm_manual : pwm_auto;
+    char mode = manual ? pwm_manual : pwm_auto;
 
     if (daemonConnected()) {
         //  Tell the daemon to set the pwm mode into the right file
-        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + pwm_manual + "#" + filePaths.pwmEnablePath);
+        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + pwm_manual + '#' + filePaths.pwmEnablePath);
     } else  //  No daemon available
-        setNewValue(filePaths.pwmEnablePath, mode);
+        setNewValue(filePaths.pwmEnablePath, "" + mode);
 }
 
 int dXorg::getPwmSpeed() {
@@ -605,7 +605,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     if (!filePaths.pwmEnablePath.isEmpty()) {
         QFile f(filePaths.pwmEnablePath);
         f.open(QIODevice::ReadOnly);
-        if (QString(f.readLine(1)) != pwm_disabled) {
+        if (QString(f.readLine(2))[0] != pwm_disabled) {
             features.pwmAvailable = true;
 
             QFile fPwmMax(filePaths.pwmMaxSpeedPath);
