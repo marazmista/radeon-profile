@@ -6,13 +6,6 @@
 daemonComm::daemonComm() {
     signalSender = new QLocalSocket();
     connect(signalSender,SIGNAL(connected()),this,SLOT(onConnect()));
-
-    // init of signals
-    daemonComm::daemonSignal.config = '0';
-    daemonComm::daemonSignal.read_clocks = '1';
-    daemonComm::daemonSignal.setValue = '2';
-    daemonComm::daemonSignal.timer_on = '4';
-    daemonComm::daemonSignal.timer_off = '5';
 }
 
 daemonComm::~daemonComm() {

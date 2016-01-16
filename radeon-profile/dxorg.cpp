@@ -37,8 +37,12 @@ void dXorg::configure(QString gpuName) {
 
         dcomm->connectToDaemon();
         if (daemonConnected()) {
-            // sending card index and timer interval if selected
-            dcomm->sendCommand(dcomm->daemonSignal.config +"#" + filePaths.clocksPath + "#"+ ((globalStuff::globalConfig.daemonAutoRefresh) ? dcomm->daemonSignal.timer_on + "#" + QString().setNum(globalStuff::globalConfig.interval) : ""));
+            //  Configure the daeomon to read the data
+            dcomm->sendCommand(DAEMON_SIGNAL_CONFIG +"#" + filePaths.clocksPath);
+
+            if(globalStuff::globalConfig.daemonAutoRefresh) //  If autoRefresh is enabled
+                //  Tell the daemon to auto-refresh
+                dcomm->sendCommand(DAEMON_SIGNAL_TIMER_ON + "#" + QString().setNum(globalStuff::globalConfig.interval));
         }
     }
 }
@@ -46,9 +50,9 @@ void dXorg::configure(QString gpuName) {
 void dXorg::reconfigureDaemon() {
     if (daemonConnected()) {
         if (globalStuff::globalConfig.daemonAutoRefresh)
-            dcomm->sendCommand(dcomm->daemonSignal.timer_on + QString().setNum(globalStuff::globalConfig.interval));
+            dcomm->sendCommand(DAEMON_SIGNAL_TIMER_ON + QString().setNum(globalStuff::globalConfig.interval));
         else
-            dcomm->sendCommand(dcomm->daemonSignal.timer_off);
+            dcomm->sendCommand(DAEMON_SIGNAL_TIMER_OFF);
     }
 }
 
@@ -98,7 +102,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
             data = QString(clocksFile.readAll());
     else if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh)
-            dcomm->sendCommand(dcomm->daemonSignal.read_clocks);
+            dcomm->sendCommand(DAEMON_SIGNAL_READ_CLOCKS);
 
         // fist call, so notihing is in sharedmem and we need to wait for data
         // because we need correctly figure out what is available
@@ -493,7 +497,7 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     }
 
     if (daemonConnected())
-        dcomm->sendCommand(dcomm->daemonSignal.setValue + newValue +"#" + filePaths.dpmStateFilePath + "#");
+        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + newValue +"#" + filePaths.dpmStateFilePath + "#");
     else {
         // enum is int, so first three values are dpm, rest are profile
         if (_newPowerProfile <= globalStuff::PERFORMANCE)
@@ -519,31 +523,27 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
     }
 
     if (daemonConnected())
-        dcomm->sendCommand(dcomm->daemonSignal.setValue + newValue + "#" + filePaths.forcePowerLevelFilePath + "#");
+        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + newValue + "#" + filePaths.forcePowerLevelFilePath + "#");
     else
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
 void dXorg::setPwmValue(int value) {
     if (daemonConnected())  {
-        dcomm->sendCommand(dcomm->daemonSignal.setValue + QString().setNum(value) + "#" + filePaths.pwmSpeedPath+ "#");
+        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + QString().setNum(value) + "#" + filePaths.pwmSpeedPath+ "#");
     } else {
         setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
     }
 }
 
 void dXorg::setPwmManuaControl(bool manual) {
-    if (manual) {
-        if (daemonConnected())
-            dcomm->sendCommand(dcomm->daemonSignal.setValue + pwm_manual + "#" + filePaths.pwmEnablePath+ "#");
-        else
-            setNewValue(filePaths.pwmEnablePath,pwm_manual);
-    } else {
-        if (daemonConnected())
-            dcomm->sendCommand(dcomm->daemonSignal.setValue + pwm_auto + "#" + filePaths.pwmEnablePath+ "#");
-        else
-            setNewValue(filePaths.pwmEnablePath,pwm_auto);
-    }
+    QString mode = manual ? pwm_manual : pwm_auto;
+
+    if (daemonConnected()) {
+        //  Tell the daemon to set the pwm mode into the right file
+        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + pwm_manual + "#" + filePaths.pwmEnablePath);
+    } else  //  No daemon available
+        setNewValue(filePaths.pwmEnablePath, mode);
 }
 
 int dXorg::getPwmSpeed() {
