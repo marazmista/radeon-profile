@@ -541,7 +541,7 @@ void dXorg::setPwmManuaControl(bool manual) {
 
     if (daemonConnected()) {
         //  Tell the daemon to set the pwm mode into the right file
-        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + pwm_manual + '#' + filePaths.pwmEnablePath);
+        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + mode + '#' + filePaths.pwmEnablePath);
     } else  //  No daemon available
         setNewValue(filePaths.pwmEnablePath, "" + mode);
 }
