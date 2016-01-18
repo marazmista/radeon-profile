@@ -13,12 +13,14 @@ daemonComm::~daemonComm() {
 }
 
 void daemonComm::connectToDaemon() {
+    qDebug() << "Connecting to daemon";
     signalSender->abort();
     signalSender->connectToServer("radeon-profile-daemon-server");
 }
 
 void daemonComm::sendCommand(const QString command) {
-    signalSender->write(command.toLatin1(),command.length());
+    if(signalSender->write(command.toLatin1(),command.length()) == -1) // If sending signal fails
+        qWarning() << "Failed sending signal: " << command;
 }
 
 void daemonComm::onConnect() {

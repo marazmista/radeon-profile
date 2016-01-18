@@ -8,11 +8,12 @@
 
 #include <QLocalSocket>
 
-#define DAEMON_SIGNAL_CONFIG "0"
-#define DAEMON_SIGNAL_READ_CLOCKS "1"
-#define DAEMON_SIGNAL_SET_VALUE "2"
-#define DAEMON_SIGNAL_TIMER_ON "4"
-#define DAEMON_SIGNAL_TIMER_OFF "5"
+#define SEPARATOR '#'
+#define DAEMON_SIGNAL_CONFIG '0'
+#define DAEMON_SIGNAL_READ_CLOCKS '1'
+#define DAEMON_SIGNAL_SET_VALUE '2'
+#define DAEMON_SIGNAL_TIMER_ON '4'
+#define DAEMON_SIGNAL_TIMER_OFF '5'
 
 class daemonComm : public QObject
 {

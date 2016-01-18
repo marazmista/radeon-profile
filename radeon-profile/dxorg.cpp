@@ -30,30 +30,44 @@ void dXorg::configure(QString gpuName) {
         if (!sharedMem.isAttached()) {
             sharedMem.setKey("radeon-profile");
            if (!sharedMem.create(128))
-               qDebug() << sharedMem.errorString();
+               qCritical() << sharedMem.errorString();
            if (!sharedMem.attach())
-               qDebug() << sharedMem.errorString();
+               qCritical() << sharedMem.errorString();
         }
 
         dcomm->connectToDaemon();
         if (daemonConnected()) {
-            //  Configure the daeomon to read the data
-            dcomm->sendCommand(DAEMON_SIGNAL_CONFIG + '#' + filePaths.clocksPath);
+            //  Configure the daemon to read the data
+            QString command = QString();
 
-            if(globalStuff::globalConfig.daemonAutoRefresh) //  If autoRefresh is enabled
-                //  Tell the daemon to auto-refresh
-                dcomm->sendCommand(DAEMON_SIGNAL_TIMER_ON + '#' + QString().setNum(globalStuff::globalConfig.interval));
+            command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR); // Configuration flag
+            command.append(filePaths.clocksPath).append(SEPARATOR); // Path where the daemon will read clocks
+
+            qDebug() << "Sending daemon config command: " << command;
+            dcomm->sendCommand(command);
+
+            reconfigureDaemon(); // Set up timer
+        }else{
+            qCritical() << "Daemon is not connected, therefore it can't be configured";
         }
     }
 }
 
-void dXorg::reconfigureDaemon() {
+void dXorg::reconfigureDaemon() { // Set up the timer
     if (daemonConnected()) {
-        if (globalStuff::globalConfig.daemonAutoRefresh)
-            dcomm->sendCommand(DAEMON_SIGNAL_TIMER_ON + QString().setNum(globalStuff::globalConfig.interval));
+        QString command = QString();
+
+        if (globalStuff::globalConfig.daemonAutoRefresh){
+            command.append(DAEMON_SIGNAL_TIMER_ON); // Enable timer
+            command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR); // Set timer interval
+        }
         else
-            dcomm->sendCommand(DAEMON_SIGNAL_TIMER_OFF);
-    }
+            command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR); // Disable timer
+
+        qDebug() << "Sending daemon reconfig signal: " << command;
+        dcomm->sendCommand(command);
+    } else
+        qWarning() << "Daemon is not connected, therefore it's timer can't be reconfigured";
 }
 
 bool dXorg::daemonConnected() {
@@ -101,8 +115,10 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     if (clocksFile.open(QIODevice::ReadOnly)) // check for debugfs access
             data = QString(clocksFile.readAll());
     else if (daemonConnected()) {
-        if (!globalStuff::globalConfig.daemonAutoRefresh)
-            dcomm->sendCommand(DAEMON_SIGNAL_READ_CLOCKS);
+        if (!globalStuff::globalConfig.daemonAutoRefresh){
+            qDebug() << "Asking the daemon to read clocks";
+            dcomm->sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR));
+        }
 
         // fist call, so notihing is in sharedmem and we need to wait for data
         // because we need correctly figure out what is available
@@ -459,11 +475,14 @@ QString dXorg::getCurrentPowerLevel() {
 
 void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
     QFile file(filePath);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream stream(&file);
-    stream << newValue + "\n";
-    file.flush();
-    file.close();
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        QTextStream stream(&file);
+        stream << newValue + "\n";
+        if( ! file.flush() )
+            qWarning() << "Failed to flush " << filePath;
+        file.close();
+    }else
+        qWarning() << "Unable to open " << filePath << " to write " << newValue;
 }
 
 void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
@@ -496,8 +515,16 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     default: break;
     }
 
-    if (daemonConnected())
-        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + newValue + '#' + filePaths.dpmStateFilePath + '#');
+    if (daemonConnected()){
+        QString* command=new QString();
+
+        command->append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
+        command->append(newValue).append(SEPARATOR); // Power profile to be set
+        command->append(filePaths.dpmStateFilePath).append(SEPARATOR); // The path where the power profile should be written in
+
+        qDebug() << "Sending daemon power profile signal: " << *command;
+        dcomm->sendCommand(*command);
+    }
     else {
         // enum is int, so first three values are dpm, rest are profile
         if (_newPowerProfile <= globalStuff::PERFORMANCE)
@@ -522,15 +549,30 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
         break;
     }
 
-    if (daemonConnected())
-        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + newValue + '#' + filePaths.forcePowerLevelFilePath + '#');
+    if (daemonConnected()){
+        QString* command=new QString();
+
+        command->append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
+        command->append(newValue).append(SEPARATOR); // Power profile to be forcibly set
+        command->append(filePaths.forcePowerLevelFilePath).append(SEPARATOR); // The path where the power profile should be written in
+
+        qDebug() << "Sending daemon forced power profile signal: " << *command;
+        dcomm->sendCommand(*command);
+    }
     else
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
 void dXorg::setPwmValue(int value) {
     if (daemonConnected())  {
-        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + QString().setNum(value) + '#' + filePaths.pwmSpeedPath + '#');
+        QString* command=new QString();
+
+        command->append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
+        command->append(QString::number(value)).append(SEPARATOR); // PWM value to be set
+        command->append(filePaths.pwmSpeedPath).append(SEPARATOR); // The path where the PWM value should be written in
+
+        qDebug() << "Sending daemon forced power profile signal: " << *command;
+        dcomm->sendCommand(*command);
     } else {
         setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
     }
@@ -541,9 +583,16 @@ void dXorg::setPwmManuaControl(bool manual) {
 
     if (daemonConnected()) {
         //  Tell the daemon to set the pwm mode into the right file
-        dcomm->sendCommand(DAEMON_SIGNAL_SET_VALUE + mode + '#' + filePaths.pwmEnablePath);
+        QString* command=new QString();
+
+        command->append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
+        command->append(mode).append(SEPARATOR); // The PWM mode to set
+        command->append(filePaths.pwmEnablePath).append(SEPARATOR); // The path where the PWM mode should be written in
+
+        qDebug() << "Sending daemon forced power profile signal: " << *command;
+        dcomm->sendCommand(*command);
     } else  //  No daemon available
-        setNewValue(filePaths.pwmEnablePath, "" + mode);
+        setNewValue(filePaths.pwmEnablePath, QString(mode));
 }
 
 int dXorg::getPwmSpeed() {
