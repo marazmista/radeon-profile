@@ -516,14 +516,14 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     }
 
     if (daemonConnected()){
-        QString* command=new QString();
+        QString command = QString();
 
-        command->append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
-        command->append(newValue).append(SEPARATOR); // Power profile to be set
-        command->append(filePaths.dpmStateFilePath).append(SEPARATOR); // The path where the power profile should be written in
+        command.append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
+        command.append(newValue).append(SEPARATOR); // Power profile to be set
+        command.append(filePaths.dpmStateFilePath).append(SEPARATOR); // The path where the power profile should be written in
 
-        qDebug() << "Sending daemon power profile signal: " << *command;
-        dcomm->sendCommand(*command);
+        qDebug() << "Sending daemon power profile signal: " << command;
+        dcomm->sendCommand(command);
     }
     else {
         // enum is int, so first three values are dpm, rest are profile
@@ -550,14 +550,14 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
     }
 
     if (daemonConnected()){
-        QString* command=new QString();
+        QString command = QString();
 
-        command->append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
-        command->append(newValue).append(SEPARATOR); // Power profile to be forcibly set
-        command->append(filePaths.forcePowerLevelFilePath).append(SEPARATOR); // The path where the power profile should be written in
+        command.append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
+        command.append(newValue).append(SEPARATOR); // Power profile to be forcibly set
+        command.append(filePaths.forcePowerLevelFilePath).append(SEPARATOR); // The path where the power profile should be written in
 
-        qDebug() << "Sending daemon forced power profile signal: " << *command;
-        dcomm->sendCommand(*command);
+        qDebug() << "Sending daemon forced power profile signal: " << command;
+        dcomm->sendCommand(command);
     }
     else
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
@@ -565,14 +565,14 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
 
 void dXorg::setPwmValue(int value) {
     if (daemonConnected())  {
-        QString* command=new QString();
+        QString command = QString();
 
-        command->append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
-        command->append(QString::number(value)).append(SEPARATOR); // PWM value to be set
-        command->append(filePaths.pwmSpeedPath).append(SEPARATOR); // The path where the PWM value should be written in
+        command.append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
+        command.append(QString::number(value)).append(SEPARATOR); // PWM value to be set
+        command.append(filePaths.pwmSpeedPath).append(SEPARATOR); // The path where the PWM value should be written in
 
-        qDebug() << "Sending daemon forced power profile signal: " << *command;
-        dcomm->sendCommand(*command);
+        qDebug() << "Sending daemon forced power profile signal: " << command;
+        dcomm->sendCommand(command);
     } else {
         setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
     }
@@ -583,14 +583,14 @@ void dXorg::setPwmManuaControl(bool manual) {
 
     if (daemonConnected()) {
         //  Tell the daemon to set the pwm mode into the right file
-        QString* command=new QString();
+        QString command = QString();
 
-        command->append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
-        command->append(mode).append(SEPARATOR); // The PWM mode to set
-        command->append(filePaths.pwmEnablePath).append(SEPARATOR); // The path where the PWM mode should be written in
+        command.append(DAEMON_SIGNAL_SET_VALUE); // Set value flag
+        command.append(mode).append(SEPARATOR); // The PWM mode to set
+        command.append(filePaths.pwmEnablePath).append(SEPARATOR); // The path where the PWM mode should be written in
 
-        qDebug() << "Sending daemon forced power profile signal: " << *command;
-        dcomm->sendCommand(*command);
+        qDebug() << "Sending daemon forced power profile signal: " << command;
+        dcomm->sendCommand(command);
     } else  //  No daemon available
         setNewValue(filePaths.pwmEnablePath, QString(mode));
 }
