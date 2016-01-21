@@ -14,6 +14,8 @@
 #include <QSharedMemory>
 #include <QThread>
 
+#define SHARED_MEM_SIZE 128 // When changin this, consider changing SHARED_MEM_SIZE in radeon-profile-daemon/rpdthread.h
+
 class dXorg
 {
 public:

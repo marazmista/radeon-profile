@@ -135,7 +135,7 @@ void radeon_profile::addRuntimeWidgets() {
     btnBackProfiles->setText("Back to profiles");
     ui->tabs_execOutputs->setCornerWidget(btnBackProfiles);
     btnBackProfiles->show();
-    connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(on_btn_backToProfiles_clicked()));
+    connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
 
     // set pwm buttons in group
     QButtonGroup *pwmGroup = new QButtonGroup();
