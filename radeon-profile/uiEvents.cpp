@@ -247,6 +247,7 @@ void radeon_profile::refreshBtnClicked() {
 
     ui->list_connectors->clear();
     ui->list_connectors->addTopLevelItems(device.getCardConnectors());
+    ui->list_connectors->expandToDepth(2);
 
     ui->list_modInfo->clear();
     ui->list_modInfo->addTopLevelItems(device.getModuleInfo());

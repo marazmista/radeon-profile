@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QDateTime>
 #include <QMessageBox>
+#include <QDesktopWidget>
 
 const int appVersion = 20160124;
 
@@ -39,6 +40,11 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->setupUi(this);
     timer = new QTimer();
     execsRunning = new QList<execBin*>();
+
+    // Set up the size (2/3 of the screen size, centered)
+    QRect desktopSize = QApplication::desktop()->screenGeometry();
+    int width = desktopSize.width()*2/3, height = desktopSize.height()*2/3, x = (desktopSize.width() - width)/2, y = (desktopSize.height() - height)/2;
+    setGeometry(x,y,width,height);
 
     // checks if running as root
     if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
@@ -88,11 +94,18 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     refreshGpuData();
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
     ui->list_connectors->addTopLevelItems(device.getCardConnectors());
+    ui->list_connectors->expandToDepth(2);
     ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
     refreshUI();
 
     timer->start();
     addRuntimeWidgets();
+
+    // At last, set visible if wanted
+    if (ui->cb_startMinimized->isChecked())
+        showMinimized();
+    else
+        showNormal();
 }
 
 radeon_profile::~radeon_profile()
@@ -319,6 +332,7 @@ void radeon_profile::timerEvent() {
     if (ui->cb_connectors->isChecked()) {
         ui->list_connectors->clear();
         ui->list_connectors->addTopLevelItems(device.getCardConnectors());
+        ui->list_connectors->expandToDepth(2);
     }
     if (ui->cb_modParams->isChecked()) {
         ui->list_modInfo->clear();
