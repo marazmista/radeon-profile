@@ -120,11 +120,6 @@ void radeon_profile::loadConfig() {
     if (ui->cb_saveWindowGeometry->isChecked())
         this->setGeometry(settings.value("windowGeometry").toRect());
 
-    if (ui->cb_startMinimized->isChecked())
-        this->window()->hide();
-    else
-        showNormal();
-
     ui->cb_graphs->setEnabled(ui->cb_gpuData->isChecked());
     ui->cb_stats->setEnabled(ui->cb_gpuData->isChecked());
 

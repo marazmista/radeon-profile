@@ -45,3 +45,5 @@ FORMS    += radeon_profile.ui
 
 RESOURCES += \
     radeon-resource.qrc
+
+LIBS += -lXrandr -lX11
