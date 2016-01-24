@@ -535,7 +535,7 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
         // Creating root QTreeWidgetItem for this screen's outputs
         QTreeWidgetItem * outputListItem = new QTreeWidgetItem(QStringList() << "Outputs");
         screenItem->addChild(outputListItem);
-        int screenConnectedOutputs = 0;
+        int screenConnectedOutputs = 0, screenActiveOutputs = 0;
 
         //Cycle through outputs of this screen
         for(int outputIndex = 0; outputIndex < screenResources->noutput; outputIndex++){
@@ -561,16 +561,17 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                 XRRFreeOutputInfo(outputInfo); // Deallocate the memory of this output's info
                 continue; // Next output
             }
+
             screenConnectedOutputs++;
 
-            // Get configuration info (resolution, offset, modes, possible resolutions)
+            // Get configuration info (resolution, offset, modes, and other things available only if the screen is active)
             XRRCrtcInfo * configInfo = XRRGetCrtcInfo(display, screenResources, outputInfo->crtc);
-            if( ! configInfo)
-                qWarning() << "Error loading connectors: can't retrieve configuration info for output "
-                           << QString::number(outputIndex)
-                           << " of screen "
-                           << QString::number(screenIndex);
-            else {
+            if( ! configInfo) // The screen is disabled via software (likely turned off)
+                outputItem->addChild(new QTreeWidgetItem(QStringList() << "Active" << "No"));
+            else { // The screen is active
+                outputItem->addChild(new QTreeWidgetItem(QStringList() << "Active" << "Yes"));
+                screenActiveOutputs++;
+
                 // Add current resolution
                 outputItem->addChild(new QTreeWidgetItem(QStringList()
                                                          << "Resolution"
@@ -710,8 +711,9 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
             XRRFreeCrtcInfo(configInfo);
             XRRFreeOutputInfo(outputInfo);
         }
-        // We checked all the outputs of this screen: print how many of them are connected, deallocate the screen resources memory and exit
-        outputListItem->setText(1, QString::number(screenConnectedOutputs).append(" connected")); // Insert the number of connected outputs on the status of "Outputs"
+        // We checked all the outputs of this screen: print how many of them are connected and active, deallocate the screen resources memory and exit
+         // Insert the number of connected outputs as value of the output tree item
+        outputListItem->setText(1, QString::number(screenConnectedOutputs).append(" connected, ").append(QString::number(screenActiveOutputs).append(" active")));
         XRRFreeScreenResources(screenResources);
     }
 
