@@ -333,7 +333,7 @@ void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
     execsRunning->removeAt(index);
 
     if (ui->tabs_execOutputs->count() == 0)
-        on_btn_backToProfiles_clicked();
+        btnBackToProfilesClicked();
 }
 
 

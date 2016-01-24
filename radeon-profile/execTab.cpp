@@ -304,7 +304,7 @@ void radeon_profile::on_btn_viewOutput_clicked()
     ui->execPages->setCurrentIndex(2);
 }
 
-void radeon_profile::on_btn_backToProfiles_clicked()
+void radeon_profile::btnBackToProfilesClicked()
 {
     ui->execPages->setCurrentIndex(0);
 }

@@ -11,6 +11,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = radeon-profile
 TEMPLATE = app
 
+#   https://forum.qt.io/topic/10178/solved-qdebug-and-debug-release/2
+#   http://doc.qt.io/qt-5/qtglobal.html#QtMsgType-enum
+#   qDebug will work only when compiled for Debug
+#   QtWarning, QtCritical and QtFatal will still work on Release
+@
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+@
 
 SOURCES += main.cpp\
         radeon_profile.cpp \

@@ -129,7 +129,7 @@ private slots:
     void on_cb_manualEdit_clicked(bool checked);
     void on_btn_runExecProfile_clicked();
     void on_btn_viewOutput_clicked();
-    void on_btn_backToProfiles_clicked();
+    void btnBackToProfilesClicked();
     void on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_tabs_execOutputs_tabCloseRequested(int index);
     void on_btn_pwmFixedApply_clicked();

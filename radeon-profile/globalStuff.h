@@ -22,9 +22,9 @@
 #define profile_mid "mid"
 #define profile_low "low"
 
-#define pwm_disabled "0"
-#define pwm_manual "1"
-#define pwm_auto "2"
+#define pwm_disabled '0'
+#define pwm_manual '1'
+#define pwm_auto '2'
 
 #define file_PowerMethod "power_method"
 #define file_powerProfile "power_profile"

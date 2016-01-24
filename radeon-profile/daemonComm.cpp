@@ -6,13 +6,6 @@
 daemonComm::daemonComm() {
     signalSender = new QLocalSocket();
     connect(signalSender,SIGNAL(connected()),this,SLOT(onConnect()));
-
-    // init of signals
-    daemonComm::daemonSignal.config = '0';
-    daemonComm::daemonSignal.read_clocks = '1';
-    daemonComm::daemonSignal.setValue = '2';
-    daemonComm::daemonSignal.timer_on = '4';
-    daemonComm::daemonSignal.timer_off = '5';
 }
 
 daemonComm::~daemonComm() {
@@ -20,12 +13,14 @@ daemonComm::~daemonComm() {
 }
 
 void daemonComm::connectToDaemon() {
+    qDebug() << "Connecting to daemon";
     signalSender->abort();
     signalSender->connectToServer("radeon-profile-daemon-server");
 }
 
 void daemonComm::sendCommand(const QString command) {
-    signalSender->write(command.toLatin1(),command.length());
+    if(signalSender->write(command.toLatin1(),command.length()) == -1) // If sending signal fails
+        qWarning() << "Failed sending signal: " << command;
 }
 
 void daemonComm::onConnect() {

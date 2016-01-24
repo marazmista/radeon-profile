@@ -25,31 +25,57 @@ void dXorg::configure(QString gpuName) {
     currentPowerMethod = getPowerMethod();
 
     if (!globalStuff::globalConfig.rootMode) {
+        qDebug() << "Running in non-root mode, connecting and configuring the daemon";
         // create the shared mem block. The if comes from that configure method
         // is called on every change gpu, so later, shared mem already exists
         if (!sharedMem.isAttached()) {
+            qDebug() << "Shared memory is not attached, creating it";
             sharedMem.setKey("radeon-profile");
-           if (!sharedMem.create(128))
-               qDebug() << sharedMem.errorString();
-           if (!sharedMem.attach())
-               qDebug() << sharedMem.errorString();
+           if (!sharedMem.create(SHARED_MEM_SIZE)){
+                if(sharedMem.error() == QSharedMemory::AlreadyExists){
+                    qDebug() << "Shared memory already exists, attaching to it";
+                    if (!sharedMem.attach())
+                        qCritical() << "Unable to attach to the shared memory: " << sharedMem.errorString();
+                } else
+                    qCritical() << "Unable to create the shared memory: " << sharedMem.errorString();
+           }
+           // If QSharedMemory::create() returns true, it has already automatically attached
         }
 
         dcomm->connectToDaemon();
         if (daemonConnected()) {
-            // sending card index and timer interval if selected
-            dcomm->sendCommand(dcomm->daemonSignal.config +"#" + filePaths.clocksPath + "#"+ ((globalStuff::globalConfig.daemonAutoRefresh) ? dcomm->daemonSignal.timer_on + "#" + QString().setNum(globalStuff::globalConfig.interval) : ""));
+            qDebug() << "Daemon is connected, configuring it";
+            //  Configure the daemon to read the data
+            QString command; // SIGNAL_CONFIG + SEPARATOR + CLOCKS_PATH + SEPARATOR
+            command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR); // Configuration flag
+            command.append(filePaths.clocksPath).append(SEPARATOR); // Path where the daemon will read clocks
+
+            qDebug() << "Sending daemon config command: " << command;
+            dcomm->sendCommand(command);
+
+            reconfigureDaemon(); // Set up timer
+        }else{
+            qCritical() << "Daemon is not connected, therefore it can't be configured";
         }
     }
 }
 
-void dXorg::reconfigureDaemon() {
+void dXorg::reconfigureDaemon() { // Set up the timer
     if (daemonConnected()) {
-        if (globalStuff::globalConfig.daemonAutoRefresh)
-            dcomm->sendCommand(dcomm->daemonSignal.timer_on + QString().setNum(globalStuff::globalConfig.interval));
-        else
-            dcomm->sendCommand(dcomm->daemonSignal.timer_off);
-    }
+        qDebug() << "Configuring daemon timer";
+        QString command;
+
+        if (globalStuff::globalConfig.daemonAutoRefresh){ // SIGNAL_TIMER_ON + SEPARATOR + INTERVAL + SEPARATOR
+            command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR); // Enable timer
+            command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR); // Set timer interval
+        }
+        else // SIGNAL_TIMER_OFF + SEPARATOR
+            command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR); // Disable timer
+
+        qDebug() << "Sending daemon reconfig signal: " << command;
+        dcomm->sendCommand(command);
+    } else
+        qWarning() << "Daemon is not connected, therefore it's timer can't be reconfigured";
 }
 
 bool dXorg::daemonConnected() {
@@ -92,13 +118,15 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
 // method for gather info about clocks from deamon or from debugfs if root
 QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     QFile clocksFile(filePaths.clocksPath);
-    QString data;
+    QByteArray data;
 
     if (clocksFile.open(QIODevice::ReadOnly)) // check for debugfs access
-            data = QString(clocksFile.readAll());
+            data = clocksFile.readAll();
     else if (daemonConnected()) {
-        if (!globalStuff::globalConfig.daemonAutoRefresh)
-            dcomm->sendCommand(dcomm->daemonSignal.read_clocks);
+        if (!globalStuff::globalConfig.daemonAutoRefresh){
+            qDebug() << "Asking the daemon to read clocks";
+            dcomm->sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR)); // SIGNAL_READ_CLOCKS + SEPARATOR
+        }
 
         // fist call, so notihing is in sharedmem and we need to wait for data
         // because we need correctly figure out what is available
@@ -110,28 +138,31 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
         }
 
        if (sharedMem.lock()) {
-//     if (sharedMem.error() == QSharedMemory::NoError) {
-            char *to = (char*)sharedMem.constData();
-            char a[128] = {0};
-            strncpy(a,to,sizeof(a));
+            const char *to = (const char*)sharedMem.constData();
+            if(to != NULL){
+                qDebug() << "Reading data from shared memory";
+                data = QByteArray::fromRawData(to, SHARED_MEM_SIZE);
+            } else
+                qWarning() << "Shared memory data pointer is invalid: " << sharedMem.errorString();
             sharedMem.unlock();
-            data  = QString::fromLatin1(a).trimmed();
         } else
-            qDebug() << sharedMem.errorString();
+            qWarning() << "Unable to lock the shared memory: " << sharedMem.errorString();
     }
 
-    if (data == "")
-        data = "null";
+    if(data.isEmpty())
+        qWarning() << "No data was found";
 
-    return data;
+    return (QString)data.trimmed();
 }
 
 globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
     globalStuff::gpuClocksStruct tData(-1); // empty struct
 
     // if nothing is there returns empty (-1) struct
-    if (data == "null")
+    if (data.isEmpty()){
+        qDebug() << "Can't get clocks, no data available";
         return tData;
+    }
 
     switch (currentPowerMethod) {
     case globalStuff::DPM: {
@@ -207,6 +238,7 @@ globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
         break;
     }
     case globalStuff::PM_UNKNOWN: {
+        qWarning() << "Unknown power method, can't get clocks";
         return tData;
         break;
     }
@@ -455,11 +487,14 @@ QString dXorg::getCurrentPowerLevel() {
 
 void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
     QFile file(filePath);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream stream(&file);
-    stream << newValue + "\n";
-    file.flush();
-    file.close();
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        QTextStream stream(&file);
+        stream << newValue + "\n";
+        if( ! file.flush() )
+            qWarning() << "Failed to flush " << filePath;
+        file.close();
+    }else
+        qWarning() << "Unable to open " << filePath << " to write " << newValue;
 }
 
 void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
@@ -492,8 +527,15 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     default: break;
     }
 
-    if (daemonConnected())
-        dcomm->sendCommand(dcomm->daemonSignal.setValue + newValue +"#" + filePaths.dpmStateFilePath + "#");
+    if (daemonConnected()){
+        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
+        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
+        command.append(newValue).append(SEPARATOR); // Power profile to be set
+        command.append(filePaths.dpmStateFilePath).append(SEPARATOR); // The path where the power profile should be written in
+
+        qDebug() << "Sending daemon power profile signal: " << command;
+        dcomm->sendCommand(command);
+    }
     else {
         // enum is int, so first three values are dpm, rest are profile
         if (_newPowerProfile <= globalStuff::PERFORMANCE)
@@ -518,32 +560,47 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
         break;
     }
 
-    if (daemonConnected())
-        dcomm->sendCommand(dcomm->daemonSignal.setValue + newValue + "#" + filePaths.forcePowerLevelFilePath + "#");
+    if (daemonConnected()){
+        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
+        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
+        command.append(newValue).append(SEPARATOR); // Power profile to be forcibly set
+        command.append(filePaths.forcePowerLevelFilePath).append(SEPARATOR); // The path where the power profile should be written in
+
+        qDebug() << "Sending daemon forced power profile signal: " << command;
+        dcomm->sendCommand(command);
+    }
     else
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
 void dXorg::setPwmValue(int value) {
     if (daemonConnected())  {
-        dcomm->sendCommand(dcomm->daemonSignal.setValue + QString().setNum(value) + "#" + filePaths.pwmSpeedPath+ "#");
+        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
+        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
+        command.append(QString::number(value)).append(SEPARATOR); // PWM value to be set
+        command.append(filePaths.pwmSpeedPath).append(SEPARATOR); // The path where the PWM value should be written in
+
+        qDebug() << "Sending daemon forced power profile signal: " << command;
+        dcomm->sendCommand(command);
     } else {
         setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
     }
 }
 
 void dXorg::setPwmManuaControl(bool manual) {
-    if (manual) {
-        if (daemonConnected())
-            dcomm->sendCommand(dcomm->daemonSignal.setValue + pwm_manual + "#" + filePaths.pwmEnablePath+ "#");
-        else
-            setNewValue(filePaths.pwmEnablePath,pwm_manual);
-    } else {
-        if (daemonConnected())
-            dcomm->sendCommand(dcomm->daemonSignal.setValue + pwm_auto + "#" + filePaths.pwmEnablePath+ "#");
-        else
-            setNewValue(filePaths.pwmEnablePath,pwm_auto);
-    }
+    char mode = manual ? pwm_manual : pwm_auto;
+
+    if (daemonConnected()) {
+        //  Tell the daemon to set the pwm mode into the right file
+        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
+        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
+        command.append(mode).append(SEPARATOR); // The PWM mode to set
+        command.append(filePaths.pwmEnablePath).append(SEPARATOR); // The path where the PWM mode should be written in
+
+        qDebug() << "Sending daemon forced power profile signal: " << command;
+        dcomm->sendCommand(command);
+    } else  //  No daemon available
+        setNewValue(filePaths.pwmEnablePath, QString(mode));
 }
 
 int dXorg::getPwmSpeed() {
@@ -605,7 +662,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     if (!filePaths.pwmEnablePath.isEmpty()) {
         QFile f(filePaths.pwmEnablePath);
         f.open(QIODevice::ReadOnly);
-        if (QString(f.readLine(1)) != pwm_disabled) {
+        if (QString(f.readLine(2))[0] != pwm_disabled) {
             features.pwmAvailable = true;
 
             QFile fPwmMax(filePaths.pwmMaxSpeedPath);
