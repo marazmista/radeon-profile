@@ -54,9 +54,8 @@ void dXorg::configure(QString gpuName) {
             dcomm->sendCommand(command);
 
             reconfigureDaemon(); // Set up timer
-        }else{
+        } else
             qCritical() << "Daemon is not connected, therefore it can't be configured";
-        }
     }
 }
 
@@ -139,7 +138,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 
        if (sharedMem.lock()) {
             const char *to = (const char*)sharedMem.constData();
-            if(to != NULL){
+            if (to != NULL) {
                 qDebug() << "Reading data from shared memory";
                 data = QByteArray::fromRawData(to, SHARED_MEM_SIZE);
             } else
@@ -149,7 +148,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
             qWarning() << "Unable to lock the shared memory: " << sharedMem.errorString();
     }
 
-    if(data.isEmpty())
+    if (data.isEmpty())
         qWarning() << "No data was found";
 
     return (QString)data.trimmed();
@@ -281,19 +280,20 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
     QList<QTreeWidgetItem *> cardConnectorsList;
     QStringList out = globalStuff::grabSystemInfo("xrandr -q --verbose"), screens;
     screens = out.filter(QRegExp("Screen\\s\\d"));
+
     for (int i = 0; i < screens.count(); i++) {
         QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << screens[i].split(':')[0] << screens[i].split(",")[1].remove(" current "));
         cardConnectorsList.append(item);
     }
     cardConnectorsList.append(new QTreeWidgetItem(QStringList() << "------"));
 
-    for(int i = 0; i < out.size(); i++) {
-        if(!out[i].startsWith("\t") && out[i].contains("connected")) {
+    for (int i = 0; i < out.size(); i++) {
+        if (!out[i].startsWith("\t") && out[i].contains("connected")) {
             QString connector = out[i].split(' ')[0],
                     status = out[i].split(' ')[1],
                     res = out[i].split(' ')[2].split('+')[0];
 
-            if(status == "connected") {
+            if (status == "connected") {
                 QString monitor, edid = monitor = "";
 
                 // find EDID
@@ -305,7 +305,7 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
 
                 // Parse EDID
                 // See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
-                if(edid.size() >= 256) {
+                if (edid.size() >= 256) {
                     QStringList hex;
                     bool found = false, ok = true;
                     int i2 = 108;
@@ -326,7 +326,7 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                             break;
                         i2 += 36;
                     }
-                    if(ok && found) {
+                    if (ok && found) {
                         // Hex -> String
                         for(i2 = 0; i2 < hex.size(); i2++) {
                             monitor += QString(hex[i2].toInt(&ok, 16));
@@ -371,7 +371,6 @@ dXorg::tempSensor dXorg::testSensor() {
         if (!QString(hwmon.readLine(20)).isEmpty())
             return CARD_HWMON;
     } else {
-
         // second method, try find in system hwmon dir for file labeled VGA_TEMP
         filePaths.sysfsHwmonTempPath = findSysfsHwmonForGPU();
         if (!filePaths.sysfsHwmonTempPath.isEmpty())
@@ -476,7 +475,6 @@ QString dXorg::getCurrentPowerProfile() {
     return "err";
 }
 
-
 QString dXorg::getCurrentPowerLevel() {
     QFile forceProfile(filePaths.forcePowerLevelFilePath);
     if (forceProfile.open(QIODevice::ReadOnly))
@@ -527,7 +525,7 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     default: break;
     }
 
-    if (daemonConnected()){
+    if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
         command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
         command.append(newValue).append(SEPARATOR); // Power profile to be set
@@ -535,8 +533,7 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
 
         qDebug() << "Sending daemon power profile signal: " << command;
         dcomm->sendCommand(command);
-    }
-    else {
+    } else {
         // enum is int, so first three values are dpm, rest are profile
         if (_newPowerProfile <= globalStuff::PERFORMANCE)
             setNewValue(filePaths.dpmStateFilePath,newValue);
@@ -560,7 +557,7 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
         break;
     }
 
-    if (daemonConnected()){
+    if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
         command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
         command.append(newValue).append(SEPARATOR); // Power profile to be forcibly set
@@ -568,13 +565,12 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
 
         qDebug() << "Sending daemon forced power profile signal: " << command;
         dcomm->sendCommand(command);
-    }
-    else
+    } else
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
 void dXorg::setPwmValue(int value) {
-    if (daemonConnected())  {
+    if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
         command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
         command.append(QString::number(value)).append(SEPARATOR); // PWM value to be set
@@ -582,9 +578,8 @@ void dXorg::setPwmValue(int value) {
 
         qDebug() << "Sending daemon forced power profile signal: " << command;
         dcomm->sendCommand(command);
-    } else {
+    } else
         setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
-    }
 }
 
 void dXorg::setPwmManuaControl(bool manual) {
@@ -628,10 +623,10 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     if (test.coreClk == -1)
         test = getFeaturesFallback();
 
-    features.coreClockAvailable = (test.coreClk == -1) ? false : true;
-    features.memClockAvailable = (test.memClk == -1) ? false : true;
-    features.coreVoltAvailable = (test.coreVolt == -1) ? false : true;
-    features.memVoltAvailable = (test.memVolt == -1) ? false : true;
+    features.coreClockAvailable = !(test.coreClk == -1);
+    features.memClockAvailable = !(test.memClk == -1);
+    features.coreVoltAvailable = !(test.coreVolt == -1);
+    features.memVoltAvailable = !(test.memVolt == -1);
 
     features.pm = currentPowerMethod;
 
@@ -662,6 +657,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     if (!filePaths.pwmEnablePath.isEmpty()) {
         QFile f(filePaths.pwmEnablePath);
         f.open(QIODevice::ReadOnly);
+
         if (QString(f.readLine(2))[0] != pwm_disabled) {
             features.pwmAvailable = true;
 

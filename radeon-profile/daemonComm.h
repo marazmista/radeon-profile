@@ -25,9 +25,7 @@ public:
     void sendCommand(const QString command);
 
     inline bool connected() {
-        if (signalSender->state() == QLocalSocket::ConnectedState)
-            return true;
-        else return false;
+        return (signalSender->state() == QLocalSocket::ConnectedState);
     }
 
     QLocalSocket *signalSender;
