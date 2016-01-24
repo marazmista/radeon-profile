@@ -12,6 +12,18 @@ extern "C" {
 #include <X11/extensions/Xrandr.h>
 }
 
+#define EDID_OFFSET_PNP_ID    0x08
+#define EDID_OFFSET_MODEL_NUMBER     0x0a
+#define EDID_OFFSET_SERIAL_NUMBER    0x0c
+#define EDID_OFFSET_DATA_BLOCKS  0x36
+#define EDID_OFFSET_LAST_BLOCK   0x6c
+
+#define EDID_DESCRIPTOR_PRODUCT_NAME 0xfc
+
+#define ATOM_VALUE (Atom)4
+#define INTEGER_VALUE (Atom)19
+#define CARDINAL_VALUE (Atom)6
+
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
 globalStuff::powerMethod dXorg::currentPowerMethod;
@@ -281,6 +293,122 @@ float dXorg::getTemperature() {
     return temp.toDouble();
 }
 
+// Function that returns the human readable output of a property value
+// For reference:
+// http://cgit.freedesktop.org/xorg/app/xrandr/tree/xrandr.c#n2408
+static QString translateProperty(Display * display,
+                                 const int propertyDataFormat, // 8 / 16 / 32 bit
+                                 const Atom propertyDataType, // ATOM / INTEGER / CARDINAL
+                                 const Atom * propertyRawData){ // Pointer to the property value data array
+    QString output;
+    bool translated = false;
+
+    switch(propertyDataType){
+    case ATOM_VALUE: // Text value, like 'off' or 'None'
+        if(propertyDataFormat != 32)
+            break; // Only 32 bit supported here
+        output.append(XGetAtomName(display, propertyRawData[0]));
+        translated = true;
+        break;
+
+    case INTEGER_VALUE: // Signed numeric value
+        switch(propertyDataFormat){
+        case 8:
+            output.append((signed char) propertyRawData[0]);
+            translated = true;
+            break;
+
+        case 16:
+            output.append(QString("%1").arg((signed short) propertyRawData[0]));
+            translated = true;
+            break;
+
+        case 32:
+            output.append(QString("%1").arg((signed long) propertyRawData[0]));
+            translated = true;
+        }
+        break;
+
+    case CARDINAL_VALUE: // Unsigned numeric value
+        switch(propertyDataFormat){
+        case 8:
+            output.append((unsigned char) propertyRawData[0]);
+            translated = true;
+            break;
+
+        case 16:
+            output.append(QString("%1").arg((unsigned short) propertyRawData[0]));
+            translated = true;
+            break;
+
+        case 32:
+            output.append(QString("%1").arg((unsigned long) propertyRawData[0]));
+            translated = true;
+        }
+    }
+
+    if( ! translated) // Unknown type, print as decimal
+        output.append(QString("%1").arg(propertyRawData[0])).append('?');
+
+    return output;
+}
+
+// Get the real vendor name from the three-letter PNP ID
+// See http://www.uefi.org/pnp_id_list
+static QString translatePnpId(const QString pnpId){
+    if (pnpId.isEmpty())
+        return pnpId;
+
+    // Search a file mapping PnP IDs to vendor names
+    // List found through pkgfile --verbose --search pnp.ids
+    QStringList possiblePaths = QStringList()
+            << "/usr/share/libgnome-desktop-3.0/pnp.ids"
+            << "/usr/share/libgnome-desktop/pnp.ids"
+            << "/usr/share/libcinnamon-desktop/pnp.ids"
+            << "/usr/share/dispcalGUI/pnp.ids"
+            << "/usr/share/libmate-desktop/pnp.ids";
+
+    for(int i=0;  i < possiblePaths.length(); i++){ // Cycle until we found the name or finished the possible paths
+        QFile pnpIds(possiblePaths.at(i));
+        if( ! pnpIds.exists() || ! pnpIds.open(QIODevice::ReadOnly)) // If not available
+            continue; // Next file
+
+        while ( ! pnpIds.atEnd()) { // Continue reading the file until the name is found or the file has ended
+            QString line = pnpIds.readLine();
+            if ( ! line.startsWith(pnpId))
+                continue; // Wrong line, go to next line
+
+            QStringList parts = line.split(QLatin1Char('\t'));
+            if (parts.size() == 2)
+                return parts.at(1).trimmed();
+        }
+    }
+
+    return pnpId; // No real name found, return the PNP ID instead
+}
+
+// Get the human-readable monitor name (vendor + model) from the EDID
+// See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
+static QString getMonitorName(const quint8 *EDID){
+    QString monitorName;
+
+    //Get the vendor PnP ID
+    QString pnpId;
+    pnpId[0] = 'A' + ((EDID[EDID_OFFSET_PNP_ID + 0] & 0x7c) / 4) - 1;
+    pnpId[1] = 'A' + ((EDID[EDID_OFFSET_PNP_ID + 0] & 0x3) * 8) + ((EDID[EDID_OFFSET_PNP_ID + 1] & 0xe0) / 32) - 1;
+    pnpId[2] = 'A' + (EDID[EDID_OFFSET_PNP_ID + 1] & 0x1f) - 1;
+
+    //Translate the PnP ID into human-readable vendor name
+    monitorName.append(translatePnpId(pnpId));
+
+    // Get the model name
+    for (uint i = EDID_OFFSET_DATA_BLOCKS; i < EDID_OFFSET_LAST_BLOCK; i += 18)
+        if(EDID[i+3] == EDID_DESCRIPTOR_PRODUCT_NAME)
+            monitorName.append(' ').append(QString::fromLocal8Bit((const char*)&EDID[i+5], 12).trimmed());
+
+    return monitorName;
+}
+
 QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
     QList<QTreeWidgetItem *> cardConnectorsList;
 
@@ -377,7 +505,8 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
         // Add resolution
         screenItem->addChild(new QTreeWidgetItem(QStringList()
                                                  << "Resolution"
-                                                 << QString::number(DisplayWidth(display,screenIndex)).append('x').append(QString::number(DisplayHeight(display, screenIndex)))));
+                                                 << QString::number(DisplayWidth(display,screenIndex)).append('x')
+                                                 .append(QString::number(DisplayHeight(display, screenIndex)))));
 
         // Add screen minimum and maximum resolutions
         int screenMinWidth, screenMinHeight, screenMaxWidth, screenMaxHeight;
@@ -393,12 +522,13 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
         // Adding screen virtual dimension, in millimeters
         screenItem->addChild(new QTreeWidgetItem(QStringList()
                                                  << "Virtual dimensions"
-                                                 << QString::number(DisplayWidthMM(display, screenIndex)).append("mm x ").append(QString::number(DisplayHeightMM(display, screenIndex))).append("mm")));
+                                                 << QString::number(DisplayWidthMM(display, screenIndex)).append("mm x ")
+                                                 .append(QString::number(DisplayHeightMM(display, screenIndex))).append("mm")));
 
         // Retrieve screen resources (connectors, configurations, timestamps etc.)
         XRRScreenResources * screenResources = XRRGetScreenResources(display, screenRoot);
         if ( ! screenResources){
-            qWarning() << "Error loading connectors: can't get screen resources";
+            qWarning() << "Error loading connectors: can't get resources for screen " << QString::number(screenIndex);
             continue; // Next screen
         }
 
@@ -409,37 +539,54 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
 
         //Cycle through outputs of this screen
         for(int outputIndex = 0; outputIndex < screenResources->noutput; outputIndex++){
+            qDebug() << "Analyzing output " << QString::number(outputIndex) << " of screen " << QString::number(screenIndex);
+
             // Get output info (connection name, current configuration, dimensions, etc)
             XRROutputInfo * outputInfo = XRRGetOutputInfo(display, screenResources, screenResources->outputs[outputIndex]);
             if( ! outputInfo){
-                qWarning() << "Error loading connectors: can't retrieve output info";
+                qWarning() << "Error loading connectors: can't retrieve info for output "
+                           << QString::number(outputIndex)
+                           << " of screen "
+                           << QString::number(screenIndex);
                 continue; // Next output
             }
-
-            qDebug() << QString::fromLocal8Bit(outputInfo->name);
 
             // Creating root QTreeWidgetItem item for this output
             QTreeWidgetItem *outputItem = new QTreeWidgetItem(QStringList() << QString::fromLocal8Bit(outputInfo->name));
             outputListItem->addChild(outputItem);
 
             // Check the output connection state
-            if(outputInfo->connection){
+            if(outputInfo->connection){ // No connection
                 outputItem->setText(1, "Disconnected");
+                XRRFreeOutputInfo(outputInfo); // Deallocate the memory of this output's info
                 continue; // Next output
             }
             screenConnectedOutputs++;
 
-            // Add current resolution
+            // Get configuration info (resolution, offset, modes, possible resolutions)
             XRRCrtcInfo * configInfo = XRRGetCrtcInfo(display, screenResources, outputInfo->crtc);
-            outputItem->addChild(new QTreeWidgetItem(QStringList()
-                                                     << "Resolution"
-                                                     << QString::number(configInfo->width).append('x').append(QString::number(configInfo->height))));
-            XRRFreeCrtcInfo(configInfo);
+            if( ! configInfo)
+                qWarning() << "Error loading connectors: can't retrieve configuration info for output "
+                           << QString::number(outputIndex)
+                           << " of screen "
+                           << QString::number(screenIndex);
+            else {
+                // Add current resolution
+                outputItem->addChild(new QTreeWidgetItem(QStringList()
+                                                         << "Resolution"
+                                                         << QString::number(configInfo->width).append('x').append(QString::number(configInfo->height))));
+
+                // Add the position in the current configuration (works only in multi-head)
+                outputItem->addChild(new QTreeWidgetItem(QStringList()
+                                                         << "Offset"
+                                                         << QString::number(configInfo->x).append(", ").append(QString::number(configInfo->y))));
+            }
 
             // Add monitor size
             outputItem->addChild(new QTreeWidgetItem(QStringList()
                                                      << "Monitor size"
-                                                     << QString::number(outputInfo->mm_width).append("mm x ").append(QString::number(outputInfo->mm_height)).append("mm")));
+                                                     << QString::number(outputInfo->mm_width).append("mm x ")
+                                                     .append(QString::number(outputInfo->mm_height)).append("mm")));
 
             // Create the root QTreeWidgetItem of the property list
             QTreeWidgetItem * propertyListItem = new QTreeWidgetItem(QStringList() << "Properties");
@@ -449,45 +596,41 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
             int propertyCount;
             Atom * properties = XRRListOutputProperties(display, screenResources->outputs[outputIndex], &propertyCount);
 
-            // We'll need it later
-            QString monitorName;
-
             // Cycle through this output's properties
             for(int propertyIndex = 0; propertyIndex < propertyCount; propertyIndex++){
-                // Get the property namename
-                QString propertyName = QString::fromLocal8Bit(XGetAtomName(display, properties[propertyIndex]));
+                // Prepare this property's name and value
+                QString propertyName = QString::fromLocal8Bit(XGetAtomName(display, properties[propertyIndex])), propertyValue;
 
-                // Get the property raw data
-                Atom actual_type;
-                int actual_format;
-                unsigned char *rawProperty;
-                unsigned long itemCount, bytes_after;
+                // Get the property raw value
+                Atom propertyDataType;
+                int propertyDataFormat;
+                unsigned char *propertyRawData;
+                unsigned long propertyDataSize, propertyDataBytesAfter;
                 XRRGetOutputProperty(display,
                                      screenResources->outputs[outputIndex], // Current output
                                      properties[propertyIndex], // Current property
                                      0, 100, False, False, AnyPropertyType,
-                                     &actual_type, // Property type will be returned here
-                                     &actual_format,
-                                     &itemCount, // Length of the property
-                                     &bytes_after,
-                                     &rawProperty); // The raw data content of the property
+                                     &propertyDataType, // Property type will be returned here
+                                     &propertyDataFormat,
+                                     &propertyDataSize, // Length of the property
+                                     &propertyDataBytesAfter,
+                                     &propertyRawData); // The raw data content of the property
 
                 // Translate the property value to human readable
                 // http://us.download.nvidia.com/XFree86/Linux-x86-ARM/361.16/README/xrandrextension.html#randr-properties
-                //XRRPropertyInfo *propertyInfo = XRRQueryOutputProperty(display, screenResources->outputs[outputIndex], properties[propertyIndex]);
-                QString propertyValue;
                 if( ! propertyName.compare("EDID")){ // EDID found
-                    if(itemCount < 128){ // EDID is invalid
+                    // See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
+                    if(propertyDataSize < 128){ // EDID is invalid
                         qWarning() << "EDID is malformed, skipping";
                         continue;
                     }
                     QByteArray rawEDID;
 
-                    for(uint i = 0; i < itemCount; i++){ // For each uchar
+                    for(unsigned long i = 0; i < propertyDataSize; i++){ // For each uchar in raw data
                         if((i != 0) && ! (i % 16)) // Every 32 chars go on new line
                             propertyValue.append('\n');
-                        propertyValue.append(QString("%1").arg(rawProperty[i], 2, 16, QChar('0'))); // uchar -> readable HEX code
-                        rawEDID.append(rawProperty[i]);
+                        propertyValue.append(QString("%1").arg(propertyRawData[i], 2, 16, QChar('0'))); // uchar -> readable HEX code
+                        rawEDID.append(propertyRawData[i]);
                     }
 
                     // Get the monitor name from the EDID
@@ -497,102 +640,81 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                     // https://github.com/KDE/libkscreen/blob/master/src/edid.cpp
                     // <3
 
-#define OFFSET_PNPID    0x08
-#define OFFSET_MODEL_NUMBER     0x0a
-#define OFFSET_SERIAL_NUMBER    0x0c
-#define OFFSET_DATA_BLOCKS  0x36
-#define OFFSET_LAST_BLOCK   0x6c
-#define DESCRIPTOR_PRODUCT_NAME 0xfc
-
                     const quint8 *data = (quint8*) rawEDID.constData();
                     if (data[0] != 0x00 || data[1] != 0xff) {
                         qWarning() << "Can't parse EDID: invalid header";
                         continue;
                     }
 
-                    //Get the vendor PnP ID
-                    QString pnpId;
-                    pnpId[0] = 'A' + ((data[OFFSET_PNPID + 0] & 0x7c) / 4) - 1;
-                    pnpId[1] = 'A' + ((data[OFFSET_PNPID + 0] & 0x3) * 8) + ((data[OFFSET_PNPID + 1] & 0xe0) / 32) - 1;
-                    pnpId[2] = 'A' + (data[OFFSET_PNPID + 1] & 0x1f) - 1;
-
-                    // Get the real vendor name
-                    // Search a file mapping PnP IDs to vendor names
-                    // http://www.uefi.org/pnp_id_list
-                    if (!pnpId.isEmpty()) {
-                        QStringList possiblePaths = QStringList() // pkgfile --verbose --search pnp.ids
-                                << "/usr/share/libgnome-desktop-3.0/pnp.ids"
-                                << "/usr/share/libgnome-desktop/pnp.ids"
-                                << "/usr/share/libcinnamon-desktop/pnp.ids"
-                                << "/usr/share/dispcalGUI/pnp.ids"
-                                << "/usr/share/libmate-desktop/pnp.ids";
-
-                        bool found = false; // Have we found the real name?
-                        for(int i=0;  ! found && i < possiblePaths.length(); i++){ // Cycle until we found the name or finished the possible paths
-                            QFile pnpIds(possiblePaths.at(i));
-                            if( ! pnpIds.exists() || ! pnpIds.open(QIODevice::ReadOnly)) // If not available
-                                continue; // Next file
-
-                            while ( ! found && ! pnpIds.atEnd()) { // Read all the file unless the name is found
-                                QString line = pnpIds.readLine();
-                                if ( ! line.startsWith(pnpId))
-                                    continue; // Wrong line, go to next line
-
-                                QStringList parts = line.split(QLatin1Char('\t'));
-                                if (parts.size() == 2)
-                                    monitorName.append(parts.at(1).trimmed());
-                                found = true;
-                            }
-                        }
-                        if( ! found) // If real name is unknown, get the PNP ID instead
-                            monitorName.append(pnpId);
-                    }
-
-                    // Get the model name
-                    for (uint i = OFFSET_DATA_BLOCKS; i < OFFSET_LAST_BLOCK - 5; i += 18)
-                        if(data[i+3] == DESCRIPTOR_PRODUCT_NAME)
-                            monitorName.append(' ').append(QString::fromLocal8Bit((const char*)&data[i+5], 12).trimmed());
+                    outputItem->setText(1, getMonitorName(data)); // Add the monitor name to the tree as value of the Output Item
 
                     // Get the model number
-                    quint16 modelNumber = static_cast<quint16>(data[OFFSET_MODEL_NUMBER]);
+                    quint16 modelNumber = static_cast<quint16>(data[EDID_OFFSET_MODEL_NUMBER]);
                     if(modelNumber > 0)
                         propertyListItem->addChild(new QTreeWidgetItem(QStringList()
                                                                        << "Model number"
                                                                        << QString::number(modelNumber)));
 
                     // Get the serial number
-                    quint32 serialNumber = static_cast<quint32>(data[OFFSET_SERIAL_NUMBER]);
-                    serialNumber += static_cast<quint32>(data[OFFSET_SERIAL_NUMBER + 1] * 0x100);
-                    serialNumber += static_cast<quint32>(data[OFFSET_SERIAL_NUMBER + 2] * 0x10000);
-                    serialNumber += static_cast<quint32>(data[OFFSET_SERIAL_NUMBER + 3] * 0x1000000);
+                    quint32 serialNumber = static_cast<quint32>(data[EDID_OFFSET_SERIAL_NUMBER]);
+                    serialNumber += static_cast<quint32>(data[EDID_OFFSET_SERIAL_NUMBER + 1] * 0x100);
+                    serialNumber += static_cast<quint32>(data[EDID_OFFSET_SERIAL_NUMBER + 2] * 0x10000);
+                    serialNumber += static_cast<quint32>(data[EDID_OFFSET_SERIAL_NUMBER + 3] * 0x1000000);
                     if (serialNumber > 0)
                         propertyListItem->addChild(new QTreeWidgetItem(QStringList()
                                                                        << "Serial number"
                                                                        << QString::number(serialNumber)));
-
-                    outputItem->setText(1, monitorName); // Add the monitor name to the output Tree Item
-                    // We finished parsing the EDID
                 } else if ( ! propertyName.compare("GUID")){ // GUID found
-                    for(uint i = 0; i < itemCount; i++){ // For each uchar
-                        propertyValue.append(QString("%1").arg(rawProperty[i], 2, 16, QChar('0'))); // uchar -> readable HEX code
+                    for(unsigned long i = 0; i < propertyDataSize; i++){ // For each uchar
+                        propertyValue.append(QString("%1").arg(propertyRawData[i], 2, 16, QChar('0'))); // uchar -> readable HEX code
                         if(i % 2) // Separator every two chars
                             propertyValue.append('-');
-                    }
-                } else {
-                    for(uint i = 0; i < itemCount; i++){
-                        propertyValue.append(QString("%1").arg(rawProperty[i], 2, 16, QChar('0')));
-                    }
-                }
+                    } // Finished parsing the GUID property
+                } else { // Property is not EDID nor GUID
 
-                // Create the root QTreeWidgetItem for this property
-                QTreeWidgetItem *propertyItem = new QTreeWidgetItem(QStringList() << propertyName << propertyValue);
+                    // Translate the value ( translatePropertyValue() will handle it)
+                    for(unsigned long i = 0; i < propertyDataSize; i++)
+                        propertyValue.append(translateProperty(display, propertyDataFormat, propertyDataType, (Atom*)&propertyRawData[i]));
+
+                    // If the property has other possible values, print them
+                    // Get the property informations (allows to get ranges)
+                    XRRPropertyInfo *propertyInfo = XRRQueryOutputProperty(display, screenResources->outputs[outputIndex], properties[propertyIndex]);
+
+                    // Proceed to print the range or the list alternatives, if they are present
+                    if(propertyInfo->num_values > 0){ // Something is present
+                        propertyValue.append( propertyInfo->range ? " (Range: " : " (Supported: " );
+                        int rangeValuesIndex = 0;
+                        while( rangeValuesIndex < propertyInfo->num_values ){ // Until there is another alternative/range available
+                            propertyValue.append(translateProperty(display, 32, propertyDataType, (Atom*)&propertyInfo->values[rangeValuesIndex])); // Minimum value
+                            rangeValuesIndex++;
+
+                            if(propertyInfo->range){ // The alternative values are part of a range
+                                propertyValue.append(" - "); // Separator
+                                propertyValue.append(translateProperty(display, 32, propertyDataType, (Atom*)&propertyInfo->values[rangeValuesIndex+1])); // Maximum value
+                                rangeValuesIndex ++;
+                            }
+
+                            if(rangeValuesIndex < propertyInfo->num_values) // Another range is available
+                                propertyValue.append(", ");
+                        }
+                        propertyValue.append(')');
+                    }
+                    // We translated the property: deallocate the informations memory and exit
+                    free(propertyInfo);
+                }
+                // We got both name and value for this property: print them and exit
+                QTreeWidgetItem *propertyItem = new QTreeWidgetItem(QStringList() << propertyName << propertyValue); // Create the root QTreeWidgetItem for this property
                 propertyListItem->addChild(propertyItem);
             }
+            // We got all the details of this output: deallocate the memory of configuration and output infos and exit
+            XRRFreeCrtcInfo(configInfo);
             XRRFreeOutputInfo(outputInfo);
         }
+        // We checked all the outputs of this screen: print how many of them are connected, deallocate the screen resources memory and exit
         outputListItem->setText(1, QString::number(screenConnectedOutputs).append(" connected")); // Insert the number of connected outputs on the status of "Outputs"
         XRRFreeScreenResources(screenResources);
     }
+
     return cardConnectorsList;
 }
 
