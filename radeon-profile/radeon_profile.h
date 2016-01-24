@@ -90,10 +90,11 @@ private slots:
     void on_btn_dpmPerformance_clicked();
     void changeTimeRange();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void on_cb_showFreqGraph_clicked(bool checked);
-    void on_cb_showTempsGraph_clicked(bool checked);
-    void on_cb_showVoltsGraph_clicked(bool checked);
-    void showLegend(bool checked);
+    void on_cb_showFreqGraph_clicked(const bool &checked);
+    void on_cb_showTempsGraph_clicked(const bool &checked);
+    void on_cb_showVoltsGraph_clicked(const bool &checked);
+    void showLegend(const bool &checked);
+    void setGraphOffset(const bool &checked);
     void resetGraphs();
     void forceAuto();
     void forceLow();

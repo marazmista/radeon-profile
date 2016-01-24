@@ -122,17 +122,17 @@ void radeon_profile::changeTimeRange() {
     rangeX = ui->timeSlider->value();
 }
 
-void radeon_profile::on_cb_showFreqGraph_clicked(bool checked)
+void radeon_profile::on_cb_showFreqGraph_clicked(const bool &checked)
 {
     ui->plotColcks->setVisible(checked);
 }
 
-void radeon_profile::on_cb_showTempsGraph_clicked(bool checked)
+void radeon_profile::on_cb_showTempsGraph_clicked(const bool &checked)
 {
     ui->plotTemp->setVisible(checked);
 }
 
-void radeon_profile::on_cb_showVoltsGraph_clicked(bool checked)
+void radeon_profile::on_cb_showVoltsGraph_clicked(const bool &checked)
 {
     ui->plotVolts->setVisible(checked);
 }
@@ -143,11 +143,15 @@ void radeon_profile::resetGraphs() {
     ui->plotTemp->yAxis->setRange(10,20);
 }
 
-void radeon_profile::showLegend(bool checked) {
+void radeon_profile::showLegend(const bool &checked) {
     ui->plotColcks->legend->setVisible(checked);
     ui->plotVolts->legend->setVisible(checked);
     ui->plotColcks->replot();
     ui->plotVolts->replot();
+}
+
+void radeon_profile::setGraphOffset(const bool &checked) {
+    globalStuff::globalConfig.graphOffset = (checked) ? 20 : 0;
 }
 
 void radeon_profile::changeEvent(QEvent *event)

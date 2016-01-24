@@ -161,7 +161,13 @@ void radeon_profile::setupOptionsMenu()
     showLegend->setCheckable(true);
     showLegend->setChecked(true);
 
+    QAction *graphOffset = new QAction(this);
+    graphOffset->setText("Graph offset on right");
+    graphOffset->setCheckable(true);
+    graphOffset->setChecked(true);
+
     optionsMenu->addAction(showLegend);
+    optionsMenu->addAction(graphOffset);
     optionsMenu->addSeparator();
     optionsMenu->addAction(resetMinMax);
     optionsMenu->addAction(resetGraphs);
@@ -169,6 +175,7 @@ void radeon_profile::setupOptionsMenu()
     connect(resetMinMax,SIGNAL(triggered()),this,SLOT(resetMinMax()));
     connect(resetGraphs,SIGNAL(triggered()),this,SLOT(resetGraphs()));
     connect(showLegend,SIGNAL(triggered(bool)),this,SLOT(showLegend(bool)));
+    connect(graphOffset,SIGNAL(triggered(bool)),this,SLOT(setGraphOffset(bool)));
 }
 
 void radeon_profile::setupForcePowerLevelMenu() {

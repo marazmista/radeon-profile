@@ -25,7 +25,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 
-const int appVersion = 20150905;
+const int appVersion = 20160124;
 
 int ticksCounter = 0, statsTickCounter = 0;
 double rangeX = 180;
@@ -355,13 +355,13 @@ void radeon_profile::adjustFanSpeed()
 void radeon_profile::refreshGraphs() {
     // count the tick and move graph to right
     ticksCounter++;
-    ui->plotTemp->xAxis->setRange(ticksCounter+20, rangeX,Qt::AlignRight);
+    ui->plotTemp->xAxis->setRange(ticksCounter + globalStuff::globalConfig.graphOffset, rangeX,Qt::AlignRight);
     ui->plotTemp->replot();
 
-    ui->plotColcks->xAxis->setRange(ticksCounter+20,rangeX,Qt::AlignRight);
+    ui->plotColcks->xAxis->setRange(ticksCounter + globalStuff::globalConfig.graphOffset,rangeX,Qt::AlignRight);
     ui->plotColcks->replot();
 
-    ui->plotVolts->xAxis->setRange(ticksCounter+20,rangeX,Qt::AlignRight);
+    ui->plotVolts->xAxis->setRange(ticksCounter + globalStuff::globalConfig.graphOffset,rangeX,Qt::AlignRight);
     ui->plotVolts->replot();
 
     // choose bigger clock and adjust plot scale

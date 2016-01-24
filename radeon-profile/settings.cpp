@@ -34,6 +34,7 @@ void radeon_profile::saveConfig() {
     settings.setValue("aleternateRowColors",ui->cb_alternateRow->isChecked());
 
     settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
+    settings.setValue("graphOffset",optionsMenu->actions().at(1)->isChecked());
     settings.setValue("graphRange",ui->timeSlider->value());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
@@ -89,11 +90,12 @@ void radeon_profile::loadConfig() {
     ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
     ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
-    ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",false).toBool());
+    ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",true).toBool());
     ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
     ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",80).toInt());
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
+    optionsMenu->actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());
     ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
     // Graphs settings
     ui->spin_lineThick->setValue(settings.value("graphLineThickness",2).toInt());
@@ -158,6 +160,7 @@ void radeon_profile::loadConfig() {
 
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
+    globalStuff::globalConfig.graphOffset = ((optionsMenu->actions().at(1)->isChecked()) ? 20 : 0);
 
     QFile ef(execProfilesPath);
     if (ef.open(QIODevice::ReadOnly)) {
