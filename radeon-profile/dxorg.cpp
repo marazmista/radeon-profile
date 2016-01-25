@@ -3,6 +3,7 @@
 #include "dxorg.h"
 #include "globalStuff.h"
 
+#include <cmath>
 #include <QFile>
 #include <QTextStream>
 #include <QTime>
@@ -23,6 +24,8 @@ extern "C" {
 #define ATOM_VALUE (Atom)4
 #define INTEGER_VALUE (Atom)19
 #define CARDINAL_VALUE (Atom)6
+
+#define MILLIMETERS_PER_INCH 0.0393700787402
 
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
@@ -299,57 +302,32 @@ static QString translateProperty(Display * display,
                                  const int propertyDataFormat, // 8 / 16 / 32 bit
                                  const Atom propertyDataType, // ATOM / INTEGER / CARDINAL
                                  const Atom * propertyRawData){ // Pointer to the property value data array
-    QString output;
-    bool translated = false;
-
     switch(propertyDataType){
     case ATOM_VALUE: // Text value, like 'off' or 'None'
-        if(propertyDataFormat != 32)
-            break; // Only 32 bit supported here
-        output.append(XGetAtomName(display, propertyRawData[0]));
-        translated = true;
+        if(propertyDataFormat == 32){ // Only 32 bit supported here
+            char* string = XGetAtomName(display, *propertyRawData);
+            if(string) // If it is not NULL
+                return QString(string);
+        }
         break;
 
     case INTEGER_VALUE: // Signed numeric value
         switch(propertyDataFormat){
-        case 8:
-            output.append((signed char) propertyRawData[0]);
-            translated = true;
-            break;
-
-        case 16:
-            output.append(QString("%1").arg((signed short) propertyRawData[0]));
-            translated = true;
-            break;
-
-        case 32:
-            output.append(QString("%1").arg((signed long) propertyRawData[0]));
-            translated = true;
+        case 8: return QString::number((qint8) *propertyRawData);
+        case 16: return QString::number((qint16) *propertyRawData);
+        case 32: return QString::number((qint32) *propertyRawData);
         }
         break;
 
     case CARDINAL_VALUE: // Unsigned numeric value
         switch(propertyDataFormat){
-        case 8:
-            output.append((unsigned char) propertyRawData[0]);
-            translated = true;
-            break;
-
-        case 16:
-            output.append(QString("%1").arg((unsigned short) propertyRawData[0]));
-            translated = true;
-            break;
-
-        case 32:
-            output.append(QString("%1").arg((unsigned long) propertyRawData[0]));
-            translated = true;
+        case 8: return QString::number((quint8) *propertyRawData);
+        case 16: return QString::number((quint16) *propertyRawData);
+        case 32: return QString::number((quint32) *propertyRawData);
         }
     }
 
-    if( ! translated) // Unknown type, print as decimal
-        output.append(QString("%1").arg(propertyRawData[0])).append('?');
-
-    return output;
+    return QString::number(*propertyRawData); // Unknown type
 }
 
 // Get the real vendor name from the three-letter PNP ID
@@ -611,10 +589,47 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                 // It's the offset from the top left corner
                 QString outputOffset = QString::number(configInfo->x) + ", " + QString::number(configInfo->y);
                 outputItem->addChild(new QTreeWidgetItem(QStringList() << "Offset" << outputOffset));
+
+                // Calculate and add  gamma levels and the screen brightness level
+                XRRCrtcGamma * gammaInfo = XRRGetCrtcGamma(display, outputInfo->crtc);
+                if(gammaInfo){
+                    // For reference:
+                    // http://cgit.freedesktop.org/xorg/app/xrandr/tree/xrandr.c#n2408
+                    float highestRed = 0, highestGreen = 0, highestBlue = 0;// First check the gamma color with the highest 0xFF point
+                    bool foundRed = false, foundBlue = false, foundGreen = false;
+                    for(int i = gammaInfo->size - 1; i > 0; i--){
+                        if(!foundRed && gammaInfo->red[i] == 0xFFFF){
+                            foundRed = true;
+                            highestRed = i;
+                        }
+                        if(!foundGreen && gammaInfo->green[i] == 0xFFFF){
+                            foundGreen = true;
+                            highestGreen = i;
+                        }
+                        if(!foundBlue && gammaInfo->blue[i] == 0xFFFF){
+                            foundBlue = true;
+                            highestBlue = i;
+                        }
+                        if(foundRed && foundBlue && foundGreen)
+                            break;
+                    }
+
+                    QString monitorGamma = QString::number(highestRed, 'g', 3) + " R / " + QString::number(highestGreen, 'g', 3);
+                    monitorGamma += " G / " + QString::number(highestBlue, 'g', 3) + " B";
+                    outputItem->addChild(new QTreeWidgetItem(QStringList() << "Gamma" << monitorGamma));
+
+                    // https://en.wikipedia.org/wiki/Relative_luminance
+                    int brightnessPercent = (0.2126*highestRed + 0.7152*highestGreen + 0.0722*highestBlue) * 100 / 255;
+                    QString  monitorBrightness = brightnessPercent > 0 ? QString::number(brightnessPercent, 'g', 3) + '%' : "Unknown";
+                    outputItem->addChild(new QTreeWidgetItem(QStringList() << "Brightness" << monitorBrightness));
+                    XRRFreeGamma(gammaInfo);
+                }
+                // configInfo must NOT be freed
             } // We will get the other details (possible configurations and properties) even if the output is not active
 
             // Add monitor size
-            QString monitorSize = QString::number(outputInfo->mm_width) + "mm x " + QString::number(outputInfo->mm_height) + "mm";
+            double diagonal = sqrt(pow(outputInfo->mm_width, 2) + pow(outputInfo->mm_height, 2)) * MILLIMETERS_PER_INCH;
+            QString monitorSize = QString::number(outputInfo->mm_width) + "mm x " + QString::number(outputInfo->mm_height) + "mm (" + QString::number(diagonal, 'g', 3) + " in)";
             outputItem->addChild(new QTreeWidgetItem(QStringList() << "Monitor size" << monitorSize));
 
             // Create the root QTreeWidgetItem of the possible modes (resolution, Refresh rate, HSync, VSync, etc) list
@@ -703,6 +718,8 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                         rawEDID += propertyRawData[i];
                     }
 
+                    propertyListItem->addChild(new QTreeWidgetItem(QStringList() << propertyName << propertyValue)); // Add the EDID to the tree
+
                     // Get the monitor name from the EDID
                     // https://en.wikipedia.org/wiki/Extended_Display_Identification_Data#EDID_1.3_data_format
 
@@ -733,7 +750,6 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                     if (serialNumber) // The serial number is valid
                         propertyListItem->addChild(new QTreeWidgetItem(QStringList() << "Serial number" << QString::number(serialNumber)));
 
-                    propertyListItem->addChild(new QTreeWidgetItem(QStringList() << propertyName << propertyValue));
                     continue; // Next property
                 }
 
@@ -767,12 +783,11 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                 propertyValue.append( propertyInfo->range ? " (Range: " : " (Supported: " );
                 int rangeValuesIndex = 0;
                 while( rangeValuesIndex < propertyInfo->num_values ){ // Until there is another alternative/range available
-                    propertyValue.append(translateProperty(display, 32, propertyDataType, (Atom*)&propertyInfo->values[rangeValuesIndex]));
+                    propertyValue +=translateProperty(display, 32, propertyDataType, (Atom*)&propertyInfo->values[rangeValuesIndex]);
                     rangeValuesIndex++;
 
                     if(propertyInfo->range){ // The alternative values are part of a range, print the maximum value
-                        propertyValue.append(" - ");
-                        propertyValue.append(translateProperty(display, 32, propertyDataType, (Atom*)&propertyInfo->values[rangeValuesIndex+1]));
+                        propertyValue += " - " + translateProperty(display, 32, propertyDataType, (Atom*)&propertyInfo->values[rangeValuesIndex]);
                         rangeValuesIndex++;
                     }
 
