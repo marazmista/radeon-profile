@@ -392,7 +392,7 @@ static QString getMonitorName(const quint8 *EDID){
     QString monitorName;
 
     //Get the vendor PnP ID
-    QString pnpId;
+    QString pnpId, modelName;
     pnpId[0] = 'A' + ((EDID[EDID_OFFSET_PNP_ID + 0] & 0x7c) / 4) - 1;
     pnpId[1] = 'A' + ((EDID[EDID_OFFSET_PNP_ID + 0] & 0x3) * 8) + ((EDID[EDID_OFFSET_PNP_ID + 1] & 0xe0) / 32) - 1;
     pnpId[2] = 'A' + (EDID[EDID_OFFSET_PNP_ID + 1] & 0x1f) - 1;
@@ -403,9 +403,41 @@ static QString getMonitorName(const quint8 *EDID){
     // Get the model name
     for (uint i = EDID_OFFSET_DATA_BLOCKS; i < EDID_OFFSET_LAST_BLOCK; i += 18)
         if(EDID[i+3] == EDID_DESCRIPTOR_PRODUCT_NAME)
-            monitorName.append(' ').append(QString::fromLocal8Bit((const char*)&EDID[i+5], 12).trimmed());
+            modelName = QString::fromLocal8Bit((const char*)&EDID[i+5], 12).trimmed();
+
+    if(modelName.isEmpty())
+        monitorName.append(" (model unknown)");
+    else
+        monitorName.append(' ').append(modelName);
 
     return monitorName;
+}
+
+// Function that returns the right info struct for the RRMode it receives
+XRRModeInfo * getModeInfo(XRRScreenResources * screenResources, RRMode mode){
+    // XRRGetModeInfo does not exist (damn it) so we must manually search the right XRRModeInfo between the info structs of the screen configuration
+    for(int modeInfoIndex=0; modeInfoIndex < screenResources->nmode; modeInfoIndex++){ // For each XRRModeInfo available
+        if(screenResources->modes[modeInfoIndex].id == mode) // If we found the right modeInfo
+            return &screenResources->modes[modeInfoIndex];// We found it, we can exit the loop
+    }
+
+    return NULL; // We haven't found it
+}
+
+// Function that returns the vertical refresh rate in Hz from a XRRModeInfo
+float getVerticalRefreshRate(XRRModeInfo * modeInfo){
+    if( ! modeInfo || ! modeInfo->hTotal || ! modeInfo->vTotal) // 'modeInfo' is null or values are absent
+        return -1;
+
+    float vTotal = modeInfo->vTotal;
+
+    if(modeInfo->modeFlags & RR_DoubleScan) // https://en.wikipedia.org/wiki/Dual_Scan
+        vTotal *= 2;
+
+    if(modeInfo->modeFlags & RR_Interlace) // https://en.wikipedia.org/wiki/Interlaced_video
+        vTotal /= 2;
+
+    return (float)modeInfo->dotClock / ((float)modeInfo->hTotal * vTotal);
 }
 
 QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
@@ -496,8 +528,7 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
         return cardConnectorsList;
     }
 
-    int screenCount = ScreenCount(display); // Screens available
-    for(int screenIndex = 0; screenIndex < screenCount; screenIndex++){ // For each screen in this connection
+    for(int screenIndex = 0; screenIndex < ScreenCount(display); screenIndex++){ // For each screen in this connection
         // Create root QTreeWidgetItem item for this screen
         QTreeWidgetItem * screenItem = new QTreeWidgetItem(QStringList() << QString("Screen configuration ").append(QString::number(screenIndex)));
         cardConnectorsList.append(screenItem);
@@ -564,20 +595,27 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
 
             screenConnectedOutputs++;
 
-            // Get configuration info (resolution, offset, modes, and other things available only if the screen is active)
+            // Get configuration info (resolution, offset, modes, and other things available only if the output is active)
             XRRCrtcInfo * configInfo = XRRGetCrtcInfo(display, screenResources, outputInfo->crtc);
+            RRMode outputCurrentMode;
             if( ! configInfo) // The screen is disabled via software (likely turned off)
                 outputItem->addChild(new QTreeWidgetItem(QStringList() << "Active" << "No"));
             else { // The screen is active
                 outputItem->addChild(new QTreeWidgetItem(QStringList() << "Active" << "Yes"));
                 screenActiveOutputs++;
+                outputCurrentMode = configInfo->mode;
 
                 // Add current resolution
                 outputItem->addChild(new QTreeWidgetItem(QStringList()
                                                          << "Resolution"
                                                          << QString::number(configInfo->width).append('x').append(QString::number(configInfo->height))));
 
-                // Add the position in the current configuration (works only in multi-head)
+                // Add the refresh rate
+                outputItem->addChild(new QTreeWidgetItem(QStringList()
+                                                         << "Refresh rate"
+                                                         << QString::number(getVerticalRefreshRate(getModeInfo(screenResources, outputCurrentMode)), 'g', 3).append(" Hz")));
+
+                // Add the position in the current configuration (useful only in multi-head)
                 outputItem->addChild(new QTreeWidgetItem(QStringList()
                                                          << "Offset"
                                                          << QString::number(configInfo->x).append(", ").append(QString::number(configInfo->y))));
@@ -588,6 +626,45 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                                                      << "Monitor size"
                                                      << QString::number(outputInfo->mm_width).append("mm x ")
                                                      .append(QString::number(outputInfo->mm_height)).append("mm")));
+
+            // Create the root QTreeWidgetItem of the possible modes (resolution, Refresh rate, HSync, VSync, etc) list
+            QTreeWidgetItem * modeListItem = new QTreeWidgetItem(QStringList() << "Supported modes");
+            outputItem->addChild(modeListItem);
+
+            for(int modeIndex = 0; modeIndex < outputInfo->nmode; modeIndex++){ // For each possible mode
+                XRRModeInfo * modeInfo = getModeInfo(screenResources, outputInfo->modes[modeIndex]); // Get the info struct for this mode
+                if( ! modeInfo) // Mode info not found
+                    continue; // Proceed to next mode
+
+                QString modeName, modeDetails; // Get the mode resolution (the name)
+                modeName.append(QString::fromLocal8Bit(modeInfo->name));
+
+                if(modeInfo->id == outputCurrentMode) // If this mode is the currently active mode
+                    modeName.append(" (active)");
+
+                // Gather mode details
+                // http://en.tldp.org/HOWTO/XFree86-Video-Timings-HOWTO/basic.html
+                if(modeInfo->dotClock && modeInfo->vTotal && modeInfo->hTotal){ // We need those values
+                    float verticalRefreshRate = getVerticalRefreshRate(modeInfo),
+                            horizontalRefreshRate = ((float)modeInfo->dotClock / (float) modeInfo->hTotal) / 1000.0,
+                            dotClock = (float)modeInfo->dotClock / 1000000.0;
+
+                    modeDetails.append(QString::number(verticalRefreshRate, 'g', 3)).append(" Hz vertical, ")
+                            .append(QString::number(horizontalRefreshRate, 'g', 3)).append(" KHz horizontal, ")
+                            .append(QString::number(dotClock, 'g', 3)).append(" MHz dot clock");
+                }
+
+                if(modeInfo->modeFlags & RR_DoubleScan)
+                    modeDetails.append(", Double scan");
+
+                if(modeInfo->modeFlags & RR_Interlace)
+                    modeDetails.append(", Interlaced");
+
+                if(modeIndex == outputInfo->npreferred)
+                    modeDetails.append(" (preferred)");
+
+                modeListItem->addChild(new QTreeWidgetItem(QStringList() << modeName << modeDetails)); // Add the mode to the tree
+            }
 
             // Create the root QTreeWidgetItem of the property list
             QTreeWidgetItem * propertyListItem = new QTreeWidgetItem(QStringList() << "Properties");
@@ -647,7 +724,7 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                         continue;
                     }
 
-                    outputItem->setText(1, getMonitorName(data)); // Add the monitor name to the tree as value of the Output Item
+                    outputItem->setText(1, "Connected: " + getMonitorName(data)); // Add the monitor name to the tree as value of the Output Item
 
                     // Get the model number
                     quint16 modelNumber = static_cast<quint16>(data[EDID_OFFSET_MODEL_NUMBER]);
