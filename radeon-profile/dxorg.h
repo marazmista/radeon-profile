@@ -20,6 +20,7 @@ class dXorg
 {
 public:
     dXorg() {}
+    ~dXorg() {sharedMem.deleteLater();} // Before being deleted, the class deletes the sharedMem
 
     static globalStuff::gpuClocksStruct getClocks(const QString &data);
     static QString getClocksRawData(bool forFeatures = false);
