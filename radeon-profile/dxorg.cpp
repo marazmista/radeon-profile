@@ -1,4 +1,4 @@
-// copyright marazmista @ 29.03.2014
+﻿// copyright marazmista @ 29.03.2014
 
 #include "dxorg.h"
 #include "globalStuff.h"
@@ -26,6 +26,8 @@ extern "C" {
 #define CARDINAL_VALUE (Atom)6
 
 #define MILLIMETERS_PER_INCH 0.0393700787402
+#define RATIO_MINUS std::abs(ratio -
+#define EQUALS_ZERO ) < 0.01f
 
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
@@ -366,8 +368,7 @@ static QString translatePnpId(const QString pnpId){
 
 // Get the human-readable monitor name (vendor + model) from the EDID
 // See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
-// For reference:
-// https://github.com/KDE/libkscreen/blob/master/src/edid.cpp#L262
+// For reference: https://github.com/KDE/libkscreen/blob/master/src/edid.cpp#L262-L286
 static QString getMonitorName(const quint8 *EDID){
     QString monitorName;
 
@@ -415,6 +416,31 @@ float getVerticalRefreshRate(XRRModeInfo * modeInfo){
         vTotal /= 2;
 
     return (float)modeInfo->dotClock / ((float)modeInfo->hTotal * vTotal);
+}
+
+// Function that takes the resolution OR the width/height ratio
+// Returns as string the common name if it is one of the most common aspect ratios
+// Returns the ratio itself otherwise
+QString getAspectRatio(float width, float height = 1){
+    float ratio = width / height;
+
+    // https://en.wikipedia.org/wiki/Aspect_ratio_(image)#Some_common_examples
+    if(RATIO_MINUS 1.78f EQUALS_ZERO)
+        return "16:9";
+    else if(RATIO_MINUS 1.67f EQUALS_ZERO)
+        return "5:3";
+    else if(RATIO_MINUS 1.6f EQUALS_ZERO)
+        return "16:10";
+    else if(RATIO_MINUS 1.5f EQUALS_ZERO)
+        return "3:2";
+    else if(RATIO_MINUS 1.33f EQUALS_ZERO)
+        return "4:3";
+    else if(RATIO_MINUS 1.25f EQUALS_ZERO)
+        return "5:4";
+    else if(RATIO_MINUS 1.2f EQUALS_ZERO)
+        return "6:5";
+    else
+        return QString::number(ratio, 'g', 3) + ":1";
 }
 
 QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
@@ -506,6 +532,8 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
     }
 
     for(int screenIndex = 0; screenIndex < ScreenCount(display); screenIndex++){ // For each screen in this connection
+        qDebug() << "Analyzing screen " << screenIndex;
+
         // Create root QTreeWidgetItem item for this screen
         QTreeWidgetItem * screenItem = new QTreeWidgetItem(QStringList() << "Screen configuration " + QString::number(screenIndex));
         cardConnectorsList.append(screenItem);
@@ -545,7 +573,7 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
 
         //Cycle through outputs of this screen
         for(int outputIndex = 0; outputIndex < screenResources->noutput; outputIndex++){
-            qDebug() << "Analyzing output " << QString::number(outputIndex) << " of screen " << QString::number(screenIndex);
+            qDebug() << "  Analyzing output " << outputIndex;
 
             // Get output info (connection name, current configuration, dimensions, etc)
             XRROutputInfo * outputInfo = XRRGetOutputInfo(display, screenResources, screenResources->outputs[outputIndex]);
@@ -575,15 +603,20 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
             // We will use the pointer of configInfo to know if this output is active
             outputItem->addChild(new QTreeWidgetItem(QStringList() << "Active" << (configInfo ? "Yes" : "No")));
             if(configInfo){ // If it is active add to the tree resolution, refresh rate and the offset
+                qDebug() << "    Analyzing active mode of output" << outputIndex;
+
                 screenActiveOutputs++;
                 outputCurrentMode = &configInfo->mode;
 
                 // Add current resolution
-                QString outputConfiguration = QString::number(configInfo->width);
-                outputConfiguration += " x " + QString::number(configInfo->height) + " @ ";
+                QString outputResolution  = QString::number(configInfo->width) + " x " + QString::number(configInfo->height);
+                outputResolution += " (" + getAspectRatio(configInfo->width, configInfo->height) + ')';
+                outputItem -> addChild(new QTreeWidgetItem(QStringList() << "Resolution" << outputResolution));
+
+                //Add refresh rate
                 float vRefreshRate = getVerticalRefreshRate(getModeInfo(screenResources, *outputCurrentMode));
-                outputConfiguration += QString::number(vRefreshRate, 'g', 3) + " Hz";
-                outputItem->addChild(new QTreeWidgetItem(QStringList() << "Configuration" << outputConfiguration));
+                QString outputVRate = QString::number(vRefreshRate, 'g', 3) + " Hz";
+                outputItem->addChild(new QTreeWidgetItem(QStringList() << "Refresh rate" << outputVRate));
 
                 // Add the position in the current configuration (useful only in multi-head)
                 // It's the offset from the top left corner
@@ -593,7 +626,6 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                 // Calculate and add the screen software brightness level
                 XRRCrtcGamma * gammaInfo = XRRGetCrtcGamma(display, outputInfo->crtc);
                 if(gammaInfo){
-                    // For reference:
                     float maxRed = gammaInfo->red[gammaInfo->size-1],
                             maxGreen = gammaInfo->green[gammaInfo->size-1],
                             maxBlue = gammaInfo->blue[gammaInfo->size-1],
@@ -606,7 +638,7 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                     XRRFreeGamma(gammaInfo);
                 }
                 // We could also insert here the hardware (backlight) brightness level but we need to implement it
-                // This would require analyziong and parsing the content of /sys/class/backlight
+                // This would require analyzing and parsing the content of /sys/class/backlight
                 // Maybe in a future commit.
                 // For more info: https://wiki.archlinux.org/index.php/backlight
                 // This is an example implementation:
@@ -627,14 +659,19 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
             outputItem->addChild(modeListItem);
 
             for(int modeIndex = 0; modeIndex < outputInfo->nmode; modeIndex++){ // For each possible mode
+                qDebug() << "    Analyzing available mode" << QString::number(modeIndex);
+
                 XRRModeInfo * modeInfo = getModeInfo(screenResources, outputInfo->modes[modeIndex]); // Get info for this mode
                 if( ! modeInfo) // Mode info not found
                     continue; // Proceed to next mode
 
                 // Get the name (the resolution) and prepare the details
-                QString modeName = QString::fromLocal8Bit(modeInfo->name), modeDetails;
+                QString modeName = QString::fromLocal8Bit(modeInfo->name);
                 if(outputCurrentMode && (modeInfo->id == *outputCurrentMode)) // If the mode we are analyzing is active
                     modeName += " (active)";
+
+                // Add the aspect ratio
+                QString modeDetails = getAspectRatio(modeInfo->width, modeInfo->height) + ", ";
 
                 // Gather mode vertical and horizontal refresh rate and clock
                 // http://en.tldp.org/HOWTO/XFree86-Video-Timings-HOWTO/basic.html
@@ -642,7 +679,7 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                     float verticalRefreshRate = getVerticalRefreshRate(modeInfo),
                             horizontalRefreshRate = ((float)modeInfo->dotClock / (float) modeInfo->hTotal) / 1000.0;
 
-                    modeDetails = QString::number(verticalRefreshRate, 'g', 3) + " Hz vertical, ";
+                    modeDetails += QString::number(verticalRefreshRate, 'g', 3) + " Hz vertical, ";
                     modeDetails += QString::number(horizontalRefreshRate, 'g', 3) + " KHz horizontal, ";
                     modeDetails += QString::number((float)modeInfo->dotClock / 1000000, 'g', 3) + " MHz dot clock";
                 }
@@ -671,6 +708,8 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
 
             // Cycle through this output's properties
             for(int propertyIndex = 0; propertyIndex < propertyCount; propertyIndex++){
+                qDebug() << "    Analyzing property" << propertyIndex;
+
                 // Prepare this property's name and value
                 QString propertyName = QString::fromLocal8Bit(XGetAtomName(display, properties[propertyIndex]));
 
@@ -692,6 +731,8 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                 // Translate the property value to human readable
                 // http://us.download.nvidia.com/XFree86/Linux-x86-ARM/361.16/README/xrandrextension.html#randr-properties
                 if( ! propertyName.compare("EDID")){ // EDID found
+                    qDebug() << "      Property is EDID, parsing it";
+
                     // See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
                     if(propertyDataSize < 128){ // EDID is invalid
                         qWarning() << "EDID is malformed, skipping";
@@ -699,8 +740,8 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                     }
 
                     QString readableEDID;
-                    for(unsigned long i = 0; i < propertyDataSize; i++){ // For each uchar in raw data
-                        if((i != 0) && ! (i % 16)) // Every 32 chars go on new line
+                    for(unsigned long i = 0; i < propertyDataSize; i++){ // For each byte in raw data
+                        if( ! (i % 16) && i != 0) // Every 16 bytes (32 chars) go on new line
                             readableEDID += '\n';
 
                         readableEDID += QString("%1").arg(propertyRawData[i], 2, 16, QChar('0')); // uchar -> readable HEX code
@@ -708,51 +749,47 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
 
                     propertyListItem->addChild(new QTreeWidgetItem(QStringList() << propertyName << readableEDID));
 
-                    // Get the monitor name from the EDID
-                    // https://en.wikipedia.org/wiki/Extended_Display_Identification_Data#EDID_1.3_data_format
-
-                    // This part is inspired by
-                    // https://github.com/KDE/libkscreen/blob/master/src/edid.cpp
-                    // <3
-
+                    // Parse the EDID to gather info
                     const quint8 *data = (const quint8*) propertyRawData, // Constant raw EDID
                             header[8] = {0x00,0xff,0xff,0xff,0xff,0xff,0xff,0x00}; // Fixed EDID header
                     if (memcmp(data, header, 8)) { // If the header is not valid
-                        qWarning() << "Can't parse EDID: invalid header";
+                        qWarning() << "On screen" << screenIndex << '/' << outputInfo->name << ": can't parse EDID, invalid header";
                         continue;
                     }
 
                     // Add the monitor name to the tree as value of the Output Item
                     outputItem->setText(1, "Connected: " + getMonitorName(data));
 
+                    // See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
                     // Get the model number
                     quint16 modelNumber = static_cast<quint16>(data[EDID_OFFSET_MODEL_NUMBER]);
                     if(modelNumber > 0)
-                        propertyListItem->addChild(new QTreeWidgetItem(QStringList() << "Model number" << QString::number(modelNumber)));
+                        propertyListItem->addChild(new QTreeWidgetItem(QStringList()<<"Model number"<<QString::number(modelNumber)));
 
                     // Get the serial number
+                    // For reference: https://github.com/KDE/libkscreen/blob/master/src/edid.cpp#L288-L295
                     quint32 serialNumber = static_cast<quint32>(data[EDID_OFFSET_SERIAL_NUMBER]);
                     serialNumber += static_cast<quint32>(data[EDID_OFFSET_SERIAL_NUMBER + 1] * 0x100);
                     serialNumber += static_cast<quint32>(data[EDID_OFFSET_SERIAL_NUMBER + 2] * 0x10000);
                     serialNumber += static_cast<quint32>(data[EDID_OFFSET_SERIAL_NUMBER + 3] * 0x1000000);
 
                     if (serialNumber) // The serial number is valid
-                        propertyListItem->addChild(new QTreeWidgetItem(QStringList() << "Serial number" << QString::number(serialNumber)));
+                        propertyListItem->addChild(new QTreeWidgetItem(QStringList()<<"Serial number"<<QString::number(serialNumber)));
 
                     continue; // Next property
                 }
 
-                // Property is not EDID nor GUID
                 // Translate the value ( translateProperty() will handle it)
                 QString propertyValue;
                 for(unsigned long i = 0; i < propertyDataSize; i++)
                     propertyValue += translateProperty(display, propertyDataFormat, propertyDataType, (Atom*)&propertyRawData[i]);
 
-                // If the property has other possible values or ranges, print them
                 // Get the property informations (allows to get ranges)
-                XRRPropertyInfo *propertyInfo = XRRQueryOutputProperty(display, screenResources->outputs[outputIndex], properties[propertyIndex]);
+                XRRPropertyInfo *propertyInfo = XRRQueryOutputProperty(display,
+                                                                       screenResources->outputs[outputIndex],
+                                                                       properties[propertyIndex]);
 
-                // Check if any range or list is present
+                // Check if any range or list of alternatives is present
                 if( ! propertyInfo->num_values){ // Nothing is present
                     propertyListItem->addChild(new QTreeWidgetItem(QStringList() << propertyName << propertyValue));
                     continue; // Next property
@@ -762,11 +799,16 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                 propertyValue.append( propertyInfo->range ? " (Range: " : " (Supported: " );
                 int rangeValuesIndex = 0;
                 while( rangeValuesIndex < propertyInfo->num_values ){ // Until there is another alternative/range available
-                    propertyValue +=translateProperty(display, 32, propertyDataType, (Atom*)&propertyInfo->values[rangeValuesIndex]);
+                    qDebug() << "      Printing alternative " << rangeValuesIndex;
+
+                    propertyValue += translateProperty(display, 32, propertyDataType, (Atom*)&propertyInfo->values[rangeValuesIndex]);
                     rangeValuesIndex++;
 
                     if(propertyInfo->range){ // The alternative values are part of a range, print the maximum value
-                        propertyValue += " - " + translateProperty(display, 32, propertyDataType, (Atom*)&propertyInfo->values[rangeValuesIndex]);
+                        propertyValue += " - " + translateProperty(display,
+                                                                   32, // Value data has 32-bit format
+                                                                   propertyDataType,
+                                                                   (Atom*)&propertyInfo->values[rangeValuesIndex]);
                         rangeValuesIndex++;
                     }
 
@@ -775,17 +817,16 @@ QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
                 }
                 propertyValue += ')';
 
-                // We translated the property: deallocate the informations memory and add the property to the tree
+                // Property completed: deallocate propertyInfo, add the property to the tree and exit
                 free(propertyInfo);
                 propertyListItem->addChild(new QTreeWidgetItem(QStringList() << propertyName << propertyValue));
             }
-            // We got all the details of this output: deallocate the memory of configuration and output infos and exit
+            // Output completed: deallocate configInfo and outputInfo and exit
             XRRFreeCrtcInfo(configInfo);
             XRRFreeOutputInfo(outputInfo);
         }
-        // We checked all the outputs of this screen: print how many of them are connected and active, deallocate the screen resources memory and exit
-        // Insert the number of connected outputs as value of the output tree item
-        outputListItem->setText(1, QString::number(screenConnectedOutputs) + " connected, " + QString::number(screenActiveOutputs) + " active");
+        // Screen configuration completed: print how many outputs are connected and active, deallocate screenResources and exit
+        outputListItem->setText(1,QString::number(screenConnectedOutputs)+" connected, "+QString::number(screenActiveOutputs)+" active");
         XRRFreeScreenResources(screenResources);
     }
 

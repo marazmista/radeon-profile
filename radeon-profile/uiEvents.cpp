@@ -281,6 +281,19 @@ void radeon_profile::copyGlxInfoToClipboard() {
     QApplication::clipboard()->setText(clip);
 }
 
+void radeon_profile::copyConnectorsToClipboard(){
+    QString clip;
+    const QList<QTreeWidgetItem *> selectedItems = ui->list_connectors->selectedItems();
+
+    for(int itemIndex=0; itemIndex < selectedItems.size(); itemIndex++){ // For each item
+        QTreeWidgetItem * current = selectedItems.at(itemIndex);
+        clip += current->text(0).simplified() + '\t';
+        clip += current->text(1).simplified() + '\n';
+    }
+
+    QApplication::clipboard()->setText(clip);
+}
+
 void radeon_profile::resetStats() {
     statsTickCounter = 0;
     pmStats.clear();

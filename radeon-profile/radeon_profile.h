@@ -114,6 +114,7 @@ private slots:
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_cb_stats_clicked(bool checked);
     void copyGlxInfoToClipboard();
+    void copyConnectorsToClipboard();
     void resetStats();
     void on_cb_alternateRow_clicked(bool checked);
     void on_chProfile_clicked();

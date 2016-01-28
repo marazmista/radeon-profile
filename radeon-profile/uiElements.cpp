@@ -204,17 +204,20 @@ void radeon_profile::setupForcePowerLevelMenu() {
 void radeon_profile::setupContextMenus() {
     QAction *copyToClipboard = new QAction(this);
     copyToClipboard->setText("Copy to clipboard");
-
     ui->list_glxinfo->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->list_glxinfo->addAction(copyToClipboard);
+    connect(copyToClipboard, SIGNAL(triggered()),this,SLOT(copyGlxInfoToClipboard()));
+
+    QAction * copyConnectors = new QAction(this);
+    copyConnectors->setText("Copy to clipboard");
+    ui->list_connectors->setContextMenuPolicy(Qt::ActionsContextMenu);
+    ui->list_connectors->addAction(copyConnectors);
+    connect(copyConnectors, SIGNAL(triggered()), this, SLOT(copyConnectorsToClipboard()));
 
     QAction *reset = new QAction(this);
     reset->setText("Reset statistics");
-
     ui->list_stats->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->list_stats->addAction(reset);
-
-    connect(copyToClipboard, SIGNAL(triggered()),this,SLOT(copyGlxInfoToClipboard()));
     connect(reset,SIGNAL(triggered()),this,SLOT(resetStats()));
 }
 //========
