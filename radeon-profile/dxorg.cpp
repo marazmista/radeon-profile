@@ -3,31 +3,10 @@
 #include "dxorg.h"
 #include "globalStuff.h"
 
-#include <cmath>
 #include <QFile>
 #include <QTextStream>
 #include <QTime>
 #include <QCoreApplication>
-
-extern "C" {
-#include <X11/extensions/Xrandr.h>
-}
-
-#define EDID_OFFSET_PNP_ID    0x08
-#define EDID_OFFSET_MODEL_NUMBER     0x0a
-#define EDID_OFFSET_SERIAL_NUMBER    0x0c
-#define EDID_OFFSET_DATA_BLOCKS  0x36
-#define EDID_OFFSET_LAST_BLOCK   0x6c
-
-#define EDID_DESCRIPTOR_PRODUCT_NAME 0xfc
-
-#define ATOM_VALUE (Atom)4
-#define INTEGER_VALUE (Atom)19
-#define CARDINAL_VALUE (Atom)6
-
-#define MILLIMETERS_PER_INCH 0.0393700787402
-#define RATIO_MINUS std::abs(ratio -
-#define EQUALS_ZERO ) < 0.01f
 
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
