@@ -22,8 +22,6 @@ extern "C" {
 #define CARDINAL_VALUE (Atom)6
 
 #define MILLIMETERS_PER_INCH 0.0393700787402
-#define RATIO_MINUS std::abs(ratio -
-#define EQUALS_ZERO ) < 0.01f
 
 gpu::driver gpu::detectDriver() {
     QStringList out = globalStuff::grabSystemInfo("lsmod");
@@ -175,67 +173,64 @@ static QString translateProperty(Display * display,
                                  const int propertyDataFormat, // 8 / 16 / 32 bit
                                  const Atom propertyDataType, // ATOM / INTEGER / CARDINAL
                                  const Atom * propertyRawData){ // Pointer to the property value data array
+    QString out;
 
     switch(propertyDataType){
     case ATOM_VALUE: // Text value, like 'off' or 'None'
         if(propertyDataFormat == 32){ // Only 32 bit supported here
             char* string = XGetAtomName(display, *propertyRawData);
             if(string) // If it is not NULL
-                return QString(string);
+                out = QString(string);
         }
         break;
 
     case INTEGER_VALUE: // Signed numeric value
         switch(propertyDataFormat){
-        case 8: return QString::number((qint8) *propertyRawData);
-        case 16: return QString::number((qint16) *propertyRawData);
-        case 32: return QString::number((qint32) *propertyRawData);
+        case 8: out = QString::number((qint8) *propertyRawData);
+        case 16: out = QString::number((qint16) *propertyRawData);
+        case 32: out = QString::number((qint32) *propertyRawData);
         }
         break;
 
     case CARDINAL_VALUE: // Unsigned numeric value
         switch(propertyDataFormat){
-        case 8: return QString::number((quint8) *propertyRawData);
-        case 16: return QString::number((quint16) *propertyRawData);
-        case 32: return QString::number((quint32) *propertyRawData);
+        case 8: out = QString::number((quint8) *propertyRawData);
+        case 16: out = QString::number((quint16) *propertyRawData);
+        case 32: out = QString::number((quint32) *propertyRawData);
         }
     }
-
-    return QString::number(*propertyRawData); // Unknown type
+    return out.isEmpty() ? QString::number(*propertyRawData) : out; // If no match was found, return as number
 }
 
 // Get the real vendor name from the three-letter PNP ID
 // See http://www.uefi.org/pnp_id_list
 static QString translatePnpId(const QString pnpId){
+    if ( ! pnpId.isEmpty()){
+        // Search a file mapping PnP IDs to vendor names
+        // List found through pkgfile --verbose --search pnp.ids
+        QStringList possiblePaths = QStringList()
+                << "/usr/share/libgnome-desktop-3.0/pnp.ids"
+                << "/usr/share/libgnome-desktop/pnp.ids"
+                << "/usr/share/libcinnamon-desktop/pnp.ids"
+                << "/usr/share/dispcalGUI/pnp.ids"
+                << "/usr/share/libmate-desktop/pnp.ids";
 
-    if (pnpId.isEmpty())
-        return pnpId;
+        for(int i=0;  i < possiblePaths.length(); i++){ // Cycle until we found the name or finished the possible paths
+            QFile pnpIds(possiblePaths.at(i));
+            if( ! pnpIds.exists() || ! pnpIds.open(QIODevice::ReadOnly)) // File is not available
+                continue; // Next file
 
-    // Search a file mapping PnP IDs to vendor names
-    // List found through pkgfile --verbose --search pnp.ids
-    QStringList possiblePaths = QStringList()
-            << "/usr/share/libgnome-desktop-3.0/pnp.ids"
-            << "/usr/share/libgnome-desktop/pnp.ids"
-            << "/usr/share/libcinnamon-desktop/pnp.ids"
-            << "/usr/share/dispcalGUI/pnp.ids"
-            << "/usr/share/libmate-desktop/pnp.ids";
+            while ( ! pnpIds.atEnd()) { // Continue reading the file until the name is found or the file has ended
+                QString line = pnpIds.readLine();
+                if ( ! line.startsWith(pnpId)) // Wrong line
+                    continue; // Next line
 
-    for(int i=0;  i < possiblePaths.length(); i++){ // Cycle until we found the name or finished the possible paths
-        QFile pnpIds(possiblePaths.at(i));
-        if( ! pnpIds.exists() || ! pnpIds.open(QIODevice::ReadOnly)) // If not available
-            continue; // Next file
-
-        while ( ! pnpIds.atEnd()) { // Continue reading the file until the name is found or the file has ended
-            QString line = pnpIds.readLine();
-            if ( ! line.startsWith(pnpId))
-                continue; // Wrong line, go to next line
-
-            QStringList parts = line.split(QChar('\t')); // Separate PNP ID from the real name
-            if (parts.size() == 2)
-                return parts.at(1).trimmed(); // Get the real name
+                QStringList parts = line.split(QChar('\t')); // Separate PNP ID from the real name
+                if (parts.size() == 2)
+                    return parts.at(1).trimmed(); // Get the real name
+            }
         }
     }
-
     return pnpId; // No real name found, return the PNP ID instead
 }
 
@@ -265,7 +260,7 @@ static QString getMonitorName(const quint8 *EDID){
 }
 
 // Function that returns the right info struct for the RRMode it receives
-XRRModeInfo * getModeInfo(XRRScreenResources * screenResources, RRMode mode){
+static XRRModeInfo * getModeInfo(XRRScreenResources * screenResources, RRMode mode){
     // Cycle through all the XRRModeInfos of this screen and search the right one
     for(int modeInfoIndex=0; modeInfoIndex < screenResources->nmode; modeInfoIndex++){
         if(screenResources->modes[modeInfoIndex].id == mode) // If we found the right modeInfo
@@ -275,45 +270,64 @@ XRRModeInfo * getModeInfo(XRRScreenResources * screenResources, RRMode mode){
     return NULL; // We haven't found it
 }
 
+// Function that returns the horizontal refresh rate in Hz from a XRRModeInfo
+static float getHorizontalRefreshRate(XRRModeInfo * modeInfo){
+    float out = -1;
+
+    if(modeInfo && modeInfo->hTotal > 0 && modeInfo->dotClock > 0) // 'modeInfo' and its values must be present
+        out = (float)modeInfo->dotClock / (float) modeInfo->hTotal;
+
+    return out;
+}
+
 // Function that returns the vertical refresh rate in Hz from a XRRModeInfo
-float getVerticalRefreshRate(XRRModeInfo * modeInfo){
-    if( ! modeInfo || ! modeInfo->hTotal || ! modeInfo->vTotal) // 'modeInfo' is null or values are absent
-        return -1;
+static float getVerticalRefreshRate(XRRModeInfo * modeInfo){
+    float out = -1;
 
-    float vTotal = modeInfo->vTotal;
+    if(modeInfo && modeInfo->hTotal > 0 && modeInfo->vTotal > 0 && modeInfo->dotClock > 0){ // 'modeInfo' and its values must be present
+        float vTotal = modeInfo->vTotal;
 
-    if(modeInfo->modeFlags & RR_DoubleScan) // https://en.wikipedia.org/wiki/Dual_Scan
-        vTotal *= 2;
+        if(modeInfo->modeFlags & RR_DoubleScan) // https://en.wikipedia.org/wiki/Dual_Scan
+            vTotal *= 2;
 
-    if(modeInfo->modeFlags & RR_Interlace) // https://en.wikipedia.org/wiki/Interlaced_video
-        vTotal /= 2;
+        if(modeInfo->modeFlags & RR_Interlace) // https://en.wikipedia.org/wiki/Interlaced_video
+            vTotal /= 2;
 
-    return (float)modeInfo->dotClock / ((float)modeInfo->hTotal * vTotal);
+        out = (float)modeInfo->dotClock / ((float)modeInfo->hTotal * vTotal);
+    }
+
+    return out;
+}
+
+//Utility function for getAspectRatio
+static bool ratioEqualsValue(const float ratio, const float value){
+    return std::abs(ratio - value) < 0.01;
 }
 
 // Function that takes the resolution OR the width/height ratio
-// Returns as string the common name if it is one of the most common aspect ratios
-// Returns the ratio itself otherwise
-QString getAspectRatio(float width, float height = 1){
-    float ratio = width / height;
+// Returns as string the aspect ratio name if it is one of the most common ones
+// Returns <ratio>:1 otherwise
+static QString getAspectRatio(const float width, const float height = 1){
+    const float ratio = width / height;
+    QString out;
 
     // https://en.wikipedia.org/wiki/Aspect_ratio_(image)#Some_common_examples
-    if(RATIO_MINUS 1.78f EQUALS_ZERO)
-        return "16:9";
-    else if(RATIO_MINUS 1.67f EQUALS_ZERO)
-        return "5:3";
-    else if(RATIO_MINUS 1.6f EQUALS_ZERO)
-        return "16:10";
-    else if(RATIO_MINUS 1.5f EQUALS_ZERO)
-        return "3:2";
-    else if(RATIO_MINUS 1.33f EQUALS_ZERO)
-        return "4:3";
-    else if(RATIO_MINUS 1.25f EQUALS_ZERO)
-        return "5:4";
-    else if(RATIO_MINUS 1.2f EQUALS_ZERO)
-        return "6:5";
-    else
-        return QString::number(ratio, 'g', 3) + ":1";
+    if(ratioEqualsValue(ratio, 1.78f))
+        out = "16:9";
+    else if(ratioEqualsValue(ratio, 1.67f))
+        out = "5:3";
+    else if(ratioEqualsValue(ratio, 1.6f))
+        out = "16:10";
+    else if(ratioEqualsValue(ratio, 1.5f))
+        out = "3:2";
+    else if(ratioEqualsValue(ratio, 1.33f))
+        out = "4:3";
+    else if(ratioEqualsValue(ratio, 1.25f))
+        out = "5:4";
+    else if(ratioEqualsValue(ratio, 1.2f))
+        out = "6:5";
+
+    return out.isEmpty() ? QString::number(ratio, 'g', 3) + ":1" : out;
 }
 
 //Function that uses libXrandr to get the connectors and connected monitors list
@@ -486,8 +500,10 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
                 //Add refresh rate
                 float vRefreshRate = getVerticalRefreshRate(getModeInfo(screenResources, *outputCurrentMode));
-                QString outputVRate = QString::number(vRefreshRate, 'g', 3) + " Hz";
-                outputItem->addChild(new QTreeWidgetItem(QStringList() << "Refresh rate" << outputVRate));
+                if(vRefreshRate != -1){
+                    QString outputVRate = QString::number(vRefreshRate, 'g', 3) + " Hz";
+                    outputItem->addChild(new QTreeWidgetItem(QStringList() << "Refresh rate" << outputVRate));
+                }
 
                 // Add the position in the current configuration (useful only in multi-head)
                 // It's the offset from the top left corner
@@ -548,11 +564,16 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                 // http://en.tldp.org/HOWTO/XFree86-Video-Timings-HOWTO/basic.html
                 if(modeInfo->dotClock && modeInfo->vTotal && modeInfo->hTotal){ // We need those values
                     float verticalRefreshRate = getVerticalRefreshRate(modeInfo),
-                            horizontalRefreshRate = ((float)modeInfo->dotClock / (float) modeInfo->hTotal) / 1000.0;
+                            horizontalRefreshRate = getHorizontalRefreshRate(modeInfo);
 
-                    modeDetails += QString::number(verticalRefreshRate, 'g', 3) + " Hz vertical, ";
-                    modeDetails += QString::number(horizontalRefreshRate, 'g', 3) + " KHz horizontal, ";
-                    modeDetails += QString::number((float)modeInfo->dotClock / 1000000, 'g', 3) + " MHz dot clock";
+                    if(verticalRefreshRate > 0)
+                        modeDetails += QString::number(verticalRefreshRate, 'g', 3) + " Hz vertical, ";
+
+                    if(horizontalRefreshRate > 0)
+                        modeDetails += QString::number(horizontalRefreshRate / 1000, 'g', 3) + " KHz horizontal, ";
+
+                    if(modeInfo->dotClock > 0)
+                        modeDetails += QString::number((float) modeInfo->dotClock / 1000000, 'g', 3) + " MHz dot clock";
                 }
 
                 // Check possible mode flags
