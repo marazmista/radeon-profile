@@ -15,9 +15,7 @@ TEMPLATE = app
 #   http://doc.qt.io/qt-5/qtglobal.html#QtMsgType-enum
 #   qDebug will work only when compiled for Debug
 #   QtWarning, QtCritical and QtFatal will still work on Release
-@
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
-@
 
 SOURCES += main.cpp\
         radeon_profile.cpp \

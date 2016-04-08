@@ -142,7 +142,7 @@ void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
                 selectedVariableVaules[varIndex] = ui->list_variables->currentItem()->text()+"=\""+input+"\"";
         } else {
             // hehe, looks weird but check ok status is for, when input was empty, and whether user click ok or cancel, dispaly quesion
-            if (varIndex != -1 && !ok || ok) {
+            if ((varIndex != -1) || ok) {
                 if (QMessageBox::question(this,"Question","Remove existing variable in summary?",QMessageBox::Yes | QMessageBox::No,QMessageBox::Yes) == QMessageBox::Yes)
                     selectedVariableVaules.removeAt(varIndex);
             }

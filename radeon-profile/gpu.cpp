@@ -91,10 +91,10 @@ globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuCloc
 globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuff::gpuTemperatureStruct &data) {
     globalStuff::gpuTemperatureStructString tmp;
 
-    tmp.current = QString().setNum(data.current) + QString::fromUtf8("\u00B0C");
-    tmp.max = QString().setNum(data.max) + QString::fromUtf8("\u00B0C");
-    tmp.min = QString().setNum(data.min) + QString::fromUtf8("\u00B0C");
-    tmp.pwmSpeed = QString().setNum(data.pwmSpeed);
+    tmp.current = QString::number(data.current) + QString::fromUtf8("\u00B0C");
+    tmp.max = QString::number(data.max) + QString::fromUtf8("\u00B0C");
+    tmp.min = QString::number(data.min) + QString::fromUtf8("\u00B0C");
+    tmp.pwmSpeed = QString::number(data.pwmSpeed);
 
     return tmp;
 }
@@ -181,6 +181,7 @@ static QString translateProperty(Display * display,
             char* string = XGetAtomName(display, *propertyRawData);
             if(string) // If it is not NULL
                 out = QString(string);
+            XFree(string);
         }
         break;
 
@@ -603,7 +604,9 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                 qDebug() << "    Analyzing property" << propertyIndex;
 
                 // Prepare this property's name and value
-                QString propertyName = QString::fromLocal8Bit(XGetAtomName(display, properties[propertyIndex]));
+                char * propertyAtomName = XGetAtomName(display, properties[propertyIndex]);
+                QString propertyName = QString::fromLocal8Bit(propertyAtomName);
+                XFree(propertyAtomName);
 
                 // Get the property raw value
                 Atom propertyDataType;

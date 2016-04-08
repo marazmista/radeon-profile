@@ -42,8 +42,11 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     execsRunning = new QList<execBin*>();
 
     // Set up the size (2/3 of the screen size, centered)
-    QRect desktopSize = QApplication::desktop()->screenGeometry();
-    int width = desktopSize.width()*2/3, height = desktopSize.height()*2/3, x = (desktopSize.width() - width)/2, y = (desktopSize.height() - height)/2;
+    const QRect desktopSize = QDesktopWidget().availableGeometry(this);
+    const int width = desktopSize.width()*2/3,
+            height = desktopSize.height()*2/3,
+            x = (desktopSize.width() - width)/2,
+            y = (desktopSize.height() - height)/2;
     setGeometry(x,y,width,height);
 
     // checks if running as root
@@ -200,19 +203,16 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     if (!features.coreClockAvailable && !features.temperatureAvailable && !features.coreVoltAvailable)
         ui->mainTabs->setTabEnabled(1,false);
 
-    if (!features.pwmAvailable) {
-        actuallyFanControlNotAvaible:
-            ui->mainTabs->setTabEnabled(2,false);
-            ui->l_fanSpeed->setVisible(false);
-            ui->label_24->setVisible(false);
-    } else {
-        if (!globalStuff::globalConfig.rootMode && (!device.daemonConnected() && !globalStuff::globalConfig.rootMode))
-            goto actuallyFanControlNotAvaible;
-
+    if (features.pwmAvailable && (globalStuff::globalConfig.rootMode || device.daemonConnected())) {
+        qDebug() << "Fan control is available , configuring the fan control tab";
         ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
-
         loadFanProfiles();
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
+    } else {
+        qDebug() << "Fan control is not available";
+        ui->mainTabs->setTabEnabled(2,false);
+        ui->l_fanSpeed->setVisible(false);
+        ui->label_24->setVisible(false);
     }
 
     if (features.pm == globalStuff::DPM) {
