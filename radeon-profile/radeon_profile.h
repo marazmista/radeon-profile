@@ -179,6 +179,13 @@ private:
     void connectSignals();
     void adjustFanSpeed();
 
+    /**
+     * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.
+     * @param enabled If true enables auto-refresh, otherwise disables it.
+     * @param interval Seconds between each update.
+     */
+    void configureDaemonAutoRefresh(bool enabled = true, int interval = 1);
+
 };
 
 #endif // RADEON_PROFILE_H

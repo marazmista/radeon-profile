@@ -48,388 +48,35 @@
         <height>51</height>
        </size>
       </property>
-      <widget class="QLineEdit" name="l_cClk">
-       <property name="geometry">
-        <rect>
-         <x>302</x>
-         <y>5</y>
-         <width>41</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>41</width>
-         <height>22</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>41</width>
-         <height>22</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>GPU core clock</string>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="l_mClk">
-       <property name="geometry">
-        <rect>
-         <x>302</x>
-         <y>25</y>
-         <width>41</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>41</width>
-         <height>22</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>41</width>
-         <height>22</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>GPU memory clock</string>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_14">
-       <property name="geometry">
-        <rect>
-         <x>342</x>
-         <y>8</y>
-         <width>31</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>MHz</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_18">
-       <property name="geometry">
-        <rect>
-         <x>342</x>
-         <y>28</y>
-         <width>31</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>MHz</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="l_mVolt">
-       <property name="geometry">
-        <rect>
-         <x>370</x>
-         <y>25</y>
-         <width>41</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>41</width>
-         <height>22</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>41</width>
-         <height>22</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>GPU memory voltage</string>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_19">
-       <property name="geometry">
-        <rect>
-         <x>412</x>
-         <y>28</y>
-         <width>21</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>mV</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="l_cVolt">
-       <property name="geometry">
-        <rect>
-         <x>370</x>
-         <y>5</y>
-         <width>41</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>41</width>
-         <height>22</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>41</width>
-         <height>22</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>GPU core volatage</string>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_20">
-       <property name="geometry">
-        <rect>
-         <x>412</x>
-         <y>8</y>
-         <width>21</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>mV</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="l_temp">
-       <property name="geometry">
-        <rect>
-         <x>450</x>
-         <y>5</y>
-         <width>61</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>61</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>GPU temperature</string>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_21">
-       <property name="geometry">
-        <rect>
-         <x>508</x>
-         <y>18</y>
-         <width>31</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>°C</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="l_fanSpeed">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>5</y>
-         <width>61</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>61</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>GPU fan speed</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_24">
-       <property name="geometry">
-        <rect>
-         <x>600</x>
-         <y>18</y>
-         <width>21</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>%</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>20</x>
          <y>0</y>
-         <width>51</width>
-         <height>28</height>
+         <width>60</width>
+         <height>24</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>14</pointsize>
+         <family>Noto Sans</family>
+         <pointsize>15</pointsize>
         </font>
        </property>
        <property name="text">
         <string>GPU</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
       </widget>
       <widget class="QComboBox" name="combo_gpus">
        <property name="geometry">
         <rect>
-         <x>3</x>
+         <x>10</x>
          <y>25</y>
-         <width>78</width>
-         <height>24</height>
+         <width>80</width>
+         <height>25</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -440,87 +87,334 @@
        </property>
        <property name="font">
         <font>
-         <family>Monospace</family>
-         <pointsize>8</pointsize>
+         <family>Noto Mono</family>
+         <pointsize>10</pointsize>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>Selected GPU</string>
        </property>
       </widget>
       <widget class="QComboBox" name="combo_pProfile">
        <property name="geometry">
         <rect>
-         <x>90</x>
+         <x>100</x>
          <y>0</y>
-         <width>201</width>
+         <width>150</width>
          <height>24</height>
         </rect>
        </property>
        <property name="minimumSize">
         <size>
-         <width>201</width>
+         <width>140</width>
          <height>24</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>201</width>
+         <width>160</width>
          <height>24</height>
         </size>
        </property>
        <property name="font">
         <font>
-         <family>Monospace</family>
-         <pointsize>8</pointsize>
+         <family>Noto Mono</family>
+         <pointsize>10</pointsize>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>Power profile</string>
        </property>
       </widget>
       <widget class="QComboBox" name="combo_pLevel">
        <property name="geometry">
         <rect>
-         <x>150</x>
+         <x>100</x>
          <y>25</y>
-         <width>141</width>
+         <width>150</width>
          <height>24</height>
         </rect>
        </property>
        <property name="minimumSize">
         <size>
-         <width>141</width>
+         <width>140</width>
          <height>24</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>141</width>
+         <width>160</width>
          <height>24</height>
         </size>
        </property>
        <property name="font">
         <font>
-         <family>Monospace</family>
-         <pointsize>8</pointsize>
+         <family>Noto Mono</family>
+         <pointsize>10</pointsize>
         </font>
        </property>
+       <property name="toolTip">
+        <string>Power level</string>
+       </property>
       </widget>
-      <widget class="Line" name="line">
+      <widget class="QLabel" name="l_fanSpeed">
        <property name="geometry">
         <rect>
-         <x>432</x>
+         <x>510</x>
+         <y>0</y>
+         <width>70</width>
+         <height>50</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>90</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Mono</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>Fan speed</string>
+       </property>
+       <property name="text">
+        <string>999%</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="l_temp">
+       <property name="geometry">
+        <rect>
+         <x>410</x>
+         <y>0</y>
+         <width>80</width>
+         <height>50</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>90</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Mono</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>GPU temperature</string>
+       </property>
+       <property name="text">
+        <string>999°C</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="l_cClk">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>0</y>
+         <width>60</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Mono</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>GPU clock</string>
+       </property>
+       <property name="text">
+        <string>9999MHz</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="l_mClk">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>25</y>
+         <width>60</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Mono</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>Memory clock</string>
+       </property>
+       <property name="text">
+        <string>9999MHz</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="Line" name="line_4">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
          <y>10</y>
-         <width>16</width>
-         <height>31</height>
+         <width>10</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
       </widget>
-      <widget class="Line" name="line_2">
+      <widget class="QLabel" name="l_cVolt">
        <property name="geometry">
         <rect>
-         <x>290</x>
+         <x>340</x>
+         <y>0</y>
+         <width>50</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>80</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Mono</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>GPU voltage</string>
+       </property>
+       <property name="lineWidth">
+        <number>1</number>
+       </property>
+       <property name="text">
+        <string>9999mV</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="l_mVolt">
+       <property name="geometry">
+        <rect>
+         <x>340</x>
+         <y>25</y>
+         <width>50</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>60</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Mono</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>I/O voltage</string>
+       </property>
+       <property name="text">
+        <string>9999mV</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="Line" name="line_5">
+       <property name="geometry">
+        <rect>
+         <x>500</x>
          <y>10</y>
-         <width>16</width>
-         <height>31</height>
+         <width>10</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+      <widget class="Line" name="line_6">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>10</y>
+         <width>10</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="orientation">
@@ -544,7 +438,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -615,7 +509,7 @@
              </property>
              <property name="font">
               <font>
-               <family>Monospace</family>
+               <family>Noto Mono</family>
                <pointsize>8</pointsize>
               </font>
              </property>
@@ -825,7 +719,7 @@
         <item>
          <widget class="QTabWidget" name="tabs_systemInfo">
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="tab_glxInfo">
            <attribute name="title">
@@ -848,7 +742,7 @@
              <widget class="QListWidget" name="list_glxinfo">
               <property name="font">
                <font>
-                <family>Monospace</family>
+                <family>Noto Mono</family>
                 <pointsize>8</pointsize>
                 <weight>50</weight>
                 <bold>false</bold>
@@ -885,7 +779,7 @@
              <widget class="QTreeWidget" name="list_connectors">
               <property name="font">
                <font>
-                <family>Monospace</family>
+                <family>Noto Mono</family>
                 <pointsize>8</pointsize>
                </font>
               </property>
@@ -899,7 +793,7 @@
                <number>250</number>
               </attribute>
               <attribute name="headerMinimumSectionSize">
-               <number>150</number>
+               <number>100</number>
               </attribute>
               <column>
                <property name="text">
@@ -936,7 +830,7 @@
              <widget class="QTreeWidget" name="list_modInfo">
               <property name="font">
                <font>
-                <family>Monospace</family>
+                <family>Noto Mono</family>
                 <pointsize>8</pointsize>
                 <weight>50</weight>
                 <bold>false</bold>
@@ -948,6 +842,12 @@
               <property name="editTriggers">
                <set>QAbstractItemView::NoEditTriggers</set>
               </property>
+              <attribute name="headerDefaultSectionSize">
+               <number>100</number>
+              </attribute>
+              <attribute name="headerMinimumSectionSize">
+               <number>50</number>
+              </attribute>
               <column>
                <property name="text">
                 <string>Option</string>
@@ -988,7 +888,7 @@
              <widget class="QTreeWidget" name="list_stats">
               <property name="font">
                <font>
-                <family>Monospace</family>
+                <family>Noto Mono</family>
                 <pointsize>8</pointsize>
                </font>
               </property>
@@ -1001,8 +901,11 @@
               <property name="indentation">
                <number>2</number>
               </property>
+              <attribute name="headerDefaultSectionSize">
+               <number>350</number>
+              </attribute>
               <attribute name="headerMinimumSectionSize">
-               <number>200</number>
+               <number>100</number>
               </attribute>
               <column>
                <property name="text">
@@ -1053,7 +956,7 @@
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QCustomPlot" name="plotColcks" native="true">
+         <widget class="QCustomPlot" name="plotClocks" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -2004,7 +1907,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Warrning! Unrecommended root mode!</string>
+               <string>Warning! Unrecommended root mode!</string>
               </property>
              </widget>
             </item>
@@ -2836,7 +2739,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_mainConfig">
            <attribute name="title">
@@ -3187,15 +3090,15 @@
              <rect>
               <x>10</x>
               <y>40</y>
-              <width>281</width>
-              <height>191</height>
+              <width>300</width>
+              <height>275</height>
              </rect>
             </property>
             <property name="indentation">
              <number>5</number>
             </property>
             <attribute name="headerDefaultSectionSize">
-             <number>150</number>
+             <number>170</number>
             </attribute>
             <column>
              <property name="text">

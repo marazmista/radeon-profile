@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QTime>
 #include <QCoreApplication>
+#include <QDebug>
 
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;

@@ -124,7 +124,7 @@ void radeon_profile::changeTimeRange() {
 
 void radeon_profile::on_cb_showFreqGraph_clicked(const bool &checked)
 {
-    ui->plotColcks->setVisible(checked);
+    ui->plotClocks->setVisible(checked);
 }
 
 void radeon_profile::on_cb_showTempsGraph_clicked(const bool &checked)
@@ -138,15 +138,15 @@ void radeon_profile::on_cb_showVoltsGraph_clicked(const bool &checked)
 }
 
 void radeon_profile::resetGraphs() {
-    ui->plotColcks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
+    ui->plotClocks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
     ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
     ui->plotTemp->yAxis->setRange(10,20);
 }
 
 void radeon_profile::showLegend(const bool &checked) {
-    ui->plotColcks->legend->setVisible(checked);
+    ui->plotClocks->legend->setVisible(checked);
     ui->plotVolts->legend->setVisible(checked);
-    ui->plotColcks->replot();
+    ui->plotClocks->replot();
     ui->plotVolts->replot();
 }
 
@@ -193,14 +193,15 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     if (ui->cb_closeTray->isChecked() && !closeFromTrayMenu) {
         this->hide();
         e->ignore();
-        return;
-    }
+    } else {
 
-    saveConfig();
+        saveConfig();
 
-    if (device.features.pwmAvailable) {
-        device.setPwmManualControl(false);
-        saveFanProfiles();
+        if (device.features.pwmAvailable) {
+            device.setPwmManualControl(false);
+            saveFanProfiles();
+        }
+        QApplication::quit();
     }
 }
 
@@ -335,9 +336,7 @@ void radeon_profile::on_chProfile_clicked()
 
 void radeon_profile::on_btn_reconfigureDaemon_clicked()
 {
-    globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
-    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
-    device.reconfigureDaemon();
+    configureDaemonAutoRefresh(ui->cb_daemonAutoRefresh->isChecked(), ui->spin_timerInterval->value());
 }
 
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)

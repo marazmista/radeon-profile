@@ -11,49 +11,49 @@
 // === GUI setup functions === //
 void radeon_profile::setupGraphs()
 {
-    ui->plotColcks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
+    ui->plotClocks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
     ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
 
     ui->plotTemp->xAxis->setLabel("time");
     ui->plotTemp->yAxis->setLabel("temperature");
-    ui->plotColcks->xAxis->setLabel("time");
-    ui->plotColcks->yAxis->setLabel("MHz");
+    ui->plotClocks->xAxis->setLabel("time");
+    ui->plotClocks->yAxis->setLabel("MHz");
     ui->plotVolts->xAxis->setLabel("time");
     ui->plotVolts->yAxis->setLabel("mV");
     ui->plotTemp->xAxis->setTickLabels(false);
-    ui->plotColcks->xAxis->setTickLabels(false);
+    ui->plotClocks->xAxis->setTickLabels(false);
     ui->plotVolts->xAxis->setTickLabels(false);
 
     ui->plotTemp->addGraph(); // temp graph
-    ui->plotColcks->addGraph(); // core clock graph
-    ui->plotColcks->addGraph(); // mem clock graph
-    ui->plotColcks->addGraph(); // uvd
-    ui->plotColcks->addGraph(); // uvd
+    ui->plotClocks->addGraph(); // core clock graph
+    ui->plotClocks->addGraph(); // mem clock graph
+    ui->plotClocks->addGraph(); // uvd
+    ui->plotClocks->addGraph(); // uvd
     ui->plotVolts->addGraph(); // volts gpu
     ui->plotVolts->addGraph(); // volts mem
 
     ui->plotFanProfile->addGraph();
     ui->plotFanProfile->yAxis->setRange(0,100);
     ui->plotFanProfile->xAxis->setRange(0,110);
-    ui->plotFanProfile->xAxis->setLabel("Temperature");
-    ui->plotFanProfile->yAxis->setLabel("Fan speed [%]");
+    ui->plotFanProfile->xAxis->setLabel(label_temperature);
+    ui->plotFanProfile->yAxis->setLabel(label_fanSpeed);
 
     setupGraphsStyle();
 
     // legend clocks //
-    ui->plotColcks->graph(0)->setName("GPU clock");
-    ui->plotColcks->graph(1)->setName("Memory clock");
-    ui->plotColcks->graph(2)->setName("Video core clock");
-    ui->plotColcks->graph(3)->setName("Decoder clock");
-    ui->plotColcks->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignLeft);
-    ui->plotColcks->legend->setVisible(true);
+    ui->plotClocks->graph(0)->setName(label_currentGPUClock);
+    ui->plotClocks->graph(1)->setName(label_currentMemClock);
+    ui->plotClocks->graph(2)->setName(label_uvdVideoCoreClock);
+    ui->plotClocks->graph(3)->setName(label_uvdDecoderClock);
+    ui->plotClocks->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignLeft);
+    ui->plotClocks->legend->setVisible(true);
 
-    ui->plotVolts->graph(0)->setName("GPU voltage");
-    ui->plotVolts->graph(1)->setName("Memory voltage");
+    ui->plotVolts->graph(0)->setName(label_vddc);
+    ui->plotVolts->graph(1)->setName(label_vddci);
     ui->plotVolts->axisRect()->insetLayout()->setInsetAlignment(0,Qt::AlignTop|Qt::AlignLeft);
     ui->plotVolts->legend->setVisible(true);
 
-    ui->plotColcks->replot();
+    ui->plotClocks->replot();
     ui->plotTemp->replot();
     ui->plotVolts->replot();
 }
@@ -67,20 +67,20 @@ void radeon_profile::setupGraphsStyle()
     ui->plotTemp->graph(0)->setPen(pen);
     ui->plotFanProfile->graph(0)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->backgroundColor(1));
-    ui->plotColcks->graph(0)->setPen(pen);
+    ui->plotClocks->graph(0)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->backgroundColor(1));
-    ui->plotColcks->graph(1)->setPen(pen);
+    ui->plotClocks->graph(1)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->backgroundColor(1));
-    ui->plotColcks->graph(2)->setPen(pen);
+    ui->plotClocks->graph(2)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
-    ui->plotColcks->graph(3)->setPen(pen);
+    ui->plotClocks->graph(3)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(CORE_VOLTS_LINE)->backgroundColor(1));
     ui->plotVolts->graph(0)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(MEM_VOLTS_LINE)->backgroundColor(1));
     ui->plotVolts->graph(1)->setPen(pen);
 
     ui->plotTemp->setBackground(QBrush(ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1)));
-    ui->plotColcks->setBackground(QBrush(ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1)));
+    ui->plotClocks->setBackground(QBrush(ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1)));
     ui->plotVolts->setBackground(QBrush(ui->graphColorsList->topLevelItem(VOLTS_BG)->backgroundColor(1)));
     ui->plotFanProfile->setBackground(QBrush(ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1)));
 }
