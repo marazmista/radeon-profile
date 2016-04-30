@@ -429,8 +429,8 @@
     </message>
     <message>
         <location filename="radeon_profile.ui" line="228"/>
-        <source>999°C</source>
-        <oldsource>999 °C</oldsource>
+        <source>99.9°C</source>
+        <oldsource>999°C</oldsource>
         <translation></translation>
     </message>
     <message>

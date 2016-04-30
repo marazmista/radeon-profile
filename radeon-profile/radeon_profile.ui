@@ -87,7 +87,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Noto Mono</family>
+         <family>Monospace</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -118,7 +118,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Noto Mono</family>
+         <family>Monospace</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -129,15 +129,15 @@
       <widget class="QComboBox" name="combo_pLevel">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>125</x>
          <y>25</y>
-         <width>150</width>
+         <width>125</width>
          <height>24</height>
         </rect>
        </property>
        <property name="minimumSize">
         <size>
-         <width>140</width>
+         <width>100</width>
          <height>24</height>
         </size>
        </property>
@@ -149,7 +149,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Noto Mono</family>
+         <family>Monospace</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -160,7 +160,7 @@
       <widget class="QLabel" name="l_fanSpeed">
        <property name="geometry">
         <rect>
-         <x>510</x>
+         <x>530</x>
          <y>0</y>
          <width>70</width>
          <height>50</height>
@@ -180,7 +180,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Noto Mono</family>
+         <family>Monospace</family>
          <pointsize>20</pointsize>
         </font>
        </property>
@@ -199,7 +199,7 @@
         <rect>
          <x>410</x>
          <y>0</y>
-         <width>80</width>
+         <width>100</width>
          <height>50</height>
         </rect>
        </property>
@@ -211,13 +211,13 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>90</width>
+         <width>120</width>
          <height>50</height>
         </size>
        </property>
        <property name="font">
         <font>
-         <family>Noto Mono</family>
+         <family>Monospace</family>
          <pointsize>20</pointsize>
         </font>
        </property>
@@ -225,7 +225,7 @@
         <string>GPU temperature</string>
        </property>
        <property name="text">
-        <string>999°C</string>
+        <string>99.9°C</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -254,7 +254,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Noto Mono</family>
+         <family>Monospace</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -291,7 +291,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Noto Mono</family>
+         <family>Monospace</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -341,7 +341,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Noto Mono</family>
+         <family>Monospace</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -381,7 +381,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Noto Mono</family>
+         <family>Monospace</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -398,7 +398,7 @@
       <widget class="Line" name="line_5">
        <property name="geometry">
         <rect>
-         <x>500</x>
+         <x>520</x>
          <y>10</y>
          <width>10</width>
          <height>30</height>

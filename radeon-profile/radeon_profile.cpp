@@ -24,7 +24,6 @@
 #include <QDir>
 #include <QDateTime>
 #include <QMessageBox>
-#include <QDesktopWidget>
 #include <QDebug>
 
 #define appVersion 20160124
@@ -41,14 +40,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->setupUi(this);
     timer = new QTimer();
     execsRunning = new QList<execBin*>();
-
-    // Set up the size (2/3 of the screen size, centered)
-    const QRect desktopSize = QDesktopWidget().availableGeometry(this);
-    const int width = desktopSize.width()*2/3,
-            height = desktopSize.height()*2/3,
-            x = (desktopSize.width() - width)/2,
-            y = (desktopSize.height() - height)/2;
-    setGeometry(x,y,width,height);
 
     // checks if running as root
     if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
@@ -105,11 +96,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     timer->start();
     addRuntimeWidgets();
 
-    // At last, set visible if wanted
-    if (ui->cb_startMinimized->isChecked())
-        showMinimized();
-    else
-        showNormal();
+    showWindow();
 }
 
 radeon_profile::~radeon_profile()

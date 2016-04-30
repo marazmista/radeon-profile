@@ -186,6 +186,10 @@ private:
      */
     void configureDaemonAutoRefresh(bool enabled = true, int interval = 1);
 
+    /**
+     * @brief showWindow reveals the main window, unless the "Start Minimized" setting is checked
+     */
+    void showWindow();
 };
 
 #endif // RADEON_PROFILE_H
