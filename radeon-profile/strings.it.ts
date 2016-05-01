@@ -4,17 +4,17 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="globalStuff.h" line="44"/>
+        <location filename="globalStuff.h" line="103"/>
         <source>Resolution</source>
         <translation>Risoluzione</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="45"/>
+        <location filename="globalStuff.h" line="104"/>
         <source>Minimum resolution</source>
         <translation>Risoluzione minima</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="46"/>
+        <location filename="globalStuff.h" line="105"/>
         <source>Maximum resolution</source>
         <translation>Risoluzione massima</translation>
     </message>
@@ -60,199 +60,465 @@
         <translation>Temperatura della GPU</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="42"/>
+        <location filename="globalStuff.h" line="134"/>
+        <source>Back to profiles</source>
+        <translation>Ritorna ai profili</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="135"/>
         <source>Can&apos;t read data</source>
         <translation>Impossibile leggere i dati</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="43"/>
+        <location filename="globalStuff.h" line="136"/>
         <source>You need debugfs mounted and either root rights or the daemon running</source>
         <oldsource>To read the data you need debugfs mounted and either root rights or the daemon running</oldsource>
         <translation>È necessario che debugfs sia montato e che il demone sia attivo (o che il programma venga eseguito come root)</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="47"/>
+        <location filename="globalStuff.h" line="86"/>
+        <source>Error</source>
+        <translation>Errore</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="87"/>
+        <source>Profile name can&apos;t be empty!</source>
+        <translation>Il nome del profilo non può essere vuoto!</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="88"/>
+        <source>No binary is selected!</source>
+        <translation>Nessun eseguibile selezionato!</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="89"/>
+        <source>Binary not found in /usr/bin: </source>
+        <translation>Eseguibile non trovato in /usr/bin: </translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="90"/>
+        <source>Enter value</source>
+        <translation>Inserisci valore</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="91"/>
+        <source>Enter valid value for </source>
+        <translation>Inserisci un valore valido per </translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="92"/>
+        <source>Question</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Remove existing variable in summary?</source>
+        <translation type="vanished">Rimuovere la variabile dal sommario?</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="94"/>
+        <source>Remove</source>
+        <translation>Rimuovi</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="93"/>
+        <source>Remove this item?</source>
+        <translation>Rimuovere questo elemento?</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="95"/>
+        <source>Select binary</source>
+        <translation>Seleziona un eseguibile</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="96"/>
+        <source>Select log file</source>
+        <translation>Seleziona un file di log</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="97"/>
+        <source>Can&apos;t run something that not exists!</source>
+        <translation>Non posso eseguire qualcosa che non esiste!</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="98"/>
+        <source>Run</source>
+        <translation>Esegui</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="99"/>
+        <source>Run: &quot;</source>
+        <translation>Eseguire &quot;</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="100"/>
+        <source>&quot;?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="106"/>
         <source>Virtual size</source>
         <translation>Dimensione virtuale</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="48"/>
+        <location filename="globalStuff.h" line="107"/>
         <source>Outputs</source>
         <translation>Connessioni</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="49"/>
+        <location filename="globalStuff.h" line="108"/>
         <source>Active</source>
         <translation>Attivo</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="50"/>
+        <location filename="globalStuff.h" line="109"/>
         <source> Hz vertical, </source>
         <translation> Hz verticale, </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="51"/>
+        <location filename="globalStuff.h" line="110"/>
         <source> KHz horizontal, </source>
         <translation> KHz orizzontale, </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="52"/>
+        <location filename="globalStuff.h" line="111"/>
         <source> MHz dot clock</source>
         <translation> MHz dot clock</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="53"/>
+        <location filename="globalStuff.h" line="112"/>
         <source>Yes</source>
         <translation>Si</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="54"/>
+        <location filename="globalStuff.h" line="113"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="55"/>
+        <location filename="globalStuff.h" line="114"/>
         <source>Refresh rate</source>
         <translation>Frequenza di aggiornamento</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="56"/>
+        <location filename="globalStuff.h" line="115"/>
         <source>Offset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="57"/>
+        <location filename="globalStuff.h" line="116"/>
         <source>Brightness (software)</source>
         <translation>Luminosità (software)</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="58"/>
+        <location filename="globalStuff.h" line="117"/>
         <source>Size</source>
         <translation>Dimensione</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="59"/>
+        <location filename="globalStuff.h" line="118"/>
         <source>Supported modes</source>
         <translation>Modalità supportate</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="60"/>
+        <location filename="globalStuff.h" line="119"/>
         <source>Properties</source>
         <translation>Proprietà</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="61"/>
+        <location filename="globalStuff.h" line="120"/>
         <source>Serial number</source>
         <translation>Numero di serie</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="62"/>
+        <location filename="globalStuff.h" line="121"/>
         <source>Not available</source>
         <translation>Non disponibile</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="63"/>
+        <location filename="globalStuff.h" line="122"/>
         <source>Connected with </source>
         <translation>Connesso con </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="64"/>
+        <location filename="globalStuff.h" line="42"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="65"/>
+        <location filename="globalStuff.h" line="49"/>
         <source>Fan speed</source>
         <translation>Velocità della ventola</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="66"/>
+        <location filename="globalStuff.h" line="123"/>
         <source>Disconnected</source>
         <translation>Disconnesso</translation>
     </message>
     <message>
+        <location filename="globalStuff.h" line="45"/>
+        <source>Time (s)</source>
+        <translation>Tempo (s)</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="46"/>
+        <source>Temperature (°C)</source>
+        <translation>Temperatura (°C)</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="47"/>
+        <source>Clock (MHz)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="48"/>
+        <source>Voltage (mV)</source>
+        <translation>Voltaggio (mV)</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="50"/>
+        <source>DPM</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="51"/>
+        <source>Change standard profile</source>
+        <translation>Cambia profilo standard</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="52"/>
+        <source>Quit</source>
+        <translation>Esci</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="53"/>
+        <source>Keep refreshing when hidden</source>
+        <translation>Continua a aggiornare quando nascosto</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="54"/>
+        <source>Battery</source>
+        <translation>Batteria</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="55"/>
+        <source>Balanced</source>
+        <translation>Bilanciato</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="56"/>
+        <source>Performance</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="57"/>
+        <source>Reset min/max temperature</source>
+        <translation>Resetta temperatura min/max</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="58"/>
+        <source>Reset graphs vertical scale</source>
+        <translation>Resetta scala verticale dei grafici</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="59"/>
+        <source>Show legend</source>
+        <translation>Mostra la legenda</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="60"/>
+        <source>Graph offset on right</source>
+        <translation>Offset del grafico a destra</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="61"/>
+        <source>Auto</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="62"/>
+        <source>Low</source>
+        <translation>Basso</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="63"/>
+        <source>High</source>
+        <translation>Alto</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="64"/>
+        <source>Force power level</source>
+        <translation>Forza il livello di potenza</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="65"/>
+        <source>Copy to clipboard</source>
+        <translation>Copia negli appunti</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="66"/>
+        <source>Reset statistics</source>
+        <translation>Resetta le statistiche</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="69"/>
+        <source>GPU data is disabled</source>
+        <translation>Dati della GPU disabilitati</translation>
+    </message>
+    <message>
         <location filename="globalStuff.h" line="70"/>
+        <source>Fan control information</source>
+        <translation>Informazioni sul controllo della ventola</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="71"/>
+        <source>Don&apos;t overheat your card! Be careful! Don&apos;t use this if you don&apos;t know what you&apos;re doing! 
+
+Hovewer, looks like card won&apos;t apply too low values due its internal protection. 
+
+Closing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned!</source>
+        <oldsource>Don&apos;t overheat your card! Be careful! Don&apos;t use this if you don&apos;t know what you&apos;re doing! 
+
+Hovewer, looks like card won&apos;t apply too low values due its internal protection. Closing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned.</oldsource>
+        <translation>Non surriscaldare la tua scheda grafica! Usa questo sistema solo se sai quello che stai facendo!
+
+Il sistema di protezione della scheda grafica non accetta valori troppo bassi.
+
+Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola su Auto. Se l&apos;applicazione va in crash, l&apos;ultimo valore usato rimarrà attivo. Sei stato avvertito!</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="72"/>
+        <source>Speed [%] (20-100)</source>
+        <translation>Velocità [%] (20-100)</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="73"/>
+        <source>Select new power profile</source>
+        <translation>Seleziona un nuovo profilo di potenza</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="74"/>
+        <source>Profile selection</source>
+        <translation>Selezione del profilo</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="78"/>
+        <source>Process state: running</source>
+        <translation>Processo in esecuzione</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="75"/>
+        <source>Process is still running. Close tab?</source>
+        <translation>Il processo è ancora attivo. Chiudere comunque?</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="79"/>
+        <source>Process state: not running</source>
+        <translation>Processo terminato</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="80"/>
+        <source>Save output to file</source>
+        <translation>Salva output in un file</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="81"/>
+        <source>Command</source>
+        <translation>Comando</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="82"/>
+        <source>Output</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="83"/>
+        <source>Save</source>
+        <oldsource>Save to </oldsource>
+        <translation>Salva</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="126"/>
         <source>%n mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="72"/>
+        <location filename="globalStuff.h" line="128"/>
         <source>%n mm </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="73"/>
+        <location filename="globalStuff.h" line="129"/>
         <source>(%n inches)</source>
         <translation>(%n pollici)</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="69"/>
-        <location filename="globalStuff.h" line="71"/>
+        <location filename="globalStuff.h" line="125"/>
+        <location filename="globalStuff.h" line="127"/>
         <source>%n mm x </source>
         <oldsource>%n MHz</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="74"/>
+        <location filename="globalStuff.h" line="137"/>
         <source>%n°C</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="75"/>
-        <location filename="globalStuff.h" line="76"/>
-        <location filename="globalStuff.h" line="77"/>
-        <location filename="globalStuff.h" line="78"/>
+        <location filename="globalStuff.h" line="138"/>
+        <location filename="globalStuff.h" line="139"/>
+        <location filename="globalStuff.h" line="140"/>
+        <location filename="globalStuff.h" line="141"/>
         <source>%nMHz</source>
         <oldsource>%n %</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="79"/>
-        <location filename="globalStuff.h" line="80"/>
+        <location filename="globalStuff.h" line="142"/>
+        <location filename="globalStuff.h" line="143"/>
         <source>%nmV</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="81"/>
+        <location filename="globalStuff.h" line="144"/>
         <source>%n%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="82"/>
+        <location filename="globalStuff.h" line="145"/>
         <source>Power level %n </source>
         <oldsource>Power level %n</oldsource>
         <translation>Livello %n </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="83"/>
+        <location filename="globalStuff.h" line="146"/>
         <source>(GPU@%nMHz,</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="84"/>
-        <location filename="globalStuff.h" line="86"/>
+        <location filename="globalStuff.h" line="147"/>
+        <location filename="globalStuff.h" line="149"/>
         <source>%nmV)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="85"/>
+        <location filename="globalStuff.h" line="148"/>
         <source>(Mem@%nMHz,</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="731"/>
+        <location filename="globalStuff.h" line="130"/>
         <source>%n connected, </source>
         <oldsource> connected, </oldsource>
         <translation>%n connessi, </translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="732"/>
+        <location filename="globalStuff.h" line="131"/>
         <source>%n active</source>
         <oldsource> active</oldsource>
         <translation>%n attivi</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="68"/>
+        <location filename="globalStuff.h" line="124"/>
         <source>Virtual screen n°%n</source>
         <translatorcomment>Per un qualche motivo non viene tradotto correttamente a runtime, investigare</translatorcomment>
         <translation>Schermo virtuale n°%n</translation>

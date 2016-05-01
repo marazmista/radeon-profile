@@ -136,7 +136,7 @@ void radeon_profile::addRuntimeWidgets() {
 
     // button on exec pages
     QPushButton *btnBackProfiles = new QPushButton();
-    btnBackProfiles->setText("Back to profiles");
+    btnBackProfiles->setText(label_backToProfiles);
     ui->tabs_execOutputs->setCornerWidget(btnBackProfiles);
     btnBackProfiles->show();
     connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));

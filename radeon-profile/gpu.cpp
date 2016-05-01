@@ -728,8 +728,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             XRRFreeOutputInfo(outputInfo);
         }
         // Screen completed: print output count (connected and active) and deallocate screenResources
-        outputListItem->setText(1, QObject::tr("%n connected, ", NULL, screenConnectedOutputs)
-                                +QObject::tr("%n active", NULL, screenActiveOutputs));
+        outputListItem->setText(1, format_outputConnected + format_outputActive);
         XRRFreeScreenResources(screenResources);
     }
 

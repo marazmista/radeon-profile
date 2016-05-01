@@ -14,12 +14,12 @@ void radeon_profile::setupGraphs()
     ui->plotClocks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
     ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
 
-    ui->plotTemp->xAxis->setLabel("time");
-    ui->plotTemp->yAxis->setLabel("temperature");
-    ui->plotClocks->xAxis->setLabel("time");
-    ui->plotClocks->yAxis->setLabel("MHz");
-    ui->plotVolts->xAxis->setLabel("time");
-    ui->plotVolts->yAxis->setLabel("mV");
+    ui->plotTemp->xAxis->setLabel(label_timeAxis);
+    ui->plotTemp->yAxis->setLabel(label_temperatureAxis);
+    ui->plotClocks->xAxis->setLabel(label_timeAxis);
+    ui->plotClocks->yAxis->setLabel(label_clockAxis);
+    ui->plotVolts->xAxis->setLabel(label_timeAxis);
+    ui->plotVolts->yAxis->setLabel(label_voltageAxis);
     ui->plotTemp->xAxis->setTickLabels(false);
     ui->plotClocks->xAxis->setTickLabels(false);
     ui->plotVolts->xAxis->setTickLabels(false);
@@ -90,33 +90,33 @@ void radeon_profile::setupTrayIcon() {
     setWindowState(Qt::WindowMinimized);
     //close //
     closeApp = new QAction(this);
-    closeApp->setText("Quit");
+    closeApp->setText(label_quit);
     connect(closeApp,SIGNAL(triggered()),this,SLOT(closeFromTray()));
 
     // standard profiles
     changeProfile = new QAction(this);
-    changeProfile->setText("Change standard profile");
+    changeProfile->setText(label_changeProfile);
     connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
 
     // refresh when hidden
     refreshWhenHidden = new QAction(this);
     refreshWhenHidden->setCheckable(true);
     refreshWhenHidden->setChecked(true);
-    refreshWhenHidden->setText("Keep refreshing when hidden");
+    refreshWhenHidden->setText(label_refreshWhenHidden);
 
     // dpm menu //
     dpmMenu = new QMenu(this);
-    dpmMenu->setTitle("DPM");
+    dpmMenu->setTitle(label_dpm);
 
     dpmSetBattery = new QAction(this);
     dpmSetBalanced = new QAction(this);
     dpmSetPerformance = new QAction(this);
 
-    dpmSetBattery->setText("Battery");
+    dpmSetBattery->setText(label_battery);
     dpmSetBattery->setIcon(QIcon(":/icon/symbols/arrow1.png"));
-    dpmSetBalanced->setText("Balanced");
+    dpmSetBalanced->setText(label_performance);
     dpmSetBalanced->setIcon(QIcon(":/icon/symbols/arrow2.png"));
-    dpmSetPerformance->setText("Performance");
+    dpmSetPerformance->setText(label_performance);
     dpmSetPerformance->setIcon(QIcon(":/icon/symbols/arrow3.png"));
 
     connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(on_btn_dpmBattery_clicked()));
@@ -151,18 +151,18 @@ void radeon_profile::setupOptionsMenu()
     ui->btn_options->setMenu(optionsMenu);
 
     QAction *resetMinMax = new QAction(this);
-    resetMinMax->setText("Reset min/max temperature");
+    resetMinMax->setText(label_resetMinMax);
 
     QAction *resetGraphs = new QAction(this);
-    resetGraphs->setText("Reset graphs vertical scale");
+    resetGraphs->setText(label_resetGraphs);
 
     QAction *showLegend = new QAction(this);
-    showLegend->setText("Show legend");
+    showLegend->setText(label_showLegend);
     showLegend->setCheckable(true);
     showLegend->setChecked(true);
 
     QAction *graphOffset = new QAction(this);
-    graphOffset->setText("Graph offset on right");
+    graphOffset->setText(label_graphOffset);
     graphOffset->setCheckable(true);
     graphOffset->setChecked(true);
 
@@ -182,15 +182,15 @@ void radeon_profile::setupForcePowerLevelMenu() {
     forcePowerMenu = new QMenu(this);
 
     QAction *forceAuto = new QAction(this);
-    forceAuto->setText("Auto");
+    forceAuto->setText(label_auto);
 
     QAction *forceLow = new QAction(this);
-    forceLow->setText("Low");
+    forceLow->setText(label_low);
 
     QAction *forceHigh = new QAction(this);
-    forceHigh->setText("High");
+    forceHigh->setText(label_high);
 
-    forcePowerMenu->setTitle("Force power level");
+    forcePowerMenu->setTitle(label_forcePowerLevel);
     forcePowerMenu->addAction(forceAuto);
     forcePowerMenu->addSeparator();
     forcePowerMenu->addAction(forceLow);
@@ -203,19 +203,19 @@ void radeon_profile::setupForcePowerLevelMenu() {
 
 void radeon_profile::setupContextMenus() {
     QAction *copyToClipboard = new QAction(this);
-    copyToClipboard->setText("Copy to clipboard");
+    copyToClipboard->setText(label_copyToClipboard);
     ui->list_glxinfo->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->list_glxinfo->addAction(copyToClipboard);
     connect(copyToClipboard, SIGNAL(triggered()),this,SLOT(copyGlxInfoToClipboard()));
 
     QAction * copyConnectors = new QAction(this);
-    copyConnectors->setText("Copy to clipboard");
+    copyConnectors->setText(label_copyToClipboard);
     ui->list_connectors->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->list_connectors->addAction(copyConnectors);
     connect(copyConnectors, SIGNAL(triggered()), this, SLOT(copyConnectorsToClipboard()));
 
     QAction *reset = new QAction(this);
-    reset->setText("Reset statistics");
+    reset->setText(label_resetStatistics);
     ui->list_stats->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->list_stats->addAction(reset);
     connect(reset,SIGNAL(triggered()),this,SLOT(resetStats()));
