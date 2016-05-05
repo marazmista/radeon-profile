@@ -1,4 +1,4 @@
-// copyright marazmista @ 29.03.2014
+﻿// copyright marazmista @ 29.03.2014
 
 #include "dxorg.h"
 #include "globalStuff.h"
@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QTime>
 #include <QCoreApplication>
+#include <QDebug>
 
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
@@ -274,78 +275,6 @@ float dXorg::getTemperature() {
     }
     }
     return temp.toDouble();
-}
-
-QList<QTreeWidgetItem *> dXorg::getCardConnectors() {
-    QList<QTreeWidgetItem *> cardConnectorsList;
-    QStringList out = globalStuff::grabSystemInfo("xrandr -q --verbose"), screens;
-    screens = out.filter(QRegExp("Screen\\s\\d"));
-
-    for (int i = 0; i < screens.count(); i++) {
-        QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << screens[i].split(':')[0] << screens[i].split(",")[1].remove(" current "));
-        cardConnectorsList.append(item);
-    }
-    cardConnectorsList.append(new QTreeWidgetItem(QStringList() << "------"));
-
-    for (int i = 0; i < out.size(); i++) {
-        if (!out[i].startsWith("\t") && out[i].contains("connected")) {
-            QString connector = out[i].split(' ')[0],
-                    status = out[i].split(' ')[1],
-                    res = out[i].split(' ')[2].split('+')[0];
-
-            if (status == "connected") {
-                QString monitor, edid = monitor = "";
-
-                // find EDID
-                for (int i = out.indexOf(QRegExp(".+EDID.+"))+1; i < out.count(); i++)
-                    if (out[i].startsWith(("\t\t")))
-                        edid += out[i].remove("\t\t");
-                    else
-                        break;
-
-                // Parse EDID
-                // See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
-                if (edid.size() >= 256) {
-                    QStringList hex;
-                    bool found = false, ok = true;
-                    int i2 = 108;
-
-                    for(int i3 = 0; i3 < 4; i3++) {
-                        if(edid.mid(i2, 2).toInt(&ok, 16) == 0 && ok &&
-                                edid.mid(i2 + 2, 2).toInt(&ok, 16) == 0) {
-                            // Other Monitor Descriptor found
-                            if(ok && edid.mid(i2 + 6, 2).toInt(&ok, 16) == 0xFC && ok) {
-                                // Monitor name found
-                                for(int i4 = i2 + 10; i4 < i2 + 34; i4 += 2)
-                                    hex << edid.mid(i4, 2);
-                                found = true;
-                                break;
-                            }
-                        }
-                        if(!ok)
-                            break;
-                        i2 += 36;
-                    }
-                    if (ok && found) {
-                        // Hex -> String
-                        for(i2 = 0; i2 < hex.size(); i2++) {
-                            monitor += QString(hex[i2].toInt(&ok, 16));
-                            if(!ok)
-                                break;
-                        }
-
-                        if(ok)
-                            monitor = " (" + monitor.left(monitor.indexOf('\n')) + ")";
-                    }
-                }
-                status += monitor + " @ " + QString((res.contains('x')) ? res : "unknown");
-            }
-
-            QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << connector << status);
-            cardConnectorsList.append(item);
-        }
-    }
-    return cardConnectorsList;
 }
 
 globalStuff::powerMethod dXorg::getPowerMethod() {

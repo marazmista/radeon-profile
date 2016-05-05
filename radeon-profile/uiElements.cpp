@@ -11,49 +11,49 @@
 // === GUI setup functions === //
 void radeon_profile::setupGraphs()
 {
-    ui->plotColcks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
+    ui->plotClocks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
     ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
 
-    ui->plotTemp->xAxis->setLabel("time");
-    ui->plotTemp->yAxis->setLabel("temperature");
-    ui->plotColcks->xAxis->setLabel("time");
-    ui->plotColcks->yAxis->setLabel("MHz");
-    ui->plotVolts->xAxis->setLabel("time");
-    ui->plotVolts->yAxis->setLabel("mV");
+    ui->plotTemp->xAxis->setLabel(label_timeAxis);
+    ui->plotTemp->yAxis->setLabel(label_temperatureAxis);
+    ui->plotClocks->xAxis->setLabel(label_timeAxis);
+    ui->plotClocks->yAxis->setLabel(label_clockAxis);
+    ui->plotVolts->xAxis->setLabel(label_timeAxis);
+    ui->plotVolts->yAxis->setLabel(label_voltageAxis);
     ui->plotTemp->xAxis->setTickLabels(false);
-    ui->plotColcks->xAxis->setTickLabels(false);
+    ui->plotClocks->xAxis->setTickLabels(false);
     ui->plotVolts->xAxis->setTickLabels(false);
 
     ui->plotTemp->addGraph(); // temp graph
-    ui->plotColcks->addGraph(); // core clock graph
-    ui->plotColcks->addGraph(); // mem clock graph
-    ui->plotColcks->addGraph(); // uvd
-    ui->plotColcks->addGraph(); // uvd
+    ui->plotClocks->addGraph(); // core clock graph
+    ui->plotClocks->addGraph(); // mem clock graph
+    ui->plotClocks->addGraph(); // uvd
+    ui->plotClocks->addGraph(); // uvd
     ui->plotVolts->addGraph(); // volts gpu
     ui->plotVolts->addGraph(); // volts mem
 
     ui->plotFanProfile->addGraph();
     ui->plotFanProfile->yAxis->setRange(0,100);
     ui->plotFanProfile->xAxis->setRange(0,110);
-    ui->plotFanProfile->xAxis->setLabel("Temperature");
-    ui->plotFanProfile->yAxis->setLabel("Fan speed [%]");
+    ui->plotFanProfile->xAxis->setLabel(label_temperature);
+    ui->plotFanProfile->yAxis->setLabel(label_fanSpeed);
 
     setupGraphsStyle();
 
     // legend clocks //
-    ui->plotColcks->graph(0)->setName("GPU clock");
-    ui->plotColcks->graph(1)->setName("Memory clock");
-    ui->plotColcks->graph(2)->setName("Video core clock");
-    ui->plotColcks->graph(3)->setName("Decoder clock");
-    ui->plotColcks->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignLeft);
-    ui->plotColcks->legend->setVisible(true);
+    ui->plotClocks->graph(0)->setName(label_currentGPUClock);
+    ui->plotClocks->graph(1)->setName(label_currentMemClock);
+    ui->plotClocks->graph(2)->setName(label_uvdVideoCoreClock);
+    ui->plotClocks->graph(3)->setName(label_uvdDecoderClock);
+    ui->plotClocks->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignLeft);
+    ui->plotClocks->legend->setVisible(true);
 
-    ui->plotVolts->graph(0)->setName("GPU voltage");
-    ui->plotVolts->graph(1)->setName("Memory voltage");
+    ui->plotVolts->graph(0)->setName(label_vddc);
+    ui->plotVolts->graph(1)->setName(label_vddci);
     ui->plotVolts->axisRect()->insetLayout()->setInsetAlignment(0,Qt::AlignTop|Qt::AlignLeft);
     ui->plotVolts->legend->setVisible(true);
 
-    ui->plotColcks->replot();
+    ui->plotClocks->replot();
     ui->plotTemp->replot();
     ui->plotVolts->replot();
 }
@@ -67,20 +67,20 @@ void radeon_profile::setupGraphsStyle()
     ui->plotTemp->graph(0)->setPen(pen);
     ui->plotFanProfile->graph(0)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->backgroundColor(1));
-    ui->plotColcks->graph(0)->setPen(pen);
+    ui->plotClocks->graph(0)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->backgroundColor(1));
-    ui->plotColcks->graph(1)->setPen(pen);
+    ui->plotClocks->graph(1)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->backgroundColor(1));
-    ui->plotColcks->graph(2)->setPen(pen);
+    ui->plotClocks->graph(2)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
-    ui->plotColcks->graph(3)->setPen(pen);
+    ui->plotClocks->graph(3)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(CORE_VOLTS_LINE)->backgroundColor(1));
     ui->plotVolts->graph(0)->setPen(pen);
     pen.setColor(ui->graphColorsList->topLevelItem(MEM_VOLTS_LINE)->backgroundColor(1));
     ui->plotVolts->graph(1)->setPen(pen);
 
     ui->plotTemp->setBackground(QBrush(ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1)));
-    ui->plotColcks->setBackground(QBrush(ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1)));
+    ui->plotClocks->setBackground(QBrush(ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1)));
     ui->plotVolts->setBackground(QBrush(ui->graphColorsList->topLevelItem(VOLTS_BG)->backgroundColor(1)));
     ui->plotFanProfile->setBackground(QBrush(ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1)));
 }
@@ -90,33 +90,33 @@ void radeon_profile::setupTrayIcon() {
     setWindowState(Qt::WindowMinimized);
     //close //
     closeApp = new QAction(this);
-    closeApp->setText("Quit");
+    closeApp->setText(label_quit);
     connect(closeApp,SIGNAL(triggered()),this,SLOT(closeFromTray()));
 
     // standard profiles
     changeProfile = new QAction(this);
-    changeProfile->setText("Change standard profile");
+    changeProfile->setText(label_changeProfile);
     connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
 
     // refresh when hidden
     refreshWhenHidden = new QAction(this);
     refreshWhenHidden->setCheckable(true);
     refreshWhenHidden->setChecked(true);
-    refreshWhenHidden->setText("Keep refreshing when hidden");
+    refreshWhenHidden->setText(label_refreshWhenHidden);
 
     // dpm menu //
     dpmMenu = new QMenu(this);
-    dpmMenu->setTitle("DPM");
+    dpmMenu->setTitle(label_dpm);
 
     dpmSetBattery = new QAction(this);
     dpmSetBalanced = new QAction(this);
     dpmSetPerformance = new QAction(this);
 
-    dpmSetBattery->setText("Battery");
+    dpmSetBattery->setText(label_battery);
     dpmSetBattery->setIcon(QIcon(":/icon/symbols/arrow1.png"));
-    dpmSetBalanced->setText("Balanced");
+    dpmSetBalanced->setText(label_performance);
     dpmSetBalanced->setIcon(QIcon(":/icon/symbols/arrow2.png"));
-    dpmSetPerformance->setText("Performance");
+    dpmSetPerformance->setText(label_performance);
     dpmSetPerformance->setIcon(QIcon(":/icon/symbols/arrow3.png"));
 
     connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(on_btn_dpmBattery_clicked()));
@@ -151,18 +151,18 @@ void radeon_profile::setupOptionsMenu()
     ui->btn_options->setMenu(optionsMenu);
 
     QAction *resetMinMax = new QAction(this);
-    resetMinMax->setText("Reset min/max temperature");
+    resetMinMax->setText(label_resetMinMax);
 
     QAction *resetGraphs = new QAction(this);
-    resetGraphs->setText("Reset graphs vertical scale");
+    resetGraphs->setText(label_resetGraphs);
 
     QAction *showLegend = new QAction(this);
-    showLegend->setText("Show legend");
+    showLegend->setText(label_showLegend);
     showLegend->setCheckable(true);
     showLegend->setChecked(true);
 
     QAction *graphOffset = new QAction(this);
-    graphOffset->setText("Graph offset on right");
+    graphOffset->setText(label_graphOffset);
     graphOffset->setCheckable(true);
     graphOffset->setChecked(true);
 
@@ -182,15 +182,15 @@ void radeon_profile::setupForcePowerLevelMenu() {
     forcePowerMenu = new QMenu(this);
 
     QAction *forceAuto = new QAction(this);
-    forceAuto->setText("Auto");
+    forceAuto->setText(label_auto);
 
     QAction *forceLow = new QAction(this);
-    forceLow->setText("Low");
+    forceLow->setText(label_low);
 
     QAction *forceHigh = new QAction(this);
-    forceHigh->setText("High");
+    forceHigh->setText(label_high);
 
-    forcePowerMenu->setTitle("Force power level");
+    forcePowerMenu->setTitle(label_forcePowerLevel);
     forcePowerMenu->addAction(forceAuto);
     forcePowerMenu->addSeparator();
     forcePowerMenu->addAction(forceLow);
@@ -203,18 +203,21 @@ void radeon_profile::setupForcePowerLevelMenu() {
 
 void radeon_profile::setupContextMenus() {
     QAction *copyToClipboard = new QAction(this);
-    copyToClipboard->setText("Copy to clipboard");
-
+    copyToClipboard->setText(label_copyToClipboard);
     ui->list_glxinfo->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->list_glxinfo->addAction(copyToClipboard);
+    connect(copyToClipboard, SIGNAL(triggered()),this,SLOT(copyGlxInfoToClipboard()));
+
+    QAction * copyConnectors = new QAction(this);
+    copyConnectors->setText(label_copyToClipboard);
+    ui->list_connectors->setContextMenuPolicy(Qt::ActionsContextMenu);
+    ui->list_connectors->addAction(copyConnectors);
+    connect(copyConnectors, SIGNAL(triggered()), this, SLOT(copyConnectorsToClipboard()));
 
     QAction *reset = new QAction(this);
-    reset->setText("Reset statistics");
-
+    reset->setText(label_resetStatistics);
     ui->list_stats->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->list_stats->addAction(reset);
-
-    connect(copyToClipboard, SIGNAL(triggered()),this,SLOT(copyGlxInfoToClipboard()));
     connect(reset,SIGNAL(triggered()),this,SLOT(resetStats()));
 }
 //========

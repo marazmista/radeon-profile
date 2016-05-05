@@ -2,6 +2,7 @@
 // copyright marazmista @ 12.05.2014
 
 #include "daemonComm.h"
+#include <QDebug>
 
 daemonComm::daemonComm() {
     signalSender = new QLocalSocket();

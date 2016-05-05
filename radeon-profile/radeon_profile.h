@@ -114,6 +114,7 @@ private slots:
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_cb_stats_clicked(bool checked);
     void copyGlxInfoToClipboard();
+    void copyConnectorsToClipboard();
     void resetStats();
     void on_cb_alternateRow_clicked(bool checked);
     void on_chProfile_clicked();
@@ -178,6 +179,17 @@ private:
     void connectSignals();
     void adjustFanSpeed();
 
+    /**
+     * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.
+     * @param enabled If true enables auto-refresh, otherwise disables it.
+     * @param interval Seconds between each update.
+     */
+    void configureDaemonAutoRefresh(bool enabled = true, int interval = 1);
+
+    /**
+     * @brief showWindow reveals the main window, unless the "Start Minimized" setting is checked
+     */
+    void showWindow();
 };
 
 #endif // RADEON_PROFILE_H

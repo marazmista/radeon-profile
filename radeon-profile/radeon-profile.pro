@@ -15,9 +15,7 @@ TEMPLATE = app
 #   http://doc.qt.io/qt-5/qtglobal.html#QtMsgType-enum
 #   qDebug will work only when compiled for Debug
 #   QtWarning, QtCritical and QtFatal will still work on Release
-@
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
-@
 
 SOURCES += main.cpp\
         radeon_profile.cpp \
@@ -45,3 +43,13 @@ FORMS    += radeon_profile.ui
 
 RESOURCES += \
     radeon-resource.qrc
+
+# NOTE FOR PACKAGING
+# /usr/include/X11/extensions/Xrandr.h must be present at compile time
+# /usr/lib/libXrandr.so must be present at runtime
+# These are provided in libxrandr(Arch), libXrandr(RedHat,Fedora), libxrandr-dev(Debian,Ubuntu), libxrandr-devel(SUSE)
+LIBS += -lXrandr -lX11
+
+TRANSLATIONS += strings.it.ts
+
+DISTFILES += strings.it.ts

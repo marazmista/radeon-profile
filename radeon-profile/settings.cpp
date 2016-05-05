@@ -8,6 +8,8 @@
 #include <QMenu>
 #include <QDir>
 #include <QTreeWidgetItem>
+#include <QDesktopWidget>
+#include <QRect>
 
 const QString radeon_profile::settingsPath = QDir::homePath() + "/.radeon-profile-settings";
 const QString execProfilesPath = QDir::homePath() + "/.radeon-profile-execProfiles";
@@ -121,11 +123,14 @@ void radeon_profile::loadConfig() {
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
         this->setGeometry(settings.value("windowGeometry").toRect());
-
-    if (ui->cb_startMinimized->isChecked())
-        this->window()->hide();
-    else
-        showNormal();
+    else {
+        // Set up the size at 1/2 of the screen size, centered
+        const QRect desktopSize = QDesktopWidget().availableGeometry(this);
+        this->setGeometry(desktopSize.width() / 4, // Left offset
+                         desktopSize.height() / 4, // Top offset
+                         desktopSize.width() / 2, // Width
+                         desktopSize.height() / 2); // Height
+    }
 
     ui->cb_graphs->setEnabled(ui->cb_gpuData->isChecked());
     ui->cb_stats->setEnabled(ui->cb_gpuData->isChecked());
@@ -225,4 +230,11 @@ void radeon_profile::saveFanProfiles() {
         fsPath.write(profile.toLatin1());
         fsPath.close();
     }
+}
+
+void radeon_profile::showWindow() {
+    if (ui->cb_startMinimized->isChecked())
+        this->showMinimized();
+    else
+        this->showNormal();
 }
