@@ -151,12 +151,12 @@ void radeon_profile::addRuntimeWidgets() {
 // based on driverFeatures structure returned by gpu class, adjust ui elements
 void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &features) {
     if (features.canChangeProfile && features.pm < globalStuff::PM_UNKNOWN) {
-        ui->tabs_pm->setTabEnabled(0,features.pm == globalStuff::PROFILE ? true : false);
+        ui->tabs_pm->setTabEnabled(0,features.pm == globalStuff::PROFILE);
 
-        ui->tabs_pm->setTabEnabled(1,features.pm == globalStuff::DPM ? true : false);
-        changeProfile->setEnabled(features.pm == globalStuff::PROFILE ? true : false);
-        dpmMenu->setEnabled(features.pm == globalStuff::DPM ? true : false);
-        ui->combo_pLevel->setEnabled(features.pm == globalStuff::DPM ? true : false);
+        ui->tabs_pm->setTabEnabled(1,features.pm == globalStuff::DPM);
+        changeProfile->setEnabled(features.pm == globalStuff::PROFILE);
+        dpmMenu->setEnabled(features.pm == globalStuff::DPM);
+        ui->combo_pLevel->setEnabled(features.pm == globalStuff::DPM);
     } else {
         ui->tabs_pm->setEnabled(false);
         changeProfile->setEnabled(false);
@@ -168,7 +168,6 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     ui->l_cClk->setVisible(features.coreClockAvailable);
     ui->cb_showFreqGraph->setEnabled(features.coreClockAvailable);
     ui->tabs_systemInfo->setTabEnabled(3,features.coreClockAvailable);
-    ui->l_cClk->setVisible(features.coreClockAvailable);
 
     ui->cb_showVoltsGraph->setEnabled(features.coreVoltAvailable);
     ui->l_cVolt->setVisible(features.coreVoltAvailable);
@@ -177,10 +176,14 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 
     ui->l_mVolt->setVisible(features.memVoltAvailable);
 
+    ui->line_clocks->setVisible (features.coreClockAvailable || features.memClockAvailable);
+    ui->line_volts->setVisible (features.coreVoltAvailable || features.memVoltAvailable);
+
     if (!features.temperatureAvailable) {
         ui->cb_showTempsGraph->setEnabled(false);
         ui->plotTemp->setVisible(false);
         ui->l_temp->setVisible(false);
+        ui->line_temp->setVisible (false);
     }
 
     if (!features.coreClockAvailable && !features.temperatureAvailable && !features.coreVoltAvailable)
@@ -228,32 +231,59 @@ static void addChild(QTreeWidget * parent, QString leftColumn, QString rightColu
 // -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
 // did not alter it, it stays and in result will be not displayed
 void radeon_profile::refreshUI() {
-     ui->l_temp->setText(format_currentTemp);
-     ui->l_cClk->setText(format_GPUClock);
-     ui->l_mClk->setText(format_memoryClock);
-     ui->l_mVolt->setText(format_memoryVoltage);
-     ui->l_cVolt->setText(format_GPUVoltage);
+    const bool validCoreClock = device.gpuClocksData.coreClk >= 0,
+            validMemoryClock = device.gpuClocksData.memClk >= 0,
+            validCoreVolt = device.gpuClocksData.coreVolt >= 0,
+            validMemoryVolt = device.gpuClocksData.memVolt >= 0,
+            validPwmSpeed = device.gpuTemeperatureData.pwmSpeed >= 0;
 
-     if (device.features.pwmAvailable)
-         ui->l_fanSpeed->setText(format_fanSpeed);
+    // Header - Clocks
+    ui->l_cClk->setVisible(validCoreClock);
+    if(validCoreClock)
+        ui->l_cClk->setText(format_GPUClock);
 
+    ui->l_mClk->setVisible(validMemoryClock);
+    if(validMemoryClock)
+        ui->l_mClk->setText(format_memoryClock);
 
+    ui->line_clocks->setVisible(validCoreClock || validMemoryClock);
+
+    // Header - Volts
+    ui->l_mVolt->setVisible(validMemoryVolt);
+    if(validMemoryVolt)
+        ui->l_mVolt->setText(format_memoryVoltage);
+
+    ui->l_cVolt->setVisible(validCoreVolt);
+    if(validCoreVolt)
+        ui->l_cVolt->setText(format_GPUVoltage);
+
+    ui->line_volts->setVisible(validCoreVolt || validMemoryVolt);
+
+    // Header - Temperature
+    ui->l_temp->setText(format_currentTemp);
+
+    // Header - Fan speed
+    ui->l_fanSpeed->setVisible(validPwmSpeed);
+    if(validPwmSpeed)
+        ui->l_fanSpeed->setText(format_fanSpeed);
+
+    // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
         ui->list_currentGPUData->clear();
 
         if (device.gpuClocksData.powerLevel != -1)
             addChild(ui->list_currentGPUData, label_currentPowerLevel, device.gpuClocksDataString.powerLevel);
-        if (device.gpuClocksData.coreClk != -1)
+        if (validCoreClock)
             addChild(ui->list_currentGPUData, label_currentGPUClock, format_GPUClock);
-        if (device.gpuClocksData.memClk != -1)
+        if (validMemoryClock)
             addChild(ui->list_currentGPUData, label_currentMemClock, format_memoryClock);
         if (device.gpuClocksData.uvdCClk != -1)
             addChild(ui->list_currentGPUData, label_uvdVideoCoreClock, format_UVDClock);
         if (device.gpuClocksData.uvdDClk != -1)
             addChild(ui->list_currentGPUData, label_uvdDecoderClock, format_UVDDecoderClock);
-        if (device.gpuClocksData.coreVolt != -1)
+        if (validCoreVolt)
             addChild(ui->list_currentGPUData, label_vddc, format_GPUVoltage);
-        if (device.gpuClocksData.memVolt != -1)
+        if (validMemoryVolt)
             addChild(ui->list_currentGPUData, label_vddci, format_memoryVoltage);
 
         if (ui->list_currentGPUData->topLevelItemCount() == 0)

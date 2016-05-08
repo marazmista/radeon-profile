@@ -58,8 +58,16 @@ private:
     static QSharedMemory sharedMem;
 
     static struct driverFilePaths {
-    QString powerMethodFilePath, profilePath, dpmStateFilePath ,
-            clocksPath , forcePowerLevelFilePath , sysfsHwmonTempPath, moduleParamsPath, pwmEnablePath, pwmSpeedPath, pwmMaxSpeedPath;
+        QString powerMethodFilePath,
+            profilePath,
+            dpmStateFilePath,
+            clocksPath,
+            forcePowerLevelFilePath,
+            sysfsHwmonTempPath,
+            moduleParamsPath,
+            pwmEnablePath,
+            pwmSpeedPath,
+            pwmMaxSpeedPath;
     } filePaths;
     static int sensorsGPUtempIndex;
     static dXorg::tempSensor currentTempSensor;

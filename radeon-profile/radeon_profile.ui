@@ -51,7 +51,7 @@
       <widget class="QLabel" name="label">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>30</x>
          <y>0</y>
          <width>60</width>
          <height>24</height>
@@ -73,9 +73,9 @@
       <widget class="QComboBox" name="combo_gpus">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>0</x>
          <y>25</y>
-         <width>80</width>
+         <width>120</width>
          <height>25</height>
         </rect>
        </property>
@@ -98,15 +98,15 @@
       <widget class="QComboBox" name="combo_pProfile">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>125</x>
          <y>0</y>
-         <width>150</width>
+         <width>125</width>
          <height>24</height>
         </rect>
        </property>
        <property name="minimumSize">
         <size>
-         <width>140</width>
+         <width>100</width>
          <height>24</height>
         </size>
        </property>
@@ -129,9 +129,9 @@
       <widget class="QComboBox" name="combo_pLevel">
        <property name="geometry">
         <rect>
-         <x>125</x>
+         <x>150</x>
          <y>25</y>
-         <width>125</width>
+         <width>100</width>
          <height>24</height>
         </rect>
        </property>
@@ -305,7 +305,7 @@
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="Line" name="line_4">
+      <widget class="Line" name="line_clocks">
        <property name="geometry">
         <rect>
          <x>330</x>
@@ -395,7 +395,7 @@
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="Line" name="line_5">
+      <widget class="Line" name="line_temp">
        <property name="geometry">
         <rect>
          <x>520</x>
@@ -408,7 +408,7 @@
         <enum>Qt::Vertical</enum>
        </property>
       </widget>
-      <widget class="Line" name="line_6">
+      <widget class="Line" name="line_volts">
        <property name="geometry">
         <rect>
          <x>400</x>
@@ -843,7 +843,7 @@
                <set>QAbstractItemView::NoEditTriggers</set>
               </property>
               <attribute name="headerDefaultSectionSize">
-               <number>100</number>
+               <number>125</number>
               </attribute>
               <attribute name="headerMinimumSectionSize">
                <number>50</number>

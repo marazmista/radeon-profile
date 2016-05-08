@@ -81,7 +81,7 @@ QStringList gpu::initialize(bool skipDetectDriver) {
         f.pm = globalStuff::PM_UNKNOWN;
         f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
         features = f;
-        gpuList << "unknown";
+        gpuList << label_unknown;
     }
     }
     return gpuList;
@@ -744,7 +744,7 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
         break;
     case FGLRX:
     case DRIVER_UNKNOWN: {
-        list.append(new QTreeWidgetItem(QStringList() <<"err"));
+        list.append(new QTreeWidgetItem(QStringList() << label_noInfo));
     }
     }
 

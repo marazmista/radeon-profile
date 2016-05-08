@@ -100,6 +100,7 @@
 #define label_askRunEnd QObject::tr("\"?")
 
 // gpu.cpp
+#define label_unknown QObject::tr ("Unknown")
 #define label_resolution QObject::tr("Resolution")
 #define label_minimumRes QObject::tr("Minimum resolution")
 #define label_maximumRes QObject::tr("Maximum resolution")
@@ -129,6 +130,7 @@
 #define format_monDiagonal QObject::tr("(%n inches)", NULL, diagonal)
 #define format_outputConnected QObject::tr("%n connected, ", NULL, screenConnectedOutputs)
 #define format_outputActive QObject::tr("%n active", NULL, screenActiveOutputs)
+#define label_noInfo QObject::tr("No info")
 
 // radeon_profile.cpp
 #define label_backToProfiles QObject::tr("Back to profiles") // As "return to profiles"
@@ -203,13 +205,13 @@ public:
         gpuClocksStruct() { }
 
         gpuClocksStruct(int _coreClk, int _memClk, int _coreVolt, int _memVolt, int _uvdCClk, int _uvdDclk, char _pwrLevel ) {
-            coreClk = _coreClk,
-                    memClk = _memClk,
-                    coreVolt = _coreVolt,
-                    memVolt = _memVolt,
-                    uvdCClk = _uvdCClk,
-                    uvdDClk = _uvdDclk,
-                    powerLevel = _pwrLevel;
+            coreClk = _coreClk;
+            memClk = _memClk;
+            coreVolt = _coreVolt;
+            memVolt = _memVolt;
+            uvdCClk = _uvdCClk;
+            uvdDClk = _uvdDclk;
+            powerLevel = _pwrLevel;
         }
 
         // initialize empty struct, so when we pass -1, only values that != -1 will show
@@ -226,12 +228,24 @@ public:
     // structure which holds what can be display on ui and on its base
     // we enable ui elements
     struct driverFeatures {
-        bool canChangeProfile, coreClockAvailable, memClockAvailable, coreVoltAvailable, memVoltAvailable, temperatureAvailable, pwmAvailable;
+        bool canChangeProfile,
+            coreClockAvailable,
+            memClockAvailable,
+            coreVoltAvailable,
+            memVoltAvailable,
+            temperatureAvailable,
+            pwmAvailable;
         globalStuff::powerMethod pm;
         int pwmMaxSpeed;
 
         driverFeatures() {
-            canChangeProfile = coreClockAvailable = memClockAvailable = coreVoltAvailable = memVoltAvailable = temperatureAvailable= pwmAvailable = false;
+            canChangeProfile =
+                    coreClockAvailable =
+                    memClockAvailable =
+                    coreVoltAvailable =
+                    memVoltAvailable =
+                    temperatureAvailable =
+                    pwmAvailable = false;
             pm = PM_UNKNOWN;
             pwmMaxSpeed = 0;
         }

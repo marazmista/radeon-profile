@@ -130,10 +130,10 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 
         // fist call, so notihing is in sharedmem and we need to wait for data
         // because we need correctly figure out what is available
-        // see: https://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
+        // see: https://stackoverflow.com/a/11487434/2347196
         if (resolvingGpuFeatures) {
             QTime delayTime = QTime::currentTime().addMSecs(1000);
-            while (QTime::currentTime() < delayTime);
+            while (QTime::currentTime() < delayTime)
                 QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
         }
 
