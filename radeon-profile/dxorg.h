@@ -44,6 +44,15 @@ public:
     static bool daemonConnected();
     static globalStuff::gpuClocksStruct getFeaturesFallback();
 
+    /**
+     * @brief overClock Overclocks the GPU
+     * @param percent Overclock percentage [0-20]
+     * @return Success
+     */
+    static bool overClock(int percentage);
+
+    static void resetOverClock();
+
 
 private:
     enum tempSensor {
@@ -67,7 +76,8 @@ private:
             moduleParamsPath,
             pwmEnablePath,
             pwmSpeedPath,
-            pwmMaxSpeedPath;
+            pwmMaxSpeedPath,
+            overDrivePath;
     } filePaths;
     static int sensorsGPUtempIndex;
     static dXorg::tempSensor currentTempSensor;

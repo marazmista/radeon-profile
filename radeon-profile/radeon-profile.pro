@@ -50,6 +50,13 @@ RESOURCES += \
 # These are provided in libxrandr(Arch), libXrandr(RedHat,Fedora), libxrandr-dev(Debian,Ubuntu), libxrandr-devel(SUSE)
 LIBS += -lXrandr -lX11
 
+# NOTE FOR PACKAGING
+# In this folder are present translation files (strings.*.ts)
+# After editing a translatable string it is necessary to run "lupdate" in this folder (QtCreator: Tools > External > Linguist > Update)
+# Then these files can be edited with the Qt linguist
+# When the translations are ready it is necessary to run "lrelease" in this folder (QtCreator: Tools > External > Linguist > Release)
+# This produces compiled translation files (strings.*.qm), that need to be packaged together with the runnable
+# These can be placed in "/usr/share/radeon-profile/" or in the same folder of the binary (useful for development)
 TRANSLATIONS += strings.it.ts
 
 DISTFILES += strings.it.ts

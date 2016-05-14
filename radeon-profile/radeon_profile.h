@@ -21,17 +21,11 @@
 #define startVoltsScaleL 500
 #define startVoltsScaleH 650
 
-extern int ticksCounter, statsTickCounter;
-extern QString powerMethodFilePath, profilePath, dpmStateFilePath, clocksPath, forcePowerLevelFilePath, sysfsHwmonPath, moduleParamsPath;
-extern char selectedPowerMethod, selectedTempSensor, sensorsGPUtempIndex;
-extern double maxT, minT, rangeX, current, tempSum;
-extern QTimer timer;
+#define minFanStepsTemp 0
+#define maxFanStepsTemp 99
 
-struct pmLevel {
-    QString name;
-    float time;
-};
-extern QList<pmLevel> pmStats;
+#define minFanStepsSpeed 20
+#define maxFanStepsSpeed 100
 
 namespace Ui {
 class radeon_profile;
@@ -64,14 +58,6 @@ class radeon_profile : public QMainWindow
         LOG_FILE_DATE_APPEND
     };
 
-    struct fanStepPair {
-        int temperature, speed;
-
-        fanStepPair(int _temperature, int _speed) {
-            temperature = _temperature;
-            speed = _speed;
-        }
-    };
 
 public:
     explicit radeon_profile(QStringList, QWidget *parent = 0);
@@ -150,7 +136,9 @@ private:
     gpu device;
     static const QString settingsPath;
     QList<execBin*> *execsRunning;
-    QList<fanStepPair> fanSteps;
+    QMap<int, unsigned int> fanSteps;
+    QMap<QString, unsigned int> pmStats;
+    unsigned int rangeX = 180, ticksCounter = 0, statsTickCounter = 0;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
@@ -174,10 +162,15 @@ private:
     void loadFanProfiles();
     void saveFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
-    void makeFanProfileGraph(const QList<fanStepPair> &steps);
+    void makeFanProfileGraph();
     void refreshUI();
     void connectSignals();
-    void adjustFanSpeed();
+
+    /**
+     * @brief adjustFanSpeed Sets the PWM fan speed indicated for the actual temperature on the fan profile.
+     * @param force Adjust the fan speed even if the temperature has not changed
+     */
+    void adjustFanSpeed(bool force = false);
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.
@@ -190,6 +183,26 @@ private:
      * @brief showWindow reveals the main window, unless the "Start Minimized" setting is checked
      */
     void showWindow();
+
+    /**
+     * @brief fanStepIsValid Checks if the given parameters are a valid fan step.
+     * @param temperature
+     * @param fanSpeed
+     * @return If the step is valid.
+     */
+    bool fanStepIsValid(int temperature, int fanSpeed);
+
+    /**
+     * @brief addFanStep Adds a single fan step to the custom curve steps.
+     * If another step with the same temperature exists already it is overwritten.
+     * @param temperature
+     * @param fanSpeed
+     * @param alsoToList Adds the step also to the ui->list_fanSteps list.
+     * @param alsoToGraph Adds the step also to the fan steps graph (does NOT replot).
+     * @param alsoAdjustSpeed Updates the fan speed after adding the step.
+     * @return If the operation was successful.
+     */
+    bool addFanStep (int temperature, int fanSpeed, bool alsoToList = true, bool alsoToGraph = true, bool alsoAdjustSpeed = true);
 };
 
 #endif // RADEON_PROFILE_H

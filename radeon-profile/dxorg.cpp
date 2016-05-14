@@ -86,13 +86,14 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
 
-    filePaths.powerMethodFilePath = devicePath + file_PowerMethod,
-            filePaths.profilePath = devicePath + file_powerProfile,
-            filePaths.dpmStateFilePath = devicePath + file_powerDpmState,
-            filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel,
-            filePaths.moduleParamsPath = devicePath + "driver/module/holders/radeon/parameters/",
-            filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info"; // this path contains only index
-          //  filePaths.clocksPath = "/tmp/radeon_pm_info"; // testing
+    filePaths.powerMethodFilePath = devicePath + file_PowerMethod;
+    filePaths.profilePath = devicePath + file_powerProfile;
+    filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
+    filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
+    filePaths.moduleParamsPath = devicePath + "driver/module/holders/radeon/parameters/";
+    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info"; // this path contains only index
+    //  filePaths.clocksPath = "/tmp/radeon_pm_info"; // testing
+    filePaths.overDrivePath = devicePath + file_overclockLevel;
 
 
     QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
@@ -598,6 +599,9 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
         }
         f.close();
     }
+
+    features.overClockAvailable = QFile::exists(filePaths.overDrivePath);
+
     return features;
 }
 
@@ -621,4 +625,29 @@ globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
         return fallbackFeatures;
     } else
         return globalStuff::gpuClocksStruct(-1);
+}
+
+bool dXorg::overClock(const int percentage){
+    if( ! QFile::exists(filePaths.overDrivePath) || (percentage > 20) || (percentage < 0))
+        return false;
+
+    if (daemonConnected()){ // Signal the daemon to set the overclock value
+        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
+        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
+        command.append(QString::number(percentage)).append(SEPARATOR); // The overclock level
+        command.append(filePaths.overDrivePath).append(SEPARATOR); // The path where the overclock level should be written in
+
+        qDebug() << "Sending overclock signal: " << command;
+        dcomm->sendCommand(command);
+    } else if(globalStuff::globalConfig.rootMode) // Root mode, set it directly
+        setNewValue(filePaths.overDrivePath, QString::number(percentage));
+    else // Overclock requires root access to sysfs
+        return false;
+
+    qDebug() << "Overclocked card by" << percentage << "%";
+    return true;
+}
+
+void dXorg::resetOverClock(){
+    overClock(0);
 }
