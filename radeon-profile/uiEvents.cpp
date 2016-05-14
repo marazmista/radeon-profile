@@ -411,14 +411,15 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
                 fanSteps.remove(oldTemp);
                 delete item;
                 ui->plotFanProfile->graph(0)->removeData(oldTemp);
+                addFanStep(newTemp,newSpeed);
             }
         } else { // The user wants to change the speed
             newTemp = oldTemp;
             newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, label_fanSpeedRange);
             // addFanStep() will check the validity of newSpeed and overwrite the current step
+            addFanStep(newTemp,newSpeed);
         }
 
-        addFanStep(newTemp,newSpeed);
     }
 
 }

@@ -768,7 +768,7 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
 
     switch (currentDriver) {
     case XORG:
-        data << dXorg::getGLXInfo(gpuName, env);
+        data << dXorg::getGLXInfo(env);
         break;
     case FGLRX:
         data << dFglrx::getGLXInfo();

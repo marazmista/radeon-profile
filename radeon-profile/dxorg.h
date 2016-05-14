@@ -25,7 +25,7 @@ public:
     static globalStuff::gpuClocksStruct getClocks(const QString &data);
     static QString getClocksRawData(bool forFeatures = false);
     static float getTemperature();
-    static QStringList getGLXInfo(QString gpuName, QProcessEnvironment env);
+    static QStringList getGLXInfo(QProcessEnvironment env);
     static QList<QTreeWidgetItem *> getModuleInfo();
     static QString getCurrentPowerLevel();
     static QString getCurrentPowerProfile();

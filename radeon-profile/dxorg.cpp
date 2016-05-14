@@ -337,7 +337,7 @@ QString dXorg::findSysfsHwmonForGPU() {
     return "";
 }
 
-QStringList dXorg::getGLXInfo(QString gpuName, QProcessEnvironment env) {
+QStringList dXorg::getGLXInfo(QProcessEnvironment env) {
     return globalStuff::grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
 }
 
@@ -644,7 +644,6 @@ bool dXorg::overClock(const int percentage){
     else // Overclock requires root access to sysfs
         return false;
 
-    qDebug() << "Overclocked card by" << percentage << "%";
     return true;
 }
 
