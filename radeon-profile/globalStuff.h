@@ -30,6 +30,7 @@
 #define file_powerProfile "power_profile"
 #define file_powerDpmState "power_dpm_state"
 #define file_powerDpmForcePerformanceLevel "power_dpm_force_performance_level"
+#define file_overclockLevel "pp_sclk_od"
 
 #define label_currentPowerLevel QObject::tr("Power level")
 #define label_currentGPUClock QObject::tr("GPU clock")
@@ -73,6 +74,10 @@
 #define label_selectProfile QObject::tr("Select new power profile")
 #define label_profileSelection QObject::tr("Profile selection")
 #define label_processStillRunning QObject::tr("Process is still running. Close tab?")
+#define label_howToEdit QObject::tr("This step already exists. To edit it double click it")
+#define label_cantDeleteThisItem QObject::tr("You can't delete the first and the last item")
+#define label_cantEditThisItem QObject::tr("You can't edit the first and the last item")
+#define label_overclockFailed QObject::tr("An error occurred, overclock failed")
 
 // execbin.cpp
 #define label_processRunning QObject::tr("Process state: running")
@@ -100,6 +105,7 @@
 #define label_askRunEnd QObject::tr("\"?")
 
 // gpu.cpp
+#define label_unknown QObject::tr ("Unknown")
 #define label_resolution QObject::tr("Resolution")
 #define label_minimumRes QObject::tr("Minimum resolution")
 #define label_maximumRes QObject::tr("Maximum resolution")
@@ -129,6 +135,7 @@
 #define format_monDiagonal QObject::tr("(%n inches)", NULL, diagonal)
 #define format_outputConnected QObject::tr("%n connected, ", NULL, screenConnectedOutputs)
 #define format_outputActive QObject::tr("%n active", NULL, screenActiveOutputs)
+#define label_noInfo QObject::tr("No info")
 
 // radeon_profile.cpp
 #define label_backToProfiles QObject::tr("Back to profiles") // As "return to profiles"
@@ -149,6 +156,9 @@
 #define format_stats_memVolt QObject::tr("%nmV)", NULL, device.gpuClocksData.memVolt)
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
+
+#define appVersion 20160515
+#define format_version QObject::tr("Version %n", NULL, appVersion)
 
 
 class globalStuff {
@@ -203,13 +213,13 @@ public:
         gpuClocksStruct() { }
 
         gpuClocksStruct(int _coreClk, int _memClk, int _coreVolt, int _memVolt, int _uvdCClk, int _uvdDclk, char _pwrLevel ) {
-            coreClk = _coreClk,
-                    memClk = _memClk,
-                    coreVolt = _coreVolt,
-                    memVolt = _memVolt,
-                    uvdCClk = _uvdCClk,
-                    uvdDClk = _uvdDclk,
-                    powerLevel = _pwrLevel;
+            coreClk = _coreClk;
+            memClk = _memClk;
+            coreVolt = _coreVolt;
+            memVolt = _memVolt;
+            uvdCClk = _uvdCClk;
+            uvdDClk = _uvdDclk;
+            powerLevel = _pwrLevel;
         }
 
         // initialize empty struct, so when we pass -1, only values that != -1 will show
@@ -226,12 +236,26 @@ public:
     // structure which holds what can be display on ui and on its base
     // we enable ui elements
     struct driverFeatures {
-        bool canChangeProfile, coreClockAvailable, memClockAvailable, coreVoltAvailable, memVoltAvailable, temperatureAvailable, pwmAvailable;
+        bool canChangeProfile,
+            coreClockAvailable,
+            memClockAvailable,
+            coreVoltAvailable,
+            memVoltAvailable,
+            temperatureAvailable,
+            pwmAvailable,
+            overClockAvailable;
         globalStuff::powerMethod pm;
         int pwmMaxSpeed;
 
         driverFeatures() {
-            canChangeProfile = coreClockAvailable = memClockAvailable = coreVoltAvailable = memVoltAvailable = temperatureAvailable= pwmAvailable = false;
+            canChangeProfile =
+                    coreClockAvailable =
+                    memClockAvailable =
+                    coreVoltAvailable =
+                    memVoltAvailable =
+                    temperatureAvailable =
+                    pwmAvailable =
+                    overClockAvailable = false;
             pm = PM_UNKNOWN;
             pwmMaxSpeed = 0;
         }

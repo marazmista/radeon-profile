@@ -65,6 +65,7 @@ globalStuff::driverFeatures dFglrx::figureOutDriverFeatures() {
     features.memClockAvailable = true;
     features.temperatureAvailable = true;
     features.pwmAvailable = false;
+    features.overClockAvailable = false;
     return features;
 }
 

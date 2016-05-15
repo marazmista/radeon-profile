@@ -18,8 +18,13 @@ public:
         XORG, FGLRX, DRIVER_UNKNOWN
     };
 
-    explicit gpu() { currentGpuIndex = 0;
-                   gpuTemeperatureData.current  = gpuTemeperatureData.max = gpuTemeperatureData.min = gpuTemeperatureData.sum = 0; }
+    explicit gpu() {
+        currentGpuIndex = 0;
+        gpuTemeperatureData.current =
+                gpuTemeperatureData.max =
+                gpuTemeperatureData.min =
+                gpuTemeperatureData.sum = 0;
+    }
 
     globalStuff::gpuClocksStruct gpuClocksData;
     globalStuff::gpuClocksStructString gpuClocksDataString;
@@ -54,6 +59,8 @@ public:
     void reconfigureDaemon();
     bool daemonConnected();
 
+    bool overclock(int value);
+    void resetOverclock();
 
 private:
     driver currentDriver;

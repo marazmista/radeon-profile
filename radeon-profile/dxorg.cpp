@@ -86,13 +86,14 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
 
-    filePaths.powerMethodFilePath = devicePath + file_PowerMethod,
-            filePaths.profilePath = devicePath + file_powerProfile,
-            filePaths.dpmStateFilePath = devicePath + file_powerDpmState,
-            filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel,
-            filePaths.moduleParamsPath = devicePath + "driver/module/holders/radeon/parameters/",
-            filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info"; // this path contains only index
-          //  filePaths.clocksPath = "/tmp/radeon_pm_info"; // testing
+    filePaths.powerMethodFilePath = devicePath + file_PowerMethod;
+    filePaths.profilePath = devicePath + file_powerProfile;
+    filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
+    filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
+    filePaths.moduleParamsPath = devicePath + "driver/module/holders/radeon/parameters/";
+    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info"; // this path contains only index
+    //  filePaths.clocksPath = "/tmp/radeon_pm_info"; // testing
+    filePaths.overDrivePath = devicePath + file_overclockLevel;
 
 
     QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
@@ -130,10 +131,10 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 
         // fist call, so notihing is in sharedmem and we need to wait for data
         // because we need correctly figure out what is available
-        // see: https://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
+        // see: https://stackoverflow.com/a/11487434/2347196
         if (resolvingGpuFeatures) {
             QTime delayTime = QTime::currentTime().addMSecs(1000);
-            while (QTime::currentTime() < delayTime);
+            while (QTime::currentTime() < delayTime)
                 QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
         }
 
@@ -336,7 +337,7 @@ QString dXorg::findSysfsHwmonForGPU() {
     return "";
 }
 
-QStringList dXorg::getGLXInfo(QString gpuName, QProcessEnvironment env) {
+QStringList dXorg::getGLXInfo(QProcessEnvironment env) {
     return globalStuff::grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
 }
 
@@ -598,6 +599,9 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
         }
         f.close();
     }
+
+    features.overClockAvailable = QFile::exists(filePaths.overDrivePath);
+
     return features;
 }
 
@@ -621,4 +625,30 @@ globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
         return fallbackFeatures;
     } else
         return globalStuff::gpuClocksStruct(-1);
+}
+
+bool dXorg::overClock(const int percentage){
+    if((percentage > 20) || (percentage < 0))
+        qWarning() << "Error overclocking: invalid percentage passed: " << percentage;
+    else if (daemonConnected()){ // Signal the daemon to set the overclock value
+        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
+        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
+        command.append(QString::number(percentage)).append(SEPARATOR); // The overclock level
+        command.append(filePaths.overDrivePath).append(SEPARATOR); // The path where the overclock level should be written in
+
+        qDebug() << "Sending overclock signal: " << command;
+        dcomm->sendCommand(command);
+        return true;
+    } else if(globalStuff::globalConfig.rootMode){ // Root mode, set it directly
+        setNewValue(filePaths.overDrivePath, QString::number(percentage));
+
+        return true;
+    } else // Overclock requires root access to sysfs
+        qWarning() << "Error overclocking: daemon is not connected and no root access is available";
+
+    return false;
+}
+
+void dXorg::resetOverClock(){
+    overClock(0);
 }

@@ -41,6 +41,10 @@ void radeon_profile::saveConfig() {
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
 
+    settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
+    settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
+    settings.setValue("overclockValue", ui->slider_overclock->value());
+
     // Graph settings
     settings.setValue("graphLineThickness",ui->spin_lineThick->value());
     settings.setValue("graphTempBackground",ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1));
@@ -120,6 +124,10 @@ void radeon_profile::loadConfig() {
     ui->cb_showVoltsGraph->setChecked(settings.value("showVoltsGraphOnStart",false).toBool());
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
 
+    ui->cb_enableOverclock->setChecked(settings.value("overclockEnabled",false).toBool());
+    ui->cb_overclockAtLaunch->setChecked(settings.value("overclockAtLaunch",false).toBool());
+    ui->slider_overclock->setValue(settings.value("overclockValue",0).toInt());
+
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
         this->setGeometry(settings.value("windowGeometry").toRect());
@@ -189,33 +197,26 @@ void radeon_profile::loadFanProfiles() {
         if (steps.count() > 1) {
             for (int i = 1; i < steps.count(); ++i) {
                 QStringList pair = steps[i].split("#");
-                ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << pair[0] << pair[1]));
-
-                fanSteps.append(fanStepPair(pair[0].toInt(),pair[1].toInt()));
-
-                ui->plotFanProfile->graph(0)->addData(pair[0].toInt(), pair[1].toInt());
+                addFanStep(pair[0].toInt(),pair[1].toInt(), true, true, false);
             }
 
             fsPath.close();
         }
     } else {
         //default profile if no file found
-        fanSteps.append(fanStepPair(0,20));
-        fanSteps.append(fanStepPair(65,100));
-        fanSteps.append(fanStepPair(90,100));
+        addFanStep(0,20,true, true, false);
+        addFanStep(65,100,true, true, false);
+        addFanStep(90,100, true, true, false);
 
-        for (short i = 0;  i < fanSteps.count(); ++i)
-            ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString().setNum(fanSteps[i].temperature) <<  QString().setNum(fanSteps[i].speed)));
     }
 
-    makeFanProfileGraph(fanSteps);
 }
 
-void radeon_profile::makeFanProfileGraph(const QList<fanStepPair> &steps) {
+void radeon_profile::makeFanProfileGraph() {
     ui->plotFanProfile->graph(0)->clearData();
 
-    for (int i = 0; i < steps.count(); ++i)
-        ui->plotFanProfile->graph(0)->addData(steps[i].temperature,steps[i].speed);
+    for (int temperature : fanSteps.keys())
+        ui->plotFanProfile->graph(0)->addData(temperature, fanSteps.value(temperature));
 
     ui->plotFanProfile->replot();
 }
@@ -224,8 +225,8 @@ void radeon_profile::saveFanProfiles() {
     QFile fsPath(fanStepsPath);
     if (fsPath.open(QIODevice::WriteOnly)) {
         QString profile = "default|";
-        for (int i = 0; i < fanSteps.count(); ++i)
-            profile.append(QString().setNum(fanSteps[i].temperature)+ "#" + QString().setNum(fanSteps[i].speed)  + "|");
+        for (int temperature : fanSteps.keys())
+            profile.append(QString::number(temperature)+ "#" + QString::number(fanSteps.value(temperature))  + "|");
 
         fsPath.write(profile.toLatin1());
         fsPath.close();

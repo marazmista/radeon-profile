@@ -81,7 +81,7 @@ QStringList gpu::initialize(bool skipDetectDriver) {
         f.pm = globalStuff::PM_UNKNOWN;
         f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
         features = f;
-        gpuList << "unknown";
+        gpuList << label_unknown;
     }
     }
     return gpuList;
@@ -744,7 +744,7 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
         break;
     case FGLRX:
     case DRIVER_UNKNOWN: {
-        list.append(new QTreeWidgetItem(QStringList() <<"err"));
+        list.append(new QTreeWidgetItem(QStringList() << label_noInfo));
     }
     }
 
@@ -768,7 +768,7 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
 
     switch (currentDriver) {
     case XORG:
-        data << dXorg::getGLXInfo(gpuName, env);
+        data << dXorg::getGLXInfo(env);
         break;
     case FGLRX:
         data << dFglrx::getGLXInfo();
@@ -859,4 +859,17 @@ void gpu::getPwmSpeed() {
     case DRIVER_UNKNOWN:
         break;
     }
+}
+
+bool gpu::overclock(const int value){
+    if(features.overClockAvailable && (currentDriver == XORG))
+        return dXorg::overClock(value);
+
+    qWarning() << "Error overclocking: overclocking is not supported";
+    return false;
+}
+
+void gpu::resetOverclock(){
+    if(features.overClockAvailable && (currentDriver == XORG))
+        dXorg::resetOverClock();
 }

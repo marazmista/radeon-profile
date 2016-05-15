@@ -25,7 +25,7 @@ public:
     static globalStuff::gpuClocksStruct getClocks(const QString &data);
     static QString getClocksRawData(bool forFeatures = false);
     static float getTemperature();
-    static QStringList getGLXInfo(QString gpuName, QProcessEnvironment env);
+    static QStringList getGLXInfo(QProcessEnvironment env);
     static QList<QTreeWidgetItem *> getModuleInfo();
     static QString getCurrentPowerLevel();
     static QString getCurrentPowerProfile();
@@ -44,6 +44,15 @@ public:
     static bool daemonConnected();
     static globalStuff::gpuClocksStruct getFeaturesFallback();
 
+    /**
+     * @brief overClock Overclocks the GPU
+     * @param percent Overclock percentage [0-20]
+     * @return Success
+     */
+    static bool overClock(int percentage);
+
+    static void resetOverClock();
+
 
 private:
     enum tempSensor {
@@ -58,8 +67,17 @@ private:
     static QSharedMemory sharedMem;
 
     static struct driverFilePaths {
-    QString powerMethodFilePath, profilePath, dpmStateFilePath ,
-            clocksPath , forcePowerLevelFilePath , sysfsHwmonTempPath, moduleParamsPath, pwmEnablePath, pwmSpeedPath, pwmMaxSpeedPath;
+        QString powerMethodFilePath,
+            profilePath,
+            dpmStateFilePath,
+            clocksPath,
+            forcePowerLevelFilePath,
+            sysfsHwmonTempPath,
+            moduleParamsPath,
+            pwmEnablePath,
+            pwmSpeedPath,
+            pwmMaxSpeedPath,
+            overDrivePath;
     } filePaths;
     static int sensorsGPUtempIndex;
     static dXorg::tempSensor currentTempSensor;
