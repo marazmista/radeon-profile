@@ -134,8 +134,7 @@ private slots:
     void on_cb_enableOverclock_toggled(bool enable);
     void on_btn_applyOverclock_clicked();
     void on_slider_overclock_valueChanged(int value);
-
-    static void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
+    void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
 
 private:
     gpu device;

@@ -199,7 +199,6 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
             device.setPwmManualControl(false);
             saveFanProfiles();
         }
-        QApplication::quit();
     }
 }
 
@@ -379,49 +378,51 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 {
     QTreeWidgetItem *current = ui->list_fanSteps->currentItem();
 
-    if (ui->list_fanSteps->indexOfTopLevelItem(current) == 0 || ui->list_fanSteps->indexOfTopLevelItem(current) == ui->list_fanSteps->topLevelItemCount()-1)
+    if (ui->list_fanSteps->indexOfTopLevelItem(current) == 0 || ui->list_fanSteps->indexOfTopLevelItem(current) == ui->list_fanSteps->topLevelItemCount()-1) {
         // The selected item is the first or the last, it can't be deleted
         QMessageBox::warning(this, label_error, label_cantDeleteThisItem);
-    else { // The selected item can be removed, remove it
-        int temperature = current->text(0).toInt();
-
-        fanSteps.remove(temperature);
-        adjustFanSpeed(true);
-
-        // Remove the step from the list and from the graph
-        delete current;
-        ui->plotFanProfile->graph(0)->removeData(temperature);
-        ui->plotFanProfile->replot();
+        return;
     }
+
+    // The selected item can be removed, remove it
+    int temperature = current->text(0).toInt();
+
+    fanSteps.remove(temperature);
+    adjustFanSpeed(true);
+
+    // Remove the step from the list and from the graph
+    delete current;
+    ui->plotFanProfile->graph(0)->removeData(temperature);
+    ui->plotFanProfile->replot();
 }
+
 
 void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    if (ui->list_fanSteps->indexOfTopLevelItem(item) == 0 || ui->list_fanSteps->indexOfTopLevelItem(item) == ui->list_fanSteps->topLevelItemCount()-1)
+    if (ui->list_fanSteps->indexOfTopLevelItem(item) == 0 || ui->list_fanSteps->indexOfTopLevelItem(item) == ui->list_fanSteps->topLevelItemCount()-1) {
         // The selected item is the first or the last, it can't be edited
         QMessageBox::warning(this, label_error, label_cantEditThisItem);
-    else{ // Edit the item
-        const int oldTemp = item->text(0).toInt(), oldSpeed = item->text(1).toInt();
-        int newTemp, newSpeed;
-
-        if(column == 0){ // The user wants to change the temperature
-            newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, label_temperature);
-            if(newTemp != -1){
-                newSpeed = oldSpeed;
-                fanSteps.remove(oldTemp);
-                delete item;
-                ui->plotFanProfile->graph(0)->removeData(oldTemp);
-                addFanStep(newTemp,newSpeed);
-            }
-        } else { // The user wants to change the speed
-            newTemp = oldTemp;
-            newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, label_fanSpeedRange);
-            // addFanStep() will check the validity of newSpeed and overwrite the current step
-            addFanStep(newTemp,newSpeed);
-        }
-
+        return;
     }
 
+    const int oldTemp = item->text(0).toInt(), oldSpeed = item->text(1).toInt();
+    int newTemp, newSpeed;
+
+    if(column == 0){ // The user wants to change the temperature
+        newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, label_temperature);
+        if(newTemp != -1){
+            newSpeed = oldSpeed;
+            fanSteps.remove(oldTemp);
+            delete item;
+            ui->plotFanProfile->graph(0)->removeData(oldTemp);
+            addFanStep(newTemp,newSpeed);
+        }
+    } else { // The user wants to change the speed
+        newTemp = oldTemp;
+        newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, label_fanSpeedRange);
+        // addFanStep() will check the validity of newSpeed and overwrite the current step
+        addFanStep(newTemp,newSpeed);
+    }
 }
 
 int radeon_profile::askNumber(const int value, const int min, const int max, const QString label) {
