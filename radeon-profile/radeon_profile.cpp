@@ -165,17 +165,9 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->combo_pProfile->setEnabled(false);
     }
 
-    ui->l_cClk->setVisible(features.coreClockAvailable);
     ui->cb_showFreqGraph->setEnabled(features.coreClockAvailable);
     ui->tabs_systemInfo->setTabEnabled(3,features.coreClockAvailable);
-
     ui->cb_showVoltsGraph->setEnabled(features.coreVoltAvailable);
-    ui->l_cVolt->setVisible(features.coreVoltAvailable);
-
-    ui->l_mClk->setVisible(features.memClockAvailable);
-
-    ui->l_mVolt->setVisible(features.memVoltAvailable);
-
 
     if (!features.temperatureAvailable) {
         ui->cb_showTempsGraph->setEnabled(false);
@@ -229,51 +221,23 @@ void radeon_profile::refreshGpuData() {
     updateExecLogs();
 }
 
-static void addChild(QTreeWidget * parent, QString leftColumn, QString rightColumn) {
+void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
     parent->addTopLevelItem(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
 }
 
 // -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
 // did not alter it, it stays and in result will be not displayed
 void radeon_profile::refreshUI() {
-    const bool validCoreClock = device.gpuClocksData.coreClk >= 0,
-            validMemoryClock = device.gpuClocksData.memClk >= 0,
-            validCoreVolt = device.gpuClocksData.coreVolt >= 0,
-            validMemoryVolt = device.gpuClocksData.memVolt >= 0,
-            validPwmSpeed = device.gpuTemeperatureData.pwmSpeed >= 0;
-
-    // Header - Clocks
-    if(validCoreClock)
-        ui->l_cClk->setText(format_GPUClock);
-    else
-        ui->l_cClk->clear();
-
-    if(validMemoryClock)
-        ui->l_mClk->setText(format_memoryClock);
-    else
-        ui->l_mClk->clear();
-
-
-    // Header - Volts
-    if(validMemoryVolt)
-        ui->l_mVolt->setText(format_memoryVoltage);
-    else
-        ui->l_mVolt->clear();
-
-    if(validCoreVolt)
-        ui->l_cVolt->setText(format_GPUVoltage);
-    else
-        ui->l_cVolt->clear();
-
+    ui->l_mClk->setText(device.gpuClocksDataString.coreClk);
+    ui->l_cClk->setText(device.gpuClocksDataString.memClk);
+    ui->l_mVolt->setText(device.gpuClocksDataString.memVolt);
+    ui->l_cVolt->setText(device.gpuClocksDataString.coreVolt);
 
     // Header - Temperature
-    ui->l_temp->setText(format_currentTemp);
+    ui->l_temp->setText(device.gpuTemeperatureDataString.current);
 
     // Header - Fan speed
-    if(validPwmSpeed)
-        ui->l_fanSpeed->setText(format_fanSpeed);
-    else
-        ui->l_fanSpeed->clear();
+    ui->l_fanSpeed->setText(device.gpuTemeperatureDataString.pwmSpeed);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
@@ -281,23 +245,23 @@ void radeon_profile::refreshUI() {
 
         if (device.gpuClocksData.powerLevel != -1)
             addChild(ui->list_currentGPUData, label_currentPowerLevel, device.gpuClocksDataString.powerLevel);
-        if (validCoreClock)
-            addChild(ui->list_currentGPUData, label_currentGPUClock, format_GPUClock);
-        if (validMemoryClock)
-            addChild(ui->list_currentGPUData, label_currentMemClock, format_memoryClock);
+        if (device.gpuClocksData.coreClk != -1)
+            addChild(ui->list_currentGPUData, label_currentGPUClock, device.gpuClocksDataString.coreClk);
+        if (device.gpuClocksData.coreClk != -1)
+            addChild(ui->list_currentGPUData, label_currentMemClock, device.gpuClocksDataString.memClk);
         if (device.gpuClocksData.uvdCClk != -1)
-            addChild(ui->list_currentGPUData, label_uvdVideoCoreClock, format_UVDClock);
+            addChild(ui->list_currentGPUData, label_uvdVideoCoreClock, device.gpuClocksDataString.uvdCClk);
         if (device.gpuClocksData.uvdDClk != -1)
-            addChild(ui->list_currentGPUData, label_uvdDecoderClock, format_UVDDecoderClock);
-        if (validCoreVolt)
-            addChild(ui->list_currentGPUData, label_vddc, format_GPUVoltage);
-        if (validMemoryVolt)
-            addChild(ui->list_currentGPUData, label_vddci, format_memoryVoltage);
+            addChild(ui->list_currentGPUData, label_uvdDecoderClock, device.gpuClocksDataString.uvdDClk);
+        if (device.gpuClocksData.coreVolt != -1)
+            addChild(ui->list_currentGPUData, label_vddc, device.gpuClocksDataString.memVolt);
+        if (device.gpuClocksData.memVolt != -1)
+            addChild(ui->list_currentGPUData, label_vddci, device.gpuClocksDataString.coreVolt);
 
         if (ui->list_currentGPUData->topLevelItemCount() == 0)
             addChild(ui->list_currentGPUData, label_errorReadingData, label_howToReadData);
 
-        addChild(ui->list_currentGPUData, label_currentGPUTemperature, format_currentTemp);
+        addChild(ui->list_currentGPUData, label_currentGPUTemperature, device.gpuTemeperatureDataString.current);
     }
 }
 
@@ -369,13 +333,13 @@ void radeon_profile::timerEvent() {
 void radeon_profile::adjustFanSpeed(const bool force)
 {
     // If 'force' is true skip all checks.
-    if(force ||
+    if (force ||
             // Otherwise check if PWM is available and enabled by the user and if the temperature has changed
             (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked() &&
             device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore)) {
 
         float speed;
-        if(fanSteps.contains(device.gpuTemeperatureData.current)) // Exact match
+        if (fanSteps.contains(device.gpuTemeperatureData.current)) // Exact match
             speed = fanSteps.value(device.gpuTemeperatureData.current);
         else {
             // find bounds of current temperature
@@ -391,7 +355,7 @@ void radeon_profile::adjustFanSpeed(const bool force)
                 speed=(float)(high.value()-low.value())/(high.key()-low.key())*(device.gpuTemeperatureData.current-low.key())+low.value();
         }
 
-        qDebug() << device.gpuTemeperatureData.current << "° -->" << speed << "%";
+        qDebug() << device.gpuTemeperatureDataString.current << " -->" << speed << "%";
         if(speed >= 0 && speed <= 100)
             device.setPwmValue(device.features.pwmMaxSpeed * speed / 100);
     }
@@ -440,13 +404,12 @@ void radeon_profile::doTheStats() {
     statsTickCounter++;
 
     // figure out pm level based on data provided
-    QString pmLevelName;
-    if(device.gpuClocksData.powerLevel >= 0)
-        pmLevelName = format_stats_powerLevel;
-    if((device.gpuClocksData.coreClk >= 0) && (device.gpuClocksData.coreVolt >= 0))
-        pmLevelName += format_stats_GPUClock + format_stats_GPUVolt;
-    if((device.gpuClocksData.memClk >= 0) && (device.gpuClocksData.memVolt >= 0))
-        pmLevelName += format_stats_memClock + format_stats_memVolt;
+    QString pmLevelName = (device.gpuClocksData.powerLevel == -1) ? "" : "Power level:" + device.gpuClocksDataString.powerLevel, volt;
+    volt = (device.gpuClocksData.coreVolt == -1) ? "" : "(" + device.gpuClocksDataString.coreVolt+")";
+    pmLevelName = (device.gpuClocksData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +device.gpuClocksDataString.coreClk + volt;
+
+    volt = (device.gpuClocksData.memVolt == -1) ? "" : "(" + device.gpuClocksDataString.memVolt + ")";
+    pmLevelName = (device.gpuClocksData.memClk == -1) ? pmLevelName : pmLevelName + " Mem:" + device.gpuClocksDataString.memClk +  volt;
 
     if (pmStats.contains(pmLevelName)) // This power level already exists, increment its count
         pmStats[pmLevelName]++;
@@ -493,38 +456,39 @@ bool radeon_profile::addFanStep(const int temperature,
                                 const bool alsoToList,
                                 const bool alsoToGraph,
                                 const bool alsoAdjustSpeed){
-    if(fanStepIsValid(temperature, fanSpeed)){
-        qDebug() << "Adding step to fanSteps" << temperature << fanSpeed;
-        fanSteps.insert(temperature,fanSpeed);
 
-        if(alsoToList){
-            qDebug() << "Adding step to list_fanSteps";
-            const QString temperatureString = QString::number(temperature),
-                    speedString = QString::number(fanSpeed);
-            const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString,Qt::MatchExactly);
-
-            if(existing.isEmpty()){ // The element does not exist
-                ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << temperatureString << speedString));
-                ui->list_fanSteps->sortItems(0, Qt::AscendingOrder);
-            } else // The element exists already, overwrite it
-                existing.first()->setText(1,speedString);
-        }
-
-        if(alsoToGraph){
-            qDebug() << "Adding step to plotFanProfile";
-            ui->plotFanProfile->graph(0)->removeData(temperature);
-            ui->plotFanProfile->graph(0)->addData(temperature, fanSpeed);
-            ui->plotFanProfile->replot();
-        }
-
-        if(alsoAdjustSpeed){
-            qDebug() << "Adjusting fan speed";
-            adjustFanSpeed(true);
-        }
-
-        return true;
+    if (!fanStepIsValid(temperature, fanSpeed)) {
+        qWarning() << "Invalid value, can't be inserted into the fan step list:" << temperature << fanSpeed;
+        return false;
     }
 
-    qWarning() << "Invalid value, can't be inserted into the fan step list:" << temperature << fanSpeed;
-    return false;
+    qDebug() << "Adding step to fanSteps" << temperature << fanSpeed;
+    fanSteps.insert(temperature,fanSpeed);
+
+    if (alsoToList){
+        qDebug() << "Adding step to list_fanSteps";
+        const QString temperatureString = QString::number(temperature),
+                speedString = QString::number(fanSpeed);
+        const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString,Qt::MatchExactly);
+
+        if(existing.isEmpty()){ // The element does not exist
+            ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << temperatureString << speedString));
+            ui->list_fanSteps->sortItems(0, Qt::AscendingOrder);
+        } else // The element exists already, overwrite it
+            existing.first()->setText(1,speedString);
+    }
+
+    if (alsoToGraph){
+        qDebug() << "Adding step to plotFanProfile";
+        ui->plotFanProfile->graph(0)->removeData(temperature);
+        ui->plotFanProfile->graph(0)->addData(temperature, fanSpeed);
+        ui->plotFanProfile->replot();
+    }
+
+    if (alsoAdjustSpeed){
+        qDebug() << "Adjusting fan speed";
+        adjustFanSpeed(true);
+    }
+
+    return true;
 }

@@ -382,17 +382,6 @@
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <zorder>label</zorder>
-      <zorder>combo_gpus</zorder>
-      <zorder>combo_pProfile</zorder>
-      <zorder>combo_pLevel</zorder>
-      <zorder>l_fanSpeed</zorder>
-      <zorder>l_temp</zorder>
-      <zorder>l_cClk</zorder>
-      <zorder>l_mClk</zorder>
-      <zorder>l_cVolt</zorder>
-      <zorder>l_mVolt</zorder>
-      <zorder>mainTabs</zorder>
      </widget>
     </item>
     <item>
@@ -481,7 +470,7 @@
              </property>
              <property name="font">
               <font>
-               <family>Noto Mono</family>
+               <family>Monospace</family>
                <pointsize>8</pointsize>
               </font>
              </property>
@@ -691,7 +680,7 @@
         <item>
          <widget class="QTabWidget" name="tabs_systemInfo">
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_glxInfo">
            <attribute name="title">
@@ -714,7 +703,7 @@
              <widget class="QListWidget" name="list_glxinfo">
               <property name="font">
                <font>
-                <family>Noto Mono</family>
+                <family>Monospace</family>
                 <pointsize>8</pointsize>
                 <weight>50</weight>
                 <bold>false</bold>
@@ -751,7 +740,7 @@
              <widget class="QTreeWidget" name="list_connectors">
               <property name="font">
                <font>
-                <family>Noto Mono</family>
+                <family>Monospace</family>
                 <pointsize>8</pointsize>
                </font>
               </property>
@@ -802,7 +791,7 @@
              <widget class="QTreeWidget" name="list_modInfo">
               <property name="font">
                <font>
-                <family>Noto Mono</family>
+                <family>Monospace</family>
                 <pointsize>8</pointsize>
                 <weight>50</weight>
                 <bold>false</bold>
@@ -860,7 +849,7 @@
              <widget class="QTreeWidget" name="list_stats">
               <property name="font">
                <font>
-                <family>Noto Mono</family>
+                <family>Monospace</family>
                 <pointsize>8</pointsize>
                </font>
               </property>

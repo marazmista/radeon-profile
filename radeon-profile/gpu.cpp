@@ -1,6 +1,7 @@
 // copyright marazmista @ 29.03.2014
 
 #include "gpu.h"
+#include "radeon_profile.h"
 
 #include <cmath>
 #include <QFile>
@@ -90,13 +91,26 @@ QStringList gpu::initialize(bool skipDetectDriver) {
 globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuClocksStruct &data) {
     globalStuff::gpuClocksStructString tmp;
 
-    tmp.coreClk = QString().setNum(data.coreClk);
-    tmp.coreVolt = QString().setNum(data.coreVolt);
-    tmp.memClk = QString().setNum(data.memClk);
-    tmp.memVolt = QString().setNum(data.memVolt);
-    tmp.powerLevel = QString().setNum(data.powerLevel);
-    tmp.uvdCClk = QString().setNum(data.uvdCClk);
-    tmp.uvdDClk = QString().setNum(data.uvdDClk);
+    if (data.coreClk != -1)
+        tmp.coreClk =  QString().setNum(data.coreClk)+"MHz";
+
+    if (data.memClk != -1)
+        tmp.memClk =  QString().setNum(data.memClk)+"MHz";
+
+    if (data.memVolt != -1)
+        tmp.memVolt =  QString().setNum(data.memVolt)+"mV";
+
+    if (data.coreVolt != -1)
+        tmp.coreVolt =  QString().setNum(data.coreVolt)+"mV";
+
+    if (data.powerLevel != -1)
+        tmp.powerLevel =  QString().setNum(data.powerLevel);
+
+    if (data.uvdCClk != -1)
+        tmp.uvdCClk =  QString().setNum(data.uvdCClk)+"MHz";
+
+    if (data.uvdDClk != -1)
+        tmp.uvdDClk =  QString().setNum(data.uvdDClk)+"MHz";
 
     return tmp;
 }
@@ -107,7 +121,7 @@ globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuf
     tmp.current = QString::number(data.current) + QString::fromUtf8("\u00B0C");
     tmp.max = QString::number(data.max) + QString::fromUtf8("\u00B0C");
     tmp.min = QString::number(data.min) + QString::fromUtf8("\u00B0C");
-    tmp.pwmSpeed = QString::number(data.pwmSpeed);
+    tmp.pwmSpeed = QString::number(data.pwmSpeed)+"%";
 
     return tmp;
 }
@@ -182,7 +196,7 @@ void gpu::getTemperature() {
 // Function that returns the human readable output of a property value
 // For reference:
 // http://cgit.freedesktop.org/xorg/app/xrandr/tree/xrandr.c#n2408
-static QString translateProperty(Display * display,
+QString translateProperty(Display * display,
                                  const int propertyDataFormat, // 8 / 16 / 32 bit
                                  const Atom propertyDataType, // ATOM / INTEGER / CARDINAL
                                  const Atom * propertyRawData){ // Pointer to the property value data array
@@ -218,7 +232,7 @@ static QString translateProperty(Display * display,
 
 // Get the real vendor name from the three-letter PNP ID
 // See http://www.uefi.org/pnp_id_list
-static QString translatePnpId(const QString pnpId){
+QString translatePnpId(const QString pnpId){
     if ( ! pnpId.isEmpty()){
         qDebug() << "Searching PnP ID: " << pnpId;
         for(int i=0;  i < PNP_ID_FILE_COUNT; i++){ // Cycle through the files
@@ -245,7 +259,7 @@ static QString translatePnpId(const QString pnpId){
 // Get the human-readable monitor name (vendor + model) from the EDID
 // See http://en.wikipedia.org/wiki/Extended_display_identification_data#EDID_1.3_data_format
 // For reference: https://github.com/KDE/libkscreen/blob/master/src/edid.cpp#L262-L286
-static QString getMonitorName(const quint8 *EDID){
+QString getMonitorName(const quint8 *EDID){
     QString monitorName;
 
     //Get the vendor PnP ID
@@ -268,7 +282,7 @@ static QString getMonitorName(const quint8 *EDID){
 }
 
 // Function that returns the right info struct for the RRMode it receives
-static XRRModeInfo * getModeInfo(XRRScreenResources * screenResources, RRMode mode){
+XRRModeInfo * getModeInfo(XRRScreenResources * screenResources, RRMode mode){
     // Cycle through all the XRRModeInfos of this screen and search the right one
     for(int modeInfoIndex=0; modeInfoIndex < screenResources->nmode; modeInfoIndex++){
         if(screenResources->modes[modeInfoIndex].id == mode) // If we found the right modeInfo
@@ -279,7 +293,7 @@ static XRRModeInfo * getModeInfo(XRRScreenResources * screenResources, RRMode mo
 }
 
 // Function that returns the horizontal refresh rate in Hz from a XRRModeInfo
-static float getHorizontalRefreshRate(XRRModeInfo * modeInfo){
+float getHorizontalRefreshRate(XRRModeInfo * modeInfo){
     float out = -1;
 
     if(modeInfo && modeInfo->hTotal > 0 && modeInfo->dotClock > 0) // 'modeInfo' and its values must be present
@@ -289,7 +303,7 @@ static float getHorizontalRefreshRate(XRRModeInfo * modeInfo){
 }
 
 // Function that returns the vertical refresh rate in Hz from a XRRModeInfo
-static float getVerticalRefreshRate(XRRModeInfo * modeInfo){
+float getVerticalRefreshRate(XRRModeInfo * modeInfo){
     float out = -1;
 
     if(modeInfo && modeInfo->hTotal > 0 && modeInfo->vTotal > 0 && modeInfo->dotClock > 0){ // 'modeInfo' and its values must be present
@@ -308,14 +322,14 @@ static float getVerticalRefreshRate(XRRModeInfo * modeInfo){
 }
 
 //Utility function for getAspectRatio
-static bool ratioEqualsValue(const float ratio, const float value){
+bool ratioEqualsValue(const float ratio, const float value){
     return std::abs(ratio - value) < 0.01;
 }
 
 // Function that takes the resolution OR the width/height ratio
 // Returns as string the aspect ratio name if it is one of the most common ones
 // Returns <ratio>:1 otherwise
-static QString getAspectRatio(const float width, const float height = 1){
+QString getAspectRatio(const float width, const float height = 1){
     const float ratio = width / height;
     QString out;
 
@@ -338,7 +352,7 @@ static QString getAspectRatio(const float width, const float height = 1){
     return out.isEmpty() ? QString::number(ratio, 'g', 3) + ":1" : out;
 }
 
-static void addChild(QTreeWidgetItem * parent, QString leftColumn, QString rightColumn) {
+void addChild(QTreeWidgetItem * parent, const QString &leftColumn, const QString &rightColumn) {
     parent->addChild(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
 }
 

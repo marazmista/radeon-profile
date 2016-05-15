@@ -141,24 +141,11 @@
 #define label_backToProfiles QObject::tr("Back to profiles") // As "return to profiles"
 #define label_errorReadingData QObject::tr("Can't read data")
 #define label_howToReadData QObject::tr("You need debugfs mounted and either root rights or the daemon running")
-#define format_currentTemp QObject::tr("%n°C", NULL, device.gpuTemeperatureData.current)
-#define format_GPUClock QObject::tr("%nMHz", NULL, device.gpuClocksData.coreClk)
-#define format_memoryClock QObject::tr("%nMHz", NULL, device.gpuClocksData.memClk)
-#define format_UVDClock QObject::tr("%nMHz", NULL, device.gpuClocksData.uvdCClk)
-#define format_UVDDecoderClock QObject::tr("%nMHz", NULL, device.gpuClocksData.uvdDClk)
-#define format_GPUVoltage QObject::tr("%nmV", NULL, device.gpuClocksData.coreVolt)
-#define format_memoryVoltage QObject::tr("%nmV", NULL, device.gpuClocksData.memVolt)
-#define format_fanSpeed QObject::tr("%n%", NULL, device.gpuTemeperatureData.pwmSpeed)
-#define format_stats_powerLevel QObject::tr("Power level %n ", NULL, device.gpuClocksData.powerLevel)
-#define format_stats_GPUClock QObject::tr("(GPU@%nMHz,", NULL, device.gpuClocksData.coreClk)
-#define format_stats_GPUVolt QObject::tr("%nmV)", NULL, device.gpuClocksData.coreVolt)
-#define format_stats_memClock QObject::tr("(Mem@%nMHz,", NULL, device.gpuClocksData.memClk)
-#define format_stats_memVolt QObject::tr("%nmV)", NULL, device.gpuClocksData.memVolt)
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
 #define appVersion 20160515
-#define format_version QObject::tr("Version %n", NULL, appVersion)
+#define format_version QObject::tr("version %n", NULL, appVersion)
 
 
 class globalStuff {
