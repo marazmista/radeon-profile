@@ -13,6 +13,7 @@ Can be forced by `--driver fglrx` parameter.
 # Dependencies
 Crucial:
 * Qt4 or Qt5  (see build below)
+* libxrandr
 * radeon card
 
 For full functionality:

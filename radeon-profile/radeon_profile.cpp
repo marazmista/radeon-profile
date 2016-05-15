@@ -122,8 +122,17 @@ void radeon_profile::addRuntimeWidgets() {
     refreshBtn->show();
     connect(refreshBtn,SIGNAL(clicked()),this,SLOT(refreshBtnClicked()));
 
-    // version label
     ui->label_version->setText(format_version);
+
+    // version label
+    QLabel *l = new QLabel("v. " +QString().setNum(appVersion),this);
+    QFont f;
+    f.setStretch(QFont::Unstretched);
+    f.setWeight(QFont::Bold);
+    f.setPointSize(8);
+    l->setFont(f);
+    ui->mainTabs->setCornerWidget(l,Qt::BottomRightCorner);
+    l->show();
 
     // button on exec pages
     QPushButton *btnBackProfiles = new QPushButton();
