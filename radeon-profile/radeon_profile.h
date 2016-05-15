@@ -131,6 +131,9 @@ private slots:
     void on_btn_removeFanStep_clicked();
     void on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_fanSpeedSlider_valueChanged(int value);
+    void on_cb_enableOverclock_toggled(bool enable);
+    void on_btn_applyOverclock_clicked();
+    void on_slider_overclock_valueChanged(int value);
 
 private:
     gpu device;

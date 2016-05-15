@@ -41,6 +41,10 @@ void radeon_profile::saveConfig() {
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
 
+    settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
+    settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
+    settings.setValue("overclockValue", ui->slider_overclock->value());
+
     // Graph settings
     settings.setValue("graphLineThickness",ui->spin_lineThick->value());
     settings.setValue("graphTempBackground",ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1));
@@ -119,6 +123,10 @@ void radeon_profile::loadConfig() {
     ui->cb_showFreqGraph->setChecked(settings.value("showFreqGraphOnStart",true).toBool());
     ui->cb_showVoltsGraph->setChecked(settings.value("showVoltsGraphOnStart",false).toBool());
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
+
+    ui->cb_enableOverclock->setChecked(settings.value("overclockEnabled",false).toBool());
+    ui->cb_overclockAtLaunch->setChecked(settings.value("overclockAtLaunch",false).toBool());
+    ui->slider_overclock->setValue(settings.value("overclockValue",0).toInt());
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())

@@ -4,17 +4,17 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="globalStuff.h" line="108"/>
+        <location filename="globalStuff.h" line="109"/>
         <source>Resolution</source>
         <translation>Risoluzione</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="109"/>
+        <location filename="globalStuff.h" line="110"/>
         <source>Minimum resolution</source>
         <translation>Risoluzione minima</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="110"/>
+        <location filename="globalStuff.h" line="111"/>
         <source>Maximum resolution</source>
         <translation>Risoluzione massima</translation>
     </message>
@@ -59,187 +59,187 @@
         <translation>Temperatura della GPU</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="137"/>
+        <location filename="globalStuff.h" line="138"/>
         <source>No info</source>
         <translation>Nessuna info</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="140"/>
+        <location filename="globalStuff.h" line="141"/>
         <source>Back to profiles</source>
         <translation>Ritorna ai profili</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="141"/>
+        <location filename="globalStuff.h" line="142"/>
         <source>Can&apos;t read data</source>
         <translation>Impossibile leggere i dati</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="142"/>
+        <location filename="globalStuff.h" line="143"/>
         <source>You need debugfs mounted and either root rights or the daemon running</source>
         <translation>È necessario che debugfs sia montato e che il demone sia attivo (o che il programma venga eseguito come root)</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="90"/>
+        <location filename="globalStuff.h" line="91"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="91"/>
+        <location filename="globalStuff.h" line="92"/>
         <source>Profile name can&apos;t be empty!</source>
         <translation>Il nome del profilo non può essere vuoto!</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="92"/>
+        <location filename="globalStuff.h" line="93"/>
         <source>No binary is selected!</source>
         <translation>Nessun eseguibile selezionato!</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="93"/>
+        <location filename="globalStuff.h" line="94"/>
         <source>Binary not found in /usr/bin: </source>
         <translation>Eseguibile non trovato in /usr/bin: </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="94"/>
+        <location filename="globalStuff.h" line="95"/>
         <source>Enter value</source>
         <translation>Inserisci valore</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="95"/>
+        <location filename="globalStuff.h" line="96"/>
         <source>Enter valid value for </source>
         <translation>Inserisci un valore valido per </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="96"/>
+        <location filename="globalStuff.h" line="97"/>
         <source>Question</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="98"/>
+        <location filename="globalStuff.h" line="99"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="97"/>
+        <location filename="globalStuff.h" line="98"/>
         <source>Remove this item?</source>
         <translation>Rimuovere questo elemento?</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="99"/>
+        <location filename="globalStuff.h" line="100"/>
         <source>Select binary</source>
         <translation>Seleziona un eseguibile</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="100"/>
+        <location filename="globalStuff.h" line="101"/>
         <source>Select log file</source>
         <translation>Seleziona un file di log</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="101"/>
+        <location filename="globalStuff.h" line="102"/>
         <source>Can&apos;t run something that not exists!</source>
         <translation>Non posso eseguire qualcosa che non esiste!</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="102"/>
+        <location filename="globalStuff.h" line="103"/>
         <source>Run</source>
         <translation>Esegui</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="103"/>
+        <location filename="globalStuff.h" line="104"/>
         <source>Run: &quot;</source>
         <translation>Eseguire &quot;</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="104"/>
+        <location filename="globalStuff.h" line="105"/>
         <source>&quot;?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="107"/>
+        <location filename="globalStuff.h" line="108"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="111"/>
+        <location filename="globalStuff.h" line="112"/>
         <source>Virtual size</source>
         <translation>Dimensione virtuale</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="112"/>
+        <location filename="globalStuff.h" line="113"/>
         <source>Outputs</source>
         <translation>Connessioni</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="113"/>
+        <location filename="globalStuff.h" line="114"/>
         <source>Active</source>
         <translation>Attivo</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="114"/>
+        <location filename="globalStuff.h" line="115"/>
         <source> Hz vertical, </source>
         <translation> Hz verticale, </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="115"/>
+        <location filename="globalStuff.h" line="116"/>
         <source> KHz horizontal, </source>
         <translation> KHz orizzontale, </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="116"/>
+        <location filename="globalStuff.h" line="117"/>
         <source> MHz dot clock</source>
         <translation> MHz dot clock</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="117"/>
+        <location filename="globalStuff.h" line="118"/>
         <source>Yes</source>
         <translation>Si</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="118"/>
+        <location filename="globalStuff.h" line="119"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="119"/>
+        <location filename="globalStuff.h" line="120"/>
         <source>Refresh rate</source>
         <translation>Frequenza di aggiornamento</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="120"/>
+        <location filename="globalStuff.h" line="121"/>
         <source>Offset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="121"/>
+        <location filename="globalStuff.h" line="122"/>
         <source>Brightness (software)</source>
         <translation>Luminosità (software)</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="122"/>
+        <location filename="globalStuff.h" line="123"/>
         <source>Size</source>
         <translation>Dimensione</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="123"/>
+        <location filename="globalStuff.h" line="124"/>
         <source>Supported modes</source>
         <translation>Modalità supportate</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="124"/>
+        <location filename="globalStuff.h" line="125"/>
         <source>Properties</source>
         <translation>Proprietà</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="125"/>
+        <location filename="globalStuff.h" line="126"/>
         <source>Serial number</source>
         <translation>Numero di serie</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="126"/>
+        <location filename="globalStuff.h" line="127"/>
         <source>Not available</source>
         <translation>Non disponibile</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="127"/>
+        <location filename="globalStuff.h" line="128"/>
         <source>Connected with </source>
         <translation>Connesso con </translation>
     </message>
@@ -254,7 +254,7 @@
         <translation>Velocità della ventola</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="128"/>
+        <location filename="globalStuff.h" line="129"/>
         <source>Disconnected</source>
         <translation>Disconnesso</translation>
     </message>
@@ -417,12 +417,17 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation>Non puoi modificare il primo e l&apos;ultimo elemento</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="82"/>
+        <location filename="globalStuff.h" line="80"/>
+        <source>An error occurred, overclock failed</source>
+        <translation>Si è verificato un errore, overclock fallito</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="83"/>
         <source>Process state: running</source>
         <translation>Processo in esecuzione</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="160"/>
+        <location filename="globalStuff.h" line="161"/>
         <source>Version %n</source>
         <translation>Versione %n</translation>
     </message>
@@ -432,108 +437,108 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation>Il processo è ancora attivo. Chiudere comunque?</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="83"/>
+        <location filename="globalStuff.h" line="84"/>
         <source>Process state: not running</source>
         <translation>Processo terminato</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="84"/>
+        <location filename="globalStuff.h" line="85"/>
         <source>Save output to file</source>
         <translation>Salva output in un file</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="85"/>
+        <location filename="globalStuff.h" line="86"/>
         <source>Command</source>
         <translation>Comando</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="86"/>
+        <location filename="globalStuff.h" line="87"/>
         <source>Output</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="87"/>
+        <location filename="globalStuff.h" line="88"/>
         <source>Save</source>
         <translation>Salva</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="131"/>
+        <location filename="globalStuff.h" line="132"/>
         <source>%n mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="133"/>
+        <location filename="globalStuff.h" line="134"/>
         <source>%n mm </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="134"/>
+        <location filename="globalStuff.h" line="135"/>
         <source>(%n inches)</source>
         <translation>(%n pollici)</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="130"/>
-        <location filename="globalStuff.h" line="132"/>
+        <location filename="globalStuff.h" line="131"/>
+        <location filename="globalStuff.h" line="133"/>
         <source>%n mm x </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="143"/>
+        <location filename="globalStuff.h" line="144"/>
         <source>%n°C</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="144"/>
         <location filename="globalStuff.h" line="145"/>
         <location filename="globalStuff.h" line="146"/>
         <location filename="globalStuff.h" line="147"/>
+        <location filename="globalStuff.h" line="148"/>
         <source>%nMHz</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="148"/>
         <location filename="globalStuff.h" line="149"/>
+        <location filename="globalStuff.h" line="150"/>
         <source>%nmV</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="150"/>
+        <location filename="globalStuff.h" line="151"/>
         <source>%n%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="151"/>
+        <location filename="globalStuff.h" line="152"/>
         <source>Power level %n </source>
         <translation>Livello %n </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="152"/>
+        <location filename="globalStuff.h" line="153"/>
         <source>(GPU@%nMHz,</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="153"/>
-        <location filename="globalStuff.h" line="155"/>
+        <location filename="globalStuff.h" line="154"/>
+        <location filename="globalStuff.h" line="156"/>
         <source>%nmV)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="154"/>
+        <location filename="globalStuff.h" line="155"/>
         <source>(Mem@%nMHz,</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="135"/>
+        <location filename="globalStuff.h" line="136"/>
         <source>%n connected, </source>
         <translation>%n connessi, </translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="136"/>
+        <location filename="globalStuff.h" line="137"/>
         <source>%n active</source>
         <translation>%n attivi</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="129"/>
+        <location filename="globalStuff.h" line="130"/>
         <source>Virtual screen n°%n</source>
         <translatorcomment>Per un qualche motivo non viene tradotto correttamente a runtime, investigare</translatorcomment>
         <translation>Schermo virtuale n°%n</translation>
@@ -543,7 +548,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <name>radeon_profile</name>
     <message>
         <location filename="radeon_profile.ui" line="20"/>
-        <location filename="radeon_profile.ui" line="3197"/>
+        <location filename="radeon_profile.ui" line="3382"/>
         <source>Radeon Profile</source>
         <translation></translation>
     </message>
@@ -589,7 +594,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="radeon_profile.ui" line="500"/>
-        <location filename="radeon_profile.ui" line="3066"/>
+        <location filename="radeon_profile.ui" line="3251"/>
         <source>Property</source>
         <translation>Proprietà</translation>
     </message>
@@ -616,7 +621,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="radeon_profile.ui" line="589"/>
-        <location filename="radeon_profile.ui" line="1155"/>
+        <location filename="radeon_profile.ui" line="1340"/>
         <source>Auto</source>
         <translation></translation>
     </message>
@@ -652,7 +657,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="radeon_profile.ui" line="724"/>
-        <location filename="radeon_profile.ui" line="2935"/>
+        <location filename="radeon_profile.ui" line="3120"/>
         <source>Connectors</source>
         <translation>Connettori</translation>
     </message>
@@ -731,8 +736,8 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="radeon_profile.ui" line="891"/>
-        <location filename="radeon_profile.ui" line="2878"/>
-        <location filename="radeon_profile.ui" line="3009"/>
+        <location filename="radeon_profile.ui" line="3063"/>
+        <location filename="radeon_profile.ui" line="3194"/>
         <source>Graphs</source>
         <translation>Grafici</translation>
     </message>
@@ -777,405 +782,428 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation>Temperature</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1135"/>
+        <location filename="radeon_profile.ui" line="1320"/>
         <source>Fan Control</source>
         <translation>Controllo ventola</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1180"/>
+        <location filename="radeon_profile.ui" line="1365"/>
         <source>Fixed</source>
         <translation>Fisso</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1202"/>
+        <location filename="radeon_profile.ui" line="1387"/>
         <source>Custom curve</source>
         <translation>Curva personalizzata</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1225"/>
+        <location filename="radeon_profile.ui" line="1410"/>
         <source>Info</source>
         <translation>Informazioni</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1248"/>
+        <location filename="radeon_profile.ui" line="1269"/>
+        <location filename="radeon_profile.ui" line="1433"/>
         <source>Apply</source>
         <translation>Applica</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1270"/>
-        <location filename="radeon_profile.ui" line="1299"/>
+        <location filename="radeon_profile.ui" line="1135"/>
+        <source>Overclock</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="radeon_profile.ui" line="1164"/>
+        <source>Be careful! Overclock can harm your GPU, use it only if you know what you are doing!</source>
+        <oldsource>Be careful! Overclock can harm your GPU, use it at your own risk!</oldsource>
+        <translation>Stai attento! L&apos;overclock può danneggiare la tua GPU, usalo solo se sai quello che stai facendo!</translation>
+    </message>
+    <message>
+        <location filename="radeon_profile.ui" line="1189"/>
+        <source>Enable overclock</source>
+        <translation>Abilita overclock</translation>
+    </message>
+    <message>
+        <location filename="radeon_profile.ui" line="1199"/>
+        <source>Apply at launch</source>
+        <oldsource>Apply on startup</oldsource>
+        <translation>Applica all&apos;avvio</translation>
+    </message>
+    <message>
+        <location filename="radeon_profile.ui" line="1455"/>
+        <location filename="radeon_profile.ui" line="1484"/>
         <source>20%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1312"/>
+        <location filename="radeon_profile.ui" line="1497"/>
         <source> / 100%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1339"/>
+        <location filename="radeon_profile.ui" line="1524"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1344"/>
+        <location filename="radeon_profile.ui" line="1529"/>
         <source>Fan Speed [%]</source>
         <translation>Velocità ventola [%]</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1366"/>
+        <location filename="radeon_profile.ui" line="1551"/>
         <source>Add step</source>
         <translation>Aggiungi punto</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1385"/>
+        <location filename="radeon_profile.ui" line="1570"/>
         <source>Remove step</source>
         <translation>Rimuovi punto</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1411"/>
+        <location filename="radeon_profile.ui" line="1596"/>
         <source>Exec</source>
         <translation>Eseguibili</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1871"/>
+        <location filename="radeon_profile.ui" line="2056"/>
         <source>Warning! Unrecommended root mode!</source>
         <translation>ATTENZIONE! L&apos;esecuzione di comandi in modalità root è sconsigliata!</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1893"/>
+        <location filename="radeon_profile.ui" line="2078"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1898"/>
+        <location filename="radeon_profile.ui" line="2083"/>
         <source>Binary</source>
         <translation>Comando</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1903"/>
+        <location filename="radeon_profile.ui" line="2088"/>
         <source>Params</source>
         <translation>Parametri</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1908"/>
+        <location filename="radeon_profile.ui" line="2093"/>
         <source>Setting</source>
         <translation>Opzioni</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1913"/>
+        <location filename="radeon_profile.ui" line="2098"/>
         <source>Log file</source>
         <translation>File di log</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1918"/>
+        <location filename="radeon_profile.ui" line="2103"/>
         <source>Append date-time</source>
         <translation>Aggiungi data e ora</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1928"/>
+        <location filename="radeon_profile.ui" line="2113"/>
         <source>Add</source>
         <translation>Aggiungi</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1935"/>
+        <location filename="radeon_profile.ui" line="2120"/>
         <source>Modify</source>
         <translation>Modifica</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1942"/>
+        <location filename="radeon_profile.ui" line="2127"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1962"/>
+        <location filename="radeon_profile.ui" line="2147"/>
         <source>View output</source>
         <translation>Vedi output</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1975"/>
-        <location filename="radeon_profile.ui" line="2968"/>
+        <location filename="radeon_profile.ui" line="2160"/>
+        <location filename="radeon_profile.ui" line="3153"/>
         <source>Run</source>
         <translation>Esegui</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2005"/>
+        <location filename="radeon_profile.ui" line="2190"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2019"/>
+        <location filename="radeon_profile.ui" line="2204"/>
         <source>Binary:</source>
         <translation>Comando:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2037"/>
-        <location filename="radeon_profile.ui" line="2082"/>
+        <location filename="radeon_profile.ui" line="2222"/>
+        <location filename="radeon_profile.ui" line="2267"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2050"/>
+        <location filename="radeon_profile.ui" line="2235"/>
         <source>Binary parameters:</source>
         <translation>Parametri:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2064"/>
+        <location filename="radeon_profile.ui" line="2249"/>
         <source>Log file: (leave empty if don&apos;t want it)</source>
         <translation>File di log (lascia vuoto se non ti interessa)</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2089"/>
+        <location filename="radeon_profile.ui" line="2274"/>
         <source>Append date and time</source>
         <translation>Aggiungi data e ora</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2106"/>
+        <location filename="radeon_profile.ui" line="2291"/>
         <source>Variables:</source>
         <translation>Variabili:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2130"/>
+        <location filename="radeon_profile.ui" line="2315"/>
         <source>Values:</source>
         <translation>Valori:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2159"/>
+        <location filename="radeon_profile.ui" line="2344"/>
         <source>Summary:</source>
         <translation>Sommario:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2181"/>
+        <location filename="radeon_profile.ui" line="2366"/>
         <source>Be careful, remember to save one space between variables.</source>
         <translation>Procedi con cautela, ricorda di aggiungere uno spazio fra le variabili.</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2184"/>
+        <location filename="radeon_profile.ui" line="2369"/>
         <source>Tune variables manually</source>
         <translation>Modifica le variabili manualmente</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2611"/>
+        <location filename="radeon_profile.ui" line="2796"/>
         <source>Proceed with caution now.</source>
         <translation>Procedi con cautela.</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2631"/>
+        <location filename="radeon_profile.ui" line="2816"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2638"/>
+        <location filename="radeon_profile.ui" line="2823"/>
         <source>OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2682"/>
+        <location filename="radeon_profile.ui" line="2867"/>
         <source>Configuration</source>
         <translation>Impostazioni</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2707"/>
+        <location filename="radeon_profile.ui" line="2892"/>
         <source>Main</source>
         <translation>Generali</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2719"/>
+        <location filename="radeon_profile.ui" line="2904"/>
         <source>Start minimized</source>
         <translation>Avvia minimizzato</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2738"/>
+        <location filename="radeon_profile.ui" line="2923"/>
         <source>Minimize to tray</source>
         <translation>Minimizza nella barra delle applicazioni</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2757"/>
+        <location filename="radeon_profile.ui" line="2942"/>
         <source>On close hide to tray</source>
         <translation>Minimizza invece di chiudere</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2770"/>
+        <location filename="radeon_profile.ui" line="2955"/>
         <source>Save window geometry</source>
         <translation>Salva la geometria della finestra</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2783"/>
+        <location filename="radeon_profile.ui" line="2968"/>
         <source>Alternate row colors on lists</source>
         <translation>Alterna i colori delle righe nelle liste</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2796"/>
+        <location filename="radeon_profile.ui" line="2981"/>
         <source>Refresh interval [s]</source>
         <translation>Intervallo di refresh [s]</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2837"/>
+        <location filename="radeon_profile.ui" line="3022"/>
         <source>Update:</source>
         <translation>Aggiornamento:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2856"/>
+        <location filename="radeon_profile.ui" line="3041"/>
         <source>GPU data, power profile, temperature</source>
         <translation>Dati GPU, profili, temperatura</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2894"/>
+        <location filename="radeon_profile.ui" line="3079"/>
         <source>Power levels statistics</source>
         <translation>Statistiche sul livello di potenza</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2916"/>
+        <location filename="radeon_profile.ui" line="3101"/>
         <source>GLX Info</source>
         <translation>Informazioni GLX</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2954"/>
+        <location filename="radeon_profile.ui" line="3139"/>
         <source>Module parameters</source>
         <translation>Parametri dei moduli</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2973"/>
+        <location filename="radeon_profile.ui" line="3158"/>
         <source>Edit</source>
         <translation>Modifica</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2987"/>
+        <location filename="radeon_profile.ui" line="3172"/>
         <source>Double click action on exec item</source>
         <translation>Doppio click su un eseguibile</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3000"/>
+        <location filename="radeon_profile.ui" line="3185"/>
         <source>Explicit append system env to exec command</source>
         <translation>Comando esplicito di aggiunta di data e ora</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3021"/>
+        <location filename="radeon_profile.ui" line="3206"/>
         <source>Line thickness:</source>
         <translation>Spessore della linea:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3071"/>
+        <location filename="radeon_profile.ui" line="3256"/>
         <source>Color</source>
         <translation>Colore</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3076"/>
+        <location filename="radeon_profile.ui" line="3261"/>
         <source>Temperature background</source>
         <translation>Sfondo temperature</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3081"/>
+        <location filename="radeon_profile.ui" line="3266"/>
         <source>Clocks background</source>
         <translation>Sfondo clock</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3086"/>
+        <location filename="radeon_profile.ui" line="3271"/>
         <source>Voltage background</source>
         <translation>Sfondo voltaggi</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3091"/>
+        <location filename="radeon_profile.ui" line="3276"/>
         <source>Temperature line</source>
         <translation>Temperatura GPU</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3096"/>
+        <location filename="radeon_profile.ui" line="3281"/>
         <source>GPU clock line</source>
         <translation>Clock della GPU</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3101"/>
+        <location filename="radeon_profile.ui" line="3286"/>
         <source>Mem clock line</source>
         <translation>Clock della memoria</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3106"/>
+        <location filename="radeon_profile.ui" line="3291"/>
         <source>UVD video core line</source>
         <translation>UVD video core</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3111"/>
+        <location filename="radeon_profile.ui" line="3296"/>
         <source>UVD decoder clock line</source>
         <translation>Decoder UVD</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3116"/>
+        <location filename="radeon_profile.ui" line="3301"/>
         <source>Core voltage line</source>
         <translation>Voltaggio della GPU</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3121"/>
+        <location filename="radeon_profile.ui" line="3306"/>
         <source>Mem voltage line</source>
         <translation>Voltaggio della memoria</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3128"/>
+        <location filename="radeon_profile.ui" line="3313"/>
         <source>Daemon</source>
         <translation>Background</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3143"/>
+        <location filename="radeon_profile.ui" line="3328"/>
         <source>Good option to check. Causes that daemon gets data from system automaticly with interval when GUI is on instead of waiting for request to read this data. Interval is the same as GUI.</source>
         <translation>Il servizio in background aggiornerà i dati automaticamente quando la GUI è attiva (consigliato).</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3146"/>
+        <location filename="radeon_profile.ui" line="3331"/>
         <source>Refresh data without request</source>
         <translation>Aggiorna dati automaticamente</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3162"/>
+        <location filename="radeon_profile.ui" line="3347"/>
         <source>Apply new configuration and send it to daemon.</source>
         <translation>Applica le opzioni e riconfigura il servizio in background.</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3165"/>
+        <location filename="radeon_profile.ui" line="3350"/>
         <source>Reconfigure daemon</source>
         <translation>Riconfigura il demone</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3171"/>
+        <location filename="radeon_profile.ui" line="3356"/>
         <source>About</source>
         <translation>Dettagli</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3243"/>
+        <location filename="radeon_profile.ui" line="3428"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Go to GitHub repository&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Vai alla repository su GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3264"/>
+        <location filename="radeon_profile.ui" line="3449"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile/issues&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Report an issue&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile/issues&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Segnala un problema&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3285"/>
+        <location filename="radeon_profile.ui" line="3470"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile-daemon&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Radeon profile daemon&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3319"/>
+        <location filename="radeon_profile.ui" line="3504"/>
         <source>Contributors:</source>
         <translation>Contributori:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3334"/>
+        <location filename="radeon_profile.ui" line="3519"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Marazmista&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3355"/>
+        <location filename="radeon_profile.ui" line="3540"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/Danysan1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Danysan1&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3376"/>
+        <location filename="radeon_profile.ui" line="3561"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/V10lator&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;V10lator&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3397"/>
+        <location filename="radeon_profile.ui" line="3582"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/pontostroy&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Pontostroy&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>

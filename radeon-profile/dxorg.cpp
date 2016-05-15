@@ -628,10 +628,9 @@ globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
 }
 
 bool dXorg::overClock(const int percentage){
-    if( ! QFile::exists(filePaths.overDrivePath) || (percentage > 20) || (percentage < 0))
-        return false;
-
-    if (daemonConnected()){ // Signal the daemon to set the overclock value
+    if((percentage > 20) || (percentage < 0))
+        qWarning() << "Error overclocking: invalid percentage passed: " << percentage;
+    else if (daemonConnected()){ // Signal the daemon to set the overclock value
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
         command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
         command.append(QString::number(percentage)).append(SEPARATOR); // The overclock level
@@ -639,12 +638,15 @@ bool dXorg::overClock(const int percentage){
 
         qDebug() << "Sending overclock signal: " << command;
         dcomm->sendCommand(command);
-    } else if(globalStuff::globalConfig.rootMode) // Root mode, set it directly
+        return true;
+    } else if(globalStuff::globalConfig.rootMode){ // Root mode, set it directly
         setNewValue(filePaths.overDrivePath, QString::number(percentage));
-    else // Overclock requires root access to sysfs
-        return false;
 
-    return true;
+        return true;
+    } else // Overclock requires root access to sysfs
+        qWarning() << "Error overclocking: daemon is not connected and no root access is available";
+
+    return false;
 }
 
 void dXorg::resetOverClock(){

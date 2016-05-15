@@ -860,3 +860,16 @@ void gpu::getPwmSpeed() {
         break;
     }
 }
+
+bool gpu::overclock(const int value){
+    if(features.overClockAvailable && (currentDriver == XORG))
+        return dXorg::overClock(value);
+
+    qWarning() << "Error overclocking: overclocking is not supported";
+    return false;
+}
+
+void gpu::resetOverclock(){
+    if(features.overClockAvailable && (currentDriver == XORG))
+        dXorg::resetOverClock();
+}

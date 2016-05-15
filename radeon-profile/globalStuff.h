@@ -77,6 +77,7 @@
 #define label_howToEdit QObject::tr("This step already exists. To edit it double click it")
 #define label_cantDeleteThisItem QObject::tr("You can't delete the first and the last item")
 #define label_cantEditThisItem QObject::tr("You can't edit the first and the last item")
+#define label_overclockFailed QObject::tr("An error occurred, overclock failed")
 
 // execbin.cpp
 #define label_processRunning QObject::tr("Process state: running")

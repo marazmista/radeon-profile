@@ -440,3 +440,25 @@ void radeon_profile::on_fanSpeedSlider_valueChanged(int value)
 }
 
 //========
+
+void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
+    ui->slider_overclock->setEnabled(enable);
+    ui->btn_applyOverclock->setEnabled(enable);
+    ui->cb_overclockAtLaunch->setEnabled(enable);
+
+    if(enable)
+        qDebug() << "Enabling overclock";
+    else {
+        qDebug() << "Disabling overclock";
+        device.resetOverclock();
+    }
+}
+
+void radeon_profile::on_btn_applyOverclock_clicked(){
+    if( ! device.overclock(ui->slider_overclock->value()))
+        QMessageBox::warning(this, label_error, label_overclockFailed);
+}
+
+void radeon_profile::on_slider_overclock_valueChanged(const int value){
+    ui->label_overclockPercentage->setText(QString::number(value));
+}
