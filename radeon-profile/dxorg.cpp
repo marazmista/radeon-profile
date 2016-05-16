@@ -506,7 +506,7 @@ void dXorg::setPwmValue(int value) {
         command.append(QString::number(value)).append(SEPARATOR); // PWM value to be set
         command.append(filePaths.pwmSpeedPath).append(SEPARATOR); // The path where the PWM value should be written in
 
-        qDebug() << "Sending daemon forced power profile signal: " << command;
+        qDebug() << "Sending daemon fan pwm speed signal: " << command;
         dcomm->sendCommand(command);
     } else
         setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
@@ -522,7 +522,7 @@ void dXorg::setPwmManuaControl(bool manual) {
         command.append(mode).append(SEPARATOR); // The PWM mode to set
         command.append(filePaths.pwmEnablePath).append(SEPARATOR); // The path where the PWM mode should be written in
 
-        qDebug() << "Sending daemon forced power profile signal: " << command;
+        qDebug() << "Sending daemon fan pwm enable signal: " << command;
         dcomm->sendCommand(command);
     } else  //  No daemon available
         setNewValue(filePaths.pwmEnablePath, QString(mode));
