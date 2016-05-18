@@ -15,25 +15,20 @@
 #define DAEMON_SIGNAL_TIMER_ON '4'
 #define DAEMON_SIGNAL_TIMER_OFF '5'
 
-class daemonComm : public QObject
+class daemonComm : public QLocalSocket
 {
     Q_OBJECT
 public:
-    daemonComm();
-    ~daemonComm();
     void connectToDaemon();
     void sendCommand(const QString command);
 
-    inline bool connected() {
-        return (signalSender->state() == QLocalSocket::ConnectedState);
-    }
+    bool connected();
 
-    QLocalSocket *signalSender;
-
-
-public slots:
-    void onConnect();
-
+    void sendConfig (QString clocksPath); // SIGNAL_CONFIG + SEPARATOR + CLOCKS_PATH + SEPARATOR
+    void sendReadClocks (); // SIGNAL_READ_CLOCKS + SEPARATOR
+    void sendSetValue (QString value, QString path); // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
+    void sendTimerOn (unsigned int interval); // SIGNAL_TIMER_ON + SEPARATOR + INTERVAL + SEPARATOR
+    void sendTimerOff (); // SIGNAL_TIMER_OFF + SEPARATOR
 };
 
 #endif // DAEMONCOMM_H

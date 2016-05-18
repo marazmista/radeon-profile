@@ -16,13 +16,18 @@
 
 #define SHARED_MEM_SIZE 128 // When changin this, consider changing SHARED_MEM_SIZE in radeon-profile-daemon/rpdthread.h
 
+typedef enum tempSensor {
+    SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
+    CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
+    PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
+    MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
+    TS_UNKNOWN
+} tempSensor;
+
 class dXorg
 {
 public:
-    dXorg() {}
-    ~dXorg() {sharedMem.deleteLater();} // Before being deleted, the class deletes the sharedMem
-
-    static globalStuff::gpuClocksStruct getClocks(const QString &data);
+    static gpuClocksStruct getClocks(const QString &data);
     static QString getClocksRawData(bool forFeatures = false);
     static float getTemperature();
     static QStringList getGLXInfo(QProcessEnvironment env);
@@ -31,18 +36,18 @@ public:
     static QString getCurrentPowerProfile();
     static int getPwmSpeed();
 
-    static void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
-    static void setForcePowerLevel(globalStuff::forcePowerLevels);
+    static void setPowerProfile(powerProfiles newPowerProfile);
+    static void setForcePowerLevel(forcePowerLevels newForcePowerLevel);
     static void setPwmManuaControl(bool manual);
     static void setPwmValue(int value);
 
     static QStringList detectCards();
     static void figureOutGpuDataFilePaths(QString gpuName);
     static void configure(QString gpuName);
-    static globalStuff::driverFeatures figureOutDriverFeatures();
+    static driverFeatures figureOutDriverFeatures();
     static void reconfigureDaemon();
     static bool daemonConnected();
-    static globalStuff::gpuClocksStruct getFeaturesFallback();
+    static gpuClocksStruct getFeaturesFallback();
 
     /**
      * @brief overClock Overclocks the GPU
@@ -55,13 +60,6 @@ public:
 
 
 private:
-    enum tempSensor {
-        SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
-        CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
-        PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
-        MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
-        TS_UNKNOWN
-    };
 
     static QChar gpuSysIndex;
     static QSharedMemory sharedMem;
@@ -80,11 +78,11 @@ private:
             overDrivePath;
     } filePaths;
     static int sensorsGPUtempIndex;
-    static dXorg::tempSensor currentTempSensor;
-    static globalStuff::powerMethod currentPowerMethod;
+    static tempSensor currentTempSensor;
+    static powerMethod currentPowerMethod;
 
     static QString findSysfsHwmonForGPU();
-    static globalStuff::powerMethod getPowerMethod();
+    static powerMethod getPowerMethod();
     static tempSensor testSensor();
     static void setNewValue(const QString &filePath, const QString &newValue);
     static QString findSysFsHwmonForGpu();

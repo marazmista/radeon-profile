@@ -35,7 +35,7 @@ class radeon_profile : public QMainWindow
 {
     Q_OBJECT
 
-    // names in this enum equals indexes in Qtreewidged in ui for selecting clors
+    // names in this enum equals indexes in Qtreewidged in ui for selecting colors
     enum graphColors {
         TEMP_BG = 0,
         CLOCKS_BG,
@@ -49,6 +49,7 @@ class radeon_profile : public QMainWindow
         MEM_VOLTS_LINE
     };
 
+    // Elements of any any exec profile
     enum itemValues {
         PROFILE_NAME,
         BINARY,
@@ -159,7 +160,7 @@ private:
     void setupContextMenus();
     void refreshGpuData();
     void refreshGraphs();
-    void setupUiEnabledFeatures(const globalStuff::driverFeatures &features);
+    void setupUiEnabledFeatures(const driverFeatures &features);
     void loadVariables();
     void updateExecLogs();
     void addRuntimeWidgets();

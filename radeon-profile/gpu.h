@@ -11,12 +11,13 @@
 #include "dfglrx.h"
 #include "dxorg.h"
 
+typedef enum driver {
+    XORG, FGLRX, DRIVER_UNKNOWN
+} driver;
+
 class gpu
 {
 public:
-    enum driver {
-        XORG, FGLRX, DRIVER_UNKNOWN
-    };
 
     explicit gpu() {
         currentGpuIndex = 0;
@@ -26,13 +27,13 @@ public:
                 gpuTemeperatureData.sum = 0;
     }
 
-    globalStuff::gpuClocksStruct gpuClocksData;
-    globalStuff::gpuClocksStructString gpuClocksDataString;
-    globalStuff::gpuTemperatureStruct gpuTemeperatureData;
-    globalStuff::gpuTemperatureStructString gpuTemeperatureDataString;
+    gpuClocksStruct gpuClocksData;
+    gpuClocksStructString gpuClocksDataString;
+    gpuTemperatureStruct gpuTemeperatureData;
+    gpuTemperatureStructString gpuTemeperatureDataString;
     QStringList gpuList;
     char currentGpuIndex;
-    globalStuff::driverFeatures features;
+    driverFeatures features;
     QString currentPowerProfile, currentPowerLevel;
 
     QList<QTreeWidgetItem *> getCardConnectors() const;
@@ -41,17 +42,17 @@ public:
     QString getCurrentPowerLevel() const;
     QString getCurrentPowerProfile() const;
     void refreshPowerLevel();
-    globalStuff::gpuClocksStructString convertClocks(const globalStuff::gpuClocksStruct &data);
-    globalStuff::gpuTemperatureStructString convertTemperature(const globalStuff::gpuTemperatureStruct &data);
+    gpuClocksStructString convertClocks(const gpuClocksStruct &data);
+    gpuTemperatureStructString convertTemperature(const gpuTemperatureStruct &data);
 
     void getClocks();
     void getTemperature();
     void getPwmSpeed();
 
     void changeGpu(char index);
-    void driverByParam(gpu::driver);
-    void setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const;
-    void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const;
+    void driverByParam(driver);
+    void setPowerProfile(powerProfiles newPowerProfile) const;
+    void setForcePowerLevel(forcePowerLevels newForcePowerLevel) const;
     void setPwmManualControl(bool manual) const;
     void setPwmValue(int value) const;
 

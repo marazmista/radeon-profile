@@ -37,7 +37,7 @@ static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
     "/usr/share/hwdata/pnp.ids"
 };
 
-gpu::driver gpu::detectDriver() {
+driver gpu::detectDriver() {
     QStringList out = globalStuff::grabSystemInfo("lsmod");
 
     if (!out.filter("radeon").isEmpty())
@@ -78,18 +78,15 @@ QStringList gpu::initialize(bool skipDetectDriver) {
         break;
     }
     case DRIVER_UNKNOWN: {
-        globalStuff::driverFeatures f;
-        f.pm = globalStuff::PM_UNKNOWN;
-        f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
-        features = f;
+        features = driverFeatures();
         gpuList << label_unknown;
     }
     }
     return gpuList;
 }
 
-globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuClocksStruct &data) {
-    globalStuff::gpuClocksStructString tmp;
+gpuClocksStructString gpu::convertClocks(const gpuClocksStruct &data) {
+    gpuClocksStructString tmp;
 
     if (data.coreClk != -1)
         tmp.coreClk =  QString().setNum(data.coreClk)+"MHz";
@@ -115,8 +112,8 @@ globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuCloc
     return tmp;
 }
 
-globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuff::gpuTemperatureStruct &data) {
-    globalStuff::gpuTemperatureStructString tmp;
+gpuTemperatureStructString gpu::convertTemperature(const gpuTemperatureStruct &data) {
+    gpuTemperatureStructString tmp;
 
     tmp.current = QString::number(data.current) + QString::fromUtf8("\u00B0C");
     tmp.max = QString::number(data.max) + QString::fromUtf8("\u00B0C");
@@ -126,7 +123,7 @@ globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuf
     return tmp;
 }
 
-void gpu::driverByParam(gpu::driver paramDriver) {
+void gpu::driverByParam(driver paramDriver) {
     this->currentDriver = paramDriver;
 }
 
@@ -159,7 +156,7 @@ void gpu::getClocks() {
         gpuClocksData = dFglrx::getClocks();
         break;
     case DRIVER_UNKNOWN: {
-        globalStuff::gpuClocksStruct clk(-1);
+        gpuClocksStruct clk(-1);
         gpuClocksData = clk;
         break;
     }
@@ -820,10 +817,10 @@ void gpu::refreshPowerLevel() {
     currentPowerProfile = getCurrentPowerProfile();
 }
 
-void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const {
+void gpu::setPowerProfile(powerProfiles newPowerProfile) const {
     switch (currentDriver) {
     case XORG:
-        dXorg::setPowerProfile(_newPowerProfile);
+        dXorg::setPowerProfile(newPowerProfile);
         break;
     case FGLRX:
     case DRIVER_UNKNOWN:
@@ -831,10 +828,10 @@ void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const {
     }
 }
 
-void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const {
+void gpu::setForcePowerLevel(forcePowerLevels newForcePowerLevel) const {
     switch (currentDriver) {
     case XORG:
-        dXorg::setForcePowerLevel(_newForcePowerLevel);
+        dXorg::setForcePowerLevel(newForcePowerLevel);
         break;
     case FGLRX:
     case DRIVER_UNKNOWN:

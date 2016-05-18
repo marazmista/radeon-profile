@@ -12,15 +12,14 @@
 class dFglrx
 {
 public:
-    dFglrx() { }
 
-    static globalStuff::gpuClocksStruct getClocks();
+    static gpuClocksStruct getClocks();
     static float getTemperature();
     static QList<QTreeWidgetItem *> getCardConnectors();
     static QStringList getGLXInfo();
     static QStringList detectCards();
     static void configure(char _gpuIndex);
-    static globalStuff::driverFeatures figureOutDriverFeatures();
+    static driverFeatures figureOutDriverFeatures();
 private:
    static char gpuIndex;
 

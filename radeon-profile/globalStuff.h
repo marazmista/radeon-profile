@@ -4,7 +4,7 @@
 
 #ifndef PUBLICSTUFF_H
 #define PUBLICSTUFF_H
-
+#include <map>
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QStringList>
@@ -141,6 +141,7 @@
 #define label_backToProfiles QObject::tr("Back to profiles") // As "return to profiles"
 #define label_errorReadingData QObject::tr("Can't read data")
 #define label_howToReadData QObject::tr("You need debugfs mounted and either root rights or the daemon running")
+#define label_noOverclock QObject::tr("Your driver or your GPU does not support overclocking")
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
@@ -174,90 +175,6 @@ public:
         delete p;
         return a.split('\n');
     }
-
-    enum powerProfiles {
-        BATTERY, BALANCED, PERFORMANCE, AUTO, DEFAULT, LOW, MID, HIGH
-    };
-
-    enum forcePowerLevels {
-        F_AUTO, F_LOW, F_HIGH
-    };
-
-//    enum pwmControl {
-//        PWM_DISABLED, PWM_MANUAL, PWM_AUTO
-//    };
-
-    enum powerMethod {
-        DPM = 0,  // kernel >= 3.11
-        PROFILE = 1,  // kernel <3.11 or dpm disabled
-        PM_UNKNOWN = 2
-    };
-
-    struct gpuClocksStruct {
-        int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
-        char powerLevel;
-
-        gpuClocksStruct() { }
-
-        gpuClocksStruct(int _coreClk, int _memClk, int _coreVolt, int _memVolt, int _uvdCClk, int _uvdDclk, char _pwrLevel ) {
-            coreClk = _coreClk;
-            memClk = _memClk;
-            coreVolt = _coreVolt;
-            memVolt = _memVolt;
-            uvdCClk = _uvdCClk;
-            uvdDClk = _uvdDclk;
-            powerLevel = _pwrLevel;
-        }
-
-        // initialize empty struct, so when we pass -1, only values that != -1 will show
-        gpuClocksStruct(int allValues) {
-            coreClk = memClk =  coreVolt =   memVolt = uvdCClk =  uvdDClk = powerLevel = allValues;
-        }
-    };
-
-    struct gpuClocksStructString {
-      QString powerLevel, coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
-    };
-
-
-    // structure which holds what can be display on ui and on its base
-    // we enable ui elements
-    struct driverFeatures {
-        bool canChangeProfile,
-            coreClockAvailable,
-            memClockAvailable,
-            coreVoltAvailable,
-            memVoltAvailable,
-            temperatureAvailable,
-            pwmAvailable,
-            overClockAvailable;
-        globalStuff::powerMethod pm;
-        int pwmMaxSpeed;
-
-        driverFeatures() {
-            canChangeProfile =
-                    coreClockAvailable =
-                    memClockAvailable =
-                    coreVoltAvailable =
-                    memVoltAvailable =
-                    temperatureAvailable =
-                    pwmAvailable =
-                    overClockAvailable = false;
-            pm = PM_UNKNOWN;
-            pwmMaxSpeed = 0;
-        }
-
-    };
-
-    struct gpuTemperatureStruct{
-        float current, currentBefore, max, min, sum;
-        int pwmSpeed;
-    };
-
-    struct gpuTemperatureStructString {
-        QString current, max, min, pwmSpeed;
-    };
-
     // settings from config used across the source
     static struct globalCfgStruct{
         float interval;
@@ -265,6 +182,100 @@ public:
         int graphOffset;
     } globalConfig;
 };
+
+typedef enum powerProfiles {
+    BATTERY, BALANCED, PERFORMANCE, AUTO, DEFAULT, LOW, MID, HIGH
+} powerProfiles;
+
+const std::map<powerProfiles, QString> profileToString =
+    {{BATTERY, dpm_battery},
+     {BALANCED, dpm_balanced},
+     {PERFORMANCE, dpm_performance},
+     {AUTO, dpm_auto},
+     {DEFAULT, profile_default},
+     {LOW, profile_low},
+     {MID, profile_mid},
+     {HIGH, profile_high}};
+
+typedef enum forcePowerLevels {
+    F_AUTO, F_LOW, F_HIGH
+} forcePowerLevels;
+
+const std::map<forcePowerLevels, QString> powerLevelToString =
+    {{F_AUTO, profile_auto},
+     {F_LOW, profile_low},
+     {F_HIGH, profile_high}};
+
+typedef enum powerMethod {
+    DPM = 0,  // kernel >= 3.11
+    PROFILE = 1,  // kernel <3.11 or dpm disabled
+    PM_UNKNOWN = 2
+} powerMethod;
+
+typedef struct gpuClocksStruct {
+    int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
+    char powerLevel;
+
+    gpuClocksStruct() { }
+
+    gpuClocksStruct(int _coreClk, int _memClk, int _coreVolt, int _memVolt, int _uvdCClk, int _uvdDclk, char _pwrLevel ) {
+        coreClk = _coreClk;
+        memClk = _memClk;
+        coreVolt = _coreVolt;
+        memVolt = _memVolt;
+        uvdCClk = _uvdCClk;
+        uvdDClk = _uvdDclk;
+        powerLevel = _pwrLevel;
+    }
+
+    // initialize empty struct, so when we pass -1, only values that != -1 will show
+    gpuClocksStruct(int allValues) {
+        coreClk = memClk =  coreVolt =   memVolt = uvdCClk =  uvdDClk = powerLevel = allValues;
+    }
+} gpuClocksStruct;
+
+typedef struct gpuClocksStructString {
+    QString powerLevel, coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
+} gpuClocksStructString;
+
+
+// structure which holds what can be display on ui and on its base
+// we enable ui elements
+typedef struct driverFeatures {
+    bool canChangeProfile,
+        coreClockAvailable,
+        memClockAvailable,
+        coreVoltAvailable,
+        memVoltAvailable,
+        temperatureAvailable,
+        pwmAvailable,
+        overClockAvailable;
+    powerMethod pm;
+    int pwmMaxSpeed;
+
+    driverFeatures() {
+        canChangeProfile =
+                coreClockAvailable =
+                memClockAvailable =
+                coreVoltAvailable =
+                memVoltAvailable =
+                temperatureAvailable =
+                pwmAvailable =
+                overClockAvailable = false;
+        pm = PM_UNKNOWN;
+        pwmMaxSpeed = 0;
+    }
+
+} driverFeatures;
+
+typedef struct gpuTemperatureStruct {
+    float current, currentBefore, max, min, sum;
+    int pwmSpeed;
+} gpuTemperatureStruct;
+
+typedef struct gpuTemperatureStructString {
+    QString current, max, min, pwmSpeed;
+} gpuTemperatureStructString;
 
 
 #endif // PUBLICSTUFF_H

@@ -62,11 +62,11 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     //figure out parameters
     QString params = a.join(" ");
     if (params.contains("--driver xorg")) {
-        device.driverByParam(gpu::XORG);
+        device.driverByParam(XORG);
         ui->combo_gpus->addItems(device.initialize(true));
     }
     else if (params.contains("--driver fglrx")) {
-        device.driverByParam(gpu::FGLRX);
+        device.driverByParam(FGLRX);
         ui->combo_gpus->addItems(device.initialize(true));
     }
     else // driver object detects cards in pc and fill the list in ui //
@@ -149,14 +149,14 @@ void radeon_profile::addRuntimeWidgets() {
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
-void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &features) {
-    if (features.canChangeProfile && features.pm < globalStuff::PM_UNKNOWN) {
-        ui->tabs_pm->setTabEnabled(0,features.pm == globalStuff::PROFILE);
+void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
+    if (features.canChangeProfile && features.pm < PM_UNKNOWN) {
+        ui->tabs_pm->setTabEnabled(0,features.pm == PROFILE);
 
-        ui->tabs_pm->setTabEnabled(1,features.pm == globalStuff::DPM);
-        changeProfile->setEnabled(features.pm == globalStuff::PROFILE);
-        dpmMenu->setEnabled(features.pm == globalStuff::DPM);
-        ui->combo_pLevel->setEnabled(features.pm == globalStuff::DPM);
+        ui->tabs_pm->setTabEnabled(1,features.pm == DPM);
+        changeProfile->setEnabled(features.pm == PROFILE);
+        dpmMenu->setEnabled(features.pm == DPM);
+        ui->combo_pLevel->setEnabled(features.pm == DPM);
     } else {
         ui->tabs_pm->setEnabled(false);
         changeProfile->setEnabled(false);
@@ -189,7 +189,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->l_fanSpeed->setVisible(false);
     }
 
-    if (features.pm == globalStuff::DPM) {
+    if (features.pm == DPM) {
         ui->combo_pProfile->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
         ui->combo_pLevel->addItems(QStringList() << dpm_auto << dpm_low << dpm_high);
 
@@ -201,13 +201,12 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
     }
 
-    // ui->mainTabs->setTabEnabled(2,features.overClockAvailable);
-    // Overclock is still not tested (it will be fully available only with Linux 4.7/4.8), disable it in release mode
-#ifdef QT_DEBUG // TO BE REMOVED AFTER TESTING
-    ui->mainTabs->setTabEnabled(2,true);
-#else
-    ui->mainTabs->setTabEnabled(2,false);
-#endif
+    if( ! features.overClockAvailable){
+        ui->label_overclock->setText((globalStuff::globalConfig.rootMode || device.daemonConnected()) ? label_noOverclock : label_howToReadData);
+
+        ui->cb_enableOverclock->setChecked(false);
+        ui->cb_enableOverclock->setEnabled(false);
+    }
 }
 
 void radeon_profile::refreshGpuData() {
@@ -294,7 +293,7 @@ void radeon_profile::timerEvent() {
         refreshGpuData();
 
         ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerProfile));
-        if (device.features.pm == globalStuff::DPM)
+        if (device.features.pm == DPM)
             ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
 
         adjustFanSpeed();

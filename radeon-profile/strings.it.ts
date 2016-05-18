@@ -427,7 +427,12 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation>Processo in esecuzione</translation>
     </message>
     <message>
-        <location filename="globalStuff.h" line="148"/>
+        <location filename="globalStuff.h" line="144"/>
+        <source>Your driver or your GPU does not support overclocking</source>
+        <translation>Il tuo driver o la tua GPU non supporta l&apos;overclock</translation>
+    </message>
+    <message>
+        <location filename="globalStuff.h" line="149"/>
         <source>version %n</source>
         <translation>versione %n</translation>
     </message>

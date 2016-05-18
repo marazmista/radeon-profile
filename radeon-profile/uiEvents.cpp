@@ -81,9 +81,9 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 void radeon_profile::changeProfileFromCombo() {
     int index = ui->combo_pProfile->currentIndex();
 
-    globalStuff::powerProfiles newPP = (globalStuff::powerProfiles)index;
+    powerProfiles newPP = (powerProfiles)index;
 
-    if (device.features.pm == globalStuff::DPM)
+    if (device.features.pm == DPM)
         device.setPowerProfile(newPP);
     else {
         index = index + 3; // frist three in enum is dpm so we need to increase
@@ -92,7 +92,7 @@ void radeon_profile::changeProfileFromCombo() {
 }
 
 void radeon_profile::changePowerLevelFromCombo() {
-    device.setForcePowerLevel((globalStuff::forcePowerLevels)ui->combo_pLevel->currentIndex());
+    device.setForcePowerLevel((forcePowerLevels)ui->combo_pLevel->currentIndex());
 }
 
 // == others
@@ -200,7 +200,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
             device.setPwmManualControl(false);
             saveFanProfiles();
         }
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
+        QApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
         QApplication::quit();
     }
 }
@@ -322,15 +322,15 @@ void radeon_profile::on_chProfile_clicked()
 
     if (ok) {
         if (selection == profile_default)
-            device.setPowerProfile(globalStuff::DEFAULT);
+            device.setPowerProfile(DEFAULT);
         else if (selection == profile_auto)
-            device.setPowerProfile(globalStuff::AUTO);
+            device.setPowerProfile(AUTO);
         else if (selection == profile_high)
-            device.setPowerProfile(globalStuff::HIGH);
+            device.setPowerProfile(HIGH);
         else if (selection == profile_mid)
-            device.setPowerProfile(globalStuff::MID);
+            device.setPowerProfile(MID);
         else if (selection == profile_low)
-            device.setPowerProfile(globalStuff::LOW);
+            device.setPowerProfile(LOW);
     }
 }
 
@@ -449,6 +449,8 @@ void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
     ui->slider_overclock->setEnabled(enable);
     ui->btn_applyOverclock->setEnabled(enable);
     ui->cb_overclockAtLaunch->setEnabled(enable);
+    ui->label_overclockPercentage->setEnabled(enable);
+    ui->label_19->setEnabled(enable);
 
     if(enable)
         qDebug() << "Enabling overclock";
