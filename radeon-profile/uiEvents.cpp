@@ -17,20 +17,15 @@ bool closeFromTrayMenu;
 // === GUI events === //
 // == menu forcePowerLevel
 void radeon_profile::forceAuto() {
-    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_auto));
-
-    // device.setForcePowerLevel(globalStuff::F_AUTO);
+    ui->combo_pLevel->setCurrentIndex(F_AUTO);
 }
 
 void radeon_profile::forceLow() {
-    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_low));
-
-    //  device.setForcePowerLevel(globalStuff::F_LOW);
+    ui->combo_pLevel->setCurrentIndex(F_LOW);
 }
 
 void radeon_profile::forceHigh() {
-    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_high));
-    //    device.setForcePowerLevel(globalStuff::F_HIGH);
+    ui->combo_pLevel->setCurrentIndex(F_HIGH);
 }
 
 // == buttons for forcePowerLevel
@@ -97,21 +92,15 @@ void radeon_profile::changePowerLevelFromCombo() {
 
 // == others
 void radeon_profile::on_btn_dpmBattery_clicked() {
-    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_battery));
-
-    // device.setPowerProfile(globalStuff::BATTERY);
+    ui->combo_pProfile->setCurrentIndex(BATTERY);
 }
 
 void radeon_profile::on_btn_dpmBalanced_clicked() {
-    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_balanced));
-
-    //    device.setPowerProfile(globalStuff::BALANCED);
+    ui->combo_pProfile->setCurrentIndex(BALANCED);
 }
 
 void radeon_profile::on_btn_dpmPerformance_clicked() {
-    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_performance));
-
-    //    device.setPowerProfile(globalStuff::PERFORMANCE);
+    ui->combo_pProfile->setCurrentIndex(PERFORMANCE);
 }
 
 void radeon_profile::resetMinMax() { device.gpuTemeperatureData.min = 0; device.gpuTemeperatureData.max = 0; }
@@ -450,7 +439,6 @@ void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
     ui->btn_applyOverclock->setEnabled(enable);
     ui->cb_overclockAtLaunch->setEnabled(enable);
     ui->label_overclockPercentage->setEnabled(enable);
-    ui->label_19->setEnabled(enable);
 
     if(enable)
         qDebug() << "Enabling overclock";
@@ -466,5 +454,16 @@ void radeon_profile::on_btn_applyOverclock_clicked(){
 }
 
 void radeon_profile::on_slider_overclock_valueChanged(const int value){
-    ui->label_overclockPercentage->setText(QString::number(value));
+    ui->label_overclockPercentage->setText(QString::number(value) + '%');
+}
+
+void radeon_profile::on_cb_showAlwaysGpuSelector_toggled(const bool checked){
+    const bool show = checked || (ui->combo_gpus->count() > 2);
+    ui->combo_gpus->setVisible(show);
+    ui->label->setVisible(show);
+}
+
+void radeon_profile::on_cb_showCombo_toggled(const bool checked){
+    ui->combo_pProfile->setVisible(checked);
+    ui->combo_pLevel->setVisible(checked);
 }

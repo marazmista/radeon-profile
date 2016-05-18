@@ -135,7 +135,8 @@ private slots:
     void on_cb_enableOverclock_toggled(bool enable);
     void on_btn_applyOverclock_clicked();
     void on_slider_overclock_valueChanged(int value);
-    void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
+    void on_cb_showAlwaysGpuSelector_toggled(bool checked);
+    void on_cb_showCombo_toggled(bool checked);
 
 private:
     gpu device;
@@ -170,6 +171,7 @@ private:
     void makeFanProfileGraph();
     void refreshUI();
     void connectSignals();
+    void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
 
     /**
      * @brief adjustFanSpeed Sets the PWM fan speed indicated for the actual temperature on the fan profile.

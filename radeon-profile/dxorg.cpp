@@ -468,7 +468,7 @@ int dXorg::getPwmSpeed() {
 
 driverFeatures dXorg::figureOutDriverFeatures() {
     driverFeatures features;
-    features.temperatureAvailable =  (currentTempSensor == TS_UNKNOWN) ? false : true;
+    features.temperatureAvailable =  (currentTempSensor != TS_UNKNOWN);
 
     QString data = getClocksRawData(true);
     gpuClocksStruct test = dXorg::getClocks(data);

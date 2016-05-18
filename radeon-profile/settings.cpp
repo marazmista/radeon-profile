@@ -40,6 +40,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("graphRange",ui->timeSlider->value());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
+    settings.setValue("showAlwaysGpuSelector", ui->cb_showAlwaysGpuSelector->isChecked());
+    settings.setValue("showCombo", ui->cb_showCombo->isChecked());
 
     settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
     settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
@@ -99,6 +101,8 @@ void radeon_profile::loadConfig() {
     ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",true).toBool());
     ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
     ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",80).toInt());
+    ui->cb_showAlwaysGpuSelector->setChecked(settings.value("showAlwaysGpuSelector",true).toBool());
+    ui->cb_showCombo->setChecked(settings.value("showCombo",true).toBool());
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
     optionsMenu->actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());

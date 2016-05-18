@@ -45,7 +45,7 @@ void radeon_profile::on_btn_modifyExecProfile_clicked()
     ui->txt_binParams->setText(ui->list_execProfiles->currentItem()->text(BINARY_PARAMS));
     ui->txt_logFile->setText(ui->list_execProfiles->currentItem()->text(LOG_FILE));
     ui->txt_summary->setText(ui->list_execProfiles->currentItem()->text(ENV_SETTINGS));
-    ui->cb_appendDateTime->setChecked(((ui->list_execProfiles->currentItem()->text(LOG_FILE_DATE_APPEND) == "1") ? true : false));
+    ui->cb_appendDateTime->setChecked(ui->list_execProfiles->currentItem()->text(LOG_FILE_DATE_APPEND) == "1");
 
     if (!ui->txt_summary->text().isEmpty())
         selectedVariableVaules = ui->txt_summary->text().split(" ");
