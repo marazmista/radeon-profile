@@ -315,7 +315,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -1058,7 +1058,7 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>117</width>
+            <width>40</width>
             <height>20</height>
            </size>
           </property>
@@ -1118,13 +1118,13 @@
               <property name="text">
                <string>Enable overclock</string>
               </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
              </widget>
             </item>
             <item alignment="Qt::AlignHCenter">
              <widget class="QCheckBox" name="cb_overclockAtLaunch">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Apply at launch</string>
               </property>
@@ -1137,7 +1137,7 @@
             <item>
              <widget class="QSlider" name="slider_overclock">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -1173,6 +1173,9 @@
             </item>
             <item>
              <widget class="QLabel" name="label_overclockPercentage">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string notr="true">20%</string>
               </property>
@@ -1182,6 +1185,9 @@
           </item>
           <item alignment="Qt::AlignHCenter">
            <widget class="QPushButton" name="btn_applyOverclock">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="maximumSize">
              <size>
               <width>100</width>
@@ -1215,7 +1221,7 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>116</width>
+            <width>40</width>
             <height>20</height>
            </size>
           </property>
@@ -2793,7 +2799,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_mainConfig">
            <attribute name="title">
@@ -3406,36 +3412,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_contributors_2">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>External resources:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_contributors">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Contributors:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_contributor2">
             <property name="font">
@@ -3517,6 +3493,36 @@
             </property>
             <property name="openExternalLinks">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_externalResources">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>External resources:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_contributors">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Contributors:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>

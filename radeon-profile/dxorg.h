@@ -56,7 +56,6 @@ public:
      */
     static bool overClock(int percentage);
 
-    static void resetOverClock();
 
 
 private:

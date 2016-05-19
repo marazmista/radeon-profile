@@ -88,25 +88,25 @@ QStringList gpu::initialize(bool skipDetectDriver) {
 gpuClocksStructString gpu::convertClocks(const gpuClocksStruct &data) {
     gpuClocksStructString tmp;
 
-    if (data.coreClk != -1)
+    if (data.coreClkOk)
         tmp.coreClk =  QString().setNum(data.coreClk)+"MHz";
 
-    if (data.memClk != -1)
+    if (data.memClkOk)
         tmp.memClk =  QString().setNum(data.memClk)+"MHz";
 
-    if (data.memVolt != -1)
+    if (data.memVoltOk)
         tmp.memVolt =  QString().setNum(data.memVolt)+"mV";
 
-    if (data.coreVolt != -1)
+    if (data.coreVoltOk)
         tmp.coreVolt =  QString().setNum(data.coreVolt)+"mV";
 
-    if (data.powerLevel != -1)
+    if (data.powerLevelOk)
         tmp.powerLevel =  QString().setNum(data.powerLevel);
 
-    if (data.uvdCClk != -1)
+    if (data.uvdCClkOk)
         tmp.uvdCClk =  QString().setNum(data.uvdCClk)+"MHz";
 
-    if (data.uvdDClk != -1)
+    if (data.uvdDClkOk)
         tmp.uvdDClk =  QString().setNum(data.uvdDClk)+"MHz";
 
     return tmp;
@@ -156,8 +156,7 @@ void gpu::getClocks() {
         gpuClocksData = dFglrx::getClocks();
         break;
     case DRIVER_UNKNOWN: {
-        gpuClocksStruct clk(-1);
-        gpuClocksData = clk;
+        gpuClocksData = gpuClocksStruct();
         break;
     }
     }
@@ -878,9 +877,4 @@ bool gpu::overclock(const int value){
 
     qWarning() << "Error overclocking: overclocking is not supported";
     return false;
-}
-
-void gpu::resetOverclock(){
-    if(features.overClockAvailable && (currentDriver == XORG))
-        dXorg::resetOverClock();
 }

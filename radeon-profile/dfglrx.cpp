@@ -12,13 +12,12 @@ void dFglrx::configure(char _gpuIndex) {
 }
 
 gpuClocksStruct dFglrx::getClocks(){
-    QStringList out = globalStuff::grabSystemInfo("aticonfig --odgc --adapter=" + gpuIndex);
+    const QStringList out = globalStuff::grabSystemInfo("aticonfig --odgc --adapter=" + gpuIndex).filter("Clocks");
     //     QFile f("/home/mm/odgc");
     //     f.open(QIODevice::ReadOnly);
     //     QStringList out = QString(f.readAll()).split('\n');
     //     f.close();
-    gpuClocksStruct tData(-1);
-    out = out.filter("Clocks");
+    gpuClocksStruct tData;
     if (!out.empty()) {
         QRegExp rx;
         rx.setPattern("\\s+\\d+\\s+\\d+");
@@ -26,7 +25,9 @@ gpuClocksStruct dFglrx::getClocks(){
         QStringList gData = rx.cap(0).trimmed().split("           ");
 
         tData.coreClk = gData[0].toInt();
+        tData.coreClkOk = tData.coreClk != -1;
         tData.memClk = gData[1].toInt();
+        tData.memClkOk = tData.memClk != -1;
     }
     return tData;
 }

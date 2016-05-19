@@ -145,7 +145,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 }
 
 gpuClocksStruct dXorg::getClocks(const QString &data) {
-    gpuClocksStruct tData(-1); // empty struct
+    gpuClocksStruct tData; // empty struct
 
     // if nothing is there returns empty (-1) struct
     if (data.isEmpty()){
@@ -159,69 +159,73 @@ gpuClocksStruct dXorg::getClocks(const QString &data) {
 
         rx.setPattern("power\\slevel\\s\\d");
         rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
+        if (!rx.cap(0).isEmpty()){
             tData.powerLevel = rx.cap(0).split(' ')[2].toShort();
+            tData.powerLevelOk = tData.powerLevel != -1;
+        }
 
         rx.setPattern("sclk:\\s\\d+");
         rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
+        if (!rx.cap(0).isEmpty()){
             tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
+            tData.coreClkOk = tData.coreClk != -1;
+        }
 
         rx.setPattern("mclk:\\s\\d+");
         rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
+        if (!rx.cap(0).isEmpty()){
             tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
+            tData.memClkOk = tData.memClk != -1;
+        }
 
         rx.setPattern("vclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
-            tData.uvdCClk  = (tData.uvdCClk  == 0) ? -1 :  tData.uvdCClk;
+            tData.uvdCClkOk = tData.uvdCClk != 0;
         }
 
         rx.setPattern("dclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
-            tData.uvdDClk = (tData.uvdDClk == 0) ? -1 : tData.uvdDClk;
+            tData.uvdDClkOk = tData.uvdDClk != 0;
         }
 
         rx.setPattern("vddc:\\s\\d+");
         rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
+        if (!rx.cap(0).isEmpty()){
             tData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
+            tData.coreVoltOk = tData.coreVolt != -1;
+        }
 
         rx.setPattern("vddci:\\s\\d+");
         rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
+        if (!rx.cap(0).isEmpty()){
             tData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
+            tData.memVoltOk = tData.memVolt != -1;
+        }
 
         return tData;
         break;
     }
     case PROFILE: {
-        QStringList clocksData = data.split("\n");
-        for (int i=0; i< clocksData.count(); i++) {
-            switch (i) {
-            case 1: {
-                if (clocksData[i].contains("current engine clock")) {
-                    tData.coreClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
-                    break;
-                }
-            };
-            case 3: {
-                if (clocksData[i].contains("current memory clock")) {
-                    tData.memClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toDouble();
-                    break;
-                }
-            }
-            case 4: {
-                if (clocksData[i].contains("voltage")) {
-                    tData.coreVolt = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toDouble();
-                    break;
-                }
-            }
-            }
+        const QStringList clocksData = data.split("\n");
+        const int count = clocksData.count();
+
+        if ((1 < count) && clocksData[1].contains("current engine clock")) {
+            tData.coreClk = clocksData[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000;
+            tData.coreClkOk = tData.coreClk != -1;
+        }
+
+        if ((3 < count) && clocksData[3].contains("current memory clock")) {
+            tData.memClk = clocksData[3].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000;
+            tData.memClkOk = tData.memClk != -1;
+        }
+
+        if ((4 < count) && clocksData[4].contains("voltage")) {
+            tData.coreVolt = clocksData[4].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat();
+            tData.coreVoltOk = tData.coreVolt != -1;
         }
         return tData;
         break;
@@ -476,13 +480,13 @@ driverFeatures dXorg::figureOutDriverFeatures() {
     // still, sometimes there is miscomunication between daemon,
     // but vales are there, so look again in the file which daemon has
     // copied to /tmp/
-    if (test.coreClk == -1)
+    if ( ! test.coreClkOk)
         test = getFeaturesFallback();
 
-    features.coreClockAvailable = !(test.coreClk == -1);
-    features.memClockAvailable = !(test.memClk == -1);
-    features.coreVoltAvailable = !(test.coreVolt == -1);
-    features.memVoltAvailable = !(test.memVolt == -1);
+    features.coreClockAvailable = test.coreClkOk;
+    features.memClockAvailable = test.memClkOk;
+    features.coreVoltAvailable = test.coreVoltOk;
+    features.memVoltAvailable = test.memVoltOk;
 
     features.pm = currentPowerMethod;
 
@@ -537,24 +541,25 @@ driverFeatures dXorg::figureOutDriverFeatures() {
 
 gpuClocksStruct dXorg::getFeaturesFallback() {
     QFile f("/tmp/radeon_pm_info");
+    gpuClocksStruct fallbackFeatures;
+
     if (f.open(QIODevice::ReadOnly)) {
-        gpuClocksStruct fallbackFeatures;
-        QString s = QString(f.readAll());
+        const QString s = QString(f.readAll());
 
         // just look for it, if it is, the value is not important at this point
         if (s.contains("sclk"))
-            fallbackFeatures.coreClk = 0;
+            fallbackFeatures.coreClkOk = true;
         if (s.contains("mclk"))
-            fallbackFeatures.memClk = 0;
+            fallbackFeatures.memClkOk = true;
         if (s.contains("vddc"))
-            fallbackFeatures.coreClk = 0;
+            fallbackFeatures.coreVoltOk = true;
         if (s.contains("vddci"))
-            fallbackFeatures.memClk = 0;
+            fallbackFeatures.memVoltOk = true;
 
         f.close();
-        return fallbackFeatures;
-    } else
-        return gpuClocksStruct(-1);
+    }
+
+    return fallbackFeatures;
 }
 
 bool dXorg::overClock(const int percentage){
@@ -571,8 +576,4 @@ bool dXorg::overClock(const int percentage){
         qWarning() << "Error overclocking: daemon is not connected and no root access is available";
 
     return false;
-}
-
-void dXorg::resetOverClock(){
-    overClock(0);
 }

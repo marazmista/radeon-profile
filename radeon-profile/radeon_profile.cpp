@@ -242,19 +242,19 @@ void radeon_profile::refreshUI() {
     if (ui->mainTabs->currentIndex() == 0) {
         ui->list_currentGPUData->clear();
 
-        if (device.gpuClocksData.powerLevel != -1)
-            addChild(ui->list_currentGPUData, label_currentPowerLevel, device.gpuClocksDataString.powerLevel);
-        if (device.gpuClocksData.coreClk != -1)
+        if (device.gpuClocksData.powerLevelOk)
+            addChild(ui->list_currentGPUData, label_powerLevel, device.gpuClocksDataString.powerLevel);
+        if (device.gpuClocksData.coreClkOk)
             addChild(ui->list_currentGPUData, label_currentGPUClock, device.gpuClocksDataString.coreClk);
-        if (device.gpuClocksData.coreClk != -1)
+        if (device.gpuClocksData.memClkOk)
             addChild(ui->list_currentGPUData, label_currentMemClock, device.gpuClocksDataString.memClk);
-        if (device.gpuClocksData.uvdCClk != -1)
+        if (device.gpuClocksData.uvdCClkOk)
             addChild(ui->list_currentGPUData, label_uvdVideoCoreClock, device.gpuClocksDataString.uvdCClk);
-        if (device.gpuClocksData.uvdDClk != -1)
+        if (device.gpuClocksData.uvdDClkOk)
             addChild(ui->list_currentGPUData, label_uvdDecoderClock, device.gpuClocksDataString.uvdDClk);
-        if (device.gpuClocksData.coreVolt != -1)
+        if (device.gpuClocksData.coreVoltOk)
             addChild(ui->list_currentGPUData, label_vddc, device.gpuClocksDataString.memVolt);
-        if (device.gpuClocksData.memVolt != -1)
+        if (device.gpuClocksData.memVoltOk)
             addChild(ui->list_currentGPUData, label_vddci, device.gpuClocksDataString.coreVolt);
 
         if (ui->list_currentGPUData->topLevelItemCount() == 0)
@@ -299,7 +299,7 @@ void radeon_profile::timerEvent() {
         adjustFanSpeed();
 
         // lets say coreClk is essential to get stats (it is disabled in ui anyway when features.clocksAvailable is false)
-        if (ui->cb_stats->isChecked() && device.gpuClocksData.coreClk != -1) {
+        if (ui->cb_stats->isChecked() && device.gpuClocksData.coreClkOk) {
             doTheStats();
 
             // do the math only when user looking at stats table
@@ -403,12 +403,22 @@ void radeon_profile::doTheStats() {
     statsTickCounter++;
 
     // figure out pm level based on data provided
-    QString pmLevelName = (device.gpuClocksData.powerLevel == -1) ? "" : "Power level:" + device.gpuClocksDataString.powerLevel, volt;
-    volt = (device.gpuClocksData.coreVolt == -1) ? "" : "(" + device.gpuClocksDataString.coreVolt+")";
-    pmLevelName = (device.gpuClocksData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +device.gpuClocksDataString.coreClk + volt;
+    QString pmLevelName;
 
-    volt = (device.gpuClocksData.memVolt == -1) ? "" : "(" + device.gpuClocksDataString.memVolt + ")";
-    pmLevelName = (device.gpuClocksData.memClk == -1) ? pmLevelName : pmLevelName + " Mem:" + device.gpuClocksDataString.memClk +  volt;
+    if(device.gpuClocksData.powerLevelOk)
+        pmLevelName = label_powerLevel + ' ' + device.gpuClocksDataString.powerLevel + ", ";
+
+    if(device.gpuClocksData.coreClkOk)
+        pmLevelName += "Core:" +device.gpuClocksDataString.coreClk;
+
+    if(device.gpuClocksData.coreVoltOk)
+        pmLevelName += "(" + device.gpuClocksDataString.coreVolt + ")";
+
+    if(device.gpuClocksData.memClkOk)
+        pmLevelName += " Mem:" + device.gpuClocksDataString.memClk;
+
+    if(device.gpuClocksData.memVoltOk)
+        pmLevelName += "(" + device.gpuClocksDataString.memVolt + ")";
 
     if (pmStats.contains(pmLevelName)) // This power level already exists, increment its count
         pmStats[pmLevelName]++;

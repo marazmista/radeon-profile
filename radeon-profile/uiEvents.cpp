@@ -444,7 +444,7 @@ void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
         qDebug() << "Enabling overclock";
     else {
         qDebug() << "Disabling overclock";
-        device.resetOverclock();
+        device.overclock(0);
     }
 }
 

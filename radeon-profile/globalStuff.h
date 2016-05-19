@@ -32,7 +32,7 @@
 #define file_powerDpmForcePerformanceLevel "power_dpm_force_performance_level"
 #define file_overclockLevel "pp_sclk_od"
 
-#define label_currentPowerLevel QObject::tr("Power level")
+#define label_powerLevel QObject::tr("Power level")
 #define label_currentGPUClock QObject::tr("GPU clock")
 #define label_currentMemClock QObject::tr("Memory clock")
 #define label_uvdVideoCoreClock QObject::tr("UVD core clock (cclk)")
@@ -213,8 +213,21 @@ typedef enum powerMethod {
 } powerMethod;
 
 typedef struct gpuClocksStruct {
-    int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
-    char powerLevel;
+    int coreClk = -1,
+        memClk = -1,
+        coreVolt = -1,
+        memVolt = -1,
+        uvdCClk = -1,
+        uvdDClk = -1;
+    char powerLevel = -1;
+
+    bool coreClkOk = false,
+        memClkOk = false,
+        coreVoltOk = false,
+        memVoltOk = false,
+        uvdCClkOk = false,
+        uvdDClkOk = false,
+        powerLevelOk = false;
 
     gpuClocksStruct() { }
 
@@ -226,11 +239,7 @@ typedef struct gpuClocksStruct {
         uvdCClk = _uvdCClk;
         uvdDClk = _uvdDclk;
         powerLevel = _pwrLevel;
-    }
-
-    // initialize empty struct, so when we pass -1, only values that != -1 will show
-    gpuClocksStruct(int allValues) {
-        coreClk = memClk =  coreVolt =   memVolt = uvdCClk =  uvdDClk = powerLevel = allValues;
+        coreClkOk = memClkOk = coreVoltOk = memVoltOk = uvdCClkOk = uvdDClkOk = powerLevelOk = true;
     }
 } gpuClocksStruct;
 
@@ -242,29 +251,18 @@ typedef struct gpuClocksStructString {
 // structure which holds what can be display on ui and on its base
 // we enable ui elements
 typedef struct driverFeatures {
-    bool canChangeProfile,
-        coreClockAvailable,
-        memClockAvailable,
-        coreVoltAvailable,
-        memVoltAvailable,
-        temperatureAvailable,
-        pwmAvailable,
-        overClockAvailable;
-    powerMethod pm;
-    int pwmMaxSpeed;
+    bool canChangeProfile = false,
+        coreClockAvailable = false,
+        memClockAvailable = false,
+        coreVoltAvailable = false,
+        memVoltAvailable = false,
+        temperatureAvailable = false,
+        pwmAvailable = false,
+        overClockAvailable = false;
+    powerMethod pm = PM_UNKNOWN;
+    int pwmMaxSpeed = 0;
 
-    driverFeatures() {
-        canChangeProfile =
-                coreClockAvailable =
-                memClockAvailable =
-                coreVoltAvailable =
-                memVoltAvailable =
-                temperatureAvailable =
-                pwmAvailable =
-                overClockAvailable = false;
-        pm = PM_UNKNOWN;
-        pwmMaxSpeed = 0;
-    }
+    driverFeatures() { }
 
 } driverFeatures;
 

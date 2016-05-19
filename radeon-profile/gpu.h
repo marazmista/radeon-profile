@@ -61,7 +61,6 @@ public:
     bool daemonConnected();
 
     bool overclock(int value);
-    void resetOverclock();
 
 private:
     driver currentDriver;
