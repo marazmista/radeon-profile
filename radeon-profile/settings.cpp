@@ -35,8 +35,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
     settings.setValue("aleternateRowColors",ui->cb_alternateRow->isChecked());
 
-    settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
-    settings.setValue("graphOffset",optionsMenu->actions().at(1)->isChecked());
+    settings.setValue("showLegend",optionsMenu.actions().at(0)->isChecked());
+    settings.setValue("graphOffset",optionsMenu.actions().at(1)->isChecked());
     settings.setValue("graphRange",ui->timeSlider->value());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
@@ -104,8 +104,8 @@ void radeon_profile::loadConfig() {
     ui->cb_showAlwaysGpuSelector->setChecked(settings.value("showAlwaysGpuSelector",true).toBool());
     ui->cb_showCombo->setChecked(settings.value("showCombo",true).toBool());
 
-    optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
-    optionsMenu->actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());
+    optionsMenu.actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
+    optionsMenu.actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());
     ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
     // Graphs settings
     ui->spin_lineThick->setValue(settings.value("graphLineThickness",2).toInt());
@@ -169,7 +169,7 @@ void radeon_profile::loadConfig() {
     ui->list_variables->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_vaules->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
 
-    showLegend(optionsMenu->actions().at(0)->isChecked());
+    showLegend(optionsMenu.actions().at(0)->isChecked());
     changeTimeRange();
     on_cb_showTempsGraph_clicked(ui->cb_showTempsGraph->isChecked());
     on_cb_showFreqGraph_clicked(ui->cb_showFreqGraph->isChecked());
@@ -177,7 +177,7 @@ void radeon_profile::loadConfig() {
 
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
-    globalStuff::globalConfig.graphOffset = ((optionsMenu->actions().at(1)->isChecked()) ? 20 : 0);
+    globalStuff::globalConfig.graphOffset = ((optionsMenu.actions().at(1)->isChecked()) ? 20 : 0);
 
     QFile ef(execProfilesPath);
     if (ef.open(QIODevice::ReadOnly)) {

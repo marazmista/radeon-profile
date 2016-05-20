@@ -56,7 +56,7 @@ public:
     void setPwmManualControl(bool manual) const;
     void setPwmValue(int value) const;
 
-    QStringList initialize(bool skipDetectDriver = false);
+    void initialize(bool skipDetectDriver = false);
     void reconfigureDaemon();
     bool daemonConnected();
 

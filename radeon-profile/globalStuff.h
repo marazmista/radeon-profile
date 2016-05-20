@@ -151,30 +151,17 @@
 
 class globalStuff {
 public:
-    static QStringList grabSystemInfo(const QString cmd) {
-        QProcess *p = new QProcess();
-        p->setProcessChannelMode(QProcess::MergedChannels);
+    static QStringList grabSystemInfo(const QString cmd, const QProcessEnvironment env = QProcessEnvironment()) {
+        QProcess p;
+        p.setProcessChannelMode(QProcess::MergedChannels);
+        p.setProcessEnvironment(env);
 
-        p->start(cmd,QIODevice::ReadOnly);
-        p->waitForFinished();
+        p.start(cmd,QIODevice::ReadOnly);
+        p.waitForFinished();
 
-        QString a = p->readAllStandardOutput();
-        delete p;
-        return a.split('\n');
+        return QString(p.readAllStandardOutput()).split('\n');
     }
 
-    static QStringList grabSystemInfo(const QString cmd, const QProcessEnvironment env) {
-        QProcess *p = new QProcess();
-        p->setProcessChannelMode(QProcess::MergedChannels);
-        p->setProcessEnvironment(env);
-
-        p->start(cmd,QIODevice::ReadOnly);
-        p->waitForFinished();
-
-        QString a = p->readAllStandardOutput();
-        delete p;
-        return a.split('\n');
-    }
     // settings from config used across the source
     static struct globalCfgStruct{
         float interval;
@@ -267,8 +254,12 @@ typedef struct driverFeatures {
 } driverFeatures;
 
 typedef struct gpuTemperatureStruct {
-    float current, currentBefore, max, min, sum;
-    int pwmSpeed;
+    float current = 0,
+        currentBefore = 0,
+        max = 0,
+        min = 0,
+        sum = 0;
+    int pwmSpeed = 0;
 } gpuTemperatureStruct;
 
 typedef struct gpuTemperatureStructString {

@@ -33,8 +33,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui(new Ui::radeon_profile)
 {
     ui->setupUi(this);
-    timer = new QTimer();
-    execsRunning = new QList<execBin*>();
 
     // checks if running as root
     if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
@@ -63,14 +61,16 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QString params = a.join(" ");
     if (params.contains("--driver xorg")) {
         device.driverByParam(XORG);
-        ui->combo_gpus->addItems(device.initialize(true));
+        device.initialize(true);
     }
     else if (params.contains("--driver fglrx")) {
         device.driverByParam(FGLRX);
-        ui->combo_gpus->addItems(device.initialize(true));
+        device.initialize(true);
     }
     else // driver object detects cards in pc and fill the list in ui //
-        ui->combo_gpus->addItems(device.initialize());
+        device.initialize();
+
+    ui->combo_gpus->addItems(device.gpuList);
 
     ui->configGroups->setTabEnabled(2,device.daemonConnected());
     setupUiEnabledFeatures(device.features);
@@ -81,7 +81,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     connectSignals();
 
     // timer init
-    timer->setInterval(ui->spin_timerInterval->value()*1000);
+    timer.setInterval(ui->spin_timerInterval->value()*1000);
 
     // fill tables with data at the start //
     refreshGpuData();
@@ -91,7 +91,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
     refreshUI();
 
-    timer->start();
+    timer.start();
     addRuntimeWidgets();
 
     showWindow();
@@ -109,7 +109,7 @@ void radeon_profile::connectSignals()
     connect(ui->combo_pProfile,SIGNAL(currentIndexChanged(int)),this,SLOT(changeProfileFromCombo()));
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(changePowerLevelFromCombo()));
 
-    connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
+    connect(&timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
     connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
 }
 
@@ -142,10 +142,10 @@ void radeon_profile::addRuntimeWidgets() {
     connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
 
     // set pwm buttons in group
-    QButtonGroup *pwmGroup = new QButtonGroup();
-    pwmGroup->addButton(ui->btn_pwmAuto);
-    pwmGroup->addButton(ui->btn_pwmFixed);
-    pwmGroup->addButton(ui->btn_pwmProfile);
+    QButtonGroup pwmGroup;
+    pwmGroup.addButton(ui->btn_pwmAuto);
+    pwmGroup.addButton(ui->btn_pwmFixed);
+    pwmGroup.addButton(ui->btn_pwmProfile);
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
@@ -155,12 +155,12 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
 
         ui->tabs_pm->setTabEnabled(1,features.pm == DPM);
         changeProfile->setEnabled(features.pm == PROFILE);
-        dpmMenu->setEnabled(features.pm == DPM);
+        dpmMenu.setEnabled(features.pm == DPM);
         ui->combo_pLevel->setEnabled(features.pm == DPM);
     } else {
         ui->tabs_pm->setEnabled(false);
         changeProfile->setEnabled(false);
-        dpmMenu->setEnabled(false);
+        dpmMenu.setEnabled(false);
         ui->combo_pLevel->setEnabled(false);
         ui->combo_pProfile->setEnabled(false);
     }
@@ -265,8 +265,8 @@ void radeon_profile::refreshUI() {
 }
 
 void radeon_profile::updateExecLogs() {
-    for (int i = 0; i < execsRunning->count(); i++) {
-        if (execsRunning->at(i)->getExecState() == QProcess::Running && execsRunning->at(i)->logEnabled) {
+    for (int i = 0; i < execsRunning.count(); i++) {
+        if (execsRunning.at(i)->getExecState() == QProcess::Running && execsRunning.at(i)->logEnabled) {
             QString logData = QDateTime::currentDateTime().toString(logDateFormat) +";" + device.gpuClocksDataString.powerLevel + ";" +
                     device.gpuClocksDataString.coreClk + ";"+
                     device.gpuClocksDataString.memClk + ";"+
@@ -275,7 +275,7 @@ void radeon_profile::updateExecLogs() {
                     device.gpuClocksDataString.coreVolt + ";"+
                     device.gpuClocksDataString.memVolt + ";"+
                     device.gpuTemeperatureDataString.current;
-            execsRunning->at(i)->appendToLog(logData);
+            execsRunning.at(i)->appendToLog(logData);
         }
     }
 }
@@ -441,7 +441,7 @@ void radeon_profile::refreshTooltip()
         tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
     }
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
-    trayIcon->setToolTip(tooltipdata);
+    trayIcon.setToolTip(tooltipdata);
 }
 
 void radeon_profile::configureDaemonAutoRefresh (bool enabled, int interval) {
@@ -475,7 +475,6 @@ bool radeon_profile::addFanStep(const int temperature,
     fanSteps.insert(temperature,fanSpeed);
 
     if (alsoToList){
-        qDebug() << "Adding step to list_fanSteps";
         const QString temperatureString = QString::number(temperature),
                 speedString = QString::number(fanSpeed);
         const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString,Qt::MatchExactly);
@@ -488,14 +487,12 @@ bool radeon_profile::addFanStep(const int temperature,
     }
 
     if (alsoToGraph){
-        qDebug() << "Adding step to plotFanProfile";
         ui->plotFanProfile->graph(0)->removeData(temperature);
         ui->plotFanProfile->graph(0)->addData(temperature, fanSpeed);
         ui->plotFanProfile->replot();
     }
 
     if (alsoAdjustSpeed){
-        qDebug() << "Adjusting fan speed";
         adjustFanSpeed(true);
     }
 

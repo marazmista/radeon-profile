@@ -63,12 +63,6 @@ class radeon_profile : public QMainWindow
 public:
     explicit radeon_profile(QStringList, QWidget *parent = 0);
     ~radeon_profile();
-    QString appHomePath;
-
-    QSystemTrayIcon *trayIcon;
-    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
-    QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
-    QTimer *timer;
 
 private slots:
     void timerEvent();
@@ -141,10 +135,14 @@ private slots:
 private:
     gpu device;
     static const QString settingsPath;
-    QList<execBin*> *execsRunning;
+    QList<execBin*> execsRunning;
     QMap<int, unsigned int> fanSteps;
     QMap<QString, unsigned int> pmStats;
     unsigned int rangeX = 180, ticksCounter = 0, statsTickCounter = 0;
+    QSystemTrayIcon trayIcon;
+    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden;
+    QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;
+    QTimer timer;
 
     Ui::radeon_profile *ui;
     void setupGraphs();

@@ -86,8 +86,6 @@ void radeon_profile::setupGraphsStyle()
 }
 
 void radeon_profile::setupTrayIcon() {
-    trayMenu = new QMenu();
-    setWindowState(Qt::WindowMinimized);
     //close //
     closeApp = new QAction(this);
     closeApp->setText(label_quit);
@@ -105,8 +103,7 @@ void radeon_profile::setupTrayIcon() {
     refreshWhenHidden->setText(label_refreshWhenHidden);
 
     // dpm menu //
-    dpmMenu = new QMenu(this);
-    dpmMenu->setTitle(label_dpm);
+    dpmMenu.setTitle(label_dpm);
 
     dpmSetBattery = new QAction(this);
     dpmSetBalanced = new QAction(this);
@@ -123,32 +120,30 @@ void radeon_profile::setupTrayIcon() {
     connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(on_btn_dpmBalanced_clicked()));
     connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(on_btn_dpmPerformance_clicked()));
 
-    dpmMenu->addAction(dpmSetBattery);
-    dpmMenu->addAction(dpmSetBalanced);
-    dpmMenu->addAction(dpmSetPerformance);
-    dpmMenu->addSeparator();
-    dpmMenu->addMenu(forcePowerMenu);
+    dpmMenu.addAction(dpmSetBattery);
+    dpmMenu.addAction(dpmSetBalanced);
+    dpmMenu.addAction(dpmSetPerformance);
+    dpmMenu.addSeparator();
+    dpmMenu.addMenu(&forcePowerMenu);
 
     // add stuff above to menu //
-    trayMenu->addAction(refreshWhenHidden);
-    trayMenu->addSeparator();
-    trayMenu->addAction(changeProfile);
-    trayMenu->addMenu(dpmMenu);
-    trayMenu->addSeparator();
-    trayMenu->addAction(closeApp);
+    trayMenu.addAction(refreshWhenHidden);
+    trayMenu.addSeparator();
+    trayMenu.addAction(changeProfile);
+    trayMenu.addMenu(&dpmMenu);
+    trayMenu.addSeparator();
+    trayMenu.addAction(closeApp);
 
     // setup icon finally //
-    QIcon appicon(":/icon/extra/radeon-profile.png");
-    trayIcon = new QSystemTrayIcon(appicon,this);
-    trayIcon->show();
-    trayIcon->setContextMenu(trayMenu);
-    connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+    trayIcon.setIcon(QIcon(":/icon/extra/radeon-profile.png"));
+    trayIcon.show();
+    trayIcon.setContextMenu(&trayMenu);
+    connect(&trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 }
 
 void radeon_profile::setupOptionsMenu()
 {
-    optionsMenu = new QMenu(this);
-    ui->btn_options->setMenu(optionsMenu);
+    ui->btn_options->setMenu(&optionsMenu);
 
     QAction *resetMinMax = new QAction(this);
     resetMinMax->setText(label_resetMinMax);
@@ -166,11 +161,11 @@ void radeon_profile::setupOptionsMenu()
     graphOffset->setCheckable(true);
     graphOffset->setChecked(true);
 
-    optionsMenu->addAction(showLegend);
-    optionsMenu->addAction(graphOffset);
-    optionsMenu->addSeparator();
-    optionsMenu->addAction(resetMinMax);
-    optionsMenu->addAction(resetGraphs);
+    optionsMenu.addAction(showLegend);
+    optionsMenu.addAction(graphOffset);
+    optionsMenu.addSeparator();
+    optionsMenu.addAction(resetMinMax);
+    optionsMenu.addAction(resetGraphs);
 
     connect(resetMinMax,SIGNAL(triggered()),this,SLOT(resetMinMax()));
     connect(resetGraphs,SIGNAL(triggered()),this,SLOT(resetGraphs()));
@@ -179,7 +174,6 @@ void radeon_profile::setupOptionsMenu()
 }
 
 void radeon_profile::setupForcePowerLevelMenu() {
-    forcePowerMenu = new QMenu(this);
 
     QAction *forceAuto = new QAction(this);
     forceAuto->setText(label_auto);
@@ -190,11 +184,11 @@ void radeon_profile::setupForcePowerLevelMenu() {
     QAction *forceHigh = new QAction(this);
     forceHigh->setText(label_high);
 
-    forcePowerMenu->setTitle(label_forcePowerLevel);
-    forcePowerMenu->addAction(forceAuto);
-    forcePowerMenu->addSeparator();
-    forcePowerMenu->addAction(forceLow);
-    forcePowerMenu->addAction(forceHigh);
+    forcePowerMenu.setTitle(label_forcePowerLevel);
+    forcePowerMenu.addAction(forceAuto);
+    forcePowerMenu.addSeparator();
+    forcePowerMenu.addAction(forceLow);
+    forcePowerMenu.addAction(forceHigh);
 
     connect(forceAuto,SIGNAL(triggered()),this,SLOT(forceAuto()));
     connect(forceLow,SIGNAL(triggered()),this,SLOT(forceLow()));

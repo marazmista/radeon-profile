@@ -58,31 +58,31 @@ bool gpu::daemonConnected() {
 
 // method for resolve which driver gpu instance will use
 // and call some things that need to be done before read data
-QStringList gpu::initialize(bool skipDetectDriver) {
+void gpu::initialize(bool skipDetectDriver) {
     if (!skipDetectDriver)
         currentDriver = detectDriver();
 
-    QStringList gpuList;
 
     switch (currentDriver) {
     case XORG: {
+        qDebug() << "Found Xorg driver, initializing";
         gpuList = dXorg::detectCards();
         dXorg::configure(gpuList[currentGpuIndex]);
         features = dXorg::figureOutDriverFeatures();
         break;
     }
     case FGLRX: {
+        qDebug() << "Found FGLRX driver, initializing";
         gpuList = dFglrx::detectCards();
         dFglrx::configure(currentGpuIndex);
         features = dFglrx::figureOutDriverFeatures();
         break;
     }
     case DRIVER_UNKNOWN: {
-        features = driverFeatures();
+        qDebug() << "No known driver found";
         gpuList << label_unknown;
     }
     }
-    return gpuList;
 }
 
 gpuClocksStructString gpu::convertClocks(const gpuClocksStruct &data) {
@@ -230,7 +230,6 @@ QString translateProperty(Display * display,
 // See http://www.uefi.org/pnp_id_list
 QString translatePnpId(const QString pnpId){
     if ( ! pnpId.isEmpty()){
-        qDebug() << "Searching PnP ID: " << pnpId;
         for(int i=0;  i < PNP_ID_FILE_COUNT; i++){ // Cycle through the files
             QFile pnpIds(pnpIdFiles[i]);
             if(pnpIds.exists() && pnpIds.open(QIODevice::ReadOnly)){ // File is available
@@ -239,7 +238,7 @@ QString translatePnpId(const QString pnpId){
                     if (line.startsWith(pnpId)){ // Right line
                         QStringList parts = line.split(QChar('\t')); // Separate PNP ID from the real name
                         if (parts.size() == 2){
-                            qDebug() << "Found PnP ID: " << pnpId << "->" << parts.at(1).simplified();
+                            qDebug() << "      Found PnP ID: " << pnpId << "->" << parts.at(1).simplified();
                             pnpIds.close();
                             return parts.at(1).simplified(); // Get the real name
                         }
@@ -506,7 +505,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             RRMode * activeMode = NULL;
 
             if(configInfo == NULL) { // This output is not active
-                qDebug() << "Output" << outputIndex << "has no active mode";
+                qDebug() << "    Output" << outputIndex << "has no active mode";
                 addChild(outputItem, label_active, label_no);
             } else { // The output is active: add resolution, refresh rate and the offset
                 addChild(outputItem, label_active, label_yes);
@@ -701,7 +700,6 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
                         for(int valuesIndex = 0; valuesIndex < propertyInfo->num_values; valuesIndex++){
                             // Until there is another alternative/range available
-                            qDebug() << "      Printing alternative " << valuesIndex;
 
                             if(propertyInfo->range) { // This is a range, print the maximum value
                                 propertyValue += translateProperty(display,
@@ -863,7 +861,7 @@ void gpu::setPwmManualControl(bool manual) const {
 void gpu::getPwmSpeed() {
     switch (currentDriver) {
     case XORG:
-            gpuTemeperatureData.pwmSpeed = ((float)dXorg::getPwmSpeed() / features.pwmMaxSpeed ) * 100;
+        gpuTemeperatureData.pwmSpeed = ((float)dXorg::getPwmSpeed() / features.pwmMaxSpeed ) * 100;
         break;
     case FGLRX:
     case DRIVER_UNKNOWN:

@@ -182,7 +182,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
         e->ignore();
     } else {
 
-        timer->stop();
+        timer.stop();
         saveConfig();
 
         if (device.features.pwmAvailable) {
@@ -206,7 +206,7 @@ void radeon_profile::on_spin_lineThick_valueChanged(int arg1)
 
 void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
 {
-    timer->setInterval(arg1*1000);
+    timer.setInterval(arg1*1000);
 }
 
 void radeon_profile::on_cb_graphs_clicked(bool checked)
@@ -330,13 +330,13 @@ void radeon_profile::on_btn_reconfigureDaemon_clicked()
 
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 {
-    if (execsRunning->at(index)->getExecState() == QProcess::Running) {
+    if (execsRunning.at(index)->getExecState() == QProcess::Running) {
         if (QMessageBox::question(this,"", label_processStillRunning, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
             return;
     }
 
     ui->tabs_execOutputs->removeTab(index);
-    execsRunning->removeAt(index);
+    execsRunning.removeAt(index);
 
     if (ui->tabs_execOutputs->count() == 0)
         btnBackToProfilesClicked();

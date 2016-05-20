@@ -21,6 +21,7 @@ dXorg::driverFilePaths dXorg::filePaths;
 daemonComm *dcomm = new daemonComm();
 
 void dXorg::configure(QString gpuName) {
+    qDebug() << "dXorg: selecting gpu " << gpuName;
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
@@ -45,7 +46,6 @@ void dXorg::configure(QString gpuName) {
 
         dcomm->connectToDaemon();
         if (daemonConnected()) {
-            qDebug() << "Daemon is connected, configuring it";
 
             dcomm->sendConfig(filePaths.clocksPath); //  Configure the daemon to read the data
 
@@ -57,7 +57,6 @@ void dXorg::configure(QString gpuName) {
 
 void dXorg::reconfigureDaemon() { // Set up the timer
     if (daemonConnected()) {
-        qDebug() << "Configuring daemon timer";
 
         if (globalStuff::globalConfig.daemonAutoRefresh)
             dcomm->sendTimerOn(globalStuff::globalConfig.interval); // Enable timer
