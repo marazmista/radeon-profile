@@ -42,8 +42,8 @@ public:
     QString getCurrentPowerLevel() const;
     QString getCurrentPowerProfile() const;
     void refreshPowerLevel();
-    gpuClocksStructString convertClocks(const gpuClocksStruct &data);
-    gpuTemperatureStructString convertTemperature(const gpuTemperatureStruct &data);
+    void convertClocks();
+    void convertTemperature();
 
     void getClocks();
     void getTemperature();

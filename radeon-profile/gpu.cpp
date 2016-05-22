@@ -27,8 +27,7 @@ extern "C" {
 
 // List of files mapping PnP IDs to vendor names
 // List found through pkgfile --verbose --search pnp.ids (on arch linux)
-#define PNP_ID_FILE_COUNT 6
-static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
+static const QStringList pnpIdFiles = {
     "/usr/share/libgnome-desktop-3.0/pnp.ids",
     "/usr/share/libgnome-desktop/pnp.ids",
     "/usr/share/libcinnamon-desktop/pnp.ids",
@@ -85,42 +84,34 @@ void gpu::initialize(bool skipDetectDriver) {
     }
 }
 
-gpuClocksStructString gpu::convertClocks(const gpuClocksStruct &data) {
-    gpuClocksStructString tmp;
+void gpu::convertClocks() {
+    if (gpuClocksData.coreClkOk)
+        gpuClocksDataString.coreClk.setNum(gpuClocksData.coreClk) += "MHz";
 
-    if (data.coreClkOk)
-        tmp.coreClk =  QString().setNum(data.coreClk)+"MHz";
+    if (gpuClocksData.memClkOk)
+        gpuClocksDataString.memClk.setNum(gpuClocksData.memClk) += "MHz";
 
-    if (data.memClkOk)
-        tmp.memClk =  QString().setNum(data.memClk)+"MHz";
+    if (gpuClocksData.memVoltOk)
+        gpuClocksDataString.memVolt.setNum(gpuClocksData.memVolt) += "mV";
 
-    if (data.memVoltOk)
-        tmp.memVolt =  QString().setNum(data.memVolt)+"mV";
+    if (gpuClocksData.coreVoltOk)
+        gpuClocksDataString.coreVolt.setNum(gpuClocksData.coreVolt) += "mV";
 
-    if (data.coreVoltOk)
-        tmp.coreVolt =  QString().setNum(data.coreVolt)+"mV";
+    if (gpuClocksData.powerLevelOk)
+        gpuClocksDataString.powerLevel.setNum(gpuClocksData.powerLevel);
 
-    if (data.powerLevelOk)
-        tmp.powerLevel =  QString().setNum(data.powerLevel);
+    if (gpuClocksData.uvdCClkOk)
+        gpuClocksDataString.uvdCClk.setNum(gpuClocksData.uvdCClk) += "MHz";
 
-    if (data.uvdCClkOk)
-        tmp.uvdCClk =  QString().setNum(data.uvdCClk)+"MHz";
-
-    if (data.uvdDClkOk)
-        tmp.uvdDClk =  QString().setNum(data.uvdDClk)+"MHz";
-
-    return tmp;
+    if (gpuClocksData.uvdDClkOk)
+        gpuClocksDataString.uvdDClk.setNum(gpuClocksData.uvdDClk) += "MHz";
 }
 
-gpuTemperatureStructString gpu::convertTemperature(const gpuTemperatureStruct &data) {
-    gpuTemperatureStructString tmp;
-
-    tmp.current = QString::number(data.current) + QString::fromUtf8("\u00B0C");
-    tmp.max = QString::number(data.max) + QString::fromUtf8("\u00B0C");
-    tmp.min = QString::number(data.min) + QString::fromUtf8("\u00B0C");
-    tmp.pwmSpeed = QString::number(data.pwmSpeed)+"%";
-
-    return tmp;
+void gpu::convertTemperature() {
+    gpuTemeperatureDataString.current.setNum(gpuTemeperatureData.current) += "\u00B0C";
+    gpuTemeperatureDataString.max.setNum(gpuTemeperatureData.max) += QString::fromUtf8("\u00B0C");
+    gpuTemeperatureDataString.min.setNum(gpuTemeperatureData.min) += QString::fromUtf8("\u00B0C");
+    gpuTemeperatureDataString.pwmSpeed.setNum(gpuTemeperatureData.pwmSpeed) += "%";
 }
 
 void gpu::driverByParam(driver paramDriver) {
@@ -156,11 +147,11 @@ void gpu::getClocks() {
         gpuClocksData = dFglrx::getClocks();
         break;
     case DRIVER_UNKNOWN: {
-        gpuClocksData = gpuClocksStruct();
+        gpuClocksData.invalidate();
         break;
     }
     }
-    gpuClocksDataString = convertClocks(gpuClocksData);
+    convertClocks();
 }
 
 void gpu::getTemperature() {
@@ -186,7 +177,7 @@ void gpu::getTemperature() {
     gpuTemeperatureData.max = (gpuTemeperatureData.max < gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.max;
     gpuTemeperatureData.min = (gpuTemeperatureData.min > gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.min;
 
-    gpuTemeperatureDataString = convertTemperature(gpuTemeperatureData);
+    convertTemperature();
 }
 
 // Function that returns the human readable output of a property value
@@ -230,8 +221,8 @@ QString translateProperty(Display * display,
 // See http://www.uefi.org/pnp_id_list
 QString translatePnpId(const QString pnpId){
     if ( ! pnpId.isEmpty()){
-        for(int i=0;  i < PNP_ID_FILE_COUNT; i++){ // Cycle through the files
-            QFile pnpIds(pnpIdFiles[i]);
+        for(const QString path : pnpIdFiles){ // Cycle through the files
+            QFile pnpIds(path);
             if(pnpIds.exists() && pnpIds.open(QIODevice::ReadOnly)){ // File is available
                 while ( ! pnpIds.atEnd()){ // Continue reading the file until the file has ended
                     QString line = pnpIds.readLine();
@@ -244,8 +235,8 @@ QString translatePnpId(const QString pnpId){
                         }
                     }
                 }
+                pnpIds.close();
             }
-            pnpIds.close();
         }
     }
     return pnpId; // No real name found, return the PNP ID instead

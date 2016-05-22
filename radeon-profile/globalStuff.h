@@ -228,6 +228,10 @@ typedef struct gpuClocksStruct {
         powerLevel = _pwrLevel;
         coreClkOk = memClkOk = coreVoltOk = memVoltOk = uvdCClkOk = uvdDClkOk = powerLevelOk = true;
     }
+
+    void invalidate(){
+        coreClkOk = memClkOk = coreVoltOk = memVoltOk = uvdCClkOk = uvdDClkOk = powerLevelOk = false;
+    }
 } gpuClocksStruct;
 
 typedef struct gpuClocksStructString {

@@ -17,7 +17,7 @@ QStringList selectedVariableVaules,envVars;
 
 void radeon_profile::on_btn_cancel_clicked()
 {
-    ui->execPages->setCurrentIndex(0);
+    ui->execPages->setCurrentWidget(ui->page_profiles);
 
     ui->list_variables->clear();
     ui->list_vaules->clear();
@@ -49,7 +49,7 @@ void radeon_profile::on_btn_modifyExecProfile_clicked()
 
     if (!ui->txt_summary->text().isEmpty())
         selectedVariableVaules = ui->txt_summary->text().split(" ");
-    ui->execPages->setCurrentIndex(1);
+    ui->execPages->setCurrentWidget(ui->page_add);
 }
 
 
@@ -100,14 +100,14 @@ void radeon_profile::on_btn_ok_clicked()
 
     ui->list_execProfiles->setCurrentItem(item);
 
-    ui->execPages->setCurrentIndex(0);
+    ui->execPages->setCurrentWidget(ui->page_profiles);
     on_btn_cancel_clicked();
 }
 
 void radeon_profile::on_btn_addExecProfile_clicked()
 {
     loadVariables();
-    ui->execPages->setCurrentIndex(1);
+    ui->execPages->setCurrentWidget(ui->page_add);
     ui->label_15->setVisible(false);
     ui->cb_manualEdit->setChecked(false);
 }
@@ -267,11 +267,11 @@ void radeon_profile::on_btn_runExecProfile_clicked()
     exe->name = item->text((PROFILE_NAME));
     ui->tabs_execOutputs->addTab(exe->tab,exe->name);
 
-    exe->setEnv(penv);
+    exe->setProcessEnvironment(penv);
 
     if (QFile::exists(item->text(BINARY))) {
         exe->runBin("\""+item->text(BINARY) +"\" " +item->text(BINARY_PARAMS));
-        ui->execPages->setCurrentIndex(2);
+        ui->execPages->setCurrentWidget(ui->page_output);
 
         //  check if there will be log
         if (!item->text(LOG_FILE).isEmpty()) {
@@ -301,12 +301,12 @@ void radeon_profile::on_btn_viewOutput_clicked()
     if (ui->tabs_execOutputs->count() == 0)
         return;
 
-    ui->execPages->setCurrentIndex(2);
+    ui->execPages->setCurrentWidget(ui->page_output);
 }
 
 void radeon_profile::btnBackToProfilesClicked()
 {
-    ui->execPages->setCurrentIndex(0);
+    ui->execPages->setCurrentWidget(ui->page_profiles);
 }
 
 void radeon_profile::on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column) {

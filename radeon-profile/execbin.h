@@ -16,12 +16,11 @@
 #include <QString>
 #include <QLabel>
 
-class execBin : public QObject {
+class execBin : public QProcess {
     Q_OBJECT
 public:
     execBin();
     ~execBin() {
-        delete p;
         delete output;
         delete cmd;
         delete mainLay;
@@ -33,23 +32,20 @@ public:
 
     void setupTab();
     void runBin(const QString &cmd);
-    void setEnv(const QProcessEnvironment &env);
-    QProcess::ProcessState getExecState();
     void appendToLog(const QString &data);
     void setLogFilename(const QString &name);
 
     QString name;
     QWidget *tab;
-    bool logEnabled;
+    bool logEnabled = false;
 
-public slots:
+private slots:
     void execProcessReadOutput();
     void execProcesStart();
     void execProcesFinished();
     void saveToFile();
 
 private:
-    QProcess *p;
     QPlainTextEdit *output;
     QPlainTextEdit *cmd;
     QVBoxLayout *mainLay;

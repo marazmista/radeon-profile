@@ -148,17 +148,11 @@ void radeon_profile::loadConfig() {
     ui->cb_stats->setEnabled(ui->cb_gpuData->isChecked());
 
     if (ui->cb_gpuData->isChecked()) {
-        if (ui->cb_stats->isChecked())
-            ui->tabs_systemInfo->setTabEnabled(3,true);
-        else
-            ui->tabs_systemInfo->setTabEnabled(3,false);
+        ui->tab_stats->setEnabled(ui->cb_stats->isChecked());
     } else
         ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "GPU data is disabled."));
 
-    if (ui->cb_graphs->isChecked() && ui->cb_graphs->isEnabled())
-        ui->mainTabs->setTabEnabled(1,true);
-    else
-        ui->mainTabs->setTabEnabled(1,false);
+    ui->graphTab->setEnabled(ui->cb_graphs->isChecked() && ui->cb_graphs->isEnabled());
 
     ui->list_currentGPUData->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_glxinfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
@@ -206,8 +200,10 @@ void radeon_profile::loadFanProfiles() {
 
             fsPath.close();
         }
-    } else {
-        //default profile if no file found
+    }
+
+    if(fanSteps.isEmpty()){
+        qWarning() << "No saved fan steps found, using default profile";
         addFanStep(0,20,true, true, false);
         addFanStep(65,100,true, true, false);
         addFanStep(90,100, true, true, false);

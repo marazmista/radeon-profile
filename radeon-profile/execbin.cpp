@@ -7,8 +7,7 @@
 #include <QLabel>
 #include <QFileDialog>
 
-execBin::execBin() : QObject() {
-    p = new QProcess();
+execBin::execBin() : QProcess() {
     mainLay = new QVBoxLayout();
     btnLay = new QHBoxLayout();
     tab = new QWidget();
@@ -19,9 +18,9 @@ execBin::execBin() : QObject() {
 
     setupTab();
 
-    connect(p,SIGNAL(readyReadStandardOutput()),this,SLOT(execProcessReadOutput()));
-    connect(p,SIGNAL(finished(int)),this,SLOT(execProcesFinished()));
-    connect(p,SIGNAL(started()),this,SLOT(execProcesStart()));
+    connect(this,SIGNAL(readyReadStandardOutput()),this,SLOT(execProcessReadOutput()));
+    connect(this,SIGNAL(finished(int)),this,SLOT(execProcesFinished()));
+    connect(this,SIGNAL(started()),this,SLOT(execProcesStart()));
     connect(btnSave,SIGNAL(clicked()),this,SLOT(saveToFile()));
 }
 
@@ -35,7 +34,7 @@ void execBin::setupTab() {
     QFont f;
     f.setBold(true);
     lStatus->setFont(f);
-    p->setProcessChannelMode(QProcess::MergedChannels);
+    setProcessChannelMode(MergedChannels);
 
 
     this->btnSave->setText(label_saveOutputToFile);
@@ -58,16 +57,12 @@ void execBin::setupTab() {
 }
 
 void execBin::runBin(const QString &cmd) {
-    p->start(cmd);
-    this->cmd->setPlainText(p->processEnvironment().toStringList().join(" ") +" "+ cmd);
-}
-
-void execBin::setEnv(const QProcessEnvironment &env) {
-    this->p->setProcessEnvironment(env);
+    start(cmd);
+    this->cmd->setPlainText(processEnvironment().toStringList().join(" ") +" "+ cmd);
 }
 
 void execBin::execProcessReadOutput() {
-    QString o = this->p->readAllStandardOutput();
+    QString o = readAllStandardOutput();
 
     if (!o.isEmpty())
         this->output->appendPlainText(o);
@@ -97,10 +92,6 @@ void execBin::saveToFile() {
             f.write(this->output->toPlainText().toLatin1());
             f.close();
         }
-}
-
-QProcess::ProcessState execBin::getExecState() {
-    return this->p->state();
 }
 
 void execBin::appendToLog(const QString &data) {

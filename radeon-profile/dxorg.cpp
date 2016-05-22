@@ -337,20 +337,17 @@ QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
     QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p radeon");
     modInfo.sort();
 
-    for (int i =0; i < modInfo.count(); i++) {
-        if (modInfo[i].contains(":")) {
+    for (const QString line : modInfo) {
+        if (line.contains(":") && ! line.startsWith("modinfo: ERROR: ")) {
             // show nothing in case of an error
-            if (modInfo[i].startsWith("modinfo: ERROR: ")) {
-                continue;
-            }
+
             // read module param name and description from modinfo command
-            QString modName = modInfo[i].split(":",QString::SkipEmptyParts)[0],
-                    modDesc = modInfo[i].split(":",QString::SkipEmptyParts)[1],
-                    modValue;
+            const QString modName = line.split(":",QString::SkipEmptyParts)[0], // Module name
+                    modDesc = line.split(":",QString::SkipEmptyParts)[1]; // Module description
 
             // read current param values
             QFile mp(filePaths.moduleParamsPath+modName);
-            modValue = (mp.open(QIODevice::ReadOnly)) ?  modValue = mp.readLine(20) : "unknown";
+            const QString modValue = (mp.open(QIODevice::ReadOnly)) ?  mp.readLine(20) : label_unknown; // Module value
 
             QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << modName.left(modName.indexOf('\n')) << modValue.left(modValue.indexOf('\n')) << modDesc.left(modDesc.indexOf('\n')));
             data.append(item);

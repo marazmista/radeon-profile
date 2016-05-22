@@ -52,7 +52,7 @@ void radeon_profile::on_btn_pwmFixedApply_clicked()
 
 void radeon_profile::on_btn_pwmFixed_clicked()
 {
-    ui->fanModesTabs->setCurrentIndex(1);
+    ui->fanModesTabs->setCurrentWidget(ui->page_fixed);
 
     device.setPwmManualControl(true);
     device.setPwmValue(ui->fanSpeedSlider->value());
@@ -61,12 +61,12 @@ void radeon_profile::on_btn_pwmFixed_clicked()
 void radeon_profile::on_btn_pwmAuto_clicked()
 {
     device.setPwmManualControl(false);
-    ui->fanModesTabs->setCurrentIndex(0);
+    ui->fanModesTabs->setCurrentWidget(ui->page);
 }
 
 void radeon_profile::on_btn_pwmProfile_clicked()
 {
-    ui->fanModesTabs->setCurrentIndex(2);
+    ui->fanModesTabs->setCurrentWidget(ui->page_profile);
 
     device.setPwmManualControl(true);
 
@@ -211,7 +211,7 @@ void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
 
 void radeon_profile::on_cb_graphs_clicked(bool checked)
 {
-    ui->mainTabs->setTabEnabled(1,checked);
+    ui->graphTab->setEnabled(checked);
 }
 
 void radeon_profile::on_cb_gpuData_clicked(bool checked)
@@ -220,10 +220,10 @@ void radeon_profile::on_cb_gpuData_clicked(bool checked)
     ui->cb_stats->setEnabled(checked);
 
     if (ui->cb_stats->isChecked())
-        ui->tabs_systemInfo->setTabEnabled(3,checked);
+        ui->tab_stats->setEnabled(checked);
 
     if (ui->cb_graphs->isChecked())
-        ui->mainTabs->setTabEnabled(1,checked);
+        ui->graphTab->setEnabled(checked);
 
     if (!checked) {
         ui->list_currentGPUData->clear();
@@ -255,7 +255,7 @@ void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item,
 
 void radeon_profile::on_cb_stats_clicked(bool checked)
 {
-    ui->tabs_systemInfo->setTabEnabled(3,checked);
+    ui->tab_stats->setEnabled(checked);
 
     // reset stats data
     statsTickCounter = 0;
@@ -273,13 +273,9 @@ void radeon_profile::copyGlxInfoToClipboard() {
 
 void radeon_profile::copyConnectorsToClipboard(){
     QString clip;
-    const QList<QTreeWidgetItem *> selectedItems = ui->list_connectors->selectedItems();
 
-    for(int itemIndex=0; itemIndex < selectedItems.size(); itemIndex++){ // For each item
-        QTreeWidgetItem * current = selectedItems.at(itemIndex);
-        clip += current->text(0).simplified() + '\t';
-        clip += current->text(1).simplified() + '\n';
-    }
+    for(QTreeWidgetItem *item : ui->list_connectors->selectedItems()) // For each item
+        clip += item->text(0).simplified() + '\t' + item->text(1).simplified() + '\n';
 
     QApplication::clipboard()->setText(clip);
 }
@@ -330,7 +326,7 @@ void radeon_profile::on_btn_reconfigureDaemon_clicked()
 
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 {
-    if (execsRunning.at(index)->getExecState() == QProcess::Running) {
+    if (execsRunning.at(index)->state() == QProcess::Running) {
         if (QMessageBox::question(this,"", label_processStillRunning, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
             return;
     }

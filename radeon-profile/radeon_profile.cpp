@@ -44,11 +44,11 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     }
 
     // setup ui elemensts
-    ui->mainTabs->setCurrentIndex(0);
-    ui->tabs_systemInfo->setCurrentIndex(0);
-    ui->configGroups->setCurrentIndex(0);
+    ui->mainTabs->setCurrentWidget(ui->infoTab);
+    ui->tabs_systemInfo->setCurrentWidget(ui->tab_glxInfo);
+    ui->configGroups->setCurrentWidget(ui->tab_mainConfig);
     ui->list_currentGPUData->setHeaderHidden(false);
-    ui->execPages->setCurrentIndex(0);
+    ui->execPages->setCurrentWidget(ui->page_profiles);
     setupGraphs();
     setupForcePowerLevelMenu();
     setupOptionsMenu();
@@ -72,7 +72,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     ui->combo_gpus->addItems(device.gpuList);
 
-    ui->configGroups->setTabEnabled(2,device.daemonConnected());
+    ui->tab_daemonConfig->setEnabled(device.daemonConnected());
     setupUiEnabledFeatures(device.features);
 
     if(ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
@@ -142,7 +142,6 @@ void radeon_profile::addRuntimeWidgets() {
     connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
 
     // set pwm buttons in group
-    QButtonGroup pwmGroup;
     pwmGroup.addButton(ui->btn_pwmAuto);
     pwmGroup.addButton(ui->btn_pwmFixed);
     pwmGroup.addButton(ui->btn_pwmProfile);
@@ -151,12 +150,16 @@ void radeon_profile::addRuntimeWidgets() {
 // based on driverFeatures structure returned by gpu class, adjust ui elements
 void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     if (features.canChangeProfile && features.pm < PM_UNKNOWN) {
-        ui->tabs_pm->setTabEnabled(0,features.pm == PROFILE);
+        const bool dpm = features.pm == DPM; // true=dpm, false=profile
+        ui->tabs_pm->setCurrentWidget(dpm ? ui->dpmProfiles : ui->stdProfiles);
 
-        ui->tabs_pm->setTabEnabled(1,features.pm == DPM);
-        changeProfile->setEnabled(features.pm == PROFILE);
-        dpmMenu.setEnabled(features.pm == DPM);
-        ui->combo_pLevel->setEnabled(features.pm == DPM);
+        ui->stdProfiles->setEnabled( ! dpm);
+        changeProfile->setEnabled( ! dpm);
+
+        ui->dpmProfiles->setEnabled(dpm);        
+        dpmMenu.setEnabled(dpm);
+        ui->combo_pLevel->setEnabled(dpm);
+        ui->label_noStdProfiles->setVisible(dpm);
     } else {
         ui->tabs_pm->setEnabled(false);
         changeProfile->setEnabled(false);
@@ -166,7 +169,7 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     }
 
     ui->cb_showFreqGraph->setEnabled(features.coreClockAvailable);
-    ui->tabs_systemInfo->setTabEnabled(3,features.coreClockAvailable);
+    ui->tab_stats->setEnabled(features.coreClockAvailable);
     ui->cb_showVoltsGraph->setEnabled(features.coreVoltAvailable);
 
     if (!features.temperatureAvailable) {
@@ -176,7 +179,7 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     }
 
     if (!features.coreClockAvailable && !features.temperatureAvailable && !features.coreVoltAvailable)
-        ui->mainTabs->setTabEnabled(1,false);
+        ui->graphTab->setEnabled(false);
 
     if (features.pwmAvailable && (globalStuff::globalConfig.rootMode || device.daemonConnected())) {
         qDebug() << "Fan control is available , configuring the fan control tab";
@@ -185,7 +188,7 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
     } else {
         qDebug() << "Fan control is not available";
-        ui->mainTabs->setTabEnabled(2,false);
+        ui->fanTab->setEnabled(false);
         ui->l_fanSpeed->setVisible(false);
     }
 
@@ -205,7 +208,7 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
         ui->label_overclock->setText((globalStuff::globalConfig.rootMode || device.daemonConnected()) ? label_noOverclock : label_howToReadData);
 
         ui->cb_enableOverclock->setChecked(false);
-        ui->cb_enableOverclock->setEnabled(false);
+        ui->overclockTab->setEnabled(false);
     }
 }
 
@@ -239,7 +242,7 @@ void radeon_profile::refreshUI() {
     ui->l_fanSpeed->setText(device.gpuTemeperatureDataString.pwmSpeed);
 
     // GPU data list
-    if (ui->mainTabs->currentIndex() == 0) {
+    if (ui->mainTabs->currentWidget() == ui->infoTab) {
         ui->list_currentGPUData->clear();
 
         if (device.gpuClocksData.powerLevelOk)
@@ -265,8 +268,8 @@ void radeon_profile::refreshUI() {
 }
 
 void radeon_profile::updateExecLogs() {
-    for (int i = 0; i < execsRunning.count(); i++) {
-        if (execsRunning.at(i)->getExecState() == QProcess::Running && execsRunning.at(i)->logEnabled) {
+    for (execBin *exe : execsRunning) {
+        if (exe->state() == QProcess::Running && exe->logEnabled) {
             QString logData = QDateTime::currentDateTime().toString(logDateFormat) +";" + device.gpuClocksDataString.powerLevel + ";" +
                     device.gpuClocksDataString.coreClk + ";"+
                     device.gpuClocksDataString.memClk + ";"+
@@ -275,7 +278,7 @@ void radeon_profile::updateExecLogs() {
                     device.gpuClocksDataString.coreVolt + ";"+
                     device.gpuClocksDataString.memVolt + ";"+
                     device.gpuTemeperatureDataString.current;
-            execsRunning.at(i)->appendToLog(logData);
+            exe->appendToLog(logData);
         }
     }
 }
@@ -303,7 +306,7 @@ void radeon_profile::timerEvent() {
             doTheStats();
 
             // do the math only when user looking at stats table
-            if (ui->tabs_systemInfo->currentIndex() == 3 && ui->mainTabs->currentIndex() == 0)
+            if (ui->tabs_systemInfo->currentWidget() == ui->tab_stats && ui->mainTabs->currentWidget() == ui->infoTab)
                 updateStatsTable();
         }
         refreshUI();

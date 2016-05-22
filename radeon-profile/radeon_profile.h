@@ -143,6 +143,7 @@ private:
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden;
     QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;
     QTimer timer;
+    QButtonGroup pwmGroup;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
