@@ -64,7 +64,7 @@ void dXorg::reconfigureDaemon() { // Set up the timer
             dcomm->sendTimerOff(); // Disable timer
 
     } else
-        qWarning() << "Daemon is not connected, therefore it's timer can't be reconfigured";
+        dcomm->connectToDaemon();
 }
 
 bool dXorg::daemonConnected() {
@@ -347,9 +347,9 @@ QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
 
             // read current param values
             QFile mp(filePaths.moduleParamsPath+modName);
-            const QString modValue = (mp.open(QIODevice::ReadOnly)) ?  mp.readLine(20) : label_unknown; // Module value
+            const QString modValue = (mp.open(QIODevice::ReadOnly)) ?  mp.readLine(20) : tr("Unknown"); // Module value
 
-            QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << modName.left(modName.indexOf('\n')) << modValue.left(modValue.indexOf('\n')) << modDesc.left(modDesc.indexOf('\n')));
+            QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << modName.simplified() << modValue.simplified() << modDesc.simplified());
             data.append(item);
             mp.close();
         }
@@ -377,7 +377,7 @@ QString dXorg::getCurrentPowerProfile() {
         if (dpmProfile.open(QIODevice::ReadOnly))
            return QString(dpmProfile.readLine(13));
         else
-            return "err";
+            return tr("No info");
         break;
     }
     case PROFILE: {
@@ -390,7 +390,7 @@ QString dXorg::getCurrentPowerProfile() {
         break;
     }
 
-    return "err";
+    return tr("No info");
 }
 
 QString dXorg::getCurrentPowerLevel() {
@@ -398,7 +398,7 @@ QString dXorg::getCurrentPowerLevel() {
     if (forceProfile.open(QIODevice::ReadOnly))
         return QString(forceProfile.readLine(13));
 
-    return "err";
+    return tr("No info");
 }
 
 void dXorg::setNewValue(const QString &filePath, const QString &newValue) {

@@ -15,8 +15,9 @@ typedef enum driver {
     XORG, FGLRX, DRIVER_UNKNOWN
 } driver;
 
-class gpu
+class gpu : public QObject
 {
+    Q_OBJECT
 public:
 
     explicit gpu() {

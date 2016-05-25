@@ -15,6 +15,9 @@
 #include <QProcessEnvironment>
 #include <QList>
 #include <QListWidgetItem>
+#include <QTimer>
+#include <QMenu>
+#include <QButtonGroup>
 
 #define startClocksScaleL 50
 #define startClocksScaleH 150
@@ -71,9 +74,9 @@ private slots:
     void on_btn_dpmPerformance_clicked();
     void changeTimeRange();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void on_cb_showFreqGraph_clicked(const bool &checked);
-    void on_cb_showTempsGraph_clicked(const bool &checked);
-    void on_cb_showVoltsGraph_clicked(const bool &checked);
+    void on_cb_showFreqGraph_toggled(const bool &checked);
+    void on_cb_showTempsGraph_toggled(const bool &checked);
+    void on_cb_showVoltsGraph_toggled(const bool &checked);
     void showLegend(const bool &checked);
     void setGraphOffset(const bool &checked);
     void resetGraphs();
@@ -89,15 +92,15 @@ private slots:
     void closeFromTray();
     void on_spin_lineThick_valueChanged(int arg1);
     void on_spin_timerInterval_valueChanged(double arg1);
-    void on_cb_graphs_clicked(bool checked);
-    void on_cb_gpuData_clicked(bool checked);
+    void on_cb_graphs_toggled(bool checked);
+    void on_cb_gpuData_toggled(bool checked);
     void refreshBtnClicked();
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
-    void on_cb_stats_clicked(bool checked);
+    void on_cb_stats_toggled(bool checked);
     void copyGlxInfoToClipboard();
     void copyConnectorsToClipboard();
     void resetStats();
-    void on_cb_alternateRow_clicked(bool checked);
+    void on_cb_alternateRow_toggled(bool checked);
     void on_chProfile_clicked();
     void on_btn_reconfigureDaemon_clicked();
     void on_btn_cancel_clicked();
@@ -109,7 +112,7 @@ private slots:
     void on_btn_removeExecProfile_clicked();
     void on_btn_selectBinary_clicked();
     void on_btn_selectLog_clicked();
-    void on_cb_manualEdit_clicked(bool checked);
+    void on_cb_manualEdit_toggled(bool checked);
     void on_btn_runExecProfile_clicked();
     void on_btn_viewOutput_clicked();
     void btnBackToProfilesClicked();
@@ -209,6 +212,14 @@ private:
      * @return If the operation was successful.
      */
     bool addFanStep (int temperature, int fanSpeed, bool alsoToList = true, bool alsoToGraph = true, bool alsoAdjustSpeed = true);
+
+    /**
+     * @brief askQuestion Creates a dialog to ask a question
+     * @param title Title of the dialog
+     * @param question Question to ask
+     * @return True if the user clicked "Yes", false otherwise
+     */
+    bool askConfirmation(QString title, QString question);
 };
 
 #endif // RADEON_PROFILE_H

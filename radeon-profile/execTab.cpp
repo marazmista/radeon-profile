@@ -56,12 +56,12 @@ void radeon_profile::on_btn_modifyExecProfile_clicked()
 void radeon_profile::on_btn_ok_clicked()
 {
     if (ui->txt_profileName->text().isEmpty()) {
-        QMessageBox::critical(this, label_error, label_emptyProfileName, QMessageBox::Ok);
+        QMessageBox::critical(this, tr("Error"), tr("Profile name can't be empty!"), QMessageBox::Ok);
         return;
     }
 
     if (ui->txt_binary->text().isEmpty()) {
-        QMessageBox::critical(this, label_error, label_noBinarySelected, QMessageBox::Ok);
+        QMessageBox::critical(this, tr("Error"), tr("No binary is selected!"), QMessageBox::Ok);
         return;
     }
 
@@ -71,7 +71,7 @@ void radeon_profile::on_btn_ok_clicked()
         if (QFile::exists(tmpS))
             ui->txt_binary->setText(tmpS);
         else {
-            QMessageBox::critical(this, label_error, label_binaryNotFound + ui->txt_binary->text());
+            QMessageBox::critical(this, tr("Error"), tr("Binary not found in /usr/bin: ") + ui->txt_binary->text());
             return;
         }
     }
@@ -122,42 +122,40 @@ void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
     if (envVars.isEmpty())
         return;
 
+    const QString text = ui->list_variables->currentItem()->text();
     // read variable possible values from file
-    QStringList values = envVars.filter(ui->list_variables->currentItem()->text())[0].remove(ui->list_variables->currentItem()->text()+"|").split("#",QString::SkipEmptyParts);
+    const QStringList values = envVars.filter(text)[0].remove(text+"|").split("#",QString::SkipEmptyParts);
 
     // if value for this variable is 'user_input' display a window for input
     if (values[0] == "user_input") {
         bool ok;
-        QString input = QInputDialog::getText(this, label_enterValue, label_valueFor + ui->list_variables->currentItem()->text(), QLineEdit::Normal,"",&ok);
+        const QString input = QInputDialog::getText(this, tr("Enter value"), tr("Enter valid value for ") + text, QLineEdit::Normal,"",&ok);
 
         // look for this variable in list
-        int varIndex = selectedVariableVaules.indexOf(QRegExp(ui->list_variables->currentItem()->text()+".+",Qt::CaseInsensitive),0);
+        int varIndex = selectedVariableVaules.indexOf(QRegExp(text+".+",Qt::CaseInsensitive),0);
         if (!input.isEmpty() && ok) {
             // if value was ok
             if (varIndex == -1)
                 // add it to list
-                selectedVariableVaules.append(ui->list_variables->currentItem()->text()+"="+input);
+                selectedVariableVaules.append(text+"="+input);
             else
                 // replace if already exists
-                selectedVariableVaules[varIndex] = ui->list_variables->currentItem()->text()+"=\""+input+"\"";
-        } else {
+                selectedVariableVaules[varIndex] = text+"=\""+input+"\"";
+        } else if (((varIndex != -1) || ok) && askConfirmation(tr("Remove"), tr("Remove this item?"))) {
             // hehe, looks weird but check ok status is for, when input was empty, and whether user click ok or cancel, dispaly quesion
-            if ((varIndex != -1) || ok) {
-                if (QMessageBox::question(this, label_question, label_askRemoveItem, QMessageBox::Yes | QMessageBox::No,QMessageBox::Yes) == QMessageBox::Yes)
-                    selectedVariableVaules.removeAt(varIndex);
-            }
+            selectedVariableVaules.removeAt(varIndex);
         }
         ui->txt_summary->setText(selectedVariableVaules.join(" "));
         return;
     }
 
     // go through list from file and check if it is selected (exists in summary)
-    for (int i= 0 ; i< values.count(); i++ ) {
+    for (const QString value : values) {
         // look for selected variable in list with variables and its values
-        int varIndex = selectedVariableVaules.indexOf(QRegExp(ui->list_variables->currentItem()->text()+".+",Qt::CaseInsensitive),0);
+        int varIndex = selectedVariableVaules.indexOf(QRegExp(text+".+",Qt::CaseInsensitive),0);
 
         QListWidgetItem *valItem = new QListWidgetItem();
-        valItem->setText(values[i]);
+        valItem->setText(value);
 
         // if not, add to list where from user can choose, add unchecked
         if (varIndex == -1) {
@@ -203,7 +201,7 @@ void radeon_profile::on_btn_removeExecProfile_clicked()
     if (ui->list_execProfiles->selectedItems().count() == 0)
         return;
 
-   if (QMessageBox::question(this, label_remove, label_askRemoveItem, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+   if (askConfirmation(tr("Remove"), tr("Remove this item?")))
         delete ui->list_execProfiles->selectedItems()[0];
    else
        return;
@@ -211,7 +209,7 @@ void radeon_profile::on_btn_removeExecProfile_clicked()
 
 void radeon_profile::on_btn_selectBinary_clicked()
 {
-    QString binaryPath = QFileDialog::getOpenFileName(this, label_selectBinary);
+    QString binaryPath = QFileDialog::getOpenFileName(this, tr("Select binary"));
 
     if (!binaryPath.isEmpty())
         ui->txt_binary->setText(binaryPath);
@@ -219,7 +217,7 @@ void radeon_profile::on_btn_selectBinary_clicked()
 
 void radeon_profile::on_btn_selectLog_clicked()
 {
-    QString logFile = QFileDialog::getSaveFileName(this, label_selectLogFile, QDir::homePath()+"/"+ui->txt_profileName->text());
+    QString logFile = QFileDialog::getSaveFileName(this, tr("Select log file"), QDir::homePath()+"/"+ui->txt_profileName->text());
 
     if (!logFile.isEmpty())
         ui->txt_logFile->setText(logFile);
@@ -247,50 +245,52 @@ void radeon_profile::on_btn_runExecProfile_clicked()
 
     QTreeWidgetItem *item = ui->list_execProfiles->currentItem();
 
-    // sets the env for binary
-    QProcessEnvironment penv;
-    if (ui->cb_execSysEnv->isChecked())
-        penv = QProcessEnvironment::systemEnvironment();
+    const QString binary = item->text(BINARY);
+    if (QFile::exists(binary)) {
+        const QString name = item->text(PROFILE_NAME),
+                settings = item->text(ENV_SETTINGS),
+                params = item->text(BINARY_PARAMS);
 
-    QStringList variables;
-    if (!item->text(ENV_SETTINGS).isEmpty()) {
-            variables = item->text(ENV_SETTINGS).split(' ',QString::SkipEmptyParts);
+        // sets the env for binary
+        QProcessEnvironment penv;
+        if (ui->cb_execSysEnv->isChecked())
+            penv = QProcessEnvironment::systemEnvironment();
 
-            for (int i = 0; i < variables.count(); i++) {
-                QString varible = variables[i].split('=')[0],
-                        value = variables[i].split('=')[1];
-                penv.insert(varible,value);
+        if (!settings.isEmpty()) {
+            for (const QString line : settings.split(' ',QString::SkipEmptyParts)) {
+                const QStringList parts = line.split('=');
+                penv.insert(parts.at(0), parts.at(1));
             }
-    }
+        }
 
-    execBin *exe = new execBin();
-    exe->name = item->text((PROFILE_NAME));
-    ui->tabs_execOutputs->addTab(exe->tab,exe->name);
+        execBin *exe = new execBin();
+        exe->name = name;
+        ui->tabs_execOutputs->addTab(exe->tab,exe->name);
 
-    exe->setProcessEnvironment(penv);
+        exe->setProcessEnvironment(penv);
 
-    if (QFile::exists(item->text(BINARY))) {
-        exe->runBin("\""+item->text(BINARY) +"\" " +item->text(BINARY_PARAMS));
+        exe->runBin("\""+ binary +"\" " + params);
         ui->execPages->setCurrentWidget(ui->page_output);
 
+        QString logFile = item->text(LOG_FILE);
         //  check if there will be log
-        if (!item->text(LOG_FILE).isEmpty()) {
+        if (!logFile.isEmpty()) {
             exe->logEnabled = true;
-            exe->setLogFilename(item->text(LOG_FILE) +
-                    ((item->text(LOG_FILE_DATE_APPEND) == "1") ? QDateTime::currentDateTime().toString("_yyyy-MM-dd_hh-mm-ss") : ""));
-            exe->appendToLog("Profile: " +item->text(PROFILE_NAME) +"; App: " + item->text(BINARY) + "; Params: " + item->text(BINARY_PARAMS) + "; Env: " + item->text(ENV_SETTINGS));
-            exe->appendToLog("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci); temp");
+            if(item->text(LOG_FILE_DATE_APPEND) == "1")
+                logFile += '.' + QDateTime::currentDateTime().toString(Qt::ISODate);
+            exe->setLogFilename(logFile);
+            exe->appendToLog("Profile: " + name +"\n App: " + binary + "\n Params: " + params + "\n Env: " + settings);
         }
         execsRunning.append(exe);
-        ui->tabs_execOutputs->setCurrentIndex(ui->tabs_execOutputs->count() - 1);
+        ui->tabs_execOutputs->setCurrentWidget(exe->tab);
+        updateExecLogs();
     }
     else {
-        QMessageBox::critical(this, label_error, label_cantRunNotExists);
-        delete exe;
+        QMessageBox::critical(this, tr("Error"), tr("The selected binary does not exist!"));
     }
 }
 
-void radeon_profile::on_cb_manualEdit_clicked(bool checked)
+void radeon_profile::on_cb_manualEdit_toggled(bool checked)
 {
     ui->txt_summary->setReadOnly(!checked);
     ui->label_15->setVisible(checked);
@@ -313,7 +313,7 @@ void radeon_profile::on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *ite
         switch (ui->cb_execDbcAction->currentIndex()) {
         default:
         case 0:
-            if (QMessageBox::question(this, label_run, label_askRunStart + item->text(0) + label_askRunEnd, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+            if (askConfirmation(tr("Run"), tr("Run: \"") + item->text(0) + tr("\"?")))
                 ui->btn_runExecProfile->click();
             break;
         case 1:

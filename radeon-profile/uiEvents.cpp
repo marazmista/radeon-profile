@@ -109,17 +109,17 @@ void radeon_profile::changeTimeRange() {
     rangeX = ui->timeSlider->value();
 }
 
-void radeon_profile::on_cb_showFreqGraph_clicked(const bool &checked)
+void radeon_profile::on_cb_showFreqGraph_toggled(const bool &checked)
 {
     ui->plotClocks->setVisible(checked);
 }
 
-void radeon_profile::on_cb_showTempsGraph_clicked(const bool &checked)
+void radeon_profile::on_cb_showTempsGraph_toggled(const bool &checked)
 {
     ui->plotTemp->setVisible(checked);
 }
 
-void radeon_profile::on_cb_showVoltsGraph_clicked(const bool &checked)
+void radeon_profile::on_cb_showVoltsGraph_toggled(const bool &checked)
 {
     ui->plotVolts->setVisible(checked);
 }
@@ -209,13 +209,14 @@ void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
     timer.setInterval(arg1*1000);
 }
 
-void radeon_profile::on_cb_graphs_clicked(bool checked)
+void radeon_profile::on_cb_graphs_toggled(bool checked)
 {
     ui->graphTab->setEnabled(checked);
 }
 
-void radeon_profile::on_cb_gpuData_clicked(bool checked)
+void radeon_profile::on_cb_gpuData_toggled(bool checked)
 {
+    // Enable/Disable linked checkboxes
     ui->cb_graphs->setEnabled(checked);
     ui->cb_stats->setEnabled(checked);
 
@@ -225,10 +226,29 @@ void radeon_profile::on_cb_gpuData_clicked(bool checked)
     if (ui->cb_graphs->isChecked())
         ui->graphTab->setEnabled(checked);
 
+    // Enable/Disable the GPU data list
     if (!checked) {
         ui->list_currentGPUData->clear();
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << label_dataDisabled));
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << tr("GPU data is disabled")));
     }
+    ui->list_currentGPUData->setEnabled(checked);
+
+    // Enable/Disable the header labels
+    ui->l_cClk->setEnabled(checked);
+    ui->l_mClk->setEnabled(checked);
+    ui->l_cVolt->setEnabled(checked);
+    ui->l_mVolt->setEnabled(checked);
+    ui->l_temp->setEnabled(checked);
+    ui->l_fanSpeed->setEnabled(checked);
+
+    // Enable/Disable pwm profile control
+    ui->btn_pwmProfile->setEnabled(checked);
+    ui->page_profile->setEnabled(checked);
+    if(ui->btn_pwmProfile->isChecked())
+        device.setPwmManualControl(checked);
+
+    // Enable/Disable daemon auto update
+    configureDaemonAutoRefresh((checked && ui->cb_daemonAutoRefresh->isChecked()), ui->spin_timerInterval->value());
 }
 
 void radeon_profile::refreshBtnClicked() {
@@ -253,7 +273,7 @@ void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item,
     }
 }
 
-void radeon_profile::on_cb_stats_clicked(bool checked)
+void radeon_profile::on_cb_stats_toggled(bool checked)
 {
     ui->tab_stats->setEnabled(checked);
 
@@ -286,7 +306,7 @@ void radeon_profile::resetStats() {
     ui->list_stats->clear();
 }
 
-void radeon_profile::on_cb_alternateRow_clicked(bool checked) {
+void radeon_profile::on_cb_alternateRow_toggled(bool checked) {
     ui->list_currentGPUData->setAlternatingRowColors(checked);
     ui->list_glxinfo->setAlternatingRowColors(checked);
     ui->list_modInfo->setAlternatingRowColors(checked);
@@ -303,7 +323,7 @@ void radeon_profile::on_chProfile_clicked()
     QStringList profiles;
     profiles << profile_auto << profile_default << profile_high << profile_mid << profile_low;
 
-    QString selection = QInputDialog::getItem(this, label_selectProfile, label_profileSelection, profiles,0,false,&ok);
+    QString selection = QInputDialog::getItem(this, tr("Select new power profile"), tr("Profile selection"), profiles,0,false,&ok);
 
     if (ok) {
         if (selection == profile_default)
@@ -326,34 +346,34 @@ void radeon_profile::on_btn_reconfigureDaemon_clicked()
 
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 {
-    if (execsRunning.at(index)->state() == QProcess::Running) {
-        if (QMessageBox::question(this,"", label_processStillRunning, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
-            return;
+    if (execsRunning.at(index)->state() != QProcess::Running || askConfirmation(tr("Process running"), tr("Process is still running. Close tab?"))){
+
+        ui->tabs_execOutputs->removeTab(index);
+        execsRunning.removeAt(index);
+
+        if (ui->tabs_execOutputs->count() == 0)
+            btnBackToProfilesClicked();
     }
-
-    ui->tabs_execOutputs->removeTab(index);
-    execsRunning.removeAt(index);
-
-    if (ui->tabs_execOutputs->count() == 0)
-        btnBackToProfilesClicked();
 }
 
 
 void radeon_profile::on_btn_fanInfo_clicked()
 {
-    QMessageBox::information(this,label_fanControlInfo, label_fanControlWarning);
+    QMessageBox::information(this,
+                             tr("Fan control information"),
+                             tr("Don't overheat your card! Be careful! Don't use this if you don't know what you're doing! \n\nHovewer, looks like card won't apply too low values due its internal protection. \n\nClosing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned!"));
 }
 
 void radeon_profile::on_btn_addFanStep_clicked()
 {
-    const int temperature = askNumber(0, minFanStepsTemp, maxFanStepsTemp, label_temperature);
+    const int temperature = askNumber(0, minFanStepsTemp, maxFanStepsTemp, tr("Temperature (°C)"));
     if (temperature == -1) // User clicked Cancel
         return;
 
     if (fanSteps.contains(temperature)) // A step with this temperature already exists
-        QMessageBox::warning(this, label_error, label_howToEdit);
+        QMessageBox::warning(this, tr("Error"), tr("This step already exists. To edit it double click it"));
     else { // This step does not exist, proceed
-        const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, label_fanSpeedRange);
+        const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (20-100)"));
         if (fanSpeed == -1) // User clicked Cancel
             return;
 
@@ -368,7 +388,7 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 
     if (ui->list_fanSteps->indexOfTopLevelItem(current) == 0 || ui->list_fanSteps->indexOfTopLevelItem(current) == ui->list_fanSteps->topLevelItemCount()-1) {
         // The selected item is the first or the last, it can't be deleted
-        QMessageBox::warning(this, label_error, label_cantDeleteThisItem);
+        QMessageBox::warning(this, tr("Error"), tr("You can't delete the first and the last item"));
         return;
     }
 
@@ -389,7 +409,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
 {
     if (ui->list_fanSteps->indexOfTopLevelItem(item) == 0 || ui->list_fanSteps->indexOfTopLevelItem(item) == ui->list_fanSteps->topLevelItemCount()-1) {
         // The selected item is the first or the last, it can't be edited
-        QMessageBox::warning(this, label_error, label_cantEditThisItem);
+        QMessageBox::warning(this, tr("Error"), tr("You can't edit the first and the last item"));
         return;
     }
 
@@ -397,7 +417,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
     int newTemp, newSpeed;
 
     if(column == 0){ // The user wants to change the temperature
-        newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, label_temperature);
+        newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, tr("Temperature (°C)"));
         if(newTemp != -1){
             newSpeed = oldSpeed;
             fanSteps.remove(oldTemp);
@@ -407,7 +427,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
         }
     } else { // The user wants to change the speed
         newTemp = oldTemp;
-        newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, label_fanSpeedRange);
+        newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (20-100)"));
         // addFanStep() will check the validity of newSpeed and overwrite the current step
         addFanStep(newTemp,newSpeed);
     }
@@ -446,7 +466,7 @@ void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
 
 void radeon_profile::on_btn_applyOverclock_clicked(){
     if( ! device.overclock(ui->slider_overclock->value()))
-        QMessageBox::warning(this, label_error, label_overclockFailed);
+        QMessageBox::warning(this, tr("Error"), tr("An error occurred, overclock failed"));
 }
 
 void radeon_profile::on_slider_overclock_valueChanged(const int value){

@@ -24,8 +24,9 @@ typedef enum tempSensor {
     TS_UNKNOWN
 } tempSensor;
 
-class dXorg
+class dXorg : public QObject
 {
+    Q_OBJECT
 public:
     static gpuClocksStruct getClocks(const QString &data);
     static QString getClocksRawData(bool forFeatures = false);
