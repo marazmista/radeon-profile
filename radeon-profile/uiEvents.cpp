@@ -242,10 +242,12 @@ void radeon_profile::on_cb_gpuData_toggled(bool checked)
     ui->l_fanSpeed->setEnabled(checked);
 
     // Enable/Disable pwm profile control
-    ui->btn_pwmProfile->setEnabled(checked);
-    ui->page_profile->setEnabled(checked);
-    if(ui->btn_pwmProfile->isChecked())
-        device.setPwmManualControl(checked);
+    if(device.features.pwmAvailable){
+        ui->btn_pwmProfile->setEnabled(checked);
+        ui->page_profile->setEnabled(checked);
+        if(ui->btn_pwmProfile->isChecked())
+            device.setPwmManualControl(checked);
+    }
 
     // Enable/Disable daemon auto update
     configureDaemonAutoRefresh((checked && ui->cb_daemonAutoRefresh->isChecked()), ui->spin_timerInterval->value());
@@ -482,4 +484,10 @@ void radeon_profile::on_cb_showAlwaysGpuSelector_toggled(const bool checked){
 void radeon_profile::on_cb_showCombo_toggled(const bool checked){
     ui->combo_pProfile->setVisible(checked);
     ui->combo_pLevel->setVisible(checked);
+}
+
+void radeon_profile::on_mainTabs_currentChanged(int index){
+    if(ui->mainTabs->indexOf(ui->graphTab) == index && ui->graphTab->isEnabled())
+        // graphTab tabs are not replotted when not visible, replot them when graphTab is chosen
+        replotGraphs();
 }

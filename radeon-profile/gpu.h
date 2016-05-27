@@ -20,20 +20,13 @@ class gpu : public QObject
     Q_OBJECT
 public:
 
-    explicit gpu() {
-        currentGpuIndex = 0;
-        gpuTemeperatureData.current =
-                gpuTemeperatureData.max =
-                gpuTemeperatureData.min =
-                gpuTemeperatureData.sum = 0;
-    }
 
     gpuClocksStruct gpuClocksData;
     gpuClocksStructString gpuClocksDataString;
     gpuTemperatureStruct gpuTemeperatureData;
     gpuTemperatureStructString gpuTemeperatureDataString;
     QStringList gpuList;
-    char currentGpuIndex;
+    int currentGpuIndex = 0;
     driverFeatures features;
     QString currentPowerProfile, currentPowerLevel;
 

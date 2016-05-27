@@ -25,9 +25,9 @@ gpuClocksStruct dFglrx::getClocks(){
         QStringList gData = rx.cap(0).trimmed().split("           ");
 
         tData.coreClk = gData[0].toInt();
-        tData.coreClkOk = tData.coreClk != -1;
+        tData.coreClkOk = tData.coreClk > 0;
         tData.memClk = gData[1].toInt();
-        tData.memClkOk = tData.memClk != -1;
+        tData.memClkOk = tData.memClk > 0;
     }
     return tData;
 }

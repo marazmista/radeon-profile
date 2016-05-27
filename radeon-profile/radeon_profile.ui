@@ -663,9 +663,6 @@
                 <bold>false</bold>
                </font>
               </property>
-              <property name="verticalScrollBarPolicy">
-               <enum>Qt::ScrollBarAlwaysOn</enum>
-              </property>
               <property name="editTriggers">
                <set>QAbstractItemView::NoEditTriggers</set>
               </property>
@@ -816,15 +813,28 @@
               <property name="indentation">
                <number>2</number>
               </property>
+              <property name="columnCount">
+               <number>4</number>
+              </property>
               <attribute name="headerDefaultSectionSize">
-               <number>400</number>
+               <number>150</number>
               </attribute>
               <attribute name="headerMinimumSectionSize">
-               <number>100</number>
+               <number>50</number>
               </attribute>
               <column>
                <property name="text">
                 <string>Power level</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>GPU</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Memory</string>
                </property>
               </column>
               <column>
@@ -3084,163 +3094,206 @@
            <attribute name="title">
             <string>Graphs</string>
            </attribute>
-           <widget class="QLabel" name="label_6">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>171</width>
-              <height>24</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Line thickness:</string>
-            </property>
-           </widget>
-           <widget class="QSpinBox" name="spin_lineThick">
-            <property name="geometry">
-             <rect>
-              <x>190</x>
-              <y>10</y>
-              <width>42</width>
-              <height>24</height>
-             </rect>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>10</number>
-            </property>
-            <property name="value">
-             <number>2</number>
-            </property>
-           </widget>
-           <widget class="QTreeWidget" name="graphColorsList">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>40</y>
-              <width>300</width>
-              <height>275</height>
-             </rect>
-            </property>
-            <property name="indentation">
-             <number>5</number>
-            </property>
-            <attribute name="headerDefaultSectionSize">
-             <number>170</number>
-            </attribute>
-            <column>
-             <property name="text">
-              <string>Property</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Color</string>
-             </property>
-            </column>
-            <item>
-             <property name="text">
-              <string>Temperature background</string>
-             </property>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Line thickness:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spin_lineThick">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>10</number>
+                </property>
+                <property name="value">
+                 <number>2</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_13">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </item>
-            <item>
-             <property name="text">
-              <string>Clocks background</string>
-             </property>
+            <item row="0" column="1">
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
-            <item>
-             <property name="text">
-              <string>Voltage background</string>
-             </property>
+            <item row="1" column="0">
+             <widget class="QTreeWidget" name="graphColorsList">
+              <property name="minimumSize">
+               <size>
+                <width>300</width>
+                <height>275</height>
+               </size>
+              </property>
+              <property name="indentation">
+               <number>5</number>
+              </property>
+              <attribute name="headerDefaultSectionSize">
+               <number>170</number>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>Property</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Color</string>
+               </property>
+              </column>
+              <item>
+               <property name="text">
+                <string>Temperature background</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Clocks background</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Voltage background</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Temperature line</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>GPU clock line</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Mem clock line</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>UVD video core line</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>UVD decoder clock line</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Core voltage line</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Mem voltage line</string>
+               </property>
+              </item>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>Temperature line</string>
-             </property>
+            <item row="2" column="0">
+             <spacer name="verticalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
             </item>
-            <item>
-             <property name="text">
-              <string>GPU clock line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Mem clock line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>UVD video core line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>UVD decoder clock line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Core voltage line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Mem voltage line</string>
-             </property>
-            </item>
-           </widget>
+           </layout>
           </widget>
           <widget class="QWidget" name="tab_daemonConfig">
            <attribute name="title">
             <string>Daemon</string>
            </attribute>
-           <widget class="QCheckBox" name="cb_daemonAutoRefresh">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>211</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="toolTip">
-             <string>Good option to check. Causes that daemon gets data from system automaticly with interval when GUI is on instead of waiting for request to read this data. Interval is the same as GUI.</string>
-            </property>
-            <property name="text">
-             <string>Refresh data without request</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="btn_reconfigureDaemon">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>40</y>
-              <width>141</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="toolTip">
-             <string>Apply new configuration and send it to daemon.</string>
-            </property>
-            <property name="text">
-             <string>Reconfigure daemon</string>
-            </property>
-           </widget>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="1" column="0">
+             <widget class="QPushButton" name="btn_reconfigureDaemon">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>Apply new configuration and send it to daemon.</string>
+              </property>
+              <property name="text">
+               <string>Reconfigure daemon</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="cb_daemonAutoRefresh">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>Good option to check. Causes that daemon gets data from system automaticly with interval when GUI is on instead of waiting for request to read this data. Interval is the same as GUI.</string>
+              </property>
+              <property name="text">
+               <string>Refresh data without request</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <spacer name="horizontalSpacer_14">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="2" column="0">
+             <spacer name="verticalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>

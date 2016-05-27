@@ -134,6 +134,7 @@ private slots:
     void on_slider_overclock_valueChanged(int value);
     void on_cb_showAlwaysGpuSelector_toggled(bool checked);
     void on_cb_showCombo_toggled(bool checked);
+    void on_mainTabs_currentChanged(int index);
 
 private:
     gpu device;
@@ -163,6 +164,7 @@ private:
     void setupContextMenus();
     void refreshGpuData();
     void refreshGraphs();
+    void replotGraphs();
     void setupUiEnabledFeatures(const driverFeatures &features);
     void loadVariables();
     void updateExecLogs();

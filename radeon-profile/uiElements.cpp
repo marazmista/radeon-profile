@@ -11,6 +11,7 @@
 // === GUI setup functions === //
 void radeon_profile::setupGraphs()
 {
+    qDebug() << "Setting up graphs";
     ui->plotClocks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
     ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
 
@@ -86,6 +87,7 @@ void radeon_profile::setupGraphsStyle()
 }
 
 void radeon_profile::setupTrayIcon() {
+    qDebug() << "Setting up tray icon";
     //close //
     closeApp = new QAction(this);
     closeApp->setText(tr("Quit"));
@@ -143,6 +145,7 @@ void radeon_profile::setupTrayIcon() {
 
 void radeon_profile::setupOptionsMenu()
 {
+    qDebug() << "Setting up options menu";
     ui->btn_options->setMenu(&optionsMenu);
 
     QAction *resetMinMax = new QAction(this);
@@ -175,6 +178,7 @@ void radeon_profile::setupOptionsMenu()
 
 void radeon_profile::setupForcePowerLevelMenu() {
 
+    qDebug() << "Setting up force power level menu";
     QAction *forceAuto = new QAction(this);
     forceAuto->setText(tr("Auto"));
 
@@ -196,6 +200,7 @@ void radeon_profile::setupForcePowerLevelMenu() {
 }
 
 void radeon_profile::setupContextMenus() {
+    qDebug() << "Setting up context menus";
     QAction *copyToClipboard = new QAction(this);
     copyToClipboard->setText(tr("Copy to clipboard"));
     ui->list_glxinfo->setContextMenuPolicy(Qt::ActionsContextMenu);

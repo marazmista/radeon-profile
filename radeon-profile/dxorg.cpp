@@ -44,19 +44,14 @@ void dXorg::configure(QString gpuName) {
            // If QSharedMemory::create() returns true, it has already automatically attached
         }
 
-        dcomm->connectToDaemon();
-        if (daemonConnected()) {
-
-            dcomm->sendConfig(filePaths.clocksPath); //  Configure the daemon to read the data
-
-            reconfigureDaemon(); // Set up timer
-        } else
-            qCritical() << "Daemon is not connected, therefore it can't be configured";
+        reconfigureDaemon();
     }
 }
 
 void dXorg::reconfigureDaemon() { // Set up the timer
+    dcomm->connectToDaemon();
     if (daemonConnected()) {
+        dcomm->sendConfig(filePaths.clocksPath); //  Configure the daemon to read the data
 
         if (globalStuff::globalConfig.daemonAutoRefresh)
             dcomm->sendTimerOn(globalStuff::globalConfig.interval); // Enable timer
@@ -64,7 +59,7 @@ void dXorg::reconfigureDaemon() { // Set up the timer
             dcomm->sendTimerOff(); // Disable timer
 
     } else
-        dcomm->connectToDaemon();
+        qCritical() << "Daemon is not connected and can't be configured";
 }
 
 bool dXorg::daemonConnected() {
@@ -137,10 +132,13 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
             qWarning() << "Unable to lock the shared memory: " << sharedMem.errorString();
     }
 
-    if (data.isEmpty())
+    const QString out = QString(data).simplified();
+    if (out.isEmpty())
         qWarning() << "No data was found";
+    else
+        qDebug() << out;
 
-    return (QString)data.trimmed();
+    return out;
 }
 
 gpuClocksStruct dXorg::getClocks(const QString &data) {
@@ -167,42 +165,42 @@ gpuClocksStruct dXorg::getClocks(const QString &data) {
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()){
             tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
-            tData.coreClkOk = tData.coreClk != -1;
+            tData.coreClkOk = tData.coreClk > 0;
         }
 
         rx.setPattern("mclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()){
             tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
-            tData.memClkOk = tData.memClk != -1;
+            tData.memClkOk = tData.memClk > 0;
         }
 
         rx.setPattern("vclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
-            tData.uvdCClkOk = tData.uvdCClk != 0;
+            tData.uvdCClkOk = tData.uvdCClk > 0;
         }
 
         rx.setPattern("dclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
-            tData.uvdDClkOk = tData.uvdDClk != 0;
+            tData.uvdDClkOk = tData.uvdDClk > 0;
         }
 
         rx.setPattern("vddc:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()){
             tData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
-            tData.coreVoltOk = tData.coreVolt != -1;
+            tData.coreVoltOk = tData.coreVolt > 0;
         }
 
         rx.setPattern("vddci:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()){
             tData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
-            tData.memVoltOk = tData.memVolt != -1;
+            tData.memVoltOk = tData.memVolt > 0;
         }
 
         return tData;
@@ -214,17 +212,17 @@ gpuClocksStruct dXorg::getClocks(const QString &data) {
 
         if ((1 < count) && clocksData[1].contains("current engine clock")) {
             tData.coreClk = clocksData[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000;
-            tData.coreClkOk = tData.coreClk != -1;
+            tData.coreClkOk = tData.coreClk > 0;
         }
 
         if ((3 < count) && clocksData[3].contains("current memory clock")) {
             tData.memClk = clocksData[3].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000;
-            tData.memClkOk = tData.memClk != -1;
+            tData.memClkOk = tData.memClk > 0;
         }
 
         if ((4 < count) && clocksData[4].contains("voltage")) {
             tData.coreVolt = clocksData[4].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat();
-            tData.coreVoltOk = tData.coreVolt != -1;
+            tData.coreVoltOk = tData.coreVolt > 0;
         }
         return tData;
         break;

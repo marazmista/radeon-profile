@@ -4,14 +4,14 @@
 <context>
     <name>dXorg</name>
     <message>
-        <location filename="dxorg.cpp" line="350"/>
+        <location filename="dxorg.cpp" line="348"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
     <message>
-        <location filename="dxorg.cpp" line="380"/>
-        <location filename="dxorg.cpp" line="393"/>
-        <location filename="dxorg.cpp" line="401"/>
+        <location filename="dxorg.cpp" line="378"/>
+        <location filename="dxorg.cpp" line="391"/>
+        <location filename="dxorg.cpp" line="399"/>
         <source>No info</source>
         <translation>Nessuna info</translation>
     </message>
@@ -211,52 +211,53 @@
     <name>radeon_profile</name>
     <message>
         <location filename="radeon_profile.ui" line="20"/>
-        <location filename="radeon_profile.ui" line="3275"/>
+        <location filename="radeon_profile.ui" line="3328"/>
         <source>Radeon Profile</source>
         <translation></translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="194"/>
-        <location filename="radeon_profile.cpp" line="269"/>
+        <location filename="radeon_profile.cpp" line="272"/>
         <source>GPU temperature</source>
         <translation>Temperatura della GPU</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="152"/>
-        <location filename="radeon_profile.cpp" line="254"/>
-        <location filename="uiElements.cpp" line="44"/>
+        <location filename="radeon_profile.cpp" line="257"/>
+        <location filename="uiElements.cpp" line="45"/>
         <source>GPU clock</source>
         <translation>Clock della GPU</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="80"/>
-        <location filename="uiElements.cpp" line="39"/>
+        <location filename="uiElements.cpp" line="40"/>
         <source>Fan speed</source>
         <translation>Velocità della ventola</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="172"/>
+        <location filename="radeon_profile.ui" line="832"/>
         <source>GPU</source>
         <translation></translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="242"/>
-        <location filename="radeon_profile.cpp" line="256"/>
-        <location filename="uiElements.cpp" line="45"/>
+        <location filename="radeon_profile.cpp" line="259"/>
+        <location filename="uiElements.cpp" line="46"/>
         <source>Memory clock</source>
         <translation>Clock della memoria</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="266"/>
-        <location filename="radeon_profile.cpp" line="262"/>
-        <location filename="uiElements.cpp" line="51"/>
+        <location filename="radeon_profile.cpp" line="267"/>
+        <location filename="uiElements.cpp" line="52"/>
         <source>GPU voltage</source>
         <translation>Voltaggio della GPU</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="128"/>
-        <location filename="radeon_profile.cpp" line="264"/>
-        <location filename="uiElements.cpp" line="52"/>
+        <location filename="radeon_profile.cpp" line="265"/>
+        <location filename="uiElements.cpp" line="53"/>
         <source>I/O voltage</source>
         <translation>Voltaggio dell&apos;I/O</translation>
     </message>
@@ -267,13 +268,13 @@
     </message>
     <message>
         <location filename="radeon_profile.ui" line="416"/>
-        <location filename="radeon_profile.ui" line="3142"/>
+        <location filename="radeon_profile.ui" line="3164"/>
         <source>Property</source>
         <translation>Proprietà</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="421"/>
-        <location filename="radeon_profile.ui" line="773"/>
+        <location filename="radeon_profile.ui" line="770"/>
         <source>Value</source>
         <translation>Valore</translation>
     </message>
@@ -289,44 +290,44 @@
     </message>
     <message>
         <location filename="radeon_profile.ui" line="516"/>
-        <location filename="uiElements.cpp" line="106"/>
+        <location filename="uiElements.cpp" line="108"/>
         <source>DPM</source>
         <translation></translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="543"/>
-        <location filename="radeon_profile.ui" line="1298"/>
-        <location filename="uiElements.cpp" line="179"/>
+        <location filename="radeon_profile.ui" line="1308"/>
+        <location filename="uiElements.cpp" line="183"/>
         <source>Auto</source>
         <translation></translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="556"/>
-        <location filename="uiElements.cpp" line="112"/>
+        <location filename="uiElements.cpp" line="114"/>
         <source>Battery</source>
         <translation>Batteria</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="576"/>
-        <location filename="uiElements.cpp" line="114"/>
+        <location filename="uiElements.cpp" line="116"/>
         <source>Balanced</source>
         <translation>Bilanciato</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="593"/>
-        <location filename="uiElements.cpp" line="116"/>
+        <location filename="uiElements.cpp" line="118"/>
         <source>Performance</source>
         <translation></translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="610"/>
-        <location filename="uiElements.cpp" line="182"/>
+        <location filename="uiElements.cpp" line="186"/>
         <source>Low</source>
         <translation>Basso</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="623"/>
-        <location filename="uiElements.cpp" line="185"/>
+        <location filename="uiElements.cpp" line="189"/>
         <source>High</source>
         <translation>Alto</translation>
     </message>
@@ -336,46 +337,45 @@
         <translation>Informazioni GLX</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="678"/>
-        <location filename="radeon_profile.ui" line="2970"/>
+        <location filename="radeon_profile.ui" line="675"/>
+        <location filename="radeon_profile.ui" line="2980"/>
         <source>Connectors</source>
         <translation>Connettori</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="715"/>
+        <location filename="radeon_profile.ui" line="712"/>
         <source>Connector</source>
         <translation>Componente</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="720"/>
+        <location filename="radeon_profile.ui" line="717"/>
         <source>Status</source>
         <translation>Stato</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="729"/>
+        <location filename="radeon_profile.ui" line="726"/>
         <source>Module info</source>
         <translation>Informazioni del modulo</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="768"/>
+        <location filename="radeon_profile.ui" line="765"/>
         <source>Option</source>
         <translation>Opzione</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="778"/>
+        <location filename="radeon_profile.ui" line="775"/>
         <source>Description</source>
         <translation>Descrizione</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="787"/>
+        <location filename="radeon_profile.ui" line="784"/>
         <source>Stats</source>
         <translation>Statistiche</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="296"/>
         <location filename="radeon_profile.ui" line="827"/>
-        <location filename="radeon_profile.cpp" line="252"/>
-        <location filename="radeon_profile.cpp" line="415"/>
+        <location filename="radeon_profile.cpp" line="255"/>
         <source>Power level</source>
         <translation>Livello di potenza</translation>
     </message>
@@ -412,80 +412,80 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="832"/>
+        <location filename="radeon_profile.ui" line="842"/>
         <source>Time</source>
         <translation>Tempo</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="845"/>
-        <location filename="radeon_profile.ui" line="2931"/>
-        <location filename="radeon_profile.ui" line="3085"/>
+        <location filename="radeon_profile.ui" line="855"/>
+        <location filename="radeon_profile.ui" line="2941"/>
+        <location filename="radeon_profile.ui" line="3095"/>
         <source>Graphs</source>
         <translation>Grafici</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1081"/>
+        <location filename="radeon_profile.ui" line="1091"/>
         <source>Reset min max temps and graphs scale</source>
         <translation>Resetta la scala del grafico</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1084"/>
+        <location filename="radeon_profile.ui" line="1094"/>
         <source>Options</source>
         <translation>Opzioni</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1042"/>
+        <location filename="radeon_profile.ui" line="1052"/>
         <source>Clocks graph</source>
         <translation>Grafico dei clock</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1058"/>
+        <location filename="radeon_profile.ui" line="1068"/>
         <source>Volts graph</source>
         <translation>Grafico dei voltaggi</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1026"/>
+        <location filename="radeon_profile.ui" line="1036"/>
         <source>Temperature graph</source>
         <translation>Grafico delle temperature</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="959"/>
+        <location filename="radeon_profile.ui" line="969"/>
         <source>1h</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="912"/>
+        <location filename="radeon_profile.ui" line="922"/>
         <source>30s</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="892"/>
+        <location filename="radeon_profile.ui" line="902"/>
         <source>temps label</source>
         <translation>Temperature</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1278"/>
+        <location filename="radeon_profile.ui" line="1288"/>
         <source>Fan Control</source>
         <translation>Controllo ventola</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1323"/>
+        <location filename="radeon_profile.ui" line="1333"/>
         <source>Fixed</source>
         <translation>Fisso</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1345"/>
+        <location filename="radeon_profile.ui" line="1355"/>
         <source>Custom curve</source>
         <translation>Curva personalizzata</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1368"/>
+        <location filename="radeon_profile.ui" line="1378"/>
         <source>Info</source>
         <translation>Informazioni</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1242"/>
-        <location filename="radeon_profile.ui" line="1391"/>
+        <location filename="radeon_profile.ui" line="1252"/>
+        <location filename="radeon_profile.ui" line="1401"/>
         <source>Apply</source>
         <translation>Applica</translation>
     </message>
@@ -495,539 +495,544 @@
         <translation>Solo per linux &lt; 3.13</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1095"/>
+        <location filename="radeon_profile.ui" line="837"/>
+        <source>Memory</source>
+        <translation>Memoria</translation>
+    </message>
+    <message>
+        <location filename="radeon_profile.ui" line="1105"/>
         <source>Overclock</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1138"/>
+        <location filename="radeon_profile.ui" line="1148"/>
         <source>Be careful! Overclock can harm your GPU, use it only if you know what you are doing!</source>
         <oldsource>Be careful! Overclock can harm your GPU, use it at your own risk!</oldsource>
         <translation>Stai attento! L&apos;overclock può danneggiare la tua GPU, usalo solo se sai quello che stai facendo!</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1163"/>
+        <location filename="radeon_profile.ui" line="1173"/>
         <source>Enable overclock</source>
         <translation>Abilita overclock</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1173"/>
+        <location filename="radeon_profile.ui" line="1183"/>
         <source>Apply at launch</source>
         <oldsource>Apply on startup</oldsource>
         <translation>Applica all&apos;avvio</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1413"/>
-        <location filename="radeon_profile.ui" line="1442"/>
+        <location filename="radeon_profile.ui" line="1423"/>
+        <location filename="radeon_profile.ui" line="1452"/>
         <source>20%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1455"/>
+        <location filename="radeon_profile.ui" line="1465"/>
         <source> / 100%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1482"/>
+        <location filename="radeon_profile.ui" line="1492"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1487"/>
+        <location filename="radeon_profile.ui" line="1497"/>
         <source>Fan Speed [%]</source>
         <translation>Velocità ventola [%]</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1509"/>
+        <location filename="radeon_profile.ui" line="1519"/>
         <source>Add step</source>
         <translation>Aggiungi punto</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1528"/>
+        <location filename="radeon_profile.ui" line="1538"/>
         <source>Remove step</source>
         <translation>Rimuovi punto</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="1554"/>
+        <location filename="radeon_profile.ui" line="1564"/>
         <source>Exec</source>
         <translation>Eseguibili</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2014"/>
+        <location filename="radeon_profile.ui" line="2024"/>
         <source>Warning! Unrecommended root mode!</source>
         <translation>ATTENZIONE! L&apos;esecuzione di comandi in modalità root è sconsigliata!</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2036"/>
+        <location filename="radeon_profile.ui" line="2046"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2041"/>
+        <location filename="radeon_profile.ui" line="2051"/>
         <source>Binary</source>
         <translation>Comando</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2046"/>
+        <location filename="radeon_profile.ui" line="2056"/>
         <source>Params</source>
         <translation>Parametri</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2051"/>
+        <location filename="radeon_profile.ui" line="2061"/>
         <source>Setting</source>
         <translation>Opzioni</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2056"/>
+        <location filename="radeon_profile.ui" line="2066"/>
         <source>Log file</source>
         <translation>File di log</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2061"/>
+        <location filename="radeon_profile.ui" line="2071"/>
         <source>Append date-time</source>
         <translation>Aggiungi data e ora</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2071"/>
+        <location filename="radeon_profile.ui" line="2081"/>
         <source>Add</source>
         <translation>Aggiungi</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2078"/>
+        <location filename="radeon_profile.ui" line="2088"/>
         <source>Modify</source>
         <translation>Modifica</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2085"/>
+        <location filename="radeon_profile.ui" line="2095"/>
         <location filename="execTab.cpp" line="144"/>
         <location filename="execTab.cpp" line="204"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2105"/>
+        <location filename="radeon_profile.ui" line="2115"/>
         <source>View output</source>
         <translation>Vedi output</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2118"/>
-        <location filename="radeon_profile.ui" line="3010"/>
+        <location filename="radeon_profile.ui" line="2128"/>
+        <location filename="radeon_profile.ui" line="3020"/>
         <location filename="execTab.cpp" line="316"/>
         <source>Run</source>
         <translation>Esegui</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2131"/>
+        <location filename="radeon_profile.ui" line="2141"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2141"/>
+        <location filename="radeon_profile.ui" line="2151"/>
         <source>Binary:</source>
         <translation>Comando:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2159"/>
-        <location filename="radeon_profile.ui" line="2196"/>
+        <location filename="radeon_profile.ui" line="2169"/>
+        <location filename="radeon_profile.ui" line="2206"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2168"/>
+        <location filename="radeon_profile.ui" line="2178"/>
         <source>Binary parameters:</source>
         <translation>Parametri:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2178"/>
+        <location filename="radeon_profile.ui" line="2188"/>
         <source>Log file: (leave empty if don&apos;t want it)</source>
         <translation>File di log (lascia vuoto se non ti interessa)</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2203"/>
+        <location filename="radeon_profile.ui" line="2213"/>
         <source>Append date and time</source>
         <translation>Aggiungi data e ora</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2221"/>
+        <location filename="radeon_profile.ui" line="2231"/>
         <source>Variables:</source>
         <translation>Variabili:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2214"/>
+        <location filename="radeon_profile.ui" line="2224"/>
         <source>Values:</source>
         <translation>Valori:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2259"/>
+        <location filename="radeon_profile.ui" line="2269"/>
         <source>Summary:</source>
         <translation>Sommario:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2281"/>
+        <location filename="radeon_profile.ui" line="2291"/>
         <source>Be careful, remember to save one space between variables.</source>
         <translation>Procedi con cautela, ricorda di aggiungere uno spazio fra le variabili.</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2284"/>
+        <location filename="radeon_profile.ui" line="2294"/>
         <source>Tune variables manually</source>
         <translation>Modifica le variabili manualmente</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2711"/>
+        <location filename="radeon_profile.ui" line="2721"/>
         <source>Proceed with caution now.</source>
         <translation>Procedi con cautela.</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2731"/>
+        <location filename="radeon_profile.ui" line="2741"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2738"/>
+        <location filename="radeon_profile.ui" line="2748"/>
         <source>OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2778"/>
+        <location filename="radeon_profile.ui" line="2788"/>
         <source>Configuration</source>
         <translation>Impostazioni</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2803"/>
+        <location filename="radeon_profile.ui" line="2813"/>
         <source>Main</source>
         <translation>Generali</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2809"/>
+        <location filename="radeon_profile.ui" line="2819"/>
         <source>Start minimized</source>
         <translation>Avvia minimizzato</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2822"/>
+        <location filename="radeon_profile.ui" line="2832"/>
         <source>Minimize to tray</source>
         <translation>Minimizza nella barra delle applicazioni</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2835"/>
+        <location filename="radeon_profile.ui" line="2845"/>
         <source>On close hide to tray</source>
         <translation>Minimizza invece di chiudere</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2842"/>
+        <location filename="radeon_profile.ui" line="2852"/>
         <source>Save window geometry</source>
         <translation>Salva la geometria della finestra</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2849"/>
+        <location filename="radeon_profile.ui" line="2859"/>
         <source>Alternate row colors on lists</source>
         <translation>Alterna i colori delle righe nelle liste</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2864"/>
+        <location filename="radeon_profile.ui" line="2874"/>
         <source>Refresh interval [s]</source>
         <translation>Intervallo di refresh [s]</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2908"/>
+        <location filename="radeon_profile.ui" line="2918"/>
         <source>Update:</source>
         <translation>Aggiornamento:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2915"/>
+        <location filename="radeon_profile.ui" line="2925"/>
         <source>GPU data, power profile, temperature</source>
         <translation>Dati GPU, profili, temperatura</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2941"/>
+        <location filename="radeon_profile.ui" line="2951"/>
         <source>Power levels statistics</source>
         <translation>Statistiche sul livello di potenza</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2957"/>
+        <location filename="radeon_profile.ui" line="2967"/>
         <source>GLX Info</source>
         <translation>Informazioni GLX</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2983"/>
+        <location filename="radeon_profile.ui" line="2993"/>
         <source>Module parameters</source>
         <translation>Parametri dei moduli</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3015"/>
+        <location filename="radeon_profile.ui" line="3025"/>
         <source>Edit</source>
         <translation>Modifica</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3002"/>
+        <location filename="radeon_profile.ui" line="3012"/>
         <source>Double click action on exec item</source>
         <translation>Doppio click su un eseguibile</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="2990"/>
+        <location filename="radeon_profile.ui" line="3000"/>
         <source>Explicit append system env to exec command</source>
         <translation>Comando esplicito di aggiunta di data e ora</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3038"/>
+        <location filename="radeon_profile.ui" line="3048"/>
         <source>Always show gpu selector</source>
         <translation>Mostra sempre il selettore della GPU</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3048"/>
+        <location filename="radeon_profile.ui" line="3058"/>
         <source>Show profile and power level selector</source>
         <translation>Mostra i selettori di profilo e potenza</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3097"/>
+        <location filename="radeon_profile.ui" line="3103"/>
         <source>Line thickness:</source>
         <translation>Spessore della linea:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3147"/>
+        <location filename="radeon_profile.ui" line="3169"/>
         <source>Color</source>
         <translation>Colore</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3152"/>
+        <location filename="radeon_profile.ui" line="3174"/>
         <source>Temperature background</source>
         <translation>Sfondo temperature</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3157"/>
+        <location filename="radeon_profile.ui" line="3179"/>
         <source>Clocks background</source>
         <translation>Sfondo clock</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3162"/>
+        <location filename="radeon_profile.ui" line="3184"/>
         <source>Voltage background</source>
         <translation>Sfondo voltaggi</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3167"/>
+        <location filename="radeon_profile.ui" line="3189"/>
         <source>Temperature line</source>
         <translation>Temperatura GPU</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3172"/>
+        <location filename="radeon_profile.ui" line="3194"/>
         <source>GPU clock line</source>
         <translation>Clock della GPU</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3177"/>
+        <location filename="radeon_profile.ui" line="3199"/>
         <source>Mem clock line</source>
         <translation>Clock della memoria</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3182"/>
+        <location filename="radeon_profile.ui" line="3204"/>
         <source>UVD video core line</source>
         <translation>UVD video core</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3187"/>
+        <location filename="radeon_profile.ui" line="3209"/>
         <source>UVD decoder clock line</source>
         <translation>Decoder UVD</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3192"/>
+        <location filename="radeon_profile.ui" line="3214"/>
         <source>Core voltage line</source>
         <translation>Voltaggio della GPU</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3197"/>
+        <location filename="radeon_profile.ui" line="3219"/>
         <source>Mem voltage line</source>
         <translation>Voltaggio della memoria</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3204"/>
+        <location filename="radeon_profile.ui" line="3241"/>
         <source>Daemon</source>
         <translation>Background</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3219"/>
+        <location filename="radeon_profile.ui" line="3263"/>
         <source>Good option to check. Causes that daemon gets data from system automaticly with interval when GUI is on instead of waiting for request to read this data. Interval is the same as GUI.</source>
         <translation>Il servizio in background aggiornerà i dati automaticamente quando la GUI è attiva (consigliato).</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3222"/>
+        <location filename="radeon_profile.ui" line="3266"/>
         <source>Refresh data without request</source>
         <translation>Aggiorna dati automaticamente</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3238"/>
+        <location filename="radeon_profile.ui" line="3250"/>
         <source>Apply new configuration and send it to daemon.</source>
         <translation>Applica le opzioni e riconfigura il servizio in background.</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3241"/>
+        <location filename="radeon_profile.ui" line="3253"/>
         <source>Reconfigure daemon</source>
         <translation>Riconfigura il demone</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3251"/>
+        <location filename="radeon_profile.ui" line="3304"/>
         <source>About</source>
         <translation>Dettagli</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3321"/>
+        <location filename="radeon_profile.ui" line="3374"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Go to GitHub repository&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Vai alla repository su GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3504"/>
+        <location filename="radeon_profile.ui" line="3557"/>
         <source>External resources:</source>
         <translation>Risorse esterne:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3462"/>
+        <location filename="radeon_profile.ui" line="3515"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.qcustomplot.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;QCustomPlot library&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.qcustomplot.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;QCustomPlot&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3483"/>
+        <location filename="radeon_profile.ui" line="3536"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Icon&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Icona&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3342"/>
+        <location filename="radeon_profile.ui" line="3395"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile-daemon&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Radeon profile daemon&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3519"/>
+        <location filename="radeon_profile.ui" line="3572"/>
         <source>Contributors:</source>
         <translation>Contributori:</translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3378"/>
+        <location filename="radeon_profile.ui" line="3431"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Marazmista&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3420"/>
+        <location filename="radeon_profile.ui" line="3473"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/Danysan1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Danysan1&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3399"/>
+        <location filename="radeon_profile.ui" line="3452"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/V10lator&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;V10lator&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="radeon_profile.ui" line="3441"/>
+        <location filename="radeon_profile.ui" line="3494"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/pontostroy&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Pontostroy&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="17"/>
-        <location filename="uiElements.cpp" line="19"/>
-        <location filename="uiElements.cpp" line="21"/>
+        <location filename="uiElements.cpp" line="18"/>
+        <location filename="uiElements.cpp" line="20"/>
+        <location filename="uiElements.cpp" line="22"/>
         <source>Time (s)</source>
         <translation>Tempo (s)</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="18"/>
-        <location filename="uiElements.cpp" line="38"/>
-        <location filename="uiEvents.cpp" line="369"/>
-        <location filename="uiEvents.cpp" line="420"/>
+        <location filename="uiElements.cpp" line="19"/>
+        <location filename="uiElements.cpp" line="39"/>
+        <location filename="uiEvents.cpp" line="371"/>
+        <location filename="uiEvents.cpp" line="422"/>
         <source>Temperature (°C)</source>
         <translation>Temperatura (°C)</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="20"/>
+        <location filename="uiElements.cpp" line="21"/>
         <source>Clock (MHz)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="22"/>
+        <location filename="uiElements.cpp" line="23"/>
         <source>Voltage (mV)</source>
         <translation>Voltaggio (mV)</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="91"/>
+        <location filename="uiElements.cpp" line="93"/>
         <source>Quit</source>
         <translation>Esci</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="96"/>
+        <location filename="uiElements.cpp" line="98"/>
         <source>Change standard profile</source>
         <translation>Cambia profilo standard</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="103"/>
+        <location filename="uiElements.cpp" line="105"/>
         <source>Keep refreshing when hidden</source>
         <translation>Continua a aggiornare quando nascosto</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="149"/>
+        <location filename="uiElements.cpp" line="152"/>
         <source>Reset min/max temperature</source>
         <translation>Resetta temperatura min/max</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="152"/>
+        <location filename="uiElements.cpp" line="155"/>
         <source>Reset graphs vertical scale</source>
         <translation>Resetta scala verticale dei grafici</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="155"/>
+        <location filename="uiElements.cpp" line="158"/>
         <source>Show legend</source>
         <translation>Mostra la legenda</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="160"/>
+        <location filename="uiElements.cpp" line="163"/>
         <source>Graph offset on right</source>
         <translation>Offset del grafico a destra</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="187"/>
+        <location filename="uiElements.cpp" line="191"/>
         <source>Force power level</source>
         <translation>Forza il livello di potenza</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="200"/>
-        <location filename="uiElements.cpp" line="206"/>
+        <location filename="uiElements.cpp" line="205"/>
+        <location filename="uiElements.cpp" line="211"/>
         <source>Copy to clipboard</source>
         <translation>Copia negli appunti</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="212"/>
+        <location filename="uiElements.cpp" line="217"/>
         <source>Reset statistics</source>
         <translation>Resetta le statistiche</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="126"/>
+        <location filename="radeon_profile.cpp" line="127"/>
         <source>version %n</source>
         <translation>versione %n</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="140"/>
+        <location filename="radeon_profile.cpp" line="141"/>
         <source>Back to profiles</source>
         <translation>Ritorna ai profili</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="210"/>
+        <location filename="radeon_profile.cpp" line="213"/>
         <source>Your driver or your GPU does not support overclocking</source>
         <translation>Il tuo driver o la tua GPU non supporta l&apos;overclock</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="211"/>
-        <location filename="radeon_profile.cpp" line="267"/>
+        <location filename="radeon_profile.cpp" line="214"/>
+        <location filename="radeon_profile.cpp" line="270"/>
         <source>You need debugfs mounted and either root rights or the daemon running</source>
         <translation>È necessario che debugfs sia montato e che il demone sia attivo (o che il programma venga eseguito come root)</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="258"/>
-        <location filename="uiElements.cpp" line="46"/>
+        <location filename="radeon_profile.cpp" line="261"/>
+        <location filename="uiElements.cpp" line="47"/>
         <source>UVD core clock</source>
         <translation>Clock del UVD</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="260"/>
-        <location filename="uiElements.cpp" line="47"/>
+        <location filename="radeon_profile.cpp" line="263"/>
+        <location filename="uiElements.cpp" line="48"/>
         <source>UVD decoder clock</source>
         <translation>Clock del decoder UVD</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="267"/>
+        <location filename="radeon_profile.cpp" line="270"/>
         <source>Can&apos;t read data</source>
         <translation>Impossibile leggere i dati</translation>
     </message>
@@ -1036,10 +1041,10 @@
         <location filename="execTab.cpp" line="64"/>
         <location filename="execTab.cpp" line="74"/>
         <location filename="execTab.cpp" line="289"/>
-        <location filename="uiEvents.cpp" line="374"/>
-        <location filename="uiEvents.cpp" line="391"/>
-        <location filename="uiEvents.cpp" line="412"/>
-        <location filename="uiEvents.cpp" line="469"/>
+        <location filename="uiEvents.cpp" line="376"/>
+        <location filename="uiEvents.cpp" line="393"/>
+        <location filename="uiEvents.cpp" line="414"/>
+        <location filename="uiEvents.cpp" line="471"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
@@ -1105,32 +1110,32 @@
         <translation>Dati della GPU disabilitati</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="326"/>
+        <location filename="uiEvents.cpp" line="328"/>
         <source>Select new power profile</source>
         <translation>Seleziona il profilo di potenza</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="326"/>
+        <location filename="uiEvents.cpp" line="328"/>
         <source>Profile selection</source>
         <translation>Selezione del profilo</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="349"/>
+        <location filename="uiEvents.cpp" line="351"/>
         <source>Process is still running. Close tab?</source>
         <translation>Il processo è ancora attivo. Chiudere comunque?</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="349"/>
+        <location filename="uiEvents.cpp" line="351"/>
         <source>Process running</source>
         <translation>Processo in esecuzione</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="363"/>
+        <location filename="uiEvents.cpp" line="365"/>
         <source>Fan control information</source>
         <translation>Informazioni sul controllo della ventola</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="364"/>
+        <location filename="uiEvents.cpp" line="366"/>
         <source>Don&apos;t overheat your card! Be careful! Don&apos;t use this if you don&apos;t know what you&apos;re doing! 
 
 Hovewer, looks like card won&apos;t apply too low values due its internal protection. 
@@ -1143,28 +1148,28 @@ Il sistema di protezione della scheda grafica non accetta valori troppo bassi.
 Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola su Auto. Se l&apos;applicazione va in crash, l&apos;ultimo valore usato rimarrà attivo. Sei stato avvertito!</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="374"/>
+        <location filename="uiEvents.cpp" line="376"/>
         <source>This step already exists. To edit it double click it</source>
         <translation>Questo elemento è gia presente. Per modificarlo fai doppio click</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="376"/>
-        <location filename="uiEvents.cpp" line="430"/>
+        <location filename="uiEvents.cpp" line="378"/>
+        <location filename="uiEvents.cpp" line="432"/>
         <source>Speed [%] (20-100)</source>
         <translation>Velocità [%] (20-100)</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="391"/>
+        <location filename="uiEvents.cpp" line="393"/>
         <source>You can&apos;t delete the first and the last item</source>
         <translation>Non puoi cancellare il primo e l&apos;ultimo elemento</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="412"/>
+        <location filename="uiEvents.cpp" line="414"/>
         <source>You can&apos;t edit the first and the last item</source>
         <translation>Non puoi modificare il primo e l&apos;ultimo elemento</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="469"/>
+        <location filename="uiEvents.cpp" line="471"/>
         <source>An error occurred, overclock failed</source>
         <translation>Si è verificato un errore, overclock fallito</translation>
     </message>

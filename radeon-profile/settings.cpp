@@ -84,6 +84,7 @@ void radeon_profile::saveConfig() {
 }
 
 void radeon_profile::loadConfig() {
+    qDebug() << "Loading config from" << radeon_profile::settingsPath;
     QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
 
     ui->cb_startMinimized->setChecked(settings.value("startMinimized",false).toBool());
