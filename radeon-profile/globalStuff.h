@@ -144,7 +144,7 @@
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
-#define appVersion 20160515
+#define appVersion 20160527
 #define format_version QObject::tr("version %n", NULL, appVersion)
 
 

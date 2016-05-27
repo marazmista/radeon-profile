@@ -228,8 +228,8 @@ void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, c
 // -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
 // did not alter it, it stays and in result will be not displayed
 void radeon_profile::refreshUI() {
-    ui->l_mClk->setText(device.gpuClocksDataString.coreClk);
-    ui->l_cClk->setText(device.gpuClocksDataString.memClk);
+    ui->l_cClk->setText(device.gpuClocksDataString.coreClk);
+    ui->l_mClk->setText(device.gpuClocksDataString.memClk);
     ui->l_mVolt->setText(device.gpuClocksDataString.memVolt);
     ui->l_cVolt->setText(device.gpuClocksDataString.coreVolt);
 
