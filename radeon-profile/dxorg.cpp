@@ -90,8 +90,8 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     filePaths.profilePath = devicePath + file_powerProfile;
     filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
     filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
-    filePaths.moduleParamsPath = devicePath + "driver/module/holders/radeon/parameters/";
-    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info"; // this path contains only index
+    filePaths.moduleParamsPath = devicePath + "driver/module/holders/amdgpu/parameters/";
+    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/amdgpu_pm_info"; // this path contains only index
     //  filePaths.clocksPath = "/tmp/radeon_pm_info"; // testing
     filePaths.overDrivePath = devicePath + file_overclockLevel;
 
