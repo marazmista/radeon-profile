@@ -49,6 +49,21 @@
        </size>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
+       <property name="leftMargin">
+        <number>1</number>
+       </property>
+       <property name="topMargin">
+        <number>1</number>
+       </property>
+       <property name="rightMargin">
+        <number>1</number>
+       </property>
+       <property name="bottomMargin">
+        <number>1</number>
+       </property>
+       <property name="spacing">
+        <number>1</number>
+       </property>
        <item row="0" column="6">
         <spacer name="horizontalSpacer_7">
          <property name="orientation">
@@ -66,7 +81,7 @@
         <widget class="QLabel" name="l_fanSpeed">
          <property name="minimumSize">
           <size>
-           <width>70</width>
+           <width>80</width>
            <height>0</height>
           </size>
          </property>
@@ -139,7 +154,7 @@
         <widget class="QLabel" name="l_cClk">
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>70</width>
            <height>0</height>
           </size>
          </property>
@@ -180,7 +195,7 @@
         <widget class="QLabel" name="l_temp">
          <property name="minimumSize">
           <size>
-           <width>100</width>
+           <width>110</width>
            <height>0</height>
           </size>
          </property>
@@ -253,7 +268,7 @@
         <widget class="QLabel" name="l_cVolt">
          <property name="minimumSize">
           <size>
-           <width>50</width>
+           <width>60</width>
            <height>0</height>
           </size>
          </property>
@@ -896,6 +911,8 @@
              <property name="font">
               <font>
                <family>Monospace</family>
+               <weight>75</weight>
+               <bold>true</bold>
               </font>
              </property>
              <property name="text">
@@ -1066,6 +1083,9 @@
              </property>
              <property name="text">
               <string>Volts graph</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>

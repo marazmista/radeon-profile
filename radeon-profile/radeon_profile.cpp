@@ -275,18 +275,20 @@ void radeon_profile::refreshUI() {
 
 void radeon_profile::updateExecLogs() {
     for (execBin *exe : execsRunning) {
-        if (exe->state() == QProcess::Running && exe->logEnabled)
-            exe->appendToLog(QDateTime::currentDateTime().toString(Qt::ISODate) +
-                             ": Level " + device.gpuClocksDataString.powerLevel +
-                             ", GPU " + device.gpuClocksDataString.coreClk +
-                             "/" + device.gpuClocksDataString.coreVolt +
-                             ", Mem " +device.gpuClocksDataString.memClk +
-                             "/" + device.gpuClocksDataString.memVolt +
-                             ", UVD " + device.gpuClocksDataString.uvdCClk +
-                             "/" + device.gpuClocksDataString.uvdDClk +
-                             ", Temp " + device.gpuTemeperatureDataString.current);
+        if (exe->state() == QProcess::Running && exe->logEnabled) {
+            QString logData = QDateTime::currentDateTime().toString(logDateFormat) +";" + device.gpuClocksDataString.powerLevel + ";" +
+                    device.gpuClocksDataString.coreClk + ";"+
+                    device.gpuClocksDataString.memClk + ";"+
+                    device.gpuClocksDataString.uvdCClk + ";"+
+                    device.gpuClocksDataString.uvdDClk + ";"+
+                    device.gpuClocksDataString.coreVolt + ";"+
+                    device.gpuClocksDataString.memVolt + ";"+
+                    device.gpuTemeperatureDataString.current;
+            exe->appendToLog(logData);
+        }
     }
 }
+
 //===================================
 // === Main timer loop  === //
 void radeon_profile::timerEvent() {

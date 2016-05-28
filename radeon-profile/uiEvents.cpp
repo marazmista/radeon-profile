@@ -222,12 +222,15 @@ void radeon_profile::on_cb_gpuData_toggled(bool checked)
 
     if (ui->cb_stats->isChecked())
         ui->tab_stats->setEnabled(checked);
+    resetStats();
 
     if (ui->cb_graphs->isChecked())
         ui->graphTab->setEnabled(checked);
+    ui->l_minMaxTemp->setText(tr("GPU data is disabled"));
 
     // Enable/Disable the GPU data list
     if (!checked) {
+        ui->list_stats->insertTopLevelItem(0, new QTreeWidgetItem(QStringList() << "" << "" << "" << tr("GPU data is disabled")));
         ui->list_currentGPUData->clear();
         ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << tr("GPU data is disabled")));
     }
@@ -242,12 +245,11 @@ void radeon_profile::on_cb_gpuData_toggled(bool checked)
     ui->l_fanSpeed->setEnabled(checked);
 
     // Enable/Disable pwm profile control
-    if(device.features.pwmAvailable){
-        ui->btn_pwmProfile->setEnabled(checked);
-        ui->page_profile->setEnabled(checked);
-        if(ui->btn_pwmProfile->isChecked())
-            device.setPwmManualControl(checked);
-    }
+    const bool enableProfile = checked && device.features.pwmAvailable;
+    ui->btn_pwmProfile->setEnabled(enableProfile);
+    ui->page_profile->setEnabled(enableProfile);
+    if(ui->btn_pwmProfile->isChecked())
+        device.setPwmManualControl(enableProfile);
 
     // Enable/Disable daemon auto update
     configureDaemonAutoRefresh((checked && ui->cb_daemonAutoRefresh->isChecked()), ui->spin_timerInterval->value());
@@ -280,9 +282,9 @@ void radeon_profile::on_cb_stats_toggled(bool checked)
     ui->tab_stats->setEnabled(checked);
 
     // reset stats data
-    statsTickCounter = 0;
+    resetStats();
     if (!checked)
-        resetStats();
+        ui->list_stats->insertTopLevelItem(0, new QTreeWidgetItem(QStringList() << "" << "" << "" << tr("Stats disabled")));
 }
 
 void radeon_profile::copyGlxInfoToClipboard() {

@@ -33,6 +33,7 @@
 #define file_powerDpmForcePerformanceLevel "power_dpm_force_performance_level"
 #define file_overclockLevel "pp_sclk_od"
 
+#define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
 #define appVersion 20160515
 

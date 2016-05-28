@@ -133,15 +133,16 @@ void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
 
         // look for this variable in list
         int varIndex = selectedVariableVaules.indexOf(QRegExp(text+".+",Qt::CaseInsensitive),0);
+        const bool varAlreadyPresent = varIndex != -1;
         if (!input.isEmpty() && ok) {
             // if value was ok
-            if (varIndex == -1)
+            if ( ! varAlreadyPresent)
                 // add it to list
                 selectedVariableVaules.append(text+"="+input);
             else
                 // replace if already exists
                 selectedVariableVaules[varIndex] = text+"=\""+input+"\"";
-        } else if (((varIndex != -1) || ok) && askConfirmation(tr("Remove"), tr("Remove this item?"))) {
+        } else if (varAlreadyPresent &&  ok && askConfirmation(tr("Remove"), tr("Remove this item?"))) {
             // hehe, looks weird but check ok status is for, when input was empty, and whether user click ok or cancel, dispaly quesion
             selectedVariableVaules.removeAt(varIndex);
         }
@@ -280,6 +281,7 @@ void radeon_profile::on_btn_runExecProfile_clicked()
                 logFile += '.' + QDateTime::currentDateTime().toString(Qt::ISODate);
             exe->setLogFilename(logFile);
             exe->appendToLog("Profile: " + name +"\n App: " + binary + "\n Params: " + params + "\n Env: " + settings);
+            exe->appendToLog("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci); temp");
         }
         execsRunning.append(exe);
         ui->tabs_execOutputs->setCurrentWidget(exe->tab);
