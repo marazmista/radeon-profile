@@ -37,11 +37,19 @@ static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
     "/usr/share/hwdata/pnp.ids"
 };
 
+QString gpu::driverModule;
+
 gpu::driver gpu::detectDriver() {
     QStringList out = globalStuff::grabSystemInfo("lsmod");
 
-    if (!out.filter("radeon").isEmpty())
+    if (!out.filter("radeon").isEmpty()) {
+        gpu::driverModule = "radeon";
         return XORG;
+    }
+    if (!out.filter("amdgpu").isEmpty()) {
+        gpu::driverModule = "amdgpu";
+        return XORG;
+    }
     if (!out.filter("fglrx").isEmpty())
         return FGLRX;
 

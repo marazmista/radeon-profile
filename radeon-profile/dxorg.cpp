@@ -2,6 +2,7 @@
 
 #include "dxorg.h"
 #include "globalStuff.h"
+#include "gpu.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -90,8 +91,8 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     filePaths.profilePath = devicePath + file_powerProfile;
     filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
     filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
-    filePaths.moduleParamsPath = devicePath + "driver/module/holders/amdgpu/parameters/";
-    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/amdgpu_pm_info"; // this path contains only index
+    filePaths.moduleParamsPath = devicePath + "driver/module/holders/"+gpu::driverModule+"/parameters/";
+    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+gpu::driverModule+"_pm_info"; // this path contains only index
     //  filePaths.clocksPath = "/tmp/radeon_pm_info"; // testing
     filePaths.overDrivePath = devicePath + file_overclockLevel;
 
@@ -308,8 +309,8 @@ dXorg::tempSensor dXorg::testSensor() {
 
         // if above fails, use lm_sensors
         QStringList out = globalStuff::grabSystemInfo("sensors");
-        if (out.indexOf(QRegExp("radeon-pci.+")) != -1) {
-            sensorsGPUtempIndex = out.indexOf(QRegExp("radeon-pci.+"));  // in order to not search for it again in timer loop
+        if (out.indexOf(QRegExp(gpu::driverModule+"-pci.+")) != -1) {
+            sensorsGPUtempIndex = out.indexOf(QRegExp(gpu::driverModule+"-pci.+"));  // in order to not search for it again in timer loop
             return PCI_SENSOR;
         }
         else if (out.indexOf(QRegExp("VGA_TEMP.+")) != -1) {
@@ -343,7 +344,7 @@ QStringList dXorg::getGLXInfo(QProcessEnvironment env) {
 
 QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
     QList<QTreeWidgetItem *> data;
-    QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p radeon");
+    QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p "+gpu::driverModule);
     modInfo.sort();
 
     for (int i =0; i < modInfo.count(); i++) {
@@ -375,7 +376,7 @@ QStringList dXorg::detectCards() {
     for (char i = 0; i < out.count(); i++) {
         QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
         if (f.open(QIODevice::ReadOnly)) {
-            if (f.readLine(50).contains("DRIVER=radeon"))
+            if (QString(f.readLine(50)).contains("DRIVER="+gpu::driverModule))
                 data.append(f.fileName().split('/')[4]);
         }
     }
@@ -606,7 +607,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
 }
 
 globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
-    QFile f("/tmp/radeon_pm_info");
+    QFile f("/tmp/"+gpu::driverModule+"_pm_info");
     if (f.open(QIODevice::ReadOnly)) {
         globalStuff::gpuClocksStruct fallbackFeatures;
         QString s = QString(f.readAll());
