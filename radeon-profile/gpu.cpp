@@ -39,8 +39,15 @@ static const QStringList pnpIdFiles = {
 driver gpu::detectDriver() {
     QStringList out = globalStuff::grabSystemInfo("lsmod");
 
-    if (!out.filter("radeon").isEmpty())
+    if (!out.filter("radeon").isEmpty()) {
+        dXorg::driverName = "radeon";
         return XORG;
+    }
+    if (!out.filter("amdgpu").isEmpty()) {
+        dXorg::driverName = "amdgpu";
+        return XORG;
+    }
+
     if (!out.filter("fglrx").isEmpty())
         return FGLRX;
 

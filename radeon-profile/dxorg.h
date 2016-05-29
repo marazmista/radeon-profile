@@ -28,6 +28,8 @@ class dXorg : public QObject
 {
     Q_OBJECT
 public:
+    static QString driverName;
+
     static gpuClocksStruct getClocks(const QString &data);
     static QString getClocksRawData(bool forFeatures = false);
     static float getTemperature();
