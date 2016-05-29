@@ -862,10 +862,34 @@ void gpu::getPwmSpeed() {
     }
 }
 
-bool gpu::overclock(const int value){
-    if(features.overClockAvailable && (currentDriver == XORG))
-        return dXorg::overClock(value);
+bool gpu::overclockGPU(const int value){
+    if(features.GPUoverClockAvailable){
+        switch(currentDriver){
+        case XORG:
+            return dXorg::overClockGPU(value);
+            break;
+        case FGLRX:
+        case DRIVER_UNKNOWN:
+            break;
+        }
+    }
 
-    qWarning() << "Error overclocking: overclocking is not supported";
+    qWarning() << "Error overclocking GPU: overclocking is not supported";
+    return false;
+}
+
+bool gpu::overclockMemory(const int value){
+    if(features.GPUoverClockAvailable){
+        switch(currentDriver){
+        case XORG:
+            return dXorg::overClockMemory(value);
+            break;
+        case FGLRX:
+        case DRIVER_UNKNOWN:
+            break;
+        }
+    }
+
+    qWarning() << "Error overclocking memory: overclocking is not supported";
     return false;
 }

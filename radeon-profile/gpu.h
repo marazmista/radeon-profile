@@ -54,7 +54,19 @@ public:
     void reconfigureDaemon();
     bool daemonConnected();
 
-    bool overclock(int value);
+    /**
+     * @brief overclockGPU Overclock the GPU core clock by a percentage
+     * @param value Percentage to overclock
+     * @return True if the overclock is successful, false otherwise
+     */
+    bool overclockGPU(int value);
+
+    /**
+     * @brief overclockMemory Overclock the GPU memory clock by a percentage
+     * @param value Percentage to overclock
+     * @return True if the overclock is successful, false otherwise
+     */
+    bool overclockMemory(int value);
 
 private:
     driver currentDriver;

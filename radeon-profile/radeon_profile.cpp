@@ -208,13 +208,24 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
         ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
     }
 
-    if( ! features.overClockAvailable){
+    if( ! features.GPUoverClockAvailable && ! features.memoryOverclockAvailable){
         ui->label_overclock->setText((globalStuff::globalConfig.rootMode || device.daemonConnected()) ?
                                          tr("Your driver or your GPU does not support overclocking") :
                                          tr("You need debugfs mounted and either root rights or the daemon running"));
 
         ui->cb_enableOverclock->setChecked(false);
         ui->overclockTab->setEnabled(false);
+    } else {
+        const bool gpuOcOk = features.GPUoverClockAvailable && ui->cb_enableOverclock->isChecked(),
+                memoryOcOk = features.memoryOverclockAvailable && ui->cb_enableOverclock->isChecked();
+
+        ui->label_GPUoc->setEnabled(gpuOcOk);
+        ui->slider_GPUoverclock->setEnabled(gpuOcOk);
+        ui->label_GPUoverclock->setEnabled(gpuOcOk);
+
+        ui->label_memoryOc->setEnabled(memoryOcOk);
+        ui->slider_memoryOverclock->setEnabled(memoryOcOk);
+        ui->label_memoryOverclock->setEnabled(memoryOcOk);
     }
 }
 

@@ -131,7 +131,8 @@ private slots:
     void on_fanSpeedSlider_valueChanged(int value);
     void on_cb_enableOverclock_toggled(bool enable);
     void on_btn_applyOverclock_clicked();
-    void on_slider_overclock_valueChanged(int value);
+    void on_slider_GPUoverclock_valueChanged(int value);
+    void on_slider_memoryOverclock_valueChanged(int value);
     void on_cb_showAlwaysGpuSelector_toggled(bool checked);
     void on_cb_showCombo_toggled(bool checked);
     void on_mainTabs_currentChanged(int index);

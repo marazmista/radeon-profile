@@ -51,11 +51,18 @@ public:
     static gpuClocksStruct getFeaturesFallback();
 
     /**
-     * @brief overClock Overclocks the GPU
-     * @param percent Overclock percentage [0-20]
+     * @brief overClockGPU Overclocks the GPU
+     * @param percentage Overclock percentage [0-20]
+     * @return  Success
+     */
+    static bool overClockGPU(int percentage);
+
+    /**
+     * @brief overClock Overclocks the memory
+     * @param percentage Overclock percentage [0-20]
      * @return Success
      */
-    static bool overClock(int percentage);
+    static bool overClockMemory(int percentage);
 
 
 
@@ -75,7 +82,8 @@ private:
             pwmEnablePath,
             pwmSpeedPath,
             pwmMaxSpeedPath,
-            overDrivePath;
+            GPUoverDrivePath,
+            memoryOverDrivePath;
     } filePaths;
     static int sensorsGPUtempIndex;
     static tempSensor currentTempSensor;

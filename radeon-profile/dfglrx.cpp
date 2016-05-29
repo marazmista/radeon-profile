@@ -65,8 +65,7 @@ driverFeatures dFglrx::figureOutDriverFeatures() {
     features.coreClockAvailable = true;
     features.memClockAvailable = true;
     features.temperatureAvailable = true;
-    features.pwmAvailable = false;
-    features.overClockAvailable = false;
+    // Other features are automatically initialized as false
     return features;
 }
 

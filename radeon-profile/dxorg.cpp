@@ -77,7 +77,8 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     filePaths.moduleParamsPath = devicePath + "driver/module/holders/radeon/parameters/";
     filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/radeon_pm_info"; // this path contains only index
     //  filePaths.clocksPath = "/tmp/radeon_pm_info"; // testing
-    filePaths.overDrivePath = devicePath + file_overclockLevel;
+    filePaths.GPUoverDrivePath = devicePath + file_GPUoverclockLevel;
+    filePaths.memoryOverDrivePath = devicePath + file_memoryOverclockLevel;
 
 
     QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
@@ -525,9 +526,9 @@ driverFeatures dXorg::figureOutDriverFeatures() {
     }
 
 #ifdef QT_DEBUG
-    features.overClockAvailable = QFile::exists(filePaths.overDrivePath);
-#else // Overclock is still not tested (it will be fully available only with Linux 4.7/4.8), disable it in release mode
-    features.overClockAvailable = false;
+    features.GPUoverClockAvailable = QFile::exists(filePaths.GPUoverDrivePath);
+    features.memoryOverclockAvailable = QFile::exists(filePaths.memoryOverDrivePath);
+    // Overclock is still not tested (it will be fully available only with Linux 4.7/4.8), disable it in release mode
 #endif
 
     return features;
@@ -556,18 +557,34 @@ gpuClocksStruct dXorg::getFeaturesFallback() {
     return fallbackFeatures;
 }
 
-bool dXorg::overClock(const int percentage){
+bool dXorg::overClockGPU(const int percentage){
     if((percentage > 20) || (percentage < 0))
-        qWarning() << "Error overclocking: invalid percentage passed: " << percentage;
+        qWarning() << "Error overclocking GPU: invalid percentage passed: " << percentage;
     else if (daemonConnected()){ // Signal the daemon to set the overclock value
-        dcomm->sendSetValue(QString::number(percentage), filePaths.overDrivePath);
+        dcomm->sendSetValue(QString::number(percentage), filePaths.GPUoverDrivePath);
         return true;
     } else if(globalStuff::globalConfig.rootMode){ // Root mode, set it directly
-        setNewValue(filePaths.overDrivePath, QString::number(percentage));
+        setNewValue(filePaths.GPUoverDrivePath, QString::number(percentage));
 
         return true;
     } else // Overclock requires root access to sysfs
-        qWarning() << "Error overclocking: daemon is not connected and no root access is available";
+        qWarning() << "Error overclocking GPU: daemon is not connected and root access is not available";
+
+    return false;
+}
+
+bool dXorg::overClockMemory(const int percentage){
+    if((percentage > 20) || (percentage < 0))
+        qWarning() << "Error overclocking memory: invalid percentage passed: " << percentage;
+    else if (daemonConnected()){ // Signal the daemon to set the overclock value
+        dcomm->sendSetValue(QString::number(percentage), filePaths.memoryOverDrivePath);
+        return true;
+    } else if(globalStuff::globalConfig.rootMode){ // Root mode, set it directly
+        setNewValue(filePaths.memoryOverDrivePath, QString::number(percentage));
+
+        return true;
+    } else // Overclock requires root access to sysfs
+        qWarning() << "Error overclocking memory: daemon is not connected and root access is not available";
 
     return false;
 }

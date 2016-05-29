@@ -455,26 +455,43 @@ void radeon_profile::on_fanSpeedSlider_valueChanged(int value)
 //========
 
 void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
-    ui->slider_overclock->setEnabled(enable);
+    const bool GPUOcOk = enable && device.features.GPUoverClockAvailable,
+            memoryOcOk = enable && device.features.memoryOverclockAvailable;
+
+    ui->label_GPUoc->setEnabled(GPUOcOk);
+    ui->slider_GPUoverclock->setEnabled(GPUOcOk);
+    ui->label_GPUoverclock->setEnabled(GPUOcOk);
+
+    ui->label_memoryOc->setEnabled(memoryOcOk);
+    ui->slider_memoryOverclock->setEnabled(memoryOcOk);
+    ui->label_memoryOverclock->setEnabled(memoryOcOk);
+
     ui->btn_applyOverclock->setEnabled(enable);
     ui->cb_overclockAtLaunch->setEnabled(enable);
-    ui->label_overclockPercentage->setEnabled(enable);
 
     if(enable)
         qDebug() << "Enabling overclock";
     else {
         qDebug() << "Disabling overclock";
-        device.overclock(0);
+        device.overclockGPU(0);
+        device.overclockMemory(0);
     }
 }
 
 void radeon_profile::on_btn_applyOverclock_clicked(){
-    if( ! device.overclock(ui->slider_overclock->value()))
-        QMessageBox::warning(this, tr("Error"), tr("An error occurred, overclock failed"));
+    if( ! device.overclockGPU(ui->slider_GPUoverclock->value()))
+        QMessageBox::warning(this, tr("Error"), tr("An error occurred, GPU overclock failed"));
+
+    if( ! device.overclockMemory(ui->slider_memoryOverclock->value()))
+        QMessageBox::warning(this, tr("Error"), tr("An error occurred, memory overclock failed"));
 }
 
-void radeon_profile::on_slider_overclock_valueChanged(const int value){
-    ui->label_overclockPercentage->setText(QString::number(value) + '%');
+void radeon_profile::on_slider_GPUoverclock_valueChanged(const int value){
+    ui->label_GPUoverclock->setText(QString::number(value) + '%');
+}
+
+void radeon_profile::on_slider_memoryOverclock_valueChanged(const int value){
+    ui->label_memoryOverclock->setText(QString::number(value) + '%');
 }
 
 void radeon_profile::on_cb_showAlwaysGpuSelector_toggled(const bool checked){

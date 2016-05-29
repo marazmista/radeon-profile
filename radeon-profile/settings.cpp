@@ -45,7 +45,8 @@ void radeon_profile::saveConfig() {
 
     settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
     settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
-    settings.setValue("overclockValue", ui->slider_overclock->value());
+    settings.setValue("GPUoverclockValue", ui->slider_GPUoverclock->value());
+    settings.setValue("memoryOverclockValue", ui->slider_memoryOverclock->value());
 
     // Graph settings
     settings.setValue("graphLineThickness",ui->spin_lineThick->value());
@@ -131,7 +132,8 @@ void radeon_profile::loadConfig() {
 
     ui->cb_enableOverclock->setChecked(settings.value("overclockEnabled",false).toBool());
     ui->cb_overclockAtLaunch->setChecked(settings.value("overclockAtLaunch",false).toBool());
-    ui->slider_overclock->setValue(settings.value("overclockValue",0).toInt());
+    ui->slider_GPUoverclock->setValue(settings.value("GPUoverclockValue",0).toInt());
+    ui->slider_memoryOverclock->setValue(settings.value("memoryOverclockValue",0).toInt());
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())

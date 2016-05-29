@@ -31,7 +31,8 @@
 #define file_powerProfile "power_profile"
 #define file_powerDpmState "power_dpm_state"
 #define file_powerDpmForcePerformanceLevel "power_dpm_force_performance_level"
-#define file_overclockLevel "pp_sclk_od"
+#define file_GPUoverclockLevel "pp_sclk_od"
+#define file_memoryOverclockLevel "pp_mclk_od"
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
@@ -138,7 +139,8 @@ typedef struct driverFeatures {
         memVoltAvailable = false,
         temperatureAvailable = false,
         pwmAvailable = false,
-        overClockAvailable = false;
+        GPUoverClockAvailable = false,
+        memoryOverclockAvailable = false;
     powerMethod pm = PM_UNKNOWN;
     int pwmMaxSpeed = 0;
 
