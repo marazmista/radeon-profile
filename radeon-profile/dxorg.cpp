@@ -328,7 +328,8 @@ QString dXorg::findSysfsHwmonForGPU() {
 }
 
 QStringList dXorg::getGLXInfo(QProcessEnvironment env) {
-    return globalStuff::grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
+    // Consider only lines containing "direct rendering" or containing "OpenGL ... : ..." but not containing 'none'
+    return globalStuff::grabSystemInfo("glxinfo",env).filter(QRegExp("direct rendering|OpenGL.+:..(?!none)"));
 }
 
 QList<QTreeWidgetItem *> dXorg::getModuleInfo() {

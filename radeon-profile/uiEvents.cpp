@@ -226,10 +226,11 @@ void radeon_profile::on_cb_gpuData_toggled(bool checked)
 
     if (ui->cb_graphs->isChecked())
         ui->graphTab->setEnabled(checked);
-    ui->l_minMaxTemp->setText(tr("GPU data is disabled"));
 
-    // Enable/Disable the GPU data list
     if (!checked) {
+        ui->l_minMaxTemp->setText(tr("GPU data is disabled"));
+
+        // Enable/Disable the GPU data and stats list
         ui->list_stats->insertTopLevelItem(0, new QTreeWidgetItem(QStringList() << "" << "" << "" << tr("GPU data is disabled")));
         ui->list_currentGPUData->clear();
         ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << tr("GPU data is disabled")));

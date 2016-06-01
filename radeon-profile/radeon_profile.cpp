@@ -326,10 +326,12 @@ void radeon_profile::timerEvent() {
             doTheStats();
 
             // do the math only when user looking at stats table
-            if (ui->tabs_systemInfo->currentWidget() == ui->tab_stats && ui->mainTabs->currentWidget() == ui->infoTab)
+            if (ui->tabs_systemInfo->currentWidget() == ui->tab_stats && ui->mainTabs->currentWidget() == ui->infoTab && !this->isHidden())
                 updateStatsTable();
         }
+
         refreshUI();
+        refreshTooltip();
 
         if (ui->graphTab->isEnabled())
             refreshGraphs();
@@ -349,7 +351,6 @@ void radeon_profile::timerEvent() {
         ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
     }
 
-    refreshTooltip();
 }
 
 void radeon_profile::adjustFanSpeed(const bool force)
@@ -387,43 +388,45 @@ void radeon_profile::refreshGraphs() {
     // count the tick and move graph to right
     ticksCounter++;
 
-    // add data to plots
+    // add data to plots and adjust vertical scale
     ui->plotTemp->graph(0)->addData(ticksCounter,device.gpuTemeperatureData.current);
+    if (device.gpuTemeperatureData.max >= ui->plotTemp->yAxis->range().upper || device.gpuTemeperatureData.min <= ui->plotTemp->yAxis->range().lower)
+        ui->plotTemp->yAxis->setRange(device.gpuTemeperatureData.min - 5, device.gpuTemeperatureData.max + 5);
+
     ui->plotClocks->graph(0)->addData(ticksCounter,device.gpuClocksData.coreClk);
     ui->plotClocks->graph(1)->addData(ticksCounter,device.gpuClocksData.memClk);
     ui->plotClocks->graph(2)->addData(ticksCounter,device.gpuClocksData.uvdCClk);
     ui->plotClocks->graph(3)->addData(ticksCounter,device.gpuClocksData.uvdDClk);
-    ui->plotVolts->graph(0)->addData(ticksCounter,device.gpuClocksData.coreVolt);
-    ui->plotVolts->graph(1)->addData(ticksCounter,device.gpuClocksData.memVolt);
-
-    if(ui->mainTabs->currentWidget() == ui->graphTab) // If the graph tab is selected replot the graphs
-        replotGraphs();
-}
-
-void radeon_profile::replotGraphs(){
-    const int position = ticksCounter + globalStuff::globalConfig.graphOffset;
-    ui->plotTemp->xAxis->setRange(position, rangeX,Qt::AlignRight);
-    ui->plotTemp->replot();
-
-    ui->plotClocks->xAxis->setRange(position,rangeX,Qt::AlignRight);
-    ui->plotClocks->replot();
-
-    ui->plotVolts->xAxis->setRange(position,rangeX,Qt::AlignRight);
-    ui->plotVolts->replot();
-
-    // choose bigger clock and adjust plot scale
     int r = (device.gpuClocksData.memClk >= device.gpuClocksData.coreClk) ? device.gpuClocksData.memClk : device.gpuClocksData.coreClk;
     if (r > ui->plotClocks->yAxis->range().upper)
         ui->plotClocks->yAxis->setRangeUpper(r + 150);
 
-
+    ui->plotVolts->graph(0)->addData(ticksCounter,device.gpuClocksData.coreVolt);
+    ui->plotVolts->graph(1)->addData(ticksCounter,device.gpuClocksData.memVolt);
     if (device.gpuClocksData.coreVolt > ui->plotVolts->yAxis->range().upper)
         ui->plotVolts->yAxis->setRangeUpper(device.gpuClocksData.coreVolt + 100);
 
+    if(ui->mainTabs->currentWidget() == ui->graphTab && !this->isHidden()) // If the graph tab is selected replot the graphs
+        replotGraphs();
+}
 
-    // temperature graph
-    if (device.gpuTemeperatureData.max >= ui->plotTemp->yAxis->range().upper || device.gpuTemeperatureData.min <= ui->plotTemp->yAxis->range().lower)
-        ui->plotTemp->yAxis->setRange(device.gpuTemeperatureData.min - 5, device.gpuTemeperatureData.max + 5);
+void radeon_profile::replotGraphs(){
+    qDebug() << "Replotting graphs";
+    const int position = ticksCounter + globalStuff::globalConfig.graphOffset;
+    if(ui->cb_showTempsGraph->isChecked()){
+        ui->plotTemp->xAxis->setRange(position, rangeX,Qt::AlignRight);
+        ui->plotTemp->replot();
+    }
+
+    if(ui->cb_showFreqGraph->isChecked()){
+        ui->plotClocks->xAxis->setRange(position,rangeX,Qt::AlignRight);
+        ui->plotClocks->replot();
+    }
+
+    if(ui->cb_showVoltsGraph->isChecked()){
+        ui->plotVolts->xAxis->setRange(position,rangeX,Qt::AlignRight);
+        ui->plotVolts->replot();
+    }
 
     ui->l_minMaxTemp->setText("Max: " + device.gpuTemeperatureDataString.max  + " | Min: " +
                               device.gpuTemeperatureDataString.min + " | Avg: " + QString().setNum(device.gpuTemeperatureData.sum/ticksCounter,'f',1) + QString::fromUtf8("\u00B0C"));
@@ -459,6 +462,7 @@ void radeon_profile::doTheStats() {
 }
 
 void radeon_profile::updateStatsTable() {
+    qDebug() << "Updating stats table";
     // do the math with percents
     for(QTreeWidgetItemIterator item(ui->list_stats); *item; item++) // For each item in list_stats
         (*item)->setText(3,QString::number(pmStats.value((*item)->text(0))*100.0/statsTickCounter)+"%");

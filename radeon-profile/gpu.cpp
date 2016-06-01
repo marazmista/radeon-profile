@@ -765,7 +765,7 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
 
     // loop for multi gpu
     for (int i = 0; i < gpus.count(); i++)
-        data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
+        data << tr("VGA:") +gpus[i].split(":",QString::SkipEmptyParts)[2];
 
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     if (!gpuName.isEmpty())
