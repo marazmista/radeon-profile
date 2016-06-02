@@ -25,7 +25,9 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QDebug>
+#include <QTime>
 
+#define logTime qDebug() << QTime::currentTime().toString("ss.zzz")
 
 
 radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
@@ -43,7 +45,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
         ui->label_rootWarrning->setVisible(false);
     }
 
-    // setup ui elemensts
+    logTime << "Setting up ui elements";
     ui->mainTabs->setCurrentWidget(ui->infoTab);
     ui->tabs_systemInfo->setCurrentWidget(ui->tab_glxInfo);
     ui->configGroups->setCurrentWidget(ui->tab_mainConfig);
@@ -55,9 +57,10 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     setupContextMenus();
     setupTrayIcon();
 
+    logTime << "Loading config";
     loadConfig();
 
-    //figure out parameters
+    logTime << "Figuring out driver";
     QString params = a.join(" ");
     if (params.contains("--driver xorg")) {
         device.driverByParam(XORG);
@@ -70,12 +73,14 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     else // driver object detects cards in pc and fill the list in ui //
         device.initialize();
 
+    logTime << "Setting up UI elements for available features";
     ui->combo_gpus->addItems(device.gpuList);
 
     ui->tab_daemonConfig->setEnabled(device.daemonConnected());
     setupUiEnabledFeatures(device.features);
 
-    if(ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
+    if((device.features.GPUoverClockAvailable || device.features.memoryOverclockAvailable)
+            && ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
         ui->btn_applyOverclock->click();
 
     connectSignals();
@@ -83,7 +88,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     // timer init
     timer.setInterval(ui->spin_timerInterval->value()*1000);
 
-    // fill tables with data at the start //
+    logTime << "Filling tables with data at the start";
     refreshGpuData();
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
     ui->list_connectors->addTopLevelItems(device.getCardConnectors());
@@ -92,10 +97,12 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     if(ui->cb_gpuData->isChecked())
         refreshUI();
 
+    logTime << "Starting timer and adding runtime widgets";
     timer.start();
     addRuntimeWidgets();
 
     showWindow();
+    logTime << "Initialization completed";
 }
 
 radeon_profile::~radeon_profile()
@@ -366,7 +373,7 @@ void radeon_profile::adjustFanSpeed(const bool force)
             speed = fanSteps.value(device.gpuTemeperatureData.current);
         else {
             // find bounds of current temperature
-            const QMap<int,unsigned int>::const_iterator high = fanSteps.upperBound(device.gpuTemeperatureData.current),
+            const QMap<short, unsigned short>::const_iterator high = fanSteps.upperBound(device.gpuTemeperatureData.current),
                     low = high - 1;
             if(high == fanSteps.constBegin()) // Before the first step
                 speed = high.value();

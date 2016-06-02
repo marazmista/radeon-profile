@@ -71,7 +71,7 @@ void gpu::initialize(bool skipDetectDriver) {
 
     switch (currentDriver) {
     case XORG: {
-        qDebug() << "Found Xorg " + dXorg::driverName + " driver, initializing";
+        qDebug() << "Found Xorg " << dXorg::driverName << " driver, initializing";
         gpuList = dXorg::detectCards();
         dXorg::configure(gpuList[currentGpuIndex]);
         features = dXorg::figureOutDriverFeatures();

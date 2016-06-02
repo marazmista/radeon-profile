@@ -56,7 +56,7 @@ public:
     static struct globalCfgStruct{
         float interval;
         bool daemonAutoRefresh, rootMode;
-        int graphOffset;
+        ushort graphOffset;
     } globalConfig;
 };
 
@@ -90,13 +90,13 @@ typedef enum powerMethod {
 } powerMethod;
 
 typedef struct gpuClocksStruct {
-    int coreClk = -1,
+    short coreClk = -1,
         memClk = -1,
         coreVolt = -1,
         memVolt = -1,
         uvdCClk = -1,
-        uvdDClk = -1;
-    char powerLevel = -1;
+        uvdDClk = -1,
+        powerLevel = -1;
 
     bool coreClkOk = false,
         memClkOk = false,
@@ -108,7 +108,7 @@ typedef struct gpuClocksStruct {
 
     gpuClocksStruct() { }
 
-    gpuClocksStruct(int _coreClk, int _memClk, int _coreVolt, int _memVolt, int _uvdCClk, int _uvdDclk, char _pwrLevel ) {
+    gpuClocksStruct(short _coreClk, short _memClk, short _coreVolt, short _memVolt, short _uvdCClk, short _uvdDclk, short _pwrLevel ) {
         coreClk = _coreClk;
         memClk = _memClk;
         coreVolt = _coreVolt;
@@ -142,7 +142,7 @@ typedef struct driverFeatures {
         GPUoverClockAvailable = false,
         memoryOverclockAvailable = false;
     powerMethod pm = PM_UNKNOWN;
-    int pwmMaxSpeed = 0;
+    ushort pwmMaxSpeed = 0;
 
     driverFeatures() { }
 
@@ -154,7 +154,7 @@ typedef struct gpuTemperatureStruct {
         max = 0,
         min = 0,
         sum = 0;
-    int pwmSpeed = 0;
+    ushort pwmSpeed = 0;
 } gpuTemperatureStruct;
 
 typedef struct gpuTemperatureStructString {

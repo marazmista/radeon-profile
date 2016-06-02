@@ -141,9 +141,9 @@ private:
     gpu device;
     static const QString settingsPath;
     QList<execBin*> execsRunning;
-    QMap<int, unsigned int> fanSteps;
-    QMap<QString, unsigned int> pmStats;
-    unsigned int rangeX = 180, ticksCounter = 0, statsTickCounter = 0;
+    QMap<short, unsigned short> fanSteps;
+    QMap<QString, unsigned short> pmStats;
+    unsigned short rangeX = 180, ticksCounter = 0, statsTickCounter = 0;
     QSystemTrayIcon trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden;
     QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;

@@ -908,8 +908,6 @@
              <property name="font">
               <font>
                <family>Monospace</family>
-               <weight>75</weight>
-               <bold>true</bold>
               </font>
              </property>
             </widget>
