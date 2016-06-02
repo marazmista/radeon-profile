@@ -29,6 +29,7 @@ public:
     int currentGpuIndex = 0;
     driverFeatures features;
     QString currentPowerProfile, currentPowerLevel;
+    static QString driverModule;
 
     QList<QTreeWidgetItem *> getCardConnectors() const;
     QStringList getGLXInfo(QString gpuName) const;

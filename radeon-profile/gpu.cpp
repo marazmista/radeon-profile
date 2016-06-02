@@ -36,15 +36,17 @@ static const QStringList pnpIdFiles = {
     "/usr/share/hwdata/pnp.ids"
 };
 
+QString gpu::driverModule;
+
 driver gpu::detectDriver() {
     QStringList out = globalStuff::grabSystemInfo("lsmod");
 
     if (!out.filter("radeon").isEmpty()) {
-        dXorg::driverName = "radeon";
+        gpu::driverModule = "radeon";
         return XORG;
     }
     if (!out.filter("amdgpu").isEmpty()) {
-        dXorg::driverName = "amdgpu";
+        gpu::driverModule = "amdgpu";
         return XORG;
     }
 
@@ -71,7 +73,7 @@ void gpu::initialize(bool skipDetectDriver) {
 
     switch (currentDriver) {
     case XORG: {
-        qDebug() << "Found Xorg " << dXorg::driverName << " driver, initializing";
+        qDebug() << "Found Xorg " << driverModule << " driver, initializing";
         gpuList = dXorg::detectCards();
         dXorg::configure(gpuList[currentGpuIndex]);
         features = dXorg::figureOutDriverFeatures();
