@@ -46,19 +46,17 @@ void daemonComm::sendTimerOff (){
 }
 
 bool daemonComm::attachToMemory(){
-    if (sharedMem.isAttached()){
-        qDebug() << "Shared memory is already attached";
-        return true;
-    }
+    if (sharedMem.isAttached())
+        sharedMem.detach();
 
     sharedMem.setKey("radeon-profile");
-    if (sharedMem.create(SHARED_MEM_SIZE)){
+    if (sharedMem.create(SHARED_MEM_SIZE, QSharedMemory::ReadOnly)){
         // If QSharedMemory::create() returns true, it has already automatically attached
         qDebug() << "Shared memory created and connected";
         return true;
     }
 
-    if(sharedMem.error() == QSharedMemory::AlreadyExists && sharedMem.attach()){
+    if((sharedMem.error() == QSharedMemory::AlreadyExists) && sharedMem.attach()){
         qDebug() << "Shared memory already existed, attached to it";
         return true;
     }
@@ -84,7 +82,7 @@ QByteArray daemonComm::readMemory() {
     const QByteArray out = QByteArray::fromRawData(to, SHARED_MEM_SIZE).trimmed();
 
     if(!sharedMem.unlock())
-        qWarning() << "Failed unlocking";
+        qWarning() << "Failed unlocking" << sharedMem.errorString();
 
     return out;
 }

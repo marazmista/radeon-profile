@@ -151,6 +151,7 @@ private:
     QButtonGroup pwmGroup;
     ushort graphOffset = 0;
     bool closeFromTrayMenu = false;
+    QStringList selectedVariableVaules, envVars;
 
     Ui::radeon_profile *ui;
 

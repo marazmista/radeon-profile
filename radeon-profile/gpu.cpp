@@ -104,11 +104,11 @@ driverFeatures gpu::figureOutDriverFeatures(){
 }
 
 void gpu::changeGPU(ushort gpuIndex){
-    qWarning() << "configure is not implemented";
+    qWarning() << "changeGPU is not implemented - index =" << gpuIndex;
 }
 
 gpuClocksStruct gpu::getClocks(bool forFeatures){
-    qWarning() << "getClocks is not implemented";
+    qWarning() << "getClocks is not implemented - forFeatures =" << forFeatures;
 
     return gpuClocksStruct(); // Empty struct
 }
@@ -481,7 +481,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
                 //Add refresh rate
                 float vRefreshRate = getVerticalRefreshRate(getModeInfo(screenResources, *activeMode));
-                if(vRefreshRate != -1){
+                if(vRefreshRate > 0){
                     QString outputVRate = QString::number(static_cast<double>(vRefreshRate), 'g', 3) + " Hz";
                     addChild(outputItem, tr("Refresh rate"), outputVRate);
                 }
@@ -713,7 +713,8 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
         qWarning() << "getModuleInfo: no module available";
     else {
         // Get the list of the current module parameters
-        const QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p " + driverModule);
+        QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p " + driverModule);
+        modInfo.sort();
         const QString parameterPath = "/sys/module/" + driverModule + "/parameters/";
 
         for (const QString & line : modInfo) { // For each parameter
@@ -788,19 +789,19 @@ void gpu::refreshPowerLevel() {
 }
 
 void gpu::setPowerProfile(powerProfiles newPowerProfile) {
-    qWarning() << "setPowerProfile is not implemented";
+    qWarning() << "setPowerProfile is not implemented - newPowerProfile" << newPowerProfile;
 }
 
 void gpu::setForcePowerLevel(forcePowerLevels newForcePowerLevel) {
-    qWarning() << "setForcePowerLevel is not implemented";
+    qWarning() << "setForcePowerLevel is not implemented - newForcePowerLevel =" << newForcePowerLevel;
 }
 
 void gpu::setPwmValue(ushort value) {
-    qWarning() << "setForcePowerLevel is not implemented";
+    qWarning() << "setForcePowerLevel is not implemented - value =" << value;
 }
 
 void gpu::setPwmManualControl(bool manual) {
-    qWarning() << "setPwmManualControl is not implemented";
+    qWarning() << "setPwmManualControl is not implemented - manual =" << manual;
 }
 
 ushort gpu::getPwmSpeed() const {
@@ -810,13 +811,13 @@ ushort gpu::getPwmSpeed() const {
 }
 
 bool gpu::overclockGPU(const int value){
-    qWarning() << "Error overclocking GPU: overclocking is not implemented";
+    qWarning() << "Error overclocking GPU: overclocking is not implemented - value =" << value;
 
     return false;
 }
 
 bool gpu::overclockMemory(const int value){
-    qWarning() << "Error overclocking memory: overclocking is not implemented";
+    qWarning() << "Error overclocking memory: overclocking is not implemented - value=" << value;
 
     return false;
 }
@@ -862,8 +863,10 @@ bool gpu::setNewValue(const QString & filePath, const QString & newValue, const 
 QString gpu::readFile(const QString & filePath) const {
     QFile file(filePath);
 
-    if( ! file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if( ! file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        qDebug() << "Failed reading" << filePath;
         return "";
+    }
 
     const QString out = file.readAll().trimmed();
 

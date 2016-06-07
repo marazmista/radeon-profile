@@ -13,7 +13,6 @@
 #include <QProcessEnvironment>
 #include <QInputDialog>
 
-QStringList selectedVariableVaules,envVars;
 
 void radeon_profile::on_btn_cancel_clicked()
 {
@@ -151,7 +150,7 @@ void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
     }
 
     // go through list from file and check if it is selected (exists in summary)
-    for (const QString value : values) {
+    for (const QString & value : values) {
         // look for selected variable in list with variables and its values
         int varIndex = selectedVariableVaules.indexOf(QRegExp(text+".+",Qt::CaseInsensitive),0);
 
@@ -258,7 +257,7 @@ void radeon_profile::on_btn_runExecProfile_clicked()
             penv = QProcessEnvironment::systemEnvironment();
 
         if (!settings.isEmpty()) {
-            for (const QString line : settings.split(' ',QString::SkipEmptyParts)) {
+            for (const QString & line : settings.split(' ',QString::SkipEmptyParts)) {
                 const QStringList parts = line.split('=');
                 penv.insert(parts.at(0), parts.at(1));
             }

@@ -507,6 +507,7 @@ void radeon_profile::doTheStats() {
                 memDetails += "  " + device->gpuClocksDataString.memVolt;
 
             ui->list_stats->addTopLevelItem(new QTreeWidgetItem(QStringList() << device->gpuClocksDataString.powerLevel << coreDetails << memDetails));
+            ui->list_stats->sortItems(0, Qt::AscendingOrder);
         }
     }
 }
