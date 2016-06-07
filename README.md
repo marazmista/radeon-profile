@@ -2,7 +2,11 @@ Simple application to read current clocks and temperatures, overclock and manage
 
 # Supported drivers
 * ## Radeon ( xf86-video-ati / xf86-video-amdgpu )
-  Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-profile-daemon) for using this app as normal user. Otherwise app need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`. Here is tip for run app as normal user but involves change permissions to system files: http://bit.ly/1dvQMhS
+  The app reads clocks and power profiles from debugfs, which requires root access. Possible solutions (only one is needed):
+  * Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-profile-daemon).
+  * Run the app with root privileges.
+  * Add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`.
+  * Change debugfs permissions (unsafe) http://bit.ly/1dvQMhS
 
   Can be forced by `--driver xorg` parameter.
 
