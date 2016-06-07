@@ -176,8 +176,6 @@
          <property name="font">
           <font>
            <pointsize>15</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
           </font>
          </property>
          <property name="text">
@@ -2919,18 +2917,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QDoubleSpinBox" name="spin_timerInterval">
-                <property name="decimals">
-                 <number>0</number>
-                </property>
+               <widget class="QSpinBox" name="spin_timerInterval">
                 <property name="minimum">
-                 <double>1.000000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>1.000000000000000</double>
-                </property>
-                <property name="value">
-                 <double>1.000000000000000</double>
+                 <number>1</number>
                 </property>
                </widget>
               </item>

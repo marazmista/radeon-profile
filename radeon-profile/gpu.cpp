@@ -1,7 +1,8 @@
 // copyright marazmista @ 29.03.2014
 
 #include "gpu.h"
-#include "radeon_profile.h"
+#include "dfglrx.h"
+#include "dxorg.h"
 
 #include <cmath>
 #include <QFile>
@@ -19,9 +20,9 @@ extern "C" {
 
 #define EDID_DESCRIPTOR_PRODUCT_NAME 0xfc
 
-#define ATOM_VALUE (Atom)4
-#define INTEGER_VALUE (Atom)19
-#define CARDINAL_VALUE (Atom)6
+#define ATOM_VALUE static_cast<Atom>(4)
+#define INTEGER_VALUE static_cast<Atom>(19)
+#define CARDINAL_VALUE static_cast<Atom>(6)
 
 #define MILLIMETERS_PER_INCH 0.0393700787402
 
@@ -36,61 +37,25 @@ static const QStringList pnpIdFiles = {
     "/usr/share/hwdata/pnp.ids"
 };
 
-QString gpu::driverModule;
-
-driver gpu::detectDriver() {
-    QStringList out = globalStuff::grabSystemInfo("lsmod");
-
-    if (!out.filter("radeon").isEmpty()) {
-        gpu::driverModule = "radeon";
-        return XORG;
-    }
-    if (!out.filter("amdgpu").isEmpty()) {
-        gpu::driverModule = "amdgpu";
-        return XORG;
-    }
-
-    if (!out.filter("fglrx").isEmpty())
-        return FGLRX;
-
-    return DRIVER_UNKNOWN;
-}
 
 void gpu::reconfigureDaemon() {
-    dXorg::reconfigureDaemon();
+    qWarning() << "reconfigureDaemon is not implemented";
 }
 
-bool gpu::daemonConnected() {
-    return dXorg::daemonConnected();
+bool gpu::daemonConnected() const {
+    return dcomm.connected();
 }
 
-// method for resolve which driver gpu instance will use
-// and call some things that need to be done before read data
-void gpu::initialize(bool skipDetectDriver) {
-    if (!skipDetectDriver)
-        currentDriver = detectDriver();
-
-
-    switch (currentDriver) {
-    case XORG: {
-        qDebug() << "Found Xorg " << driverModule << " driver, initializing";
-        gpuList = dXorg::detectCards();
-        dXorg::configure(gpuList[currentGpuIndex]);
-        features = dXorg::figureOutDriverFeatures();
-        break;
-    }
-    case FGLRX: {
-        qDebug() << "Found FGLRX driver, initializing";
-        gpuList = dFglrx::detectCards();
-        dFglrx::configure(currentGpuIndex);
-        features = dFglrx::figureOutDriverFeatures();
-        break;
-    }
-    case DRIVER_UNKNOWN: {
-        qDebug() << "No known driver found";
-        gpuList << tr("Unknown");
-    }
-    }
+void gpu::initialize(){
+    gpuList = detectCards();
+    changeGPU(currentGpuIndex);
+    features = figureOutDriverFeatures();
+    qDebug() << "Power profile enabled: " << features.canChangeProfile;
+    qDebug() << "Core {clock, volt} enabled: " << features.coreClockAvailable << features.coreVoltAvailable;
+    qDebug() << "Memory {core, volt} enabled: " << features.memClockAvailable << features.memClockAvailable;
+    qDebug() << "Temperature enabled: " << features.temperatureAvailable;
+    qDebug() << "Fan speed enabled: " << features.pwmAvailable;
+    qDebug() << "Overclock {GPU, memory} enabled: " << features.GPUoverClockAvailable << features.memoryOverclockAvailable;
 }
 
 void gpu::convertClocks() {
@@ -117,75 +82,59 @@ void gpu::convertClocks() {
 }
 
 void gpu::convertTemperature() {
-    gpuTemeperatureDataString.current.setNum(gpuTemeperatureData.current) += "\u00B0C";
-    gpuTemeperatureDataString.max.setNum(gpuTemeperatureData.max) += QString::fromUtf8("\u00B0C");
-    gpuTemeperatureDataString.min.setNum(gpuTemeperatureData.min) += QString::fromUtf8("\u00B0C");
-    gpuTemeperatureDataString.pwmSpeed.setNum(gpuTemeperatureData.pwmSpeed) += "%";
+    if(features.temperatureAvailable){
+        gpuTemeperatureDataString.current.setNum(gpuTemeperatureData.current) += "\u00B0C";
+        gpuTemeperatureDataString.max.setNum(gpuTemeperatureData.max) += QString::fromUtf8("\u00B0C");
+        gpuTemeperatureDataString.min.setNum(gpuTemeperatureData.min) += QString::fromUtf8("\u00B0C");
+    }
+
+    if(features.pwmAvailable)
+        gpuTemeperatureDataString.pwmSpeed.setNum(gpuTemeperatureData.pwmSpeed) += "%";
 }
 
-void gpu::driverByParam(driver paramDriver) {
-    this->currentDriver = paramDriver;
+driverFeatures gpu::figureOutDriverFeatures(){
+    qWarning() << "figureOutDriverFeatures is not implemented";
+    return driverFeatures(); // All features are initialized as false
 }
 
-void gpu::changeGpu(char index) {
-    currentGpuIndex = index;
-
-    switch (currentDriver) {
-    case XORG: {
-        dXorg::configure(gpuList[currentGpuIndex]);
-        features = dXorg::figureOutDriverFeatures();
-        break;
-    }
-    case FGLRX: {
-        dFglrx::configure(currentGpuIndex);
-        features = dFglrx::figureOutDriverFeatures();
-        break;
-    }
-    case DRIVER_UNKNOWN:
-        break;
-    }
+void gpu::changeGPU(ushort gpuIndex){
+    qWarning() << "configure is not implemented";
 }
 
-void gpu::getClocks() {
-    switch (currentDriver) {
-    case XORG: {
-        gpuClocksData = dXorg::getClocks(dXorg::getClocksRawData());
-        break;
-    }
-    case FGLRX:
-        gpuClocksData = dFglrx::getClocks();
-        break;
-    case DRIVER_UNKNOWN: {
-        gpuClocksData.invalidate();
-        break;
-    }
-    }
+gpuClocksStruct gpu::getClocks(bool forFeatures){
+    qWarning() << "getClocks is not implemented";
+
+    return gpuClocksStruct(); // Empty struct
+}
+
+float gpu::getTemperature() const {
+    qWarning() << "getTemperature is not implemented";
+
+    return 0;
+}
+
+void gpu::updateClocksData(){
+    gpuClocksData = getClocks();
     convertClocks();
 }
 
-void gpu::getTemperature() {
-
+void gpu::updateTemperatureData(){
     gpuTemeperatureData.currentBefore = gpuTemeperatureData.current;
 
-    switch (currentDriver) {
-    case XORG:
-        gpuTemeperatureData.current = dXorg::getTemperature();
-        break;
-    case FGLRX:
-        gpuTemeperatureData.current = dFglrx::getTemperature();
-        break;
-    case DRIVER_UNKNOWN:
-        return;
+    if(features.temperatureAvailable){
+        gpuTemeperatureData.current = getTemperature();
+
+        // update rest of structure with temperature data //
+        gpuTemeperatureData.sum += gpuTemeperatureData.current;
+        if (std::abs(gpuTemeperatureData.min) < 0.1f) // gpuTemeperatureData.min == 0
+            gpuTemeperatureData.min  = gpuTemeperatureData.current;
+
+        gpuTemeperatureData.max = (gpuTemeperatureData.max < gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.max;
+        gpuTemeperatureData.min = (gpuTemeperatureData.min > gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.min;
     }
 
-    // update rest of structure with temperature data //
-    gpuTemeperatureData.sum += gpuTemeperatureData.current;
-    if (gpuTemeperatureData.min == 0)
-        gpuTemeperatureData.min  = gpuTemeperatureData.current;
-
-    gpuTemeperatureData.max = (gpuTemeperatureData.max < gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.max;
-    gpuTemeperatureData.min = (gpuTemeperatureData.min > gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.min;
-
+    if(features.pwmAvailable)
+        gpuTemeperatureData.pwmSpeed = getPwmSpeed();
     convertTemperature();
 }
 
@@ -210,17 +159,21 @@ QString translateProperty(Display * display,
 
     case INTEGER_VALUE: // Signed numeric value
         switch(propertyDataFormat){
-        case 8: out = QString::number((qint8) *propertyRawData);
-        case 16: out = QString::number((qint16) *propertyRawData);
-        case 32: out = QString::number((qint32) *propertyRawData);
+        case 8: out = QString::number(static_cast<qint8>(*propertyRawData));
+            break;
+        case 16: out = QString::number(static_cast<qint16>(*propertyRawData));
+            break;
+        case 32: out = QString::number(static_cast<qint32>(*propertyRawData));
         }
         break;
 
     case CARDINAL_VALUE: // Unsigned numeric value
         switch(propertyDataFormat){
-        case 8: out = QString::number((quint8) *propertyRawData);
-        case 16: out = QString::number((quint16) *propertyRawData);
-        case 32: out = QString::number((quint32) *propertyRawData);
+        case 8: out = QString::number(static_cast<quint8>(*propertyRawData));
+            break;
+        case 16: out = QString::number(static_cast<quint16>(*propertyRawData));
+            break;
+        case 32: out = QString::number(static_cast<quint32>(*propertyRawData));
         }
     }
     return out.isEmpty() ? QString::number(*propertyRawData) : out; // If no match was found, return as number
@@ -230,7 +183,7 @@ QString translateProperty(Display * display,
 // See http://www.uefi.org/pnp_id_list
 QString translatePnpId(const QString pnpId){
     if ( ! pnpId.isEmpty()){
-        for(const QString path : pnpIdFiles){ // Cycle through the files
+        for(const QString & path : pnpIdFiles){ // Cycle through the files
             QFile pnpIds(path);
             if(pnpIds.exists() && pnpIds.open(QIODevice::ReadOnly)){ // File is available
                 while ( ! pnpIds.atEnd()){ // Continue reading the file until the file has ended
@@ -269,7 +222,7 @@ QString getMonitorName(const quint8 *EDID){
     // Get the model name
     for (uint i = EDID_OFFSET_DATA_BLOCKS; i <= EDID_OFFSET_LAST_BLOCK; i += 18)
         if(EDID[i+3] == EDID_DESCRIPTOR_PRODUCT_NAME)
-            modelName = QString::fromLocal8Bit((const char*)&EDID[i+5], 13).simplified();
+            modelName = QString::fromLocal8Bit(reinterpret_cast<const char*>(&EDID[i+5]), 13).simplified();
 
     monitorName.append(modelName.isEmpty() ? " - Model unknown" : ' ' + modelName);
 
@@ -292,7 +245,7 @@ float getHorizontalRefreshRate(XRRModeInfo * modeInfo){
     float out = -1;
 
     if(modeInfo && modeInfo->hTotal > 0 && modeInfo->dotClock > 0) // 'modeInfo' and its values must be present
-        out = (float)modeInfo->dotClock / (float) modeInfo->hTotal;
+        out = static_cast<float>(modeInfo->dotClock) / modeInfo->hTotal;
 
     return out;
 }
@@ -310,7 +263,7 @@ float getVerticalRefreshRate(XRRModeInfo * modeInfo){
         if(modeInfo->modeFlags & RR_Interlace) // https://en.wikipedia.org/wiki/Interlaced_video
             vTotal /= 2;
 
-        out = (float)modeInfo->dotClock / ((float)modeInfo->hTotal * vTotal);
+        out = static_cast<float>(modeInfo->dotClock) / (modeInfo->hTotal * vTotal);
     }
 
     return out;
@@ -318,7 +271,7 @@ float getVerticalRefreshRate(XRRModeInfo * modeInfo){
 
 //Utility function for getAspectRatio
 bool ratioEqualsValue(const float ratio, const float value){
-    return std::abs(ratio - value) < 0.01;
+    return std::abs(ratio - value) < 0.01f;
 }
 
 // Function that takes the resolution OR the width/height ratio
@@ -344,7 +297,7 @@ QString getAspectRatio(const float width, const float height = 1){
     else if(ratioEqualsValue(ratio, 1.2f))
         out = "6:5";
 
-    return out.isEmpty() ? QString::number(ratio, 'g', 3) + ":1" : out;
+    return out.isEmpty() ? QString::number(static_cast<double>(ratio), 'g', 3) + ":1" : out;
 }
 
 void addChild(QTreeWidgetItem * parent, const QString &leftColumn, const QString &rightColumn) {
@@ -466,7 +419,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                  tr("%n mm x ",NULL,DisplayWidthMM(display,screenIndex))+tr("%n mm",NULL,DisplayHeightMM(display,screenIndex)));
 
         // Retrieve screen resources (connectors, configurations, timestamps etc.)
-        XRRScreenResources * screenResources = XRRGetScreenResources(display, screenRoot);
+        XRRScreenResources * screenResources = XRRGetScreenResourcesCurrent(display, screenRoot);
         if (screenResources == NULL){
             qWarning() << "Error loading connectors: can't get resources for screen " << QString::number(screenIndex);
             continue; // Next screen
@@ -523,7 +476,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                 //Add refresh rate
                 float vRefreshRate = getVerticalRefreshRate(getModeInfo(screenResources, *activeMode));
                 if(vRefreshRate != -1){
-                    QString outputVRate = QString::number(vRefreshRate, 'g', 3) + " Hz";
+                    QString outputVRate = QString::number(static_cast<double>(vRefreshRate), 'g', 3) + " Hz";
                     addChild(outputItem, tr("Refresh rate"), outputVRate);
                 }
 
@@ -538,10 +491,10 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                     float maxRed = gammaInfo->red[gammaInfo->size-1],
                             maxGreen = gammaInfo->green[gammaInfo->size-1],
                             maxBlue = gammaInfo->blue[gammaInfo->size-1],
-                            brightnessPercent = (0.2126 * maxRed + 0.7152 * maxGreen + 0.0722 * maxBlue) * 100 / 0xFFFF;
+                            brightnessPercent = (0.2126f * maxRed + 0.7152f * maxGreen + 0.0722f * maxBlue) * 100 / 0xFFFF;
                     // Source of the brightness formula: https://en.wikipedia.org/wiki/Relative_luminance
                     if(brightnessPercent > 0){
-                        QString  softBrightness = QString::number(brightnessPercent, 'g', 3) + " %";
+                        QString  softBrightness = QString::number(static_cast<double>(brightnessPercent), 'g', 3) + " %";
                         addChild(outputItem, tr("Brightness (software)"), softBrightness);
                     }
                     XRRFreeGamma(gammaInfo);
@@ -558,7 +511,9 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             // Add monitor size
             double diagonal = sqrt(pow(outputInfo->mm_width, 2) + pow(outputInfo->mm_height, 2)) * MILLIMETERS_PER_INCH;
             addChild(outputItem, tr("Size"),
-                     tr("%n mm x ",NULL,outputInfo->mm_width)+tr("%n mm ",NULL,outputInfo->mm_height)+tr("(%n inches)",NULL,diagonal));
+                     QString::number(outputInfo->mm_width) + tr(" mm x ")
+                     + QString::number(outputInfo->mm_height) + tr(" mm (")
+                     + QString::number(diagonal) + tr(" inches)"));
 
             // Create the root QTreeWidgetItem of the possible modes (resolution, Refresh rate, HSync, VSync, etc) list
             QTreeWidgetItem * modeListItem = new QTreeWidgetItem(QStringList() << tr("Supported modes"));
@@ -586,13 +541,13 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                             horizontalRefreshRate = getHorizontalRefreshRate(modeInfo);
 
                     if(verticalRefreshRate > 0)
-                        modeDetails += QString::number(verticalRefreshRate, 'g', 3) + tr(" Hz vertical, ");
+                        modeDetails += QString::number(static_cast<double>(verticalRefreshRate), 'g', 3) + tr(" Hz vertical, ");
 
                     if(horizontalRefreshRate > 0)
-                        modeDetails += QString::number(horizontalRefreshRate / 1000, 'g', 3) + tr(" KHz horizontal, ");
+                        modeDetails += QString::number(static_cast<double>(horizontalRefreshRate) / 1000, 'g', 3) + tr(" KHz horizontal, ");
 
                     if(modeInfo->dotClock > 0)
-                        modeDetails += QString::number((float) modeInfo->dotClock / 1000000, 'g', 3) + tr(" MHz dot clock");
+                        modeDetails += QString::number(static_cast<double>(modeInfo->dotClock) / 1000000, 'g', 3) + tr(" MHz dot clock");
                 }
 
                 // Check possible mode flags
@@ -688,7 +643,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                         propertyValue += translateProperty(display,
                                                            propertyDataFormat,
                                                            propertyDataType,
-                                                           (Atom*)&propertyRawData[i]);
+                                                           reinterpret_cast<Atom*>(&propertyRawData[i]));
 
                     // Get the property informations (allows to get ranges)
                     XRRPropertyInfo *propertyInfo = XRRQueryOutputProperty(display,
@@ -707,7 +662,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                                 propertyValue += translateProperty(display,
                                                             32, // Value data has 32-bit format
                                                             propertyDataType,
-                                                            (Atom*)&propertyInfo->values[valuesIndex]);
+                                                            reinterpret_cast<Atom*>(&propertyInfo->values[valuesIndex]));
                                propertyValue += " - ";
                                valuesIndex++;
                             }
@@ -715,7 +670,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                             propertyValue += translateProperty(display,
                                                                32,
                                                                propertyDataType,
-                                                               (Atom*)&propertyInfo->values[valuesIndex]);
+                                                               reinterpret_cast<Atom*>(&propertyInfo->values[valuesIndex]));
 
                             if(valuesIndex < propertyInfo->num_values - 1) // Another range is available
                                 propertyValue.append(", ");
@@ -748,23 +703,43 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
     QList<QTreeWidgetItem *> list;
 
-    switch (currentDriver) {
-    case XORG:
-        list = dXorg::getModuleInfo();
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN: {
-        list.append(new QTreeWidgetItem(QStringList() << tr("No info")));
-    }
+    if(driverModule.isEmpty())
+        qWarning() << "getModuleInfo: no module available";
+    else {
+        // Get the list of the current module parameters
+        const QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p " + driverModule);
+        const QString parameterPath = "/sys/module/" + driverModule + "/parameters/";
+
+        for (const QString & line : modInfo) { // For each parameter
+            if (line.contains(":") && ! line.startsWith("modinfo: ERROR: ")) { // show nothing in case of an error
+               const QStringList parts = line.split(":",QString::SkipEmptyParts);
+               QString paramName = parts[0], paramDesc = parts[1], paramValue;
+
+               // Try reading the value though "systool -m <module> -A <parameter>
+               const QStringList info = globalStuff::grabSystemInfo("systool -m " + driverModule + " -A " + paramName).filter(paramName);
+
+               if( ! info.isEmpty()) // Systool available, parse parameter line: <parameter> = "<value>"
+                   paramValue = info[0].split("=", QString::SkipEmptyParts).value(1).remove('"');
+               else { // Systool not available, read parameter value from /sys/module/<module>/parameters/<parameter>
+                    QFile mp(parameterPath + paramName);
+                    if(mp.open(QIODevice::ReadOnly)){
+                        paramValue = mp.readLine(20).simplified();
+                        mp.close();
+                    } else
+                        paramValue = tr("Unknown");
+               }
+               list.append(new QTreeWidgetItem(QStringList() << paramName << paramValue << paramDesc));
+            }
+        }
     }
 
     return list;
 }
 
-QStringList gpu::getGLXInfo(QString gpuName) const {
+QStringList gpu::getGLXInfo(const QString & gpuName) const {
+    // List installed cards
     QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter(QRegExp(".+VGA.+|.+3D.+"));
     gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
-
     // loop for multi gpu
     for (int i = 0; i < gpus.count(); i++)
         data << tr("VGA:") +gpus[i].split(":",QString::SkipEmptyParts)[2];
@@ -772,43 +747,33 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     if (!gpuName.isEmpty())
         env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
-    QStringList driver = globalStuff::grabSystemInfo("xdriinfo",env).filter("Screen 0:",Qt::CaseInsensitive);
-    if (!driver.isEmpty())  // because of segfault when no xdriinfo
-        data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
+    // Show the DRI driver
+    const QStringList driver = globalStuff::grabSystemInfo("xdriinfo driver 0");
+    if(!driver.isEmpty())
+        data << "Driver: " + driver[0];
+    // Old implementation
+    // QStringList driver = globalStuff::grabSystemInfo("xdriinfo", env).filter("Screen 0:",Qt::CaseInsensitive);
+    // if (!driver.isEmpty())  // because of segfault when no xdriinfo
+    //    data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
-    switch (currentDriver) {
-    case XORG:
-        data << dXorg::getGLXInfo(env);
-        break;
-    case FGLRX:
-        data << dFglrx::getGLXInfo();
-        break;
-    case DRIVER_UNKNOWN:
-        break;
-    }
+    // Show OpenGL informations
+    data.append(globalStuff::grabSystemInfo("glxinfo -B", env).filter(QRegExp(".+")));
+    // Old dxorg.cpp implementation, using full glxinfo output instead of glxinfo -B
+    // Consider only lines containing "direct rendering" or containing "OpenGL ... : ..." but not containing 'none
+    // data.append(globalStuff::grabSystemInfo("glxinfo", env).filter(QRegExp("direct rendering|OpenGL.+:..(?!none)")));
     return data;
 }
 
 QString gpu::getCurrentPowerLevel() const {
-    switch (currentDriver) {
-    case XORG:
-        return dXorg::getCurrentPowerLevel().trimmed();
-        break;
-    default:
-        return "";
-        break;
-    }
+    qWarning() << "getCurrentPowerLevel is not implemented";
+
+    return "";
 }
 
 QString gpu::getCurrentPowerProfile() const {
-    switch (currentDriver) {
-    case XORG:
-        return dXorg::getCurrentPowerProfile().trimmed();
-        break;
-    default:
-        return "";
-        break;
-    }
+    qWarning() << "getCurrentPowerProfile is not implemented";
+
+    return "";
 }
 
 void gpu::refreshPowerLevel() {
@@ -816,89 +781,86 @@ void gpu::refreshPowerLevel() {
     currentPowerProfile = getCurrentPowerProfile();
 }
 
-void gpu::setPowerProfile(powerProfiles newPowerProfile) const {
-    switch (currentDriver) {
-    case XORG:
-        dXorg::setPowerProfile(newPowerProfile);
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+void gpu::setPowerProfile(powerProfiles newPowerProfile) {
+    qWarning() << "setPowerProfile is not implemented";
 }
 
-void gpu::setForcePowerLevel(forcePowerLevels newForcePowerLevel) const {
-    switch (currentDriver) {
-    case XORG:
-        dXorg::setForcePowerLevel(newForcePowerLevel);
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+void gpu::setForcePowerLevel(forcePowerLevels newForcePowerLevel) {
+    qWarning() << "setForcePowerLevel is not implemented";
 }
 
-void gpu::setPwmValue(int value) const {
-    switch (currentDriver) {
-    case XORG:
-        dXorg::setPwmValue(value);
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+void gpu::setPwmValue(ushort value) {
+    qWarning() << "setForcePowerLevel is not implemented";
 }
 
-void gpu::setPwmManualControl(bool manual) const {
-    switch (currentDriver) {
-    case XORG:
-        dXorg::setPwmManuaControl(manual);
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+void gpu::setPwmManualControl(bool manual) {
+    qWarning() << "setPwmManualControl is not implemented";
 }
 
-void gpu::getPwmSpeed() {
-    switch (currentDriver) {
-    case XORG:
-        gpuTemeperatureData.pwmSpeed = ((float)dXorg::getPwmSpeed() / features.pwmMaxSpeed ) * 100;
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+ushort gpu::getPwmSpeed() const {
+    qWarning() << "getPemSpeed is not implemented";
+
+    return 0;
 }
 
 bool gpu::overclockGPU(const int value){
-    if(features.GPUoverClockAvailable){
-        switch(currentDriver){
-        case XORG:
-            return dXorg::overClockGPU(value);
-            break;
-        case FGLRX:
-        case DRIVER_UNKNOWN:
-            break;
-        }
-    }
+    qWarning() << "Error overclocking GPU: overclocking is not implemented";
 
-    qWarning() << "Error overclocking GPU: overclocking is not supported";
     return false;
 }
 
 bool gpu::overclockMemory(const int value){
-    if(features.GPUoverClockAvailable){
-        switch(currentDriver){
-        case XORG:
-            return dXorg::overClockMemory(value);
-            break;
-        case FGLRX:
-        case DRIVER_UNKNOWN:
-            break;
+    qWarning() << "Error overclocking memory: overclocking is not implemented";
+
+    return false;
+}
+
+QStringList gpu::detectCards() const {
+    const QStringList list = globalStuff::grabSystemInfo("ls /sys/class/drm/").filter("card");
+    QStringList cards;
+
+    for(const QString & element : list){
+        QFile f("/sys/class/drm/" + element + "/device/uevent");
+        if (f.open(QIODevice::ReadOnly)) {
+            if (QString(f.readLine(50)).contains("DRIVER=" + driverModule))
+                cards.append(f.fileName().split('/').at(4));
         }
     }
 
-    qWarning() << "Error overclocking memory: overclocking is not supported";
-    return false;
+    return cards;
+}
+
+bool gpu::setNewValue(const QString & filePath, const QString & newValue, const bool directly) {
+    if(daemonConnected() && ! directly)
+        dcomm.sendSetValue(newValue, filePath);
+    else {
+        QFile file(filePath);
+        if( ! file.open(QIODevice::WriteOnly | QIODevice::Text)){
+            qWarning() << "Unable to open " + filePath + " to write " + newValue;
+            return false;
+        }
+
+        QTextStream stream(&file);
+        stream << newValue + "\n";
+        if( ! file.flush() ){
+            qWarning() << "Failed to flush " + filePath + " to write " + newValue;
+            return false;
+        }
+
+        file.close();
+    }
+
+    return true;
+}
+
+QString gpu::readFile(const QString & filePath) const {
+    QFile file(filePath);
+
+    if( ! file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return "";
+
+    const QString out = file.readAll().trimmed();
+
+    file.close();
+    return out;
 }

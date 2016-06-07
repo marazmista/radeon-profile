@@ -91,7 +91,7 @@ void radeon_profile::loadConfig() {
     ui->cb_startMinimized->setChecked(settings.value("startMinimized",false).toBool());
     ui->cb_minimizeTray->setChecked(settings.value("minimizeToTray",false).toBool());
     ui->cb_closeTray->setChecked(settings.value("closeToTray",false).toBool());
-    ui->spin_timerInterval->setValue(settings.value("updateInterval",1).toDouble());
+    ui->spin_timerInterval->setValue(settings.value("updateInterval",1).toInt());
     ui->cb_graphs->setChecked(settings.value("updateGraphs",true).toBool());
     ui->cb_glxInfo->setChecked(settings.value("updateGLXInfo",false).toBool());
     ui->cb_connectors->setChecked(settings.value("updateConnectors",false).toBool());
@@ -167,9 +167,9 @@ void radeon_profile::loadConfig() {
     ui->cb_showFreqGraph->setChecked(ui->cb_showFreqGraph->isChecked());
     ui->cb_showVoltsGraph->setChecked(ui->cb_showVoltsGraph->isChecked());
 
-    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
+    globalStuff::globalConfig.interval = static_cast<ushort>(ui->spin_timerInterval->value());
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
-    globalStuff::globalConfig.graphOffset = ((optionsMenu.actions().at(1)->isChecked()) ? 20 : 0);
+    graphOffset = ((optionsMenu.actions().at(1)->isChecked()) ? 20 : 0);
 
     QFile ef(execProfilesPath);
     if (ef.open(QIODevice::ReadOnly)) {
@@ -193,7 +193,7 @@ void radeon_profile::loadFanProfiles() {
         if (steps.count() > 1) {
             for (int i = 1; i < steps.count(); ++i) {
                 QStringList pair = steps[i].split("#");
-                addFanStep(pair[0].toInt(),pair[1].toInt(), true, true, false);
+                addFanStep(pair[0].toShort(), pair[1].toUShort(), true, true, false);
             }
 
             fsPath.close();
@@ -213,7 +213,7 @@ void radeon_profile::loadFanProfiles() {
 void radeon_profile::makeFanProfileGraph() {
     ui->plotFanProfile->graph(0)->clearData();
 
-    for (int temperature : fanSteps.keys())
+    for (short temperature : fanSteps.keys())
         ui->plotFanProfile->graph(0)->addData(temperature, fanSteps.value(temperature));
 
     ui->plotFanProfile->replot();
@@ -223,7 +223,7 @@ void radeon_profile::saveFanProfiles() {
     QFile fsPath(fanStepsPath);
     if (fsPath.open(QIODevice::WriteOnly)) {
         QString profile = "default|";
-        for (int temperature : fanSteps.keys())
+        for (short temperature : fanSteps.keys())
             profile.append(QString::number(temperature)+ "#" + QString::number(fanSteps.value(temperature))  + "|");
 
         fsPath.write(profile.toLatin1());

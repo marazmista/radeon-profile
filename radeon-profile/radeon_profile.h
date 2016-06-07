@@ -34,7 +34,7 @@ namespace Ui {
 class radeon_profile;
 }
 
-class radeon_profile : public QMainWindow
+class radeon_profile : private QMainWindow
 {
     Q_OBJECT
 
@@ -68,7 +68,7 @@ public:
     ~radeon_profile();
 
 private slots:
-    void timerEvent();
+    void timerEvent(QTimerEvent *event);
     void on_btn_dpmBattery_clicked();
     void on_btn_dpmBalanced_clicked();
     void on_btn_dpmPerformance_clicked();
@@ -91,7 +91,7 @@ private slots:
     void closeEvent(QCloseEvent *);
     void closeFromTray();
     void on_spin_lineThick_valueChanged(int arg1);
-    void on_spin_timerInterval_valueChanged(double arg1);
+    void on_spin_timerInterval_valueChanged(int arg1);
     void on_cb_graphs_toggled(bool checked);
     void on_cb_gpuData_toggled(bool checked);
     void refreshBtnClicked();
@@ -138,7 +138,7 @@ private slots:
     void on_mainTabs_currentChanged(int index);
 
 private:
-    gpu device;
+    gpu * device;
     static const QString settingsPath;
     QList<execBin*> execsRunning;
     QMap<short, unsigned short> fanSteps;
@@ -147,10 +147,14 @@ private:
     QSystemTrayIcon trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden;
     QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;
-    QTimer timer;
+    int timerID;
     QButtonGroup pwmGroup;
+    ushort graphOffset = 0;
+    bool closeFromTrayMenu = false;
 
     Ui::radeon_profile *ui;
+
+    gpu * detectDriver();
     void setupGraphs();
     void setupTrayIcon();
     void setupOptionsMenu();
@@ -214,7 +218,7 @@ private:
      * @param alsoAdjustSpeed Updates the fan speed after adding the step.
      * @return If the operation was successful.
      */
-    bool addFanStep (int temperature, int fanSpeed, bool alsoToList = true, bool alsoToGraph = true, bool alsoAdjustSpeed = true);
+    bool addFanStep (short temperature, ushort fanSpeed, bool alsoToList = true, bool alsoToGraph = true, bool alsoAdjustSpeed = true);
 
     /**
      * @brief askQuestion Creates a dialog to ask a question

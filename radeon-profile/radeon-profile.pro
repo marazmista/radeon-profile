@@ -4,6 +4,9 @@
 #
 #-------------------------------------------------
 
+QMAKE_CXXFLAGS += -std=c++11 -Wno-unused-parameter
+CONFIG += c++11
+
 QT       += core gui network widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
@@ -17,6 +20,8 @@ TEMPLATE = app
 #   QtWarning, QtCritical and QtFatal will still work on Release
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
+CONFIG(debug, debug|release):QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic
+
 SOURCES += main.cpp\
         radeon_profile.cpp \
     qcustomplot.cpp \
@@ -28,7 +33,8 @@ SOURCES += main.cpp\
     settings.cpp \
     daemonComm.cpp \
     execTab.cpp \
-    execbin.cpp
+    execbin.cpp \
+    dintel.cpp
 
 HEADERS  += radeon_profile.h \
     qcustomplot.h \
@@ -37,7 +43,8 @@ HEADERS  += radeon_profile.h \
     dfglrx.h \
     globalStuff.h \
     daemonComm.h \
-    execbin.h
+    execbin.h \
+    dintel.h
 
 FORMS    += radeon_profile.ui
 

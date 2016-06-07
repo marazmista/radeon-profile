@@ -9,6 +9,8 @@
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QStringList>
+#include <QDebug>
+#include <QTime>
 
 #define dpm_battery "battery"
 #define dpm_performance "performance"
@@ -54,9 +56,8 @@ public:
 
     // settings from config used across the source
     static struct globalCfgStruct{
-        float interval;
+        ushort interval; // seconds
         bool daemonAutoRefresh, rootMode;
-        ushort graphOffset;
     } globalConfig;
 };
 
@@ -154,7 +155,7 @@ typedef struct gpuTemperatureStruct {
         max = 0,
         min = 0,
         sum = 0;
-    ushort pwmSpeed = 0;
+    ushort pwmSpeed = 0; // Pwm speed percentage on max PWM speed
 } gpuTemperatureStruct;
 
 typedef struct gpuTemperatureStructString {
