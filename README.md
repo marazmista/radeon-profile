@@ -1,14 +1,20 @@
-Simple application to read current clocks of ATi Radeon cards (xf86-video-ati and fglrx).
+Simple application to read current clocks and temperatures, overclock and manage power settings of your graphic card.
 
-# xf86-video-ati driver
-Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-profile-daemon) for using this app as normal user. Otherwise app need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`. Here is tip for run app as normal user but involves change permissions to system files: http://bit.ly/1dvQMhS
+# Supported drivers
+* ## Radeon ( xf86-video-ati / xf86-video-amdgpu )
+  Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-profile-daemon) for using this app as normal user. Otherwise app need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`. Here is tip for run app as normal user but involves change permissions to system files: http://bit.ly/1dvQMhS
 
-Can be forced by `--driver xorg` parameter.
+  Can be forced by `--driver xorg` parameter.
 
-# fglrx driver
-Normal user can run it. Data is read from `ati-config` output. No support for power settings.
+* ## AMD Catalyst ( fglrx )
+  Normal user can run it. Data is read from `ati-config` output. No support for power settings.
 
-Can be forced by `--driver fglrx` parameter.
+  Can be forced by `--driver fglrx` parameter.
+
+* ## Intel ( xf86-video-intel )
+  Normal user can run it. No support for power settings.
+
+  Can be forced by `--driver intel` parameter.
 
 # Dependencies
 Crucial:

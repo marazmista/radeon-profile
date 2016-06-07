@@ -178,19 +178,26 @@ void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
 }
 
 void radeon_profile::closeEvent(QCloseEvent *e) {
-    if (ui->cb_closeTray->isChecked() && !closeFromTrayMenu) {
-        this->hide();
-        e->ignore();
-    } else {
+    hide();
 
+    if (ui->cb_closeTray->isChecked() && !closeFromTrayMenu) {
+        e->ignore();
+        qDebug() << "Closing to tray menu";
+    } else {
+        e->accept();
+
+        qDebug() << "Saving config";
         killTimer(timerID);
         saveConfig();
 
         if (device->features.pwmAvailable) {
+            qDebug() << "Disabling pwm and saving fan profiles";
             device->setPwmManualControl(false);
             saveFanProfiles();
+            QApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
         }
-        QApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
+
+        qDebug() << "Closing";
         QApplication::quit();
     }
 }

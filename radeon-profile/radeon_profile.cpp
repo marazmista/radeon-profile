@@ -184,8 +184,8 @@ void radeon_profile::addRuntimeWidgets() {
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
 void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
-    qDebug() << "Setting up UI elements with enabled features";
     if (features.canChangeProfile && features.pm < PM_UNKNOWN) {
+        qDebug() << "Power profiles are available, configuring";
         const bool dpm = features.pm == DPM; // true=dpm, false=profile
         ui->tabs_pm->setCurrentWidget(dpm ? ui->dpmProfiles : ui->stdProfiles);
 
@@ -211,6 +211,7 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     ui->cb_showVoltsGraph->setEnabled(features.coreVoltAvailable);
 
     if (!features.temperatureAvailable) {
+        qDebug() << "Temperature data is available, configuring";
         ui->cb_showTempsGraph->setEnabled(false);
         ui->plotTemp->setVisible(false);
         ui->l_temp->setVisible(false);
@@ -300,8 +301,14 @@ void radeon_profile::refreshUI() {
 
         if (device->gpuClocksData.powerLevelOk)
             addChild(ui->list_currentGPUData, tr("Power level"), device->gpuClocksDataString.powerLevel);
+
+        if(device->features.coreMaxClkAvailable)
+            addChild(ui->list_currentGPUData, tr("Maximum GPU clock"), device->fixedData.maxCoreFreqString);
         if (device->gpuClocksData.coreClkOk)
             addChild(ui->list_currentGPUData, tr("GPU clock"), device->gpuClocksDataString.coreClk);
+        if(device->features.coreMinClkAvailable)
+            addChild(ui->list_currentGPUData, tr("Minimum GPU clock"), device->fixedData.minCoreFreqString);
+
         if (device->gpuClocksData.memClkOk)
             addChild(ui->list_currentGPUData, tr("Memory clock"), device->gpuClocksDataString.memClk);
         if (device->gpuClocksData.uvdCClkOk)
@@ -513,7 +520,11 @@ void radeon_profile::updateStatsTable() {
 
 void radeon_profile::refreshTooltip()
 {
-    QString tooltipdata = radeon_profile::windowTitle() + "\nCurrent profile: "+ device->currentPowerProfile + "  " + device->currentPowerLevel +"\n";
+    QString tooltipdata = radeon_profile::windowTitle() + "\n";
+
+    if(device->features.canChangeProfile)
+        tooltipdata += "Power profile: "+ device->currentPowerProfile + "  " + device->currentPowerLevel +"\n";
+
     for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++) {
         tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
     }

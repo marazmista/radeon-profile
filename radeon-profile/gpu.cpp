@@ -50,6 +50,12 @@ void gpu::initialize(){
     gpuList = detectCards();
     changeGPU(currentGpuIndex);
     features = figureOutDriverFeatures();
+
+    if(features.coreMaxClkAvailable)
+        fixedData.maxCoreFreqString = QString::number (fixedData.maxCoreFreq) + "MHz";
+    if(features.coreMinClkAvailable)
+        fixedData.minCoreFreqString = QString::number (fixedData.minCoreFreq) + "MHz";
+
     qDebug() << "Power profile enabled: " << features.canChangeProfile;
     qDebug() << "Core {clock, volt} enabled: " << features.coreClockAvailable << features.coreVoltAvailable;
     qDebug() << "Memory {core, volt} enabled: " << features.memClockAvailable << features.memClockAvailable;

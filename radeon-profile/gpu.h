@@ -32,6 +32,12 @@ public:
     driverFeatures features;
     QString currentPowerProfile, currentPowerLevel;
 
+    struct fixedDataStruct {
+        short maxCoreFreq = -1, // MHz
+            minCoreFreq = -1; // MHz
+        QString maxCoreFreqString, minCoreFreqString;
+    } fixedData;
+
     /*  Common functions, already implemented in gpu.cpp (can be re-implemented/extended by inheriting classes)  */
     /**
      * @brief initialize Initialize the driver (detect available cards, select the current card, figure out available features)

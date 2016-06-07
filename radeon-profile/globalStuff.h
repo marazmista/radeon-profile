@@ -135,6 +135,8 @@ typedef struct gpuClocksStructString {
 typedef struct driverFeatures {
     bool canChangeProfile = false,
         coreClockAvailable = false,
+        coreMaxClkAvailable = false,
+        coreMinClkAvailable = false,
         memClockAvailable = false,
         coreVoltAvailable = false,
         memVoltAvailable = false,

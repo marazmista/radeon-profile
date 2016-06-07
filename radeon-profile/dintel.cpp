@@ -29,13 +29,19 @@ void dIntel::changeGPU(ushort gpuIndex){
     curFreq = device + file_curFreq;
     minFreq = device + file_minFreq;
     maxFreq = device + file_maxFreq;
+
+    fixedData.maxCoreFreq = readFile(maxFreq).toShort();
+    fixedData.minCoreFreq = readFile(minFreq).toShort();
 }
 
 driverFeatures dIntel::figureOutDriverFeatures(){
     driverFeatures features;
 
-    gpuClocksData = getClocks();
-    features.coreClockAvailable = gpuClocksData.coreClkOk;
+    gpuClocksData = getClocks(true);
+    features.coreClockAvailable = gpuClocksData.coreClkOk > 0;
+
+    features.coreMaxClkAvailable = fixedData.maxCoreFreq > 0;
+    features.coreMinClkAvailable = fixedData.minCoreFreq > 0;
 
     return features;
 }
