@@ -31,14 +31,12 @@ public:
     QStringList gpuList;
     driverFeatures features;
     QString currentPowerProfile, currentPowerLevel;
-
-    struct fixedDataStruct {
-        short maxCoreFreq = -1, // MHz
-            minCoreFreq = -1; // MHz
-        QString maxCoreFreqString, minCoreFreqString;
-    } fixedData;
+    short maxCoreFreq, minCoreFreq; // MHz
+    QString maxCoreFreqString, minCoreFreqString;
 
     /*  Common functions, already implemented in gpu.cpp (can be re-implemented/extended by inheriting classes)  */
+    gpu();
+
     /**
      * @brief initialize Initialize the driver (detect available cards, select the current card, figure out available features)
      * @see detectCard()
@@ -180,7 +178,7 @@ public:
     virtual bool overclockMemory(int value);
 
 protected:
-    ushort currentGpuIndex = 0;
+    ushort currentGpuIndex;
     daemonComm dcomm;
     QString driverModule;
 

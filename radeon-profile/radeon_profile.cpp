@@ -43,6 +43,10 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
 {
+    rangeX = 180;
+    ticksCounter = statsTickCounter = graphOffset = 0;
+    closeFromTrayMenu = false;
+
     logTime << "Figuring out the driver";
     QString params = a.join(" ");
     if (params.contains("--driver xorg"))
@@ -269,7 +273,8 @@ void radeon_profile::refreshGpuData() {
     if(device->features.canChangeProfile)
         device->refreshPowerLevel();
 
-    device->updateClocksData();
+    if(device->features.coreClockAvailable || device->features.memClockAvailable)
+        device->updateClocksData();
     device->updateTemperatureData();
 
     updateExecLogs();
@@ -303,11 +308,11 @@ void radeon_profile::refreshUI() {
             addChild(ui->list_currentGPUData, tr("Power level"), device->gpuClocksDataString.powerLevel);
 
         if(device->features.coreMaxClkAvailable)
-            addChild(ui->list_currentGPUData, tr("Maximum GPU clock"), device->fixedData.maxCoreFreqString);
+            addChild(ui->list_currentGPUData, tr("Maximum GPU clock"), device->maxCoreFreqString);
         if (device->gpuClocksData.coreClkOk)
             addChild(ui->list_currentGPUData, tr("GPU clock"), device->gpuClocksDataString.coreClk);
         if(device->features.coreMinClkAvailable)
-            addChild(ui->list_currentGPUData, tr("Minimum GPU clock"), device->fixedData.minCoreFreqString);
+            addChild(ui->list_currentGPUData, tr("Minimum GPU clock"), device->minCoreFreqString);
 
         if (device->gpuClocksData.memClkOk)
             addChild(ui->list_currentGPUData, tr("Memory clock"), device->gpuClocksDataString.memClk);

@@ -91,23 +91,13 @@ typedef enum powerMethod {
 } powerMethod;
 
 typedef struct gpuClocksStruct {
-    short coreClk = -1,
-        memClk = -1,
-        coreVolt = -1,
-        memVolt = -1,
-        uvdCClk = -1,
-        uvdDClk = -1,
-        powerLevel = -1;
+    short coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk, powerLevel;
+    bool coreClkOk, memClkOk, coreVoltOk, memVoltOk, uvdCClkOk, uvdDClkOk, powerLevelOk;
 
-    bool coreClkOk = false,
-        memClkOk = false,
-        coreVoltOk = false,
-        memVoltOk = false,
-        uvdCClkOk = false,
-        uvdDClkOk = false,
-        powerLevelOk = false;
-
-    gpuClocksStruct() { }
+    gpuClocksStruct() {
+        coreClk = memClk = coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = -1;
+        coreClkOk = memClkOk = coreVoltOk = memVoltOk = uvdCClkOk = uvdDClkOk = powerLevelOk = false;
+    }
 
     gpuClocksStruct(short _coreClk, short _memClk, short _coreVolt, short _memVolt, short _uvdCClk, short _uvdDclk, short _pwrLevel ) {
         coreClk = _coreClk;
@@ -120,9 +110,6 @@ typedef struct gpuClocksStruct {
         coreClkOk = memClkOk = coreVoltOk = memVoltOk = uvdCClkOk = uvdDClkOk = powerLevelOk = true;
     }
 
-    void invalidate(){
-        coreClkOk = memClkOk = coreVoltOk = memVoltOk = uvdCClkOk = uvdDClkOk = powerLevelOk = false;
-    }
 } gpuClocksStruct;
 
 typedef struct gpuClocksStructString {
@@ -133,31 +120,37 @@ typedef struct gpuClocksStructString {
 // structure which holds what can be display on ui and on its base
 // we enable ui elements
 typedef struct driverFeatures {
-    bool canChangeProfile = false,
-        coreClockAvailable = false,
-        coreMaxClkAvailable = false,
-        coreMinClkAvailable = false,
-        memClockAvailable = false,
-        coreVoltAvailable = false,
-        memVoltAvailable = false,
-        temperatureAvailable = false,
-        pwmAvailable = false,
-        GPUoverClockAvailable = false,
-        memoryOverclockAvailable = false;
-    powerMethod pm = PM_UNKNOWN;
-    ushort pwmMaxSpeed = 0;
+    bool canChangeProfile,
+        coreClockAvailable,
+        coreMaxClkAvailable,
+        coreMinClkAvailable,
+        memClockAvailable,
+        coreVoltAvailable,
+        memVoltAvailable,
+        temperatureAvailable,
+        pwmAvailable,
+        GPUoverClockAvailable,
+        memoryOverclockAvailable;
+    powerMethod pm;
+    ushort pwmMaxSpeed;
 
-    driverFeatures() { }
+    driverFeatures() {
+        canChangeProfile = coreClockAvailable = coreMaxClkAvailable = coreMinClkAvailable =
+                memClockAvailable = coreVoltAvailable = memVoltAvailable = temperatureAvailable =
+                pwmAvailable = GPUoverClockAvailable = memoryOverclockAvailable = false;
+        pm = PM_UNKNOWN;
+        pwmMaxSpeed = 0;
+    }
 
 } driverFeatures;
 
 typedef struct gpuTemperatureStruct {
-    float current = 0,
-        currentBefore = 0,
-        max = 0,
-        min = 0,
-        sum = 0;
-    ushort pwmSpeed = 0; // Pwm speed percentage on max PWM speed
+    float current, currentBefore, max, min, sum;
+    ushort pwmSpeed; // Pwm speed percentage on max PWM speed
+
+    gpuTemperatureStruct(){
+        current = currentBefore = max = min = sum = pwmSpeed = 0;
+    }
 } gpuTemperatureStruct;
 
 typedef struct gpuTemperatureStructString {

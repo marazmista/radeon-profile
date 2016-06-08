@@ -8,6 +8,8 @@
 #include <QFileDialog>
 
 execBin::execBin() : QProcess() {
+    logEnabled = false;
+
     mainLay = new QVBoxLayout();
     btnLay = new QHBoxLayout();
     tab = new QWidget();

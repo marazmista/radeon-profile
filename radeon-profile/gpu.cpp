@@ -37,6 +37,9 @@ static const QStringList pnpIdFiles = {
     "/usr/share/hwdata/pnp.ids"
 };
 
+gpu::gpu(){
+    currentGpuIndex = 0;
+}
 
 void gpu::reconfigureDaemon() {
     qWarning() << "reconfigureDaemon is not implemented";
@@ -52,9 +55,9 @@ void gpu::initialize(){
     features = figureOutDriverFeatures();
 
     if(features.coreMaxClkAvailable)
-        fixedData.maxCoreFreqString = QString::number (fixedData.maxCoreFreq) + "MHz";
+        maxCoreFreqString = QString::number (maxCoreFreq) + "MHz";
     if(features.coreMinClkAvailable)
-        fixedData.minCoreFreqString = QString::number (fixedData.minCoreFreq) + "MHz";
+        minCoreFreqString = QString::number (minCoreFreq) + "MHz";
 
     qDebug() << "Power profile enabled: " << features.canChangeProfile;
     qDebug() << "Core {clock, volt} enabled: " << features.coreClockAvailable << features.coreVoltAvailable;

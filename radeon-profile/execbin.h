@@ -37,7 +37,7 @@ public:
 
     QString name;
     QWidget *tab;
-    bool logEnabled = false;
+    bool logEnabled;
 
 private slots:
     void execProcessReadOutput();

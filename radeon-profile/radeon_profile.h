@@ -143,14 +143,14 @@ private:
     QList<execBin*> execsRunning;
     QMap<short, unsigned short> fanSteps;
     QMap<QString, unsigned short> pmStats;
-    unsigned short rangeX = 180, ticksCounter = 0, statsTickCounter = 0;
+    unsigned short rangeX, ticksCounter, statsTickCounter;
     QSystemTrayIcon trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden;
     QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;
     int timerID;
     QButtonGroup pwmGroup;
-    ushort graphOffset = 0;
-    bool closeFromTrayMenu = false;
+    ushort graphOffset;
+    bool closeFromTrayMenu;
     QStringList selectedVariableVaules, envVars;
 
     Ui::radeon_profile *ui;
