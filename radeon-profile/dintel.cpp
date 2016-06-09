@@ -43,12 +43,37 @@ driverFeatures dIntel::figureOutDriverFeatures(){
     features.coreMaxClkAvailable = maxCoreFreq > 0;
     features.coreMinClkAvailable = minCoreFreq > 0;
 
+    features.temperatureAvailable = getTemperature() > 0;
+
     return features;
 }
 
 gpuClocksStruct dIntel::getClocks(bool forFeatures) {
+    UNUSED(forFeatures);
     gpuClocksStruct data;
     data.coreClk = readFile(actFreq).toShort();
     data.coreClkOk = data.coreClk > 0;
     return data;
+}
+
+float dIntel::getTemperature() const {
+    // Integrated graphics temperature == CPU temperature
+    const QStringList sensors = globalStuff::grabSystemInfo("sensors").filter("Core ");
+
+    // Average temperature
+    float sum = 0;
+    ushort count = 0;
+
+    for(const QString & line : sensors){
+        float temp = line.split(" ",QString::SkipEmptyParts)[2].remove("+").remove("C").remove("°").toFloat();
+        if(temp > 0){
+            sum += temp;
+            count++;
+        }
+    }
+
+    if(count == 0)
+        return 0;
+    else
+        return sum / count;
 }

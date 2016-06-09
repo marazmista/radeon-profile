@@ -209,6 +209,7 @@ void radeon_profile::closeFromTray() {
 
 void radeon_profile::on_spin_lineThick_valueChanged(int arg1)
 {
+    UNUSED(arg1);
     setupGraphsStyle();
 }
 
@@ -281,6 +282,7 @@ void radeon_profile::refreshBtnClicked() {
 
 void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
+    UNUSED(column);
     QColor c = QColorDialog::getColor(item->backgroundColor(1));
     if (c.isValid()) {
         item->setBackgroundColor(1,c);

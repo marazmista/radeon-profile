@@ -179,17 +179,16 @@ public:
 
 protected:
     ushort currentGpuIndex;
-    daemonComm dcomm;
     QString driverModule;
 
     // Already implemented utility functions
     /**
-     * @brief setNewValue Writes newValue into filePath (through the daemon if it is connected and 'directly' is false, directly otherwise)
+     * @brief setNewValue Writes newValue into filePath
      * @param filePath Destination path
      * @param newValue Value to write
      * @return success or failure
      */
-    bool setNewValue(const QString & filePath, const QString & newValue, const bool directly = false);
+    bool setNewValue(const QString & filePath, const QString & newValue) const;
 
     /**
      * @brief readFile read the content of a file

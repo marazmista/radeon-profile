@@ -39,6 +39,7 @@ public:
     void changeGPU(ushort gpuIndex);
     driverFeatures figureOutDriverFeatures();
     void reconfigureDaemon();
+    bool daemonConnected() const;
 
     bool overclockGPU(int value);
 
@@ -61,6 +62,7 @@ private:
             memoryOverDrivePath;
     } filePaths;
 
+    daemonComm dcomm;
     ushort sensorsGPUtempIndex;
     tempSensor currentTempSensor;
     powerMethod currentPowerMethod;
@@ -71,6 +73,7 @@ private:
     powerMethod getPowerMethod() const;
     tempSensor testSensor();
     QString findSysFsHwmonForGpu();
+    bool sendValue(const QString & filePath, const QString & value);
 };
 
 #endif // DXORG_H

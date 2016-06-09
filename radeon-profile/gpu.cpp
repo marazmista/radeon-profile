@@ -46,7 +46,7 @@ void gpu::reconfigureDaemon() {
 }
 
 bool gpu::daemonConnected() const {
-    return dcomm.connected();
+    return false;
 }
 
 void gpu::initialize(){
@@ -840,25 +840,22 @@ QStringList gpu::detectCards() const {
     return cards;
 }
 
-bool gpu::setNewValue(const QString & filePath, const QString & newValue, const bool directly) {
-    if(daemonConnected() && ! directly)
-        dcomm.sendSetValue(newValue, filePath);
-    else {
-        QFile file(filePath);
-        if( ! file.open(QIODevice::WriteOnly | QIODevice::Text)){
-            qWarning() << "Unable to open " + filePath + " to write " + newValue;
-            return false;
-        }
-
-        QTextStream stream(&file);
-        stream << newValue + "\n";
-        if( ! file.flush() ){
-            qWarning() << "Failed to flush " + filePath + " to write " + newValue;
-            return false;
-        }
-
-        file.close();
+bool gpu::setNewValue(const QString & filePath, const QString & newValue) const {
+    qDebug() << "Writing" << newValue << "into" << filePath;
+    QFile file(filePath);
+    if( ! file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        qWarning() << "Unable to open " + filePath + " to write " + newValue;
+        return false;
     }
+
+    QTextStream stream(&file);
+    stream << newValue + "\n";
+    if( ! file.flush() ){
+        qWarning() << "Failed to flush " + filePath + " to write " + newValue;
+        return false;
+    }
+
+    file.close();
 
     return true;
 }

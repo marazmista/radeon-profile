@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QMAKE_CXXFLAGS += -std=c++0x -Wno-unused-parameter
+QMAKE_CXXFLAGS += -std=c++0x
 CONFIG += c++0x
 
 QT       += core gui network widgets

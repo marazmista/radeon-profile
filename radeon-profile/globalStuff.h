@@ -40,6 +40,7 @@
 
 #define appVersion 20160527
 
+#define UNUSED(x) (void)(x)
 
 class globalStuff {
 public:

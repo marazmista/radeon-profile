@@ -177,6 +177,7 @@ void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
 
 void radeon_profile::on_list_vaules_itemClicked(QListWidgetItem *item)
 {
+    UNUSED(item);
     ui->txt_summary->clear();
     QStringList selectedValues;
 
@@ -311,14 +312,15 @@ void radeon_profile::btnBackToProfilesClicked()
 }
 
 void radeon_profile::on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column) {
-        switch (ui->cb_execDbcAction->currentIndex()) {
-        default:
-        case 0:
-            if (askConfirmation(tr("Run"), tr("Run: \"") + item->text(0) + tr("\"?")))
-                ui->btn_runExecProfile->click();
-            break;
-        case 1:
-            ui->btn_modifyExecProfile->click();
-            break;
-        }
+    UNUSED(column);
+    switch (ui->cb_execDbcAction->currentIndex()) {
+    default:
+    case 0:
+        if (askConfirmation(tr("Run"), tr("Run: \"") + item->text(0) + tr("\"?")))
+            ui->btn_runExecProfile->click();
+        break;
+    case 1:
+        ui->btn_modifyExecProfile->click();
+        break;
+    }
 }

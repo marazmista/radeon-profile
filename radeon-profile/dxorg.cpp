@@ -61,6 +61,9 @@ void dXorg::reconfigureDaemon() { // Set up the timer
         qCritical() << "Daemon is not connected and can't be configured";
 }
 
+bool dXorg::daemonConnected() const {
+    return dcomm.connected();
+}
 
 void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     const QChar gpuSysIndex = gpuName.at(gpuName.length()-1);
@@ -331,27 +334,27 @@ void dXorg::setPowerProfile(powerProfiles newPowerProfile) {
 
     // enum is int, so first three values are dpm, rest are profile
     if (newPowerProfile <= PERFORMANCE)
-        setNewValue(filePaths.dpmStateFilePath,newValue);
+        sendValue(filePaths.dpmStateFilePath,newValue);
     else
-        setNewValue(filePaths.profilePath,newValue);
+        sendValue(filePaths.profilePath,newValue);
 }
 
 void dXorg::setForcePowerLevel(forcePowerLevels newForcePowerLevel) {
     const QString newValue = powerLevelToString.at(newForcePowerLevel);
 
-    setNewValue(filePaths.forcePowerLevelFilePath, newValue);
+    sendValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
 void dXorg::setPwmValue(ushort value) {
     const QString newValue = QString::number(value);
 
-    setNewValue(filePaths.pwmSpeedPath, newValue);
+    sendValue(filePaths.pwmSpeedPath, newValue);
 }
 
 void dXorg::setPwmManualControl(bool manual){
     const QString mode = QString(manual ? pwm_manual : pwm_auto);
 
-    setNewValue(filePaths.pwmEnablePath, mode);
+    sendValue(filePaths.pwmEnablePath, mode);
 }
 
 ushort dXorg::getPwmSpeed() const {
@@ -463,7 +466,7 @@ bool dXorg::overclockGPU(const int percentage){
         return false;
     }
 
-    return setNewValue(filePaths.GPUoverDrivePath, QString::number(percentage));
+    return sendValue(filePaths.GPUoverDrivePath, QString::number(percentage));
 }
 
 bool dXorg::overclockMemory(const int percentage){
@@ -472,5 +475,14 @@ bool dXorg::overclockMemory(const int percentage){
         return false;
     }
 
-    return setNewValue(filePaths.memoryOverDrivePath, QString::number(percentage));
+    return sendValue(filePaths.memoryOverDrivePath, QString::number(percentage));
+}
+
+bool dXorg::sendValue(const QString & filePath, const QString & value){
+    if(daemonConnected()){
+        dcomm.sendSetValue(value, filePath);
+        return true;
+    }
+    else
+        return setNewValue(filePath, value);
 }
