@@ -8,7 +8,6 @@
 #define GPU_H
 
 #include "globalStuff.h"
-#include "daemonComm.h"
 #include <QTreeWidgetItem>
 #include <QStringList>
 

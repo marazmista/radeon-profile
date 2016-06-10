@@ -88,6 +88,12 @@ void radeon_profile::setupGraphsStyle()
 
 void radeon_profile::setupTrayIcon() {
     qDebug() << "Setting up tray icon";
+
+    // maximize
+    show = new QAction(this);
+    show->setText(tr("Show"));
+    connect(show, SIGNAL(triggered()),this,SLOT(showNormal()));
+
     //close //
     closeApp = new QAction(this);
     closeApp->setText(tr("Quit"));
@@ -134,6 +140,7 @@ void radeon_profile::setupTrayIcon() {
     trayMenu.addAction(changeProfile);
     trayMenu.addMenu(&dpmMenu);
     trayMenu.addSeparator();
+    trayMenu.addAction(show);
     trayMenu.addAction(closeApp);
 
     // setup icon finally //

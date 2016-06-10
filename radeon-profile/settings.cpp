@@ -19,6 +19,7 @@ const QString fanStepsPath = QDir::homePath() + "/.radeon-profile-fanSteps";
 globalStuff::globalCfgStruct globalStuff::globalConfig;
 
 void radeon_profile::saveConfig() {
+    qDebug() << "Saving config to" << radeon_profile::settingsPath;
     QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
 
     settings.setValue("startMinimized",ui->cb_startMinimized->isChecked());
@@ -184,6 +185,7 @@ void radeon_profile::loadConfig() {
 }
 
 void radeon_profile::loadFanProfiles() {
+    qDebug() << "Loading fan profiles from" << fanStepsPath;
     QFile fsPath(fanStepsPath);
     if (fsPath.open(QIODevice::ReadOnly)) {
         QString profile = QString(fsPath.readAll());
@@ -220,6 +222,7 @@ void radeon_profile::makeFanProfileGraph() {
 }
 
 void radeon_profile::saveFanProfiles() {
+    qDebug() << "Saving fan profiles to" << fanStepsPath;
     QFile fsPath(fanStepsPath);
     if (fsPath.open(QIODevice::WriteOnly)) {
         QString profile = "default|";

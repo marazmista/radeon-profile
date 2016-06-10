@@ -1,8 +1,6 @@
 // copyright marazmista @ 29.03.2014
 
 #include "gpu.h"
-#include "dfglrx.h"
-#include "dxorg.h"
 
 #include <cmath>
 #include <QFile>

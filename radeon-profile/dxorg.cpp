@@ -1,8 +1,6 @@
 ﻿// copyright marazmista @ 29.03.2014
 
 #include "dxorg.h"
-#include "globalStuff.h"
-#include "gpu.h"
 
 #include <QFile>
 #include <QTextStream>

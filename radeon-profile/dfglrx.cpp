@@ -63,8 +63,8 @@ QStringList dFglrx::detectCards() const {
 }
 
 QStringList dFglrx::getGLXInfo(const QString & gpuName) const {
-    QStringList list = gpu::getGLXInfo(gpuName);
-    list.append(globalStuff::grabSystemInfo("fglrxinfo").filter(QRegExp("\\.+")));
+    QStringList list = globalStuff::grabSystemInfo("fglrxinfo").filter(QRegExp("\\.+"));
+    list.append(gpu::getGLXInfo(gpuName));
     return list;
 }
 

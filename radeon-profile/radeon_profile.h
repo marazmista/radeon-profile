@@ -88,6 +88,8 @@ private slots:
     void on_btn_forceHigh_clicked();
     void on_btn_forceLow_clicked();
     void gpuChanged();
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
     void closeEvent(QCloseEvent *);
     void closeFromTray();
     void on_spin_lineThick_valueChanged(int arg1);
@@ -145,7 +147,7 @@ private:
     QMap<QString, unsigned short> pmStats;
     unsigned short rangeX, ticksCounter, statsTickCounter;
     QSystemTrayIcon trayIcon;
-    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden;
+    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden, *show;
     QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;
     int timerID;
     QButtonGroup pwmGroup;

@@ -1,7 +1,7 @@
 Simple application to read current clocks and temperatures, overclock and manage power settings of your graphic card.
 
 # Supported drivers
-* ## Radeon ( xf86-video-ati / xf86-video-amdgpu )
+* ## Radeon open source ( radeon / amdgpu )
   The app reads clocks and power profiles from debugfs, which requires root access. Possible solutions (only one is needed):
   * Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-profile-daemon).
   * Run the app with root privileges.
@@ -10,12 +10,12 @@ Simple application to read current clocks and temperatures, overclock and manage
 
   Can be forced by `--driver xorg` parameter.
 
-* ## AMD Catalyst ( fglrx )
+* ## Catalyst ( fglrx )
   Normal user can run it. Data is read from `ati-config` output. No support for power settings.
 
   Can be forced by `--driver fglrx` parameter.
 
-* ## Intel ( xf86-video-intel )
+* ## Intel ( i915 )
   Normal user can run it. No support for power settings.
 
   Can be forced by `--driver intel` parameter.

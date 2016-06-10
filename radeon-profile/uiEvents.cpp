@@ -177,6 +177,16 @@ void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
     }
 }
 
+void radeon_profile::showEvent(QShowEvent *event){
+    event->accept();
+    show->setVisible(false);
+}
+
+void radeon_profile::hideEvent(QHideEvent *event){
+    event->accept();
+    show->setVisible(true);
+}
+
 void radeon_profile::closeEvent(QCloseEvent *e) {
     hide();
 
@@ -186,7 +196,6 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     } else {
         e->accept();
 
-        qDebug() << "Saving config";
         killTimer(timerID);
         saveConfig();
 
