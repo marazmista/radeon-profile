@@ -163,7 +163,6 @@ void radeon_profile::loadConfig() {
     ui->list_vaules->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
 
     showLegend(optionsMenu.actions().at(0)->isChecked());
-    changeTimeRange();
     ui->cb_showTempsGraph->setChecked(ui->cb_showTempsGraph->isChecked());
     ui->cb_showFreqGraph->setChecked(ui->cb_showFreqGraph->isChecked());
     ui->cb_showVoltsGraph->setChecked(ui->cb_showVoltsGraph->isChecked());

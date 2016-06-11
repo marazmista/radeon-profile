@@ -19,6 +19,8 @@ dXorg::dXorg(QString module){
     } else
         driverModule = module;
 
+    gpuList = detectCards();
+
     qDebug() << "Using Xorg " << driverModule << " driver";
 }
 
@@ -43,6 +45,8 @@ void dXorg::changeGPU(ushort gpuIndex) {
 
         reconfigureDaemon();
     }
+
+    features = figureOutDriverFeatures();
 }
 
 void dXorg::reconfigureDaemon() { // Set up the timer
@@ -112,6 +116,7 @@ gpuClocksStruct dXorg::getClocks(bool forFeatures) {
         // see: https://stackoverflow.com/a/11487434/2347196
         if (forFeatures) {
             QTime delayTime = QTime::currentTime().addMSecs(1000);
+            qDebug() << "Waiting for data...";
             while (QTime::currentTime() < delayTime)
                 QApplication::processEvents(QEventLoop::AllEvents, 100);
         }

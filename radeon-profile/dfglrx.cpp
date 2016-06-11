@@ -6,14 +6,18 @@
 dFglrx::dFglrx(){
     driverModule = "fglrx";
 
+    gpuList = detectCards();
+
     qDebug() << "Using fglrx driver";
 }
 
 void dFglrx::changeGPU(ushort _gpuIndex) {
     if(_gpuIndex >= gpuList.size())
         qWarning() << "Requested unexisting card " << _gpuIndex;
-    else
+    else {
         currentGpuIndex = _gpuIndex;
+        features = figureOutDriverFeatures();
+    }
 }
 
 gpuClocksStruct dFglrx::getClocks(bool forFeatures){

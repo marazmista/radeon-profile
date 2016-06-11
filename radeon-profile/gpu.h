@@ -36,13 +36,6 @@ public:
     /*  Common functions, already implemented in gpu.cpp (can be re-implemented/extended by inheriting classes)  */
     gpu();
 
-    /**
-     * @brief initialize Initialize the driver (detect available cards, select the current card, figure out available features)
-     * @see detectCard()
-     * @see changeGpu()
-     * @see figureOutDriverFeatures()
-     */
-    virtual void initialize();
 
     /**
      * @brief getCardConnectors

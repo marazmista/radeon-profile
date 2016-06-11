@@ -46,7 +46,8 @@ HEADERS  += radeon_profile.h \
     execbin.h \
     dintel.h
 
-FORMS    += radeon_profile.ui
+FORMS    += radeon_profile.ui \
+    export_dialog.ui
 
 RESOURCES += \
     radeon-resource.qrc

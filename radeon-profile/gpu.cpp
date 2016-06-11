@@ -47,23 +47,6 @@ bool gpu::daemonConnected() const {
     return false;
 }
 
-void gpu::initialize(){
-    gpuList = detectCards();
-    changeGPU(currentGpuIndex);
-    features = figureOutDriverFeatures();
-
-    if(features.coreMaxClkAvailable)
-        maxCoreFreqString = QString::number (maxCoreFreq) + "MHz";
-    if(features.coreMinClkAvailable)
-        minCoreFreqString = QString::number (minCoreFreq) + "MHz";
-
-    qDebug() << "Power profile enabled: " << features.canChangeProfile;
-    qDebug() << "Core {clock, volt} enabled: " << features.coreClockAvailable << features.coreVoltAvailable;
-    qDebug() << "Memory {core, volt} enabled: " << features.memClockAvailable << features.memClockAvailable;
-    qDebug() << "Temperature enabled: " << features.temperatureAvailable;
-    qDebug() << "Fan speed enabled: " << features.pwmAvailable;
-    qDebug() << "Overclock {GPU, memory} enabled: " << features.GPUoverClockAvailable << features.memoryOverclockAvailable;
-}
 
 void gpu::convertClocks() {
     if (gpuClocksData.coreClkOk)

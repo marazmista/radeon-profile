@@ -150,6 +150,21 @@ void radeon_profile::setupTrayIcon() {
     connect(&trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 }
 
+void radeon_profile::setupExportDialog(){
+    qDebug() << "Setting up exportDialog";
+    exportUi.setupUi(&exportDialog);
+    exportUi.directory->setText(QDir::homePath());
+    connect(&exportDialog, SIGNAL(accepted()), this, SLOT(exportGraphs()));
+
+    exportFormat.addButton(exportUi.rb_pdf);
+    exportFormat.addButton(exportUi.rb_png);
+    exportFormat.addButton(exportUi.rb_jpg);
+    exportFormat.addButton(exportUi.rb_bmp);
+    exportFormat.setExclusive(true);
+
+    connect(exportUi.btn_changeDirectory, SIGNAL(clicked()), this, SLOT(changeExportDirectory()));
+}
+
 void radeon_profile::setupOptionsMenu()
 {
     qDebug() << "Setting up options menu";

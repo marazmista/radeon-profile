@@ -12,6 +12,8 @@ dIntel::dIntel()
 {
     driverModule = "i915";
 
+    gpuList = detectCards();
+
     qDebug() << "Using intel i915 driver";
 }
 
@@ -30,8 +32,13 @@ void dIntel::changeGPU(ushort gpuIndex){
     minFreq = device + file_minFreq;
     maxFreq = device + file_maxFreq;
 
-    maxCoreFreq = readFile(maxFreq).toShort();
-    minCoreFreq = readFile(minFreq).toShort();
+    const QString max = readFile(maxFreq), min = readFile(minFreq);
+    maxCoreFreqString = max + "MHz";
+    minCoreFreqString = min + "MHz";
+    maxCoreFreq = max.toShort();
+    minCoreFreq = min.toShort();
+
+    features = figureOutDriverFeatures();
 }
 
 driverFeatures dIntel::figureOutDriverFeatures(){

@@ -4,6 +4,7 @@
 #include "gpu.h"
 #include "daemonComm.h"
 #include "execbin.h"
+#include "ui_export_dialog.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -72,7 +73,7 @@ private slots:
     void on_btn_dpmBattery_clicked();
     void on_btn_dpmBalanced_clicked();
     void on_btn_dpmPerformance_clicked();
-    void changeTimeRange();
+    void on_timeSlider_valueChanged(int value);
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void on_cb_showFreqGraph_toggled(const bool &checked);
     void on_cb_showTempsGraph_toggled(const bool &checked);
@@ -87,7 +88,7 @@ private slots:
     void on_btn_forceAuto_clicked();
     void on_btn_forceHigh_clicked();
     void on_btn_forceLow_clicked();
-    void gpuChanged();
+    void on_combo_gpus_currentIndexChanged(int index);
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent *event);
     void closeEvent(QCloseEvent *);
@@ -124,8 +125,8 @@ private slots:
     void on_btn_pwmFixed_clicked();
     void on_btn_pwmAuto_clicked();
     void on_btn_pwmProfile_clicked();
-    void changeProfileFromCombo();
-    void changePowerLevelFromCombo();
+    void on_combo_pProfile_currentIndexChanged(int index);
+    void on_combo_pLevel_currentIndexChanged(int index);
     void on_btn_fanInfo_clicked();
     void on_btn_addFanStep_clicked();
     void on_btn_removeFanStep_clicked();
@@ -138,6 +139,9 @@ private slots:
     void on_cb_showAlwaysGpuSelector_toggled(bool checked);
     void on_cb_showCombo_toggled(bool checked);
     void on_mainTabs_currentChanged(int index);
+    void on_btn_exportGraph_clicked();
+    void exportGraphs();
+    void changeExportDirectory();
 
 private:
     gpu * device;
@@ -150,16 +154,19 @@ private:
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden, *show;
     QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;
     int timerID;
-    QButtonGroup pwmGroup;
+    QButtonGroup pwmGroup, exportFormat;
     ushort graphOffset;
     bool closeFromTrayMenu;
     QStringList selectedVariableVaules, envVars;
+    QDialog exportDialog;
 
+    Ui::export_graphs exportUi;
     Ui::radeon_profile *ui;
 
     gpu * detectDriver();
     void setupGraphs();
     void setupTrayIcon();
+    void setupExportDialog();
     void setupOptionsMenu();
     void refreshTooltip();
     void setupForcePowerLevelMenu();
@@ -182,8 +189,8 @@ private:
     int askNumber(const int value, const int min, const int max, const QString label);
     void makeFanProfileGraph();
     void refreshUI();
-    void connectSignals();
     void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
+    void exportSingleGraph(QAbstractButton * format, QCustomPlot * graph, const QString & path);
 
     /**
      * @brief adjustFanSpeed Sets the PWM fan speed indicated for the actual temperature on the fan profile.
