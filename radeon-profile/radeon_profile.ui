@@ -2166,6 +2166,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="btn_modifyExecProfile">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Modify</string>
                 </property>
@@ -2173,6 +2176,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="btn_removeExecProfile">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Remove</string>
                 </property>
@@ -2193,6 +2199,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="btn_viewOutput">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>View output</string>
                 </property>
@@ -2200,6 +2209,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="btn_runExecProfile">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>0</width>

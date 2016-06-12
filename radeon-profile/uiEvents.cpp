@@ -172,15 +172,15 @@ void radeon_profile::on_combo_gpus_currentIndexChanged(int index)
 {
     logEvent "combo_gpus current index changed, selecting gpu";
 
-    if(index != -1){ // Any profile is selected in combo_gpus
+    if(index != -1) // Any profile is selected in combo_gpus
         device->changeGPU(static_cast<ushort>(index));
 
-        setupUiEnabledFeatures(device->features);
-        timerEvent(0);
+    setupUiEnabledFeatures(device->features);
+    timerEvent(0);
 
-        ui->list_glxinfo->clear();
-        ui->list_glxinfo->addItems(device->getGLXInfo(ui->combo_gpus->currentText()));
-    }
+    ui->list_stats->clear();
+    ui->list_glxinfo->clear();
+    ui->list_glxinfo->addItems(device->getGLXInfo(ui->combo_gpus->currentText()));
 }
 
 void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
@@ -196,7 +196,6 @@ void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
 void radeon_profile::showEvent(QShowEvent *event){
     logEvent "Showing window";
     event->accept();
-    show->setVisible(false);
 }
 
 void radeon_profile::hideEvent(QHideEvent *event){
@@ -237,7 +236,7 @@ void radeon_profile::closeFromTray() {
 
 void radeon_profile::on_spin_lineThick_valueChanged(int arg1)
 {
-    UNUSED(arg1);
+    Q_UNUSED(arg1);
     setupGraphsStyle();
 }
 
@@ -254,16 +253,13 @@ void radeon_profile::on_cb_graphs_toggled(bool checked)
 
 void radeon_profile::on_cb_gpuData_toggled(bool checked)
 {
+    logEvent "cb_gpuData toggled, applying changes";
     // Enable/Disable linked checkboxes
     ui->cb_graphs->setEnabled(checked);
     ui->cb_stats->setEnabled(checked);
 
-    if (ui->cb_stats->isChecked())
-        ui->tab_stats->setEnabled(checked);
     resetStats();
 
-    if (ui->cb_graphs->isChecked())
-        ui->graphTab->setEnabled(checked);
 
     // Enable/Disable the GPU data and stats list
     if (!checked) {
@@ -273,17 +269,7 @@ void radeon_profile::on_cb_gpuData_toggled(bool checked)
         ui->list_currentGPUData->clear();
         ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << tr("GPU data is disabled")));
     }
-    ui->list_currentGPUData->setEnabled(checked);
-
-    // Enable/Disable the header labels
-    ui->combo_pLevel->setEnabled(checked);
-    ui->combo_pProfile->setEnabled(checked);
-    ui->l_cClk->setEnabled(checked);
-    ui->l_mClk->setEnabled(checked);
-    ui->l_cVolt->setEnabled(checked);
-    ui->l_mVolt->setEnabled(checked);
-    ui->l_temp->setEnabled(checked);
-    ui->l_fanSpeed->setEnabled(checked);
+    setupUiEnabledFeatures(device->features);
 
     // Enable/Disable pwm profile control
     const bool enableProfile = checked && device->features.pwmAvailable;
@@ -312,7 +298,7 @@ void radeon_profile::refreshBtnClicked() {
 
 void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    UNUSED(column);
+    Q_UNUSED(column);
     QColor c = QColorDialog::getColor(item->backgroundColor(1));
     if (c.isValid()) {
         item->setBackgroundColor(1,c);
@@ -607,4 +593,12 @@ void radeon_profile::exportGraphs(){
 void radeon_profile::changeExportDirectory(){
     logEvent "Changing export directory";
     exportUi.directory->setText(QFileDialog::getExistingDirectory(this, "Export directory", exportUi.directory->text()));
+}
+
+void radeon_profile::on_list_execProfiles_itemSelectionChanged(){
+    logEvent "Item selected in list_variables, enabling buttons";
+    ui->btn_modifyExecProfile->setEnabled(true);
+    ui->btn_removeExecProfile->setEnabled(true);
+    ui->btn_runExecProfile->setEnabled(true);
+    ui->btn_viewOutput->setEnabled(true);
 }

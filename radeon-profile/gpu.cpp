@@ -735,23 +735,48 @@ QStringList gpu::getGLXInfo(const QString & gpuName) const {
     for (int i = 0; i < gpus.count(); i++)
         data << tr("VGA:") +gpus[i].split(":",QString::SkipEmptyParts)[2];
 
+    QRegExp noEmptyLines = QRegExp(".+");
+
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     if (!gpuName.isEmpty())
         env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
     // Show the DRI driver
-    const QStringList driver = globalStuff::grabSystemInfo("xdriinfo driver 0");
+    const QStringList driver = globalStuff::grabSystemInfo("xdriinfo driver 0").filter(noEmptyLines);
     if(!driver.isEmpty())
-        data << "Driver: " + driver[0];
+        data << tr("Driver: ") + driver[0];
     // Old implementation
     // QStringList driver = globalStuff::grabSystemInfo("xdriinfo", env).filter("Screen 0:",Qt::CaseInsensitive);
     // if (!driver.isEmpty())  // because of segfault when no xdriinfo
     //    data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
     // Show OpenGL informations
-    data.append(globalStuff::grabSystemInfo("glxinfo -B", env).filter(QRegExp(".+")));
+    const QStringList glxinfo = globalStuff::grabSystemInfo("glxinfo -B", env).filter(noEmptyLines);
+    if( ! glxinfo.isEmpty()){
+        data.append("");
+        data.append(tr("OpenGL info"));
+        data.append(glxinfo);
+    }
     // Old dxorg.cpp implementation, using full glxinfo output instead of glxinfo -B
     // Consider only lines containing "direct rendering" or containing "OpenGL ... : ..." but not containing 'none
     // data.append(globalStuff::grabSystemInfo("glxinfo", env).filter(QRegExp("direct rendering|OpenGL.+:..(?!none)")));
+
+    // Show vulkan information, if available
+    // http://www.phoronix.com/scan.php?page=news_item&px=Vulkan-1.0-SKL-First-Test
+    const QStringList vulkaninfo = globalStuff::grabSystemInfo("vulkaninfo").filter(noEmptyLines);
+    if( ! vulkaninfo.isEmpty()){
+        data.append("");
+        data.append(tr("Vulkan info"));
+        data.append(vulkaninfo);
+    }
+
+    // Show OpenCL information, if available
+    const QStringList clinfo = globalStuff::grabSystemInfo("clinfo --human").filter(noEmptyLines);
+    if( ! clinfo.isEmpty()){
+        data.append("");
+        data.append(tr("OpenCL info"));
+        data.append(clinfo);
+    }
+
     return data;
 }
 

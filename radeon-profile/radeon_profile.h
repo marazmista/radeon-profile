@@ -142,6 +142,7 @@ private slots:
     void on_btn_exportGraph_clicked();
     void exportGraphs();
     void changeExportDirectory();
+    void on_list_execProfiles_itemSelectionChanged();
 
 private:
     gpu * device;

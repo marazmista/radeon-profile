@@ -56,7 +56,7 @@ driverFeatures dIntel::figureOutDriverFeatures(){
 }
 
 gpuClocksStruct dIntel::getClocks(bool forFeatures) {
-    UNUSED(forFeatures);
+    Q_UNUSED(forFeatures);
     gpuClocksStruct data;
     data.coreClk = readFile(actFreq).toShort();
     data.coreClkOk = data.coreClk > 0;

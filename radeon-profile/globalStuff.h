@@ -10,7 +10,6 @@
 #include <QProcessEnvironment>
 #include <QStringList>
 #include <QDebug>
-#include <QTime>
 
 #define dpm_battery "battery"
 #define dpm_performance "performance"
@@ -40,7 +39,6 @@
 
 #define appVersion 20160527
 
-#define UNUSED(x) (void)(x)
 
 class globalStuff {
 public:

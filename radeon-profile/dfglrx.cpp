@@ -21,7 +21,7 @@ void dFglrx::changeGPU(ushort _gpuIndex) {
 }
 
 gpuClocksStruct dFglrx::getClocks(bool forFeatures){
-    UNUSED(forFeatures);
+    Q_UNUSED(forFeatures);
     const QStringList out = globalStuff::grabSystemInfo("aticonfig --odgc --adapter=" + QString::number(currentGpuIndex)).filter("Clocks");
     //     QFile f("/home/mm/odgc");
     //     f.open(QIODevice::ReadOnly);
