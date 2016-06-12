@@ -205,16 +205,30 @@ void radeon_profile::hideEvent(QHideEvent *event){
 }
 
 void radeon_profile::closeEvent(QCloseEvent *e) {
-    hide();
+    logEvent "closeEvent";
 
     if (ui->cb_closeTray->isChecked() && !closeFromTrayMenu) {
-        logEvent "Closing to tray menu";
+        qDebug() << "Closing to tray menu";
+        this->hide();
         e->ignore();
     } else {
-        logEvent "Closing application";
+        //Check if a process is still running
+        bool exit = true;
+        for(int i=0; exit && (i < execsRunning.size()); i++){
+            execBin * process = execsRunning.at(i);
+            if(process->state() == QProcess::Running)
+                exit = askConfirmation(tr("Quit"), process->name + tr(" is still running, exit anyway?"));
+        }
+
+        if( ! exit){
+            e->ignore();
+            return;
+        }
+        qDebug() << "Closing application";
         e->accept();
 
         killTimer(timerID);
+        this->hide();
         saveConfig();
 
         if (device->features.pwmAvailable) {
