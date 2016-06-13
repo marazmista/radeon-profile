@@ -25,6 +25,11 @@ void radeon_profile::setupGraphs()
     ui->plotClocks->xAxis->setTickLabels(false);
     ui->plotVolts->xAxis->setTickLabels(false);
 
+    QCP::PlottingHints fastReplot = QCP::phCacheLabels | QCP::phFastPolylines;
+    ui->plotTemp->setPlottingHints(fastReplot);
+    ui->plotClocks->setPlottingHints(fastReplot);
+    ui->plotVolts->setPlottingHints(fastReplot);
+
     ui->plotTemp->addGraph(); // temp graph
     ui->plotClocks->addGraph(); // core clock graph
     ui->plotClocks->addGraph(); // mem clock graph

@@ -182,7 +182,7 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     qDebug() << "Overclock {GPU, memory} enabled: " << features.GPUoverClockAvailable << features.memoryOverclockAvailable;
 
     const bool gpuDataAvailable = ui->cb_gpuData->isChecked(),
-            profilesAvailable = gpuDataAvailable && features.canChangeProfile && (features.pm < PM_UNKNOWN),
+            profilesAvailable = features.canChangeProfile && (features.pm < PM_UNKNOWN),
             dpm = profilesAvailable && (features.pm == DPM),
             standardProfiles = profilesAvailable && ! dpm,
             temperatureAvailable = gpuDataAvailable && features.temperatureAvailable,
@@ -206,21 +206,23 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     if(profilesAvailable) {
         qDebug() << "Power profiles are available, configuring";
         ui->tabs_pm->setCurrentWidget(dpm ? ui->dpmProfiles : ui->stdProfiles);
+        QString powerProfile = device->currentPowerProfile,
+                powerLevel = device->currentPowerLevel;
 
         ui->combo_pProfile->clear();
         ui->combo_pLevel->clear();
         if (dpm) {
-            QString powerLevel = device->currentPowerLevel;
             qDebug() << "Setting up DPM power profiles";
             ui->combo_pProfile->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
             ui->combo_pLevel->addItems(QStringList() << dpm_auto << dpm_low << dpm_high);
 
-            ui->combo_pProfile->setCurrentIndex(ui->combo_pLevel->findText(powerLevel));
-            ui->combo_pLevel->setCurrentIndex(ui->combo_pProfile->findText(powerLevel));
+            ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(powerProfile));
+            ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(powerLevel));
 
         } else {
             qDebug() << "Setting up standard profiles";
             ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
+            ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(powerProfile));
         }
     }
 
@@ -457,22 +459,14 @@ void radeon_profile::refreshGraphs() {
 
     // add data to plots and adjust vertical scale
     ui->plotTemp->graph(0)->addData(ticksCounter, static_cast<double>(device->gpuTemeperatureData.current));
-    if (static_cast<double>(device->gpuTemeperatureData.max) >= ui->plotTemp->yAxis->range().upper
-            || static_cast<double>(device->gpuTemeperatureData.min) <= ui->plotTemp->yAxis->range().lower)
-        ui->plotTemp->yAxis->setRange(static_cast<double>(device->gpuTemeperatureData.min - 5), static_cast<double>(device->gpuTemeperatureData.max + 5));
 
     ui->plotClocks->graph(0)->addData(ticksCounter,device->gpuClocksData.coreClk);
     ui->plotClocks->graph(1)->addData(ticksCounter,device->gpuClocksData.memClk);
     ui->plotClocks->graph(2)->addData(ticksCounter,device->gpuClocksData.uvdCClk);
     ui->plotClocks->graph(3)->addData(ticksCounter,device->gpuClocksData.uvdDClk);
-    int r = (device->gpuClocksData.memClk >= device->gpuClocksData.coreClk) ? device->gpuClocksData.memClk : device->gpuClocksData.coreClk;
-    if (r > ui->plotClocks->yAxis->range().upper)
-        ui->plotClocks->yAxis->setRangeUpper(r + 150);
 
     ui->plotVolts->graph(0)->addData(ticksCounter,device->gpuClocksData.coreVolt);
     ui->plotVolts->graph(1)->addData(ticksCounter,device->gpuClocksData.memVolt);
-    if (device->gpuClocksData.coreVolt > ui->plotVolts->yAxis->range().upper)
-        ui->plotVolts->yAxis->setRangeUpper(device->gpuClocksData.coreVolt + 100);
 
     if(ui->mainTabs->currentWidget() == ui->graphTab && !this->isHidden()) // If the graph tab is selected replot the graphs
         replotGraphs();
@@ -484,16 +478,24 @@ void radeon_profile::replotGraphs(){
     if(ui->cb_showTempsGraph->isChecked()){
         ui->plotTemp->xAxis->setRange(position, rangeX,Qt::AlignRight);
         ui->plotTemp->replot();
+        if (static_cast<double>(device->gpuTemeperatureData.max) >= ui->plotTemp->yAxis->range().upper
+                || static_cast<double>(device->gpuTemeperatureData.min) <= ui->plotTemp->yAxis->range().lower)
+            ui->plotTemp->yAxis->setRange(static_cast<double>(device->gpuTemeperatureData.min - 5), static_cast<double>(device->gpuTemeperatureData.max + 5));
     }
 
     if(ui->cb_showFreqGraph->isChecked()){
         ui->plotClocks->xAxis->setRange(position,rangeX,Qt::AlignRight);
         ui->plotClocks->replot();
+        int r = (device->gpuClocksData.memClk >= device->gpuClocksData.coreClk) ? device->gpuClocksData.memClk : device->gpuClocksData.coreClk;
+        if (r > ui->plotClocks->yAxis->range().upper)
+            ui->plotClocks->yAxis->setRangeUpper(r + 150);
     }
 
     if(ui->cb_showVoltsGraph->isChecked()){
         ui->plotVolts->xAxis->setRange(position,rangeX,Qt::AlignRight);
         ui->plotVolts->replot();
+        if (device->gpuClocksData.coreVolt > ui->plotVolts->yAxis->range().upper)
+            ui->plotVolts->yAxis->setRangeUpper(device->gpuClocksData.coreVolt + 100);
     }
 
     ui->l_minMaxTemp->setText("Max: " + device->gpuTemeperatureDataString.max  + " | Min: " +
