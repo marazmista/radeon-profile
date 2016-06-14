@@ -16,6 +16,7 @@
 
 void radeon_profile::on_btn_cancel_clicked()
 {
+    logEvent "btn_cancel clicked";
     ui->execPages->setCurrentWidget(ui->page_profiles);
 
     ui->list_variables->clear();
@@ -31,6 +32,7 @@ void radeon_profile::on_btn_cancel_clicked()
 
 void radeon_profile::on_btn_modifyExecProfile_clicked()
 {
+    logEvent "btn_modifyExecProfile clicked";
     loadVariables();
 
     ui->label_15->setVisible(false);
@@ -54,6 +56,7 @@ void radeon_profile::on_btn_modifyExecProfile_clicked()
 
 void radeon_profile::on_btn_ok_clicked()
 {
+    logEvent "btn_modifyExecProfile clicked";
     if (ui->txt_profileName->text().isEmpty()) {
         QMessageBox::critical(this, tr("Error"), tr("Profile name can't be empty!"), QMessageBox::Ok);
         return;
@@ -105,6 +108,7 @@ void radeon_profile::on_btn_ok_clicked()
 
 void radeon_profile::on_btn_addExecProfile_clicked()
 {
+    logEvent "btn_addExecProfile clicked";
     loadVariables();
     ui->execPages->setCurrentWidget(ui->page_add);
     ui->label_15->setVisible(false);
@@ -113,6 +117,7 @@ void radeon_profile::on_btn_addExecProfile_clicked()
 
 void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
 {
+    logEvent "list_variables item clicked, checking out action to apply";
     ui->list_vaules->clear();
 
     if (item->text().contains("----")) // the separator
@@ -177,6 +182,7 @@ void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
 
 void radeon_profile::on_list_vaules_itemClicked(QListWidgetItem *item)
 {
+    logEvent "list_vaules item clicked";
     Q_UNUSED(item);
     ui->txt_summary->clear();
     QStringList selectedValues;
@@ -199,6 +205,7 @@ void radeon_profile::on_list_vaules_itemClicked(QListWidgetItem *item)
 
 void radeon_profile::on_btn_removeExecProfile_clicked()
 {
+    logEvent "btn_removeExecProfile clicked";
     if (ui->list_execProfiles->selectedItems().count() == 0)
         return;
 
@@ -210,6 +217,7 @@ void radeon_profile::on_btn_removeExecProfile_clicked()
 
 void radeon_profile::on_btn_selectBinary_clicked()
 {
+    logEvent "btn_selectBinary clicked";
     QString binaryPath = QFileDialog::getOpenFileName(this, tr("Select binary"));
 
     if (!binaryPath.isEmpty())
@@ -218,6 +226,7 @@ void radeon_profile::on_btn_selectBinary_clicked()
 
 void radeon_profile::on_btn_selectLog_clicked()
 {
+    logEvent "btn_selectLog clicked";
     QString logFile = QFileDialog::getSaveFileName(this, tr("Select log file"), QDir::homePath()+"/"+ui->txt_profileName->text());
 
     if (!logFile.isEmpty())
@@ -241,6 +250,7 @@ void radeon_profile::loadVariables() {
 
 void radeon_profile::on_btn_runExecProfile_clicked()
 {
+    logEvent "btn_runExecProfile clicked";
     if (ui->list_execProfiles->selectedItems().count() == 0)
         return;
 
@@ -294,12 +304,14 @@ void radeon_profile::on_btn_runExecProfile_clicked()
 
 void radeon_profile::on_cb_manualEdit_toggled(bool checked)
 {
+    logEvent "cb_manualEdit toggled";
     ui->txt_summary->setReadOnly(!checked);
     ui->label_15->setVisible(checked);
 }
 
 void radeon_profile::on_btn_viewOutput_clicked()
 {
+    logEvent "btn_viewOutput clicked";
     if (ui->tabs_execOutputs->count() == 0)
         return;
 
@@ -312,6 +324,7 @@ void radeon_profile::btnBackToProfilesClicked()
 }
 
 void radeon_profile::on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column) {
+    logEvent "list_execProfiles item double clicked";
     Q_UNUSED(column);
     switch (ui->cb_execDbcAction->currentIndex()) {
     default:

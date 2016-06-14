@@ -39,6 +39,7 @@
 
 #define appVersion 20160527
 
+#define logEvent qDebug() << "EVENT" <<
 
 class globalStuff {
 public:

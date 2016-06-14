@@ -191,6 +191,7 @@ QString translatePnpId(const QString pnpId){
             }
         }
     }
+    qDebug() << "      PnP ID not found: " << pnpId;
     return pnpId; // No real name found, return the PNP ID instead
 }
 
@@ -509,8 +510,8 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             QTreeWidgetItem * modeListItem = new QTreeWidgetItem(QStringList() << tr("Supported modes"));
             outputItem->addChild(modeListItem);
 
+            qDebug() << "    Analyzing available modes";
             for(int modeIndex = 0; modeIndex < outputInfo->nmode; modeIndex++){ // For each possible mode
-                qDebug() << "    Analyzing available mode" << modeIndex;
 
                 XRRModeInfo * modeInfo = getModeInfo(screenResources, outputInfo->modes[modeIndex]);
                 if(modeInfo == NULL) // Mode info not found
@@ -563,8 +564,8 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             Atom * properties = XRRListOutputProperties(display, screenResources->outputs[outputIndex], &propertyCount);
 
             // Cycle through this output's properties
+            qDebug() << "    Analyzing properties";
             for(int propertyIndex = 0; propertyIndex < propertyCount; propertyIndex++){
-                qDebug() << "    Analyzing property" << propertyIndex;
 
                 // Prepare this property's name and value
                 char * propertyAtomName = XGetAtomName(display, properties[propertyIndex]);
@@ -691,6 +692,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 }
 
 QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
+    qDebug() << "Getting module info";
     QList<QTreeWidgetItem *> list;
 
     if(driverModule.isEmpty())
@@ -728,6 +730,7 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
 }
 
 QStringList gpu::getGLXInfo(const QString & gpuName) const {
+    qDebug() << "Getting GLX info";
     // List installed cards
     QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter(QRegExp(".+VGA.+|.+3D.+"));
     gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
@@ -762,7 +765,7 @@ QStringList gpu::getGLXInfo(const QString & gpuName) const {
 
     // Show vulkan information, if available
     // http://www.phoronix.com/scan.php?page=news_item&px=Vulkan-1.0-SKL-First-Test
-    const QStringList vulkaninfo = globalStuff::grabSystemInfo("vulkaninfo").filter(noEmptyLines);
+    const QStringList vulkaninfo = globalStuff::grabSystemInfo("vulkaninfo").filter(QRegExp(".+= \\w"));
     if( ! vulkaninfo.isEmpty()){
         data.append("");
         data.append(tr("Vulkan info"));

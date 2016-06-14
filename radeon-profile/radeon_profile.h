@@ -97,7 +97,7 @@ private slots:
     void on_spin_timerInterval_valueChanged(int arg1);
     void on_cb_graphs_toggled(bool checked);
     void on_cb_gpuData_toggled(bool checked);
-    void refreshBtnClicked();
+    void refreshBtnClicked(bool onlyCardDependant = false);
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_cb_stats_toggled(bool checked);
     void copyGlxInfoToClipboard();

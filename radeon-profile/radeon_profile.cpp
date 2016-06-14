@@ -85,7 +85,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     logTime << "Setting up UI elements for available features";
     if(device->gpuList.isEmpty())
-        emit ui->combo_gpus->currentIndexChanged(-1);
+        on_combo_gpus_currentIndexChanged(-1);
     else
         ui->combo_gpus->addItems(device->gpuList);
     // The current index of combo_gpus changes (device->changeGpu() and setupUiEnabledFeatures() are called, list_glxinfo is filled)

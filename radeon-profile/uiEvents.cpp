@@ -10,8 +10,8 @@
 #include <QClipboard>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QFileDialog>
 
-#define logEvent qDebug() << "EVENT" <<
 
 //===================================
 // === GUI events === //
@@ -124,16 +124,19 @@ void radeon_profile::on_timeSlider_valueChanged(int value) {
 
 void radeon_profile::on_cb_showFreqGraph_toggled(const bool &checked)
 {
+    logEvent "cb_showFreqGraph toggled";
     ui->plotClocks->setVisible(checked);
 }
 
 void radeon_profile::on_cb_showTempsGraph_toggled(const bool &checked)
 {
+    logEvent "cb_showTempsGraph toggled";
     ui->plotTemp->setVisible(checked);
 }
 
 void radeon_profile::on_cb_showVoltsGraph_toggled(const bool &checked)
 {
+    logEvent "cb_showVoltsGraph toggled";
     ui->plotVolts->setVisible(checked);
 }
 
@@ -156,6 +159,7 @@ void radeon_profile::setGraphOffset(const bool &checked) {
 
 void radeon_profile::changeEvent(QEvent *event)
 {
+    logEvent "changeEvent " << event->type();
     if(event->type() == QEvent::WindowStateChange && ui->cb_minimizeTray->isChecked()) {
         if(isMinimized())
             this->hide();
@@ -172,15 +176,12 @@ void radeon_profile::on_combo_gpus_currentIndexChanged(int index)
 {
     logEvent "combo_gpus current index changed, selecting gpu";
 
-    if(index != -1) // Any profile is selected in combo_gpus
+    if(index != -1){ // Any profile is selected in combo_gpus
         device->changeGPU(static_cast<ushort>(index));
-
-    timerEvent(0);
-    setupUiEnabledFeatures(device->features);
-
-    ui->list_stats->clear();
-    ui->list_glxinfo->clear();
-    ui->list_glxinfo->addItems(device->getGLXInfo(ui->combo_gpus->currentText()));
+        setupUiEnabledFeatures(device->features);
+        timerEvent(0);
+        refreshBtnClicked(true);
+    }
 }
 
 void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
@@ -250,12 +251,14 @@ void radeon_profile::closeFromTray() {
 
 void radeon_profile::on_spin_lineThick_valueChanged(int arg1)
 {
+    logEvent "spin_lineThick value changed";
     Q_UNUSED(arg1);
     setupGraphsStyle();
 }
 
 void radeon_profile::on_spin_timerInterval_valueChanged(int arg1)
 {
+    logEvent "spin_timerInterval value changed";
     killTimer(timerID);
     timerID = startTimer(arg1 * 1000);
 }
@@ -294,22 +297,27 @@ void radeon_profile::on_cb_gpuData_toggled(bool checked)
     configureDaemonAutoRefresh((checked && ui->cb_daemonAutoRefresh->isChecked()), ui->spin_timerInterval->value());
 }
 
-void radeon_profile::refreshBtnClicked() {
+void radeon_profile::refreshBtnClicked(bool onlyCardDependant){
     logEvent "Refresh button clicked, refreshing info";
 
     ui->list_glxinfo->clear();
     ui->list_glxinfo->addItems(device->getGLXInfo(ui->combo_gpus->currentText()));
 
-    ui->list_connectors->clear();
-    ui->list_connectors->addTopLevelItems(device->getCardConnectors());
-    ui->list_connectors->expandToDepth(2);
+    if( ! onlyCardDependant){
+        ui->list_connectors->clear();
+        ui->list_connectors->addTopLevelItems(device->getCardConnectors());
+        ui->list_connectors->expandToDepth(2);
 
-    ui->list_modInfo->clear();
-    ui->list_modInfo->addTopLevelItems(device->getModuleInfo());
+        ui->list_modInfo->clear();
+        ui->list_modInfo->addTopLevelItems(device->getModuleInfo());
+    }
+
+    resetStats();
 }
 
 void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
+    logEvent "graphColorsList item double clicked";
     Q_UNUSED(column);
     QColor c = QColorDialog::getColor(item->backgroundColor(1));
     if (c.isValid()) {
@@ -321,6 +329,7 @@ void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item,
 
 void radeon_profile::on_cb_stats_toggled(bool checked)
 {
+    logEvent "cb_stats toggled";
     ui->tab_stats->setEnabled(checked);
 
     // reset stats data
@@ -353,6 +362,7 @@ void radeon_profile::resetStats() {
 }
 
 void radeon_profile::on_cb_alternateRow_toggled(bool checked) {
+    logEvent "cb_alternateRow toggled";
     ui->list_currentGPUData->setAlternatingRowColors(checked);
     ui->list_glxinfo->setAlternatingRowColors(checked);
     ui->list_modInfo->setAlternatingRowColors(checked);
@@ -365,6 +375,7 @@ void radeon_profile::on_cb_alternateRow_toggled(bool checked) {
 
 void radeon_profile::on_chProfile_clicked()
 {
+    logEvent "cb_alternateRow toggled";
     bool ok;
     QStringList profiles;
     profiles << profile_auto << profile_default << profile_high << profile_mid << profile_low;
@@ -393,6 +404,7 @@ void radeon_profile::on_btn_reconfigureDaemon_clicked()
 
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 {
+    logEvent "tabs_execOutputs tab close requested";
     if (execsRunning.at(index)->state() != QProcess::Running || askConfirmation(tr("Process running"), tr("Process is still running. Close tab?"))){
 
         ui->tabs_execOutputs->removeTab(index);

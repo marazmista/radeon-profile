@@ -6,6 +6,7 @@
 #include "ui_radeon_profile.h"
 
 #include <QMenu>
+#include <QDir>
 
 //===================================
 // === GUI setup functions === //
