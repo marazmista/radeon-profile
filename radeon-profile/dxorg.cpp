@@ -50,6 +50,11 @@ void dXorg::changeGPU(ushort gpuIndex) {
 }
 
 void dXorg::reconfigureDaemon() { // Set up the timer
+    if(filePaths.clocksPath.isEmpty()){
+        qCritical() << "Clocks path is not available, can't connect to the daemon";
+        return;
+    }
+
     dcomm.connectToDaemon();
     if (daemonConnected()) {
         dcomm.sendConfig(filePaths.clocksPath); //  Configure the daemon to read the data

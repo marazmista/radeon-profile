@@ -188,10 +188,14 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
             temperatureAvailable = gpuDataAvailable && features.temperatureAvailable,
             clocksAvailable = gpuDataAvailable && (features.coreClockAvailable || features.memClockAvailable),
             voltsAvailable = gpuDataAvailable && (features.coreVoltAvailable || features.memVoltAvailable),
+            graphsAvailable = clocksAvailable || temperatureAvailable || voltsAvailable,
+            rootAccessAvailable = globalStuff::globalConfig.rootMode || device->daemonConnected(),
             fanSpeedAvailable = gpuDataAvailable && features.pwmAvailable,
-            fanControlAvailable = fanSpeedAvailable && (globalStuff::globalConfig.rootMode || device->daemonConnected()),
-            overclockAvailable = gpuDataAvailable && (features.GPUoverClockAvailable || features.memoryOverclockAvailable);
+            fanControlAvailable = rootAccessAvailable && features.pwmAvailable,
+            fanProfileAvailable = temperatureAvailable && fanControlAvailable,
+            overclockAvailable = rootAccessAvailable && (features.GPUoverClockAvailable || features.memoryOverclockAvailable);
 
+    // Power managment
     ui->tabs_pm->setEnabled(profilesAvailable);
     ui->combo_pProfile->setEnabled(profilesAvailable);
 
@@ -216,6 +220,8 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
             ui->combo_pProfile->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
             ui->combo_pLevel->addItems(QStringList() << dpm_auto << dpm_low << dpm_high);
 
+            // When adding the possible profiles and levels, the indexes got automatically changed to 0
+            // Restore the correct power profile and level
             ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(powerProfile));
             ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(powerLevel));
 
@@ -226,21 +232,27 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
         }
     }
 
+    // GPU stats
     ui->list_currentGPUData->setEnabled(gpuDataAvailable);
     ui->tab_stats->setEnabled(gpuDataAvailable && features.coreClockAvailable && ui->cb_stats->isChecked());
 
-    ui->cb_showTempsGraph->setEnabled(temperatureAvailable);
-    ui->cb_showFreqGraph->setEnabled(clocksAvailable);
-    ui->cb_showVoltsGraph->setEnabled(voltsAvailable);
+    // Graphs
+    ui->graphTab->setEnabled(graphsAvailable);
+    if(graphsAvailable){
+        ui->cb_showTempsGraph->setEnabled(temperatureAvailable);
+        ui->cb_showFreqGraph->setEnabled(clocksAvailable);
+        ui->cb_showVoltsGraph->setEnabled(voltsAvailable);
 
-    exportUi.cb_temperature->setEnabled(temperatureAvailable);
-    exportUi.cb_frequency->setEnabled(clocksAvailable);
-    exportUi.cb_volts->setEnabled(voltsAvailable);
+        exportUi.cb_temperature->setEnabled(temperatureAvailable);
+        exportUi.cb_frequency->setEnabled(clocksAvailable);
+        exportUi.cb_volts->setEnabled(voltsAvailable);
+    }
 
     ui->plotTemp->setVisible(temperatureAvailable && ui->cb_showTempsGraph->isChecked());
     ui->plotClocks->setVisible(clocksAvailable && ui->cb_showFreqGraph->isChecked());
     ui->plotVolts->setVisible(voltsAvailable && ui->cb_showVoltsGraph->isChecked());
 
+    // Labels
     ui->l_minMaxTemp->setEnabled(temperatureAvailable);
     ui->l_cClk->setEnabled(gpuDataAvailable && features.coreClockAvailable);
     ui->l_cVolt->setEnabled(gpuDataAvailable && features.coreVoltAvailable);
@@ -248,23 +260,30 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     ui->l_mVolt->setEnabled(gpuDataAvailable && features.memVoltAvailable);
     ui->l_temp->setEnabled(temperatureAvailable);
     ui->l_fanSpeed->setEnabled(fanSpeedAvailable);
+
+    // Fan control
     ui->fanTab->setEnabled(fanControlAvailable);
 
-    ui->graphTab->setEnabled(clocksAvailable || temperatureAvailable || voltsAvailable);
+    ui->btn_pwmAuto->setEnabled(fanControlAvailable);
+    ui->btn_pwmFixed->setEnabled(fanControlAvailable);
+    ui->btn_pwmProfile->setEnabled(fanProfileAvailable);
+    ui->page_profile->setEnabled(fanProfileAvailable);
+
+    if(fanProfileAvailable && fanSteps.isEmpty())
+        loadFanProfiles();
 
     if (fanControlAvailable) {
         qDebug() << "Fan control is available , configuring the fan control tab";
         ui->fanSpeedSlider->setMaximum(device->features.pwmMaxSpeed);
-        if(fanSteps.isEmpty())
-            loadFanProfiles();
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
     }
 
+    // Overclock
     ui->cb_enableOverclock->setChecked(overclockAvailable);
     ui->overclockTab->setEnabled(overclockAvailable);
     if( ! overclockAvailable){
-        qDebug() << "Disabling overclock";
-        ui->label_overclock->setText((globalStuff::globalConfig.rootMode || device->daemonConnected()) ?
+        qDebug() << "Overclock is not available";
+        ui->label_overclock->setText(rootAccessAvailable ?
                                          tr("Your driver or your GPU does not support overclocking") :
                                          tr("You need debugfs mounted and either root rights or the daemon running"));
 

@@ -72,14 +72,12 @@ QByteArray daemonComm::readMemory() {
     }
 
     const char * to = static_cast<const char*>(sharedMem.constData());
+    QByteArray out;
 
-    if (to == NULL){
+    if (to == NULL)
         qWarning() << "Shared memory data pointer is invalid: " << sharedMem.errorString();
-        sharedMem.unlock();
-        return QByteArray();
-    }
-
-    const QByteArray out = QByteArray::fromRawData(to, SHARED_MEM_SIZE).trimmed();
+    else
+        out = QByteArray::fromRawData(to, SHARED_MEM_SIZE).trimmed();
 
     if(!sharedMem.unlock())
         qWarning() << "Failed unlocking" << sharedMem.errorString();

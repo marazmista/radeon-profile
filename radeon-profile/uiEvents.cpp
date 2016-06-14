@@ -175,8 +175,8 @@ void radeon_profile::on_combo_gpus_currentIndexChanged(int index)
     if(index != -1) // Any profile is selected in combo_gpus
         device->changeGPU(static_cast<ushort>(index));
 
-    setupUiEnabledFeatures(device->features);
     timerEvent(0);
+    setupUiEnabledFeatures(device->features);
 
     ui->list_stats->clear();
     ui->list_glxinfo->clear();
@@ -287,8 +287,6 @@ void radeon_profile::on_cb_gpuData_toggled(bool checked)
 
     // Enable/Disable pwm profile control
     const bool enableProfile = checked && device->features.pwmAvailable;
-    ui->btn_pwmProfile->setEnabled(enableProfile);
-    ui->page_profile->setEnabled(enableProfile);
     if(ui->btn_pwmProfile->isChecked())
         device->setPwmManualControl(enableProfile);
 
