@@ -188,7 +188,8 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
             temperatureAvailable = gpuDataAvailable && features.temperatureAvailable,
             clocksAvailable = gpuDataAvailable && (features.coreClockAvailable || features.memClockAvailable),
             voltsAvailable = gpuDataAvailable && (features.coreVoltAvailable || features.memVoltAvailable),
-            graphsAvailable = clocksAvailable || temperatureAvailable || voltsAvailable,
+            graphsEnabled = gpuDataAvailable && ui->cb_graphs->isChecked(),
+            graphsAvailable = graphsEnabled && (clocksAvailable || temperatureAvailable || voltsAvailable),
             rootAccessAvailable = globalStuff::globalConfig.rootMode || device->daemonConnected(),
             fanSpeedAvailable = gpuDataAvailable && features.pwmAvailable,
             fanControlAvailable = rootAccessAvailable && features.pwmAvailable,
@@ -300,6 +301,10 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
         ui->slider_memoryOverclock->setEnabled(memoryOcOk);
         ui->label_memoryOverclock->setEnabled(memoryOcOk);
     }
+
+    // Settings page
+    ui->cb_graphs->setEnabled(gpuDataAvailable);
+    ui->cb_stats->setEnabled(gpuDataAvailable);
 }
 
 void radeon_profile::refreshGpuData() {
@@ -476,9 +481,10 @@ void radeon_profile::refreshGraphs() {
     // count the tick and move graph to right
     ticksCounter++;
 
-    // add data to plots and adjust vertical scale
+    // Temperature grqaph
     ui->plotTemp->graph(0)->addData(ticksCounter, static_cast<double>(device->gpuTemeperatureData.current));
 
+    // Frequency graph
     ui->plotClocks->graph(0)->addData(ticksCounter,device->gpuClocksData.coreClk);
     ui->plotClocks->graph(1)->addData(ticksCounter,device->gpuClocksData.memClk);
     ui->plotClocks->graph(2)->addData(ticksCounter,device->gpuClocksData.uvdCClk);
@@ -487,6 +493,7 @@ void radeon_profile::refreshGraphs() {
     if (freqUpperRange > ui->plotClocks->yAxis->range().upper)
         ui->plotClocks->yAxis->setRangeUpper(freqUpperRange);
 
+    // Volts graph
     ui->plotVolts->graph(0)->addData(ticksCounter,device->gpuClocksData.coreVolt);
     ui->plotVolts->graph(1)->addData(ticksCounter,device->gpuClocksData.memVolt);
     const double voltsUpperRange = device->gpuClocksData.coreVolt + 100;
@@ -527,6 +534,8 @@ void radeon_profile::replotGraphs(){
 QString radeon_profile::getCoreDetails() const {
     QString coreDetails;
 
+    // The string MUST start with gpuClocksDataString.coreClk, if available
+    // see doTheStats()
     if(device->gpuClocksData.coreClkOk)
         coreDetails = device->gpuClocksDataString.coreClk;
 
@@ -612,10 +621,9 @@ void radeon_profile::refreshTooltip()
 }
 
 void radeon_profile::configureDaemonAutoRefresh (bool enabled, int interval) {
-    const bool valid = enabled && (interval > 0);
-    globalStuff::globalConfig.daemonAutoRefresh = valid;
+    globalStuff::globalConfig.daemonAutoRefresh = enabled && (interval > 0);
 
-    if(valid)
+    if(globalStuff::globalConfig.daemonAutoRefresh)
         globalStuff::globalConfig.interval = static_cast<ushort>(interval);
 
     device->reconfigureDaemon();
@@ -643,6 +651,7 @@ bool radeon_profile::addFanStep(const short temperature,
     fanSteps.insert(temperature,fanSpeed);
 
     if (alsoToList){
+        qDebug() << "Adding step to list_fanSteps";
         const QString temperatureString = QString::number(temperature),
                 speedString = QString::number(fanSpeed);
         const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString,Qt::MatchExactly);
@@ -655,12 +664,14 @@ bool radeon_profile::addFanStep(const short temperature,
     }
 
     if (alsoToGraph){
+        qDebug() << "Adding step to plotFanProfile";
         ui->plotFanProfile->graph(0)->removeData(temperature);
         ui->plotFanProfile->graph(0)->addData(temperature, fanSpeed);
         ui->plotFanProfile->replot();
     }
 
     if (alsoAdjustSpeed){
+        qDebug() << "Adjusting fan speed";
         adjustFanSpeed(true);
     }
 

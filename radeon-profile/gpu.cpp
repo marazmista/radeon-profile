@@ -88,7 +88,12 @@ driverFeatures gpu::figureOutDriverFeatures(){
 }
 
 void gpu::changeGPU(ushort gpuIndex){
-    qWarning() << "changeGPU is not implemented - index =" << gpuIndex;
+    if(gpuIndex >= gpuList.size())
+        qWarning() << "Requested unexisting card " << gpuIndex;
+    else {
+        currentGpuIndex = gpuIndex;
+        features = figureOutDriverFeatures();
+    }
 }
 
 gpuClocksStruct gpu::getClocks(bool forFeatures){
@@ -763,6 +768,14 @@ QStringList gpu::getGLXInfo(const QString & gpuName) const {
     // Consider only lines containing "direct rendering" or containing "OpenGL ... : ..." but not containing 'none
     // data.append(globalStuff::grabSystemInfo("glxinfo", env).filter(QRegExp("direct rendering|OpenGL.+:..(?!none)")));
 
+    // Show OpenCL information, if available
+    const QStringList clinfo = globalStuff::grabSystemInfo("clinfo --human").filter(noEmptyLines);
+    if( ! clinfo.isEmpty()){
+        data.append("");
+        data.append(tr("OpenCL info"));
+        data.append(clinfo);
+    }
+
     // Show vulkan information, if available
     // http://www.phoronix.com/scan.php?page=news_item&px=Vulkan-1.0-SKL-First-Test
     const QStringList vulkaninfo = globalStuff::grabSystemInfo("vulkaninfo").filter(QRegExp(".+= \\w"));
@@ -772,13 +785,6 @@ QStringList gpu::getGLXInfo(const QString & gpuName) const {
         data.append(vulkaninfo);
     }
 
-    // Show OpenCL information, if available
-    const QStringList clinfo = globalStuff::grabSystemInfo("clinfo --human").filter(noEmptyLines);
-    if( ! clinfo.isEmpty()){
-        data.append("");
-        data.append(tr("OpenCL info"));
-        data.append(clinfo);
-    }
 
     return data;
 }
@@ -817,7 +823,7 @@ void gpu::setPwmManualControl(bool manual) {
 }
 
 ushort gpu::getPwmSpeed() const {
-    qWarning() << "getPemSpeed is not implemented";
+    qWarning() << "getPwmSpeed is not implemented";
 
     return 0;
 }
@@ -850,13 +856,23 @@ QStringList gpu::detectCards() const {
 }
 
 bool gpu::setNewValue(const QString & filePath, const QString & newValue) const {
-    qDebug() << "Writing" << newValue << "into" << filePath;
+    if(newValue.isEmpty()){
+        qWarning() << "setNewValue: newValue is empty";
+        return false;
+    }
+
+    if( ! QFile::exists(filePath)){
+        qWarning() << "setNewValue: invalid file path";
+        return false;
+    }
+
     QFile file(filePath);
     if( ! file.open(QIODevice::WriteOnly | QIODevice::Text)){
         qWarning() << "Unable to open " + filePath + " to write " + newValue;
         return false;
     }
 
+    qDebug() << "Writing" << newValue << "into" << filePath;
     QTextStream stream(&file);
     stream << newValue + "\n";
     if( ! file.flush() ){

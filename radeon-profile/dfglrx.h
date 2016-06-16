@@ -8,6 +8,7 @@
 #include "globalStuff.h"
 #include "gpu.h"
 
+
 class dFglrx : public gpu
 {
 public:
@@ -17,7 +18,6 @@ public:
     float getTemperature() const;
     QStringList getGLXInfo(const QString & gpuName) const;
     QStringList detectCards() const;
-    void changeGPU(ushort gpuIndex);
     driverFeatures figureOutDriverFeatures();
 
 };

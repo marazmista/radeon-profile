@@ -35,7 +35,7 @@ namespace Ui {
 class radeon_profile;
 }
 
-class radeon_profile : private QMainWindow
+class radeon_profile : public QMainWindow
 {
     Q_OBJECT
 

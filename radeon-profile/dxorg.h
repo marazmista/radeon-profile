@@ -73,6 +73,13 @@ private:
     powerMethod getPowerMethod() const;
     tempSensor testSensor();
     QString findSysFsHwmonForGpu();
+
+    /**
+     * @brief sendValue Writes a string to a file, either thorugh the daemon or directly
+     * @param filePath File to write
+     * @param value String to write
+     * @return success or failure
+     */
     bool sendValue(const QString & filePath, const QString & value);
 };
 

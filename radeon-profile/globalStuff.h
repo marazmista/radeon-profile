@@ -43,7 +43,7 @@
 
 class globalStuff {
 public:
-    static QStringList grabSystemInfo(const QString cmd, const QProcessEnvironment env = QProcessEnvironment()) {
+    static QStringList grabSystemInfo(const QString cmd, const QProcessEnvironment env = QProcessEnvironment::systemEnvironment()) {
         QProcess p;
         p.setProcessChannelMode(QProcess::MergedChannels);
         p.setProcessEnvironment(env);

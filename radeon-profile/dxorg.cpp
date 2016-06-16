@@ -39,11 +39,10 @@ void dXorg::changeGPU(ushort gpuIndex) {
 
     if (!globalStuff::globalConfig.rootMode) {
         qDebug() << "Running in non-root mode, connecting and configuring the daemon";
-        // create the shared mem block. The if comes from that configure method
-        // is called on every change gpu, so later, shared mem already exists
         dcomm.attachToMemory();
 
-        reconfigureDaemon();
+
+        reconfigureDaemon(); // Set up timer
     }
 
     features = figureOutDriverFeatures();
@@ -65,7 +64,7 @@ void dXorg::reconfigureDaemon() { // Set up the timer
             dcomm.sendTimerOff(); // Disable timer
 
     } else
-        qCritical() << "Daemon is not connected and can't be configured";
+        qWarning() << "Daemon is not connected, therefore it's timer can't be reconfigured";
 }
 
 bool dXorg::daemonConnected() const {
@@ -80,7 +79,9 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     filePaths.profilePath = devicePath + file_powerProfile;
     filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
     filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
-    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+driverModule+"_pm_info"; // this path contains only index
+
+    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+driverModule+"_pm_info";
+
     filePaths.GPUoverDrivePath = devicePath + file_GPUoverclockLevel;
     filePaths.memoryOverDrivePath = devicePath + file_memoryOverclockLevel;
 
@@ -105,21 +106,20 @@ void dXorg::figureOutGpuDataFilePaths(QString gpuName) {
     }
 }
 
-gpuClocksStruct dXorg::getClocks(bool forFeatures) {
+gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
     QFile clocksFile(filePaths.clocksPath);
     QString data;
 
-    if (clocksFile.open(QIODevice::ReadOnly)){ // check for debugfs access
+    if (clocksFile.open(QIODevice::ReadOnly)) // check for debugfs access
         data = QString(clocksFile.readAll().trimmed());
-        clocksFile.close();
-    } else if (daemonConnected()) {
+    else if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh)
             dcomm.sendReadClocks();
 
         // fist call, so notihing is in sharedmem and we need to wait for data
         // because we need correctly figure out what is available
         // see: https://stackoverflow.com/a/11487434/2347196
-        if (forFeatures) {
+        if (resolvingGpuFeatures) {
             QTime delayTime = QTime::currentTime().addMSecs(1000);
             qDebug() << "Waiting for data...";
             while (QTime::currentTime() < delayTime)
@@ -194,7 +194,7 @@ gpuClocksStruct dXorg::getClocks(bool forFeatures) {
     case PROFILE: {
         const QStringList clocksData = data.split("\n");
         const int count = clocksData.count();
-
+qDebug() << "Reading profile clocks";
         if ((1 < count) && clocksData[1].contains("current engine clock")) {
             tData.coreClk = static_cast<short>(clocksData[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000);
             tData.coreClkOk = tData.coreClk > 0;
@@ -304,8 +304,11 @@ QString dXorg::findSysfsHwmonForGPU() const {
     return "";
 }
 
+// default getGLXInfo() implementation is used
 
+// default getModuleInfo() implementation is used
 
+// default detectCards() implementation is used
 
 QString dXorg::getCurrentPowerProfile() const {
     switch (currentPowerMethod) {

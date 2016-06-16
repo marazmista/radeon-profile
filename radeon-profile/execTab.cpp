@@ -6,6 +6,7 @@
 #include "execbin.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QRegExp>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -135,21 +136,24 @@ void radeon_profile::on_list_variables_itemClicked(QListWidgetItem *item)
         bool ok;
         const QString input = QInputDialog::getText(this, tr("Enter value"), tr("Enter valid value for ") + text, QLineEdit::Normal,"",&ok);
 
-        // look for this variable in list
-        int varIndex = selectedVariableVaules.indexOf(QRegExp(text+".+",Qt::CaseInsensitive),0);
-        const bool varAlreadyPresent = varIndex != -1;
-        if (!input.isEmpty() && ok) {
-            // if value was ok
-            if ( ! varAlreadyPresent)
-                // add it to list
-                selectedVariableVaules.append(text+"="+input);
-            else
-                // replace if already exists
-                selectedVariableVaules[varIndex] = text+"=\""+input+"\"";
-        } else if (varAlreadyPresent &&  ok && askConfirmation(tr("Remove"), tr("Remove this item?"))) {
-            // hehe, looks weird but check ok status is for, when input was empty, and whether user click ok or cancel, dispaly quesion
-            selectedVariableVaules.removeAt(varIndex);
+        if(ok){
+            // look for this variable in list
+            const int varIndex = selectedVariableVaules.indexOf(QRegExp(text+".+",Qt::CaseInsensitive),0);
+            const bool varAlreadyPresent = varIndex != -1;
+            if (!input.isEmpty()) {
+                // if value was ok
+                if ( ! varAlreadyPresent)
+                    // add it to list
+                    selectedVariableVaules.append(text+"="+input);
+                else
+                    // replace if already exists
+                    selectedVariableVaules[varIndex] = text+"=\""+input+"\"";
+            } else if (varAlreadyPresent && askConfirmation(tr("Remove"), tr("Remove this item?"))) {
+                // hehe, looks weird but check ok status is for, when input was empty, and whether user click ok or cancel, dispaly quesion
+                selectedVariableVaules.removeAt(varIndex);
+            }
         }
+
         ui->txt_summary->setText(selectedVariableVaules.join(" "));
         return;
     }
@@ -255,9 +259,12 @@ void radeon_profile::on_btn_runExecProfile_clicked()
         return;
 
     QTreeWidgetItem *item = ui->list_execProfiles->currentItem();
-
     const QString binary = item->text(BINARY);
-    if (QFile::exists(binary)) {
+    if ( ! QFile::exists(binary))
+        QMessageBox::critical(this, tr("Error"), tr("The selected binary does not exist!"));
+    else if( ! QFileInfo(binary).isExecutable())
+        QMessageBox::critical(this, tr("Error"), tr("The selected file is not executable!"));
+    else {
         const QString name = item->text(PROFILE_NAME),
                 settings = item->text(ENV_SETTINGS),
                 params = item->text(BINARY_PARAMS);
@@ -296,9 +303,6 @@ void radeon_profile::on_btn_runExecProfile_clicked()
         execsRunning.append(exe);
         ui->tabs_execOutputs->setCurrentWidget(exe->tab);
         updateExecLogs();
-    }
-    else {
-        QMessageBox::critical(this, tr("Error"), tr("The selected binary does not exist!"));
     }
 }
 

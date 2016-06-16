@@ -46,8 +46,10 @@ void daemonComm::sendTimerOff (){
 }
 
 bool daemonComm::attachToMemory(){
-    if (sharedMem.isAttached())
-        sharedMem.detach();
+    if (sharedMem.isAttached()){ // Already attached, skip
+        qDebug() << "Shared memory is already attached";
+        return true;
+    }
 
     sharedMem.setKey("radeon-profile");
     if (sharedMem.create(SHARED_MEM_SIZE, QSharedMemory::ReadOnly)){

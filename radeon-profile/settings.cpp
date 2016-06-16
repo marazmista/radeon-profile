@@ -93,13 +93,13 @@ void radeon_profile::loadConfig() {
     ui->cb_minimizeTray->setChecked(settings.value("minimizeToTray",false).toBool());
     ui->cb_closeTray->setChecked(settings.value("closeToTray",false).toBool());
     ui->spin_timerInterval->setValue(settings.value("updateInterval",1).toInt());
+    ui->cb_gpuData->setChecked(settings.value("updateGPUData",true).toBool());
     ui->cb_graphs->setChecked(settings.value("updateGraphs",true).toBool());
     ui->cb_glxInfo->setChecked(settings.value("updateGLXInfo",false).toBool());
     ui->cb_connectors->setChecked(settings.value("updateConnectors",false).toBool());
     ui->cb_modParams->setChecked(settings.value("updateModParams",false).toBool());
     ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
     ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
-    ui->cb_gpuData->setChecked(settings.value("updateGPUData",true).toBool());
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
     ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",true).toBool());
     ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
@@ -148,10 +148,7 @@ void radeon_profile::loadConfig() {
                          desktopSize.height() / 2); // Height
     }
 
-    ui->cb_graphs->setEnabled(ui->cb_gpuData->isChecked());
-    ui->cb_stats->setEnabled(ui->cb_gpuData->isChecked());
 
-    ui->graphTab->setEnabled(ui->cb_graphs->isChecked() && ui->cb_graphs->isEnabled());
 
     ui->list_currentGPUData->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_glxinfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());

@@ -11,14 +11,7 @@ dFglrx::dFglrx(){
     qDebug() << "Using fglrx driver";
 }
 
-void dFglrx::changeGPU(ushort _gpuIndex) {
-    if(_gpuIndex >= gpuList.size())
-        qWarning() << "Requested unexisting card " << _gpuIndex;
-    else {
-        currentGpuIndex = _gpuIndex;
-        features = figureOutDriverFeatures();
-    }
-}
+// default changeGpu() implementation is used
 
 gpuClocksStruct dFglrx::getClocks(bool forFeatures){
     Q_UNUSED(forFeatures);
