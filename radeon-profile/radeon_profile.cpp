@@ -483,9 +483,15 @@ void radeon_profile::refreshGraphs() {
     ui->plotClocks->graph(1)->addData(ticksCounter,device->gpuClocksData.memClk);
     ui->plotClocks->graph(2)->addData(ticksCounter,device->gpuClocksData.uvdCClk);
     ui->plotClocks->graph(3)->addData(ticksCounter,device->gpuClocksData.uvdDClk);
+    const double freqUpperRange = ((device->gpuClocksData.memClk >= device->gpuClocksData.coreClk) ? device->gpuClocksData.memClk : device->gpuClocksData.coreClk) + 150;
+    if (freqUpperRange > ui->plotClocks->yAxis->range().upper)
+        ui->plotClocks->yAxis->setRangeUpper(freqUpperRange);
 
     ui->plotVolts->graph(0)->addData(ticksCounter,device->gpuClocksData.coreVolt);
     ui->plotVolts->graph(1)->addData(ticksCounter,device->gpuClocksData.memVolt);
+    const double voltsUpperRange = device->gpuClocksData.coreVolt + 100;
+    if (voltsUpperRange > ui->plotVolts->yAxis->range().upper)
+        ui->plotVolts->yAxis->setRangeUpper(voltsUpperRange);
 
     if(ui->mainTabs->currentWidget() == ui->graphTab && !this->isHidden()) // If the graph tab is selected replot the graphs
         replotGraphs();
@@ -496,29 +502,60 @@ void radeon_profile::replotGraphs(){
     const int position = ticksCounter + graphOffset;
     if(ui->cb_showTempsGraph->isChecked()){
         ui->plotTemp->xAxis->setRange(position, rangeX,Qt::AlignRight);
+
+        const double upperRange = device->gpuTemeperatureData.max + 5, lowerRange = device->gpuTemeperatureData.min - 5;
+        if ((upperRange > ui->plotTemp->yAxis->range().upper) || (lowerRange < ui->plotTemp->yAxis->range().lower))
+            ui->plotTemp->yAxis->setRange(lowerRange, upperRange);
+
         ui->plotTemp->replot();
-        if (static_cast<double>(device->gpuTemeperatureData.max) >= ui->plotTemp->yAxis->range().upper
-                || static_cast<double>(device->gpuTemeperatureData.min) <= ui->plotTemp->yAxis->range().lower)
-            ui->plotTemp->yAxis->setRange(static_cast<double>(device->gpuTemeperatureData.min - 5), static_cast<double>(device->gpuTemeperatureData.max + 5));
     }
 
     if(ui->cb_showFreqGraph->isChecked()){
         ui->plotClocks->xAxis->setRange(position,rangeX,Qt::AlignRight);
         ui->plotClocks->replot();
-        int r = (device->gpuClocksData.memClk >= device->gpuClocksData.coreClk) ? device->gpuClocksData.memClk : device->gpuClocksData.coreClk;
-        if (r > ui->plotClocks->yAxis->range().upper)
-            ui->plotClocks->yAxis->setRangeUpper(r + 150);
     }
 
     if(ui->cb_showVoltsGraph->isChecked()){
         ui->plotVolts->xAxis->setRange(position,rangeX,Qt::AlignRight);
         ui->plotVolts->replot();
-        if (device->gpuClocksData.coreVolt > ui->plotVolts->yAxis->range().upper)
-            ui->plotVolts->yAxis->setRangeUpper(device->gpuClocksData.coreVolt + 100);
     }
 
     ui->l_minMaxTemp->setText("Max: " + device->gpuTemeperatureDataString.max  + " | Min: " +
                               device->gpuTemeperatureDataString.min + " | Avg: " + QString().setNum(device->gpuTemeperatureData.sum/ticksCounter,'f',1) + QString::fromUtf8("\u00B0C"));
+}
+
+QString radeon_profile::getCoreDetails() const {
+    QString coreDetails;
+
+    if(device->gpuClocksData.coreClkOk)
+        coreDetails = device->gpuClocksDataString.coreClk;
+
+    if(device->gpuClocksData.coreVoltOk)
+        coreDetails += "  " + device->gpuClocksDataString.coreVolt;
+
+    return coreDetails;
+}
+
+QString radeon_profile::getMemDetails() const {
+    QString memDetails;
+
+    if(device->gpuClocksData.memClkOk)
+        memDetails = device->gpuClocksDataString.memClk;
+
+    if(device->gpuClocksData.memVoltOk)
+        memDetails += "  " + device->gpuClocksDataString.memVolt;
+
+    return memDetails;
+}
+
+QString radeon_profile::getNextPmStatsKey() const {
+    for(int i = 0; i < SHRT_MAX; i++){
+        QString str = QString::number(i);
+        if( ! pmStats.contains(str))
+            return str;
+    }
+
+    return QString();
 }
 
 void radeon_profile::doTheStats() {
@@ -526,27 +563,29 @@ void radeon_profile::doTheStats() {
     statsTickCounter++;
 
     if(device->gpuClocksData.powerLevelOk){
+        // Use the power level as key
         if (pmStats.contains(device->gpuClocksDataString.powerLevel)) // This power level already exists, increment its count
             pmStats[device->gpuClocksDataString.powerLevel]++;
         else { // This power level does not exist, create it
             pmStats.insert(device->gpuClocksDataString.powerLevel, 1);
 
-            QString coreDetails, memDetails;
 
-            if(device->gpuClocksData.coreClkOk)
-                coreDetails = device->gpuClocksDataString.coreClk;
-
-            if(device->gpuClocksData.coreVoltOk)
-                coreDetails += "  " + device->gpuClocksDataString.coreVolt;
-
-            if(device->gpuClocksData.memClkOk)
-                memDetails = device->gpuClocksDataString.memClk;
-
-            if(device->gpuClocksData.memVoltOk)
-                memDetails += "  " + device->gpuClocksDataString.memVolt;
-
-            ui->list_stats->addTopLevelItem(new QTreeWidgetItem(QStringList() << device->gpuClocksDataString.powerLevel << coreDetails << memDetails));
+            ui->list_stats->addTopLevelItem(new QTreeWidgetItem(QStringList() << device->gpuClocksDataString.powerLevel << getCoreDetails() << getMemDetails()));
             ui->list_stats->sortItems(0, Qt::AscendingOrder);
+        }
+    } else if (device->gpuClocksData.coreClkOk) {
+        // Power level is not available, use the core clock as fallback key
+        QList<QTreeWidgetItem *> items = ui->list_stats->findItems(device->gpuClocksDataString.coreClk, Qt::MatchStartsWith, 1);
+        if(items.size() == 1){ // This level already exists, increment its count
+            pmStats[items[0]->text(0)]++;
+        } else {
+            QString key = getNextPmStatsKey();
+
+            pmStats.insert(key, 1);
+
+
+            ui->list_stats->addTopLevelItem(new QTreeWidgetItem(QStringList() << key << getCoreDetails() << getMemDetails()));
+            ui->list_stats->sortItems(1, Qt::AscendingOrder);
         }
     }
 }

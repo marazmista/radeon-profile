@@ -192,6 +192,9 @@ private:
     void refreshUI();
     void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
     void exportSingleGraph(QAbstractButton * format, QCustomPlot * graph, const QString & path);
+    QString getCoreDetails() const;
+    QString getMemDetails() const;
+    QString getNextPmStatsKey() const;
 
     /**
      * @brief adjustFanSpeed Sets the PWM fan speed indicated for the actual temperature on the fan profile.
