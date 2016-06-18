@@ -11,10 +11,6 @@ void daemonComm::connectToDaemon() {
     connectToServer("radeon-profile-daemon-server");
 }
 
-bool daemonComm::connected() const {
-    return (state() == QLocalSocket::ConnectedState);
-}
-
 void daemonComm::sendCommand(const QString & command) {
     if(write(command.toLatin1(),command.length()) == -1) // If sending signal fails
         qWarning() << "Failed sending signal: " << command;
@@ -52,7 +48,7 @@ bool daemonComm::attachToMemory(){
     }
 
     sharedMem.setKey("radeon-profile");
-    if (sharedMem.create(SHARED_MEM_SIZE, QSharedMemory::ReadOnly)){
+    if (sharedMem.create(SHARED_MEM_SIZE)){
         // If QSharedMemory::create() returns true, it has already automatically attached
         qDebug() << "Shared memory created and connected";
         return true;

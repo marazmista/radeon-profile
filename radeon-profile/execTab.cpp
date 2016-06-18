@@ -328,16 +328,16 @@ void radeon_profile::btnBackToProfilesClicked()
 }
 
 void radeon_profile::on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column) {
-    logEvent "list_execProfiles item double clicked";
-    Q_UNUSED(column);
-    switch (ui->cb_execDbcAction->currentIndex()) {
-    default:
-    case 0:
-        if (askConfirmation(tr("Run"), tr("Run: \"") + item->text(0) + tr("\"?")))
-            ui->btn_runExecProfile->click();
-        break;
-    case 1:
-        ui->btn_modifyExecProfile->click();
-        break;
-    }
+        logEvent "list_execProfiles item double clicked";
+        Q_UNUSED(column);
+        switch (ui->cb_execDbcAction->currentIndex()) {
+        default:
+        case 0:
+            if (askConfirmation(tr("Run"), tr("Run: \"") + item->text(0) + tr("\"?")))
+                ui->btn_runExecProfile->click();
+            break;
+        case 1:
+            ui->btn_modifyExecProfile->click();
+            break;
+        }
 }

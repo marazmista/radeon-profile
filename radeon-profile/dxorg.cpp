@@ -1,8 +1,10 @@
 ﻿// copyright marazmista @ 29.03.2014
 
 #include "dxorg.h"
+#include "globalStuff.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 #include <QTime>
 #include <QApplication>
@@ -35,7 +37,6 @@ void dXorg::changeGPU(ushort gpuIndex) {
     qDebug() << "dXorg: selecting gpu " << gpuName;
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
-    currentPowerMethod = getPowerMethod();
 
     if (!globalStuff::globalConfig.rootMode) {
         qDebug() << "Running in non-root mode, connecting and configuring the daemon";
@@ -131,13 +132,14 @@ gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
 
     gpuClocksStruct tData; // empty struct
 
+
     // if nothing is there returns empty (-1) struct
     if (data.isEmpty()){
         qDebug() << "Can't get clocks, no data available";
         return tData;
     }
 
-    switch (currentPowerMethod) {
+    switch (features.pm) {
     case DPM: {
         QRegExp rx;
 
@@ -194,7 +196,7 @@ gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
     case PROFILE: {
         const QStringList clocksData = data.split("\n");
         const int count = clocksData.count();
-qDebug() << "Reading profile clocks";
+
         if ((1 < count) && clocksData[1].contains("current engine clock")) {
             tData.coreClk = static_cast<short>(clocksData[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000);
             tData.coreClkOk = tData.coreClk > 0;
@@ -246,18 +248,14 @@ float dXorg::getTemperature() const {
 }
 
 powerMethod dXorg::getPowerMethod() const {
-    QFile powerMethodFile(filePaths.powerMethodFilePath);
-    if (powerMethodFile.open(QIODevice::ReadOnly)) {
-        QString s = powerMethodFile.readLine(20);
+    QString s = readFile(filePaths.powerMethodFilePath);
 
-        if (s.contains("dpm",Qt::CaseInsensitive))
-            return DPM;
-        else if (s.contains("profile",Qt::CaseInsensitive))
-            return PROFILE;
-        else
-            return PM_UNKNOWN;
-    } else
-        return PM_UNKNOWN;
+    if (s.contains("dpm",Qt::CaseInsensitive))
+        return DPM;
+    else if (s.contains("profile",Qt::CaseInsensitive))
+        return PROFILE;
+
+    return PM_UNKNOWN;
 }
 
 tempSensor dXorg::testSensor() {
@@ -308,10 +306,11 @@ QString dXorg::findSysfsHwmonForGPU() const {
 
 // default getModuleInfo() implementation is used
 
+
 // default detectCards() implementation is used
 
 QString dXorg::getCurrentPowerProfile() const {
-    switch (currentPowerMethod) {
+    switch (features.pm) {
     case DPM: {
         QFile dpmProfile(filePaths.dpmStateFilePath);
         if (dpmProfile.open(QIODevice::ReadOnly))
@@ -343,6 +342,7 @@ QString dXorg::getCurrentPowerLevel() const {
 void dXorg::setPowerProfile(powerProfiles newPowerProfile) {
     const QString newValue = profileToString.at(newPowerProfile);
 
+
     // enum is int, so first three values are dpm, rest are profile
     if (newPowerProfile <= PERFORMANCE)
         sendValue(filePaths.dpmStateFilePath,newValue);
@@ -370,21 +370,19 @@ void dXorg::setPwmManualControl(bool manual){
 
 ushort dXorg::getPwmSpeed() const {
     if(features.pwmMaxSpeed == 0) // Prevent division by zero
-        return 100;
+        return 0;
 
-    QFile f(filePaths.pwmSpeedPath);
+    QString s = readFile(filePaths.pwmSpeedPath);
 
-    float val = 0;
-    if (f.open(QIODevice::ReadOnly)) {
-       val = QString(f.readLine(4)).toFloat();
-       f.close();
-    }
+    if(s.isEmpty())
+        return 0;
 
-    return static_cast<ushort>(( val / features.pwmMaxSpeed ) * 100);
+    return static_cast<ushort>(( s.toFloat() / features.pwmMaxSpeed ) * 100);
 }
 
 driverFeatures dXorg::figureOutDriverFeatures() {
     driverFeatures features;
+    features.pm = getPowerMethod();
     features.temperatureAvailable =  (currentTempSensor != TS_UNKNOWN);
 
     gpuClocksStruct test = getClocks(true);
@@ -400,27 +398,14 @@ driverFeatures dXorg::figureOutDriverFeatures() {
     features.coreVoltAvailable = test.coreVoltOk;
     features.memVoltAvailable = test.memVoltOk;
 
-    features.pm = currentPowerMethod;
 
-    switch (currentPowerMethod) {
+    switch (features.pm) {
     case DPM: {
-        if (daemonConnected())
-            features.canChangeProfile = true;
-        else {
-            QFile f(filePaths.dpmStateFilePath);
-            if (f.open(QIODevice::WriteOnly)){
-                features.canChangeProfile = true;
-                f.close();
-            }
-        }
+        features.canChangeProfile = daemonConnected() || QFileInfo(filePaths.dpmStateFilePath).isWritable();
         break;
     }
     case PROFILE: {
-        QFile f(filePaths.profilePath);
-        if (f.open(QIODevice::WriteOnly)) {
-            features.canChangeProfile = true;
-            f.close();
-        }
+        features.canChangeProfile = daemonConnected() || QFileInfo(filePaths.profilePath).isWritable();
         break;
     }
     case PM_UNKNOWN:
@@ -453,16 +438,17 @@ driverFeatures dXorg::figureOutDriverFeatures() {
 }
 
 gpuClocksStruct dXorg::getFeaturesFallback() {
+    qDebug() << "Getting fallback features from /tmp";
     const QString s = readFile("/tmp/"+driverModule+"_pm_info");
     gpuClocksStruct fallbackFeatures;
 
     if(!s.isEmpty()){
         // just look for it, if it is, the value is not important at this point
-        if (s.contains("sclk"))
+        if (s.contains("sclk") || s.contains("current engine clock"))
             fallbackFeatures.coreClkOk = true;
-        if (s.contains("mclk"))
+        if (s.contains("mclk") || s.contains("current memory clock"))
             fallbackFeatures.memClkOk = true;
-        if (s.contains("vddc"))
+        if (s.contains("vddc") || s.contains("voltage"))
             fallbackFeatures.coreVoltOk = true;
         if (s.contains("vddci"))
             fallbackFeatures.memVoltOk = true;
@@ -476,6 +462,7 @@ bool dXorg::overclockGPU(const int percentage){
         qWarning() << "Error overclocking GPU: invalid percentage passed: " << percentage;
         return false;
     }
+
 
     return sendValue(filePaths.GPUoverDrivePath, QString::number(percentage));
 }

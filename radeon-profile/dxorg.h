@@ -5,11 +5,11 @@
 #ifndef DXORG_H
 #define DXORG_H
 
+#include "globalStuff.h"
 #include "daemonComm.h"
 #include "gpu.h"
 
 #include <QString>
-
 
 typedef enum tempSensor {
     SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
@@ -45,6 +45,7 @@ public:
 
     bool overclockMemory(int value);
 
+
 private:
 
 
@@ -65,7 +66,6 @@ private:
     daemonComm dcomm;
     ushort sensorsGPUtempIndex;
     tempSensor currentTempSensor;
-    powerMethod currentPowerMethod;
 
     void figureOutGpuDataFilePaths(QString gpuName);
     gpuClocksStruct getFeaturesFallback();

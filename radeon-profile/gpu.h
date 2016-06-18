@@ -72,6 +72,12 @@ public:
      */
     virtual QStringList detectCards() const;
 
+    /**
+     * @brief getClocksAvailable
+     * @return if getClocks() can get any data
+     */
+    virtual bool updateClocksDataIsAvailable() const;
+
     /*  Core functions, MUST be re-implemented by inheriting classes  */
 
     /**
@@ -189,4 +195,5 @@ protected:
      */
     QString readFile(const QString & filePath) const;
 };
+
 #endif // GPU_H

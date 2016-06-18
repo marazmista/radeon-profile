@@ -83,7 +83,8 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 void radeon_profile::on_combo_pProfile_currentIndexChanged(int index) {
     logEvent "combo_pProfile index changed, changing power profile";
 
-    if(index != -1){ // Any profile is selected in combo_pProfile
+    if(ui->combo_pProfile->count() > 1 // Prevents from switching profile when filling combo_pProfile in setupUiEnabledFeatures()
+            && index != -1){ // Any profile is selected in combo_pProfile
         if (device->features.pm != DPM)
             index += 3; // frist three in enum is dpm so we need to increase
 
@@ -94,7 +95,8 @@ void radeon_profile::on_combo_pProfile_currentIndexChanged(int index) {
 void radeon_profile::on_combo_pLevel_currentIndexChanged(int index) {
     logEvent "combo_pLevel current index changed, changing power level";
 
-    if(index != -1) // Any profile is selected in combo_pLevel
+    if(ui->combo_pLevel->count() > 1 // Prevents from switching level when filling combo_pLevel in setupUiEnabledFeatures()
+            && index != -1) // Any profile is selected in combo_pLevel
         device->setForcePowerLevel(static_cast<forcePowerLevels>(index));
 }
 
@@ -178,8 +180,8 @@ void radeon_profile::on_combo_gpus_currentIndexChanged(int index)
 
     if(index != -1){ // Any profile is selected in combo_gpus
         device->changeGPU(static_cast<ushort>(index));
-        setupUiEnabledFeatures(device->features);
         timerEvent(0);
+        setupUiEnabledFeatures(device->features);
         refreshBtnClicked(true);
     }
 }
@@ -282,9 +284,9 @@ void radeon_profile::on_cb_gpuData_toggled(bool checked)
     if (!checked) {
         ui->l_minMaxTemp->setText(tr("GPU data is disabled"));
 
-        ui->list_stats->insertTopLevelItem(0, new QTreeWidgetItem(QStringList() << "" << "" << "" << tr("GPU data is disabled")));
+        ui->list_stats->insertTopLevelItem(0, new QTreeWidgetItem({"", "", "", tr("GPU data is disabled")}));
         ui->list_currentGPUData->clear();
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << tr("GPU data is disabled")));
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem({tr("GPU data is disabled")}));
     }
     setupUiEnabledFeatures(device->features);
 
@@ -335,7 +337,7 @@ void radeon_profile::on_cb_stats_toggled(bool checked)
     // reset stats data
     resetStats();
     if (!checked)
-        ui->list_stats->insertTopLevelItem(0, new QTreeWidgetItem(QStringList() << "" << "" << "" << tr("Stats disabled")));
+        ui->list_stats->insertTopLevelItem(0, new QTreeWidgetItem({"", "", "", tr("Stats disabled")}));
 }
 
 void radeon_profile::copyGlxInfoToClipboard() {
@@ -375,7 +377,7 @@ void radeon_profile::on_cb_alternateRow_toggled(bool checked) {
 
 void radeon_profile::on_chProfile_clicked()
 {
-    logEvent "cb_alternateRow toggled";
+    logEvent "chProfile clicked";
     bool ok;
     QStringList profiles;
     profiles << profile_auto << profile_default << profile_high << profile_mid << profile_low;

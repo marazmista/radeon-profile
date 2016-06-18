@@ -391,7 +391,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
         qDebug() << "Analyzing screen " << screenIndex;
 
         // Create root QTreeWidgetItem item for this screen
-        QTreeWidgetItem * screenItem = new QTreeWidgetItem(QStringList() << tr("Virtual screen n°%n", NULL, screenIndex));
+        QTreeWidgetItem * screenItem = new QTreeWidgetItem({tr("Virtual screen n°%n", NULL, screenIndex)});
         cardConnectorsList.append(screenItem);
 
         // Add resolution
@@ -422,7 +422,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
         }
 
         // Creating root QTreeWidgetItem for this screen's outputs
-        QTreeWidgetItem * outputListItem = new QTreeWidgetItem(QStringList() << tr("Outputs"));
+        QTreeWidgetItem * outputListItem = new QTreeWidgetItem({tr("Outputs")});
         screenItem->addChild(outputListItem);
         int screenConnectedOutputs = 0, screenActiveOutputs = 0;
 
@@ -512,7 +512,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                      + QString::number(diagonal) + tr(" inches)"));
 
             // Create the root QTreeWidgetItem of the possible modes (resolution, Refresh rate, HSync, VSync, etc) list
-            QTreeWidgetItem * modeListItem = new QTreeWidgetItem(QStringList() << tr("Supported modes"));
+            QTreeWidgetItem * modeListItem = new QTreeWidgetItem({tr("Supported modes")});
             outputItem->addChild(modeListItem);
 
             qDebug() << "    Analyzing available modes";
@@ -561,7 +561,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             }
 
             // Create the root QTreeWidgetItem of the property list
-            QTreeWidgetItem * propertyListItem = new QTreeWidgetItem(QStringList() << tr("Properties"));
+            QTreeWidgetItem * propertyListItem = new QTreeWidgetItem({tr("Properties")});
             outputItem->addChild(propertyListItem);
 
             // Get this output properties (EDID, audio, scaling mode, etc)
@@ -726,7 +726,7 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
                     } else
                         paramValue = tr("Unknown");
                }
-               list.append(new QTreeWidgetItem(QStringList() << paramName << paramValue << paramDesc));
+               list.append(new QTreeWidgetItem({paramName, paramValue, paramDesc}));
             }
         }
     }
@@ -897,4 +897,11 @@ QString gpu::readFile(const QString & filePath) const {
 
     file.close();
     return out;
+}
+
+bool gpu::updateClocksDataIsAvailable() const {
+    return features.coreClockAvailable
+            || features.memClockAvailable
+            || features.coreVoltAvailable
+            || features.memVoltAvailable;
 }

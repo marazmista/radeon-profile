@@ -184,7 +184,7 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     const bool gpuDataAvailable = ui->cb_gpuData->isChecked(),
             profilesAvailable = features.canChangeProfile && (features.pm < PM_UNKNOWN),
             dpm = profilesAvailable && (features.pm == DPM),
-            standardProfiles = profilesAvailable && ! dpm,
+            standardProfiles = profilesAvailable && (features.pm == PROFILE),
             temperatureAvailable = gpuDataAvailable && features.temperatureAvailable,
             clocksAvailable = gpuDataAvailable && (features.coreClockAvailable || features.memClockAvailable),
             voltsAvailable = gpuDataAvailable && (features.coreVoltAvailable || features.memVoltAvailable),
@@ -211,25 +211,24 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     if(profilesAvailable) {
         qDebug() << "Power profiles are available, configuring";
         ui->tabs_pm->setCurrentWidget(dpm ? ui->dpmProfiles : ui->stdProfiles);
-        QString powerProfile = device->currentPowerProfile,
-                powerLevel = device->currentPowerLevel;
 
         ui->combo_pProfile->clear();
         ui->combo_pLevel->clear();
         if (dpm) {
             qDebug() << "Setting up DPM power profiles";
-            ui->combo_pProfile->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
-            ui->combo_pLevel->addItems(QStringList() << dpm_auto << dpm_low << dpm_high);
+            ui->combo_pProfile->addItem(dpm_battery); // See on_combo_pProfile_currentIndexChanged(), count=1
+            ui->combo_pProfile->addItems({dpm_balanced, dpm_performance});
+            ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device->currentPowerProfile));
 
-            // When adding the possible profiles and levels, the indexes got automatically changed to 0
-            // Restore the correct power profile and level
-            ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(powerProfile));
-            ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(powerLevel));
+            ui->combo_pLevel->addItem(dpm_auto); // See on_combo_pLevel_currentIndexChanged(), count=1
+            ui->combo_pLevel->addItems({dpm_low, dpm_high});
+            ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device->currentPowerLevel));
 
-        } else {
+        } else if(standardProfiles) {
             qDebug() << "Setting up standard profiles";
-            ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
-            ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(powerProfile));
+            ui->combo_pProfile->addItem(profile_auto); // See on_combo_pProfile_currentIndexChanged(), count=1
+            ui->combo_pProfile->addItems({profile_default, profile_low, profile_mid, profile_high});
+            ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device->currentPowerProfile));
         }
     }
 
@@ -311,9 +310,11 @@ void radeon_profile::refreshGpuData() {
     if(device->features.canChangeProfile)
         device->refreshPowerLevel();
 
-    if(device->features.coreClockAvailable || device->features.memClockAvailable)
+    if(device->updateClocksDataIsAvailable())
         device->updateClocksData();
-    device->updateTemperatureData();
+
+    if(device->features.temperatureAvailable)
+        device->updateTemperatureData();
 
     updateExecLogs();
 }
@@ -359,9 +360,9 @@ void radeon_profile::refreshUI() {
         if (device->gpuClocksData.uvdDClkOk)
             addChild(ui->list_currentGPUData, tr("UVD decoder clock"), device->gpuClocksDataString.uvdDClk);
         if (device->gpuClocksData.coreVoltOk)
-            addChild(ui->list_currentGPUData, tr("I/O voltage"), device->gpuClocksDataString.coreVolt);
+            addChild(ui->list_currentGPUData, tr("GPU voltage"), device->gpuClocksDataString.coreVolt);
         if (device->gpuClocksData.memVoltOk)
-            addChild(ui->list_currentGPUData, tr("GPU voltage"), device->gpuClocksDataString.memVolt);
+            addChild(ui->list_currentGPUData, tr("I/O voltage"), device->gpuClocksDataString.memVolt);
 
         if (ui->list_currentGPUData->topLevelItemCount() == 0)
             addChild(ui->list_currentGPUData, tr("Can't read data"), tr("You need debugfs mounted and either root rights or the daemon running"));
@@ -393,17 +394,18 @@ void radeon_profile::timerEvent(QTimerEvent * event) {
     if(event)
         event->accept();
 
+    if (!refreshWhenHidden->isChecked() && this->isHidden()) {
+        // even if in tray, keep the fan control active (if enabled)
+        device->updateTemperatureData();
+        adjustFanSpeed();
+        return;
+    }
+
     if (ui->cb_gpuData->isChecked()) {
-        if (!refreshWhenHidden->isChecked() && this->isHidden()) {
-            // even if in tray, keep the fan control active (if enabled)
-            device->updateTemperatureData();
-            adjustFanSpeed();
-            return;
-        }
 
         refreshGpuData();
 
-        if(ui->cb_showCombo->isChecked()){ // If pLevel and pProfile are visible update their index
+        if(ui->cb_showCombo->isChecked() && device->features.canChangeProfile){ // If pLevel and pProfile are visible update their index
             ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device->currentPowerProfile));
             if (device->features.pm == DPM)
                 ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device->currentPowerLevel));
@@ -558,7 +560,7 @@ QString radeon_profile::getMemDetails() const {
 }
 
 QString radeon_profile::getNextPmStatsKey() const {
-    for(int i = 0; i < SHRT_MAX; i++){
+    for(ushort i = 0; i < USHRT_MAX; i++){
         QString str = QString::number(i);
         if( ! pmStats.contains(str))
             return str;
@@ -579,7 +581,7 @@ void radeon_profile::doTheStats() {
             pmStats.insert(device->gpuClocksDataString.powerLevel, 1);
 
 
-            ui->list_stats->addTopLevelItem(new QTreeWidgetItem(QStringList() << device->gpuClocksDataString.powerLevel << getCoreDetails() << getMemDetails()));
+            ui->list_stats->addTopLevelItem(new QTreeWidgetItem({device->gpuClocksDataString.powerLevel, getCoreDetails(), getMemDetails()}));
             ui->list_stats->sortItems(0, Qt::AscendingOrder);
         }
     } else if (device->gpuClocksData.coreClkOk) {
@@ -593,7 +595,7 @@ void radeon_profile::doTheStats() {
             pmStats.insert(key, 1);
 
 
-            ui->list_stats->addTopLevelItem(new QTreeWidgetItem(QStringList() << key << getCoreDetails() << getMemDetails()));
+            ui->list_stats->addTopLevelItem(new QTreeWidgetItem({key, getCoreDetails(), getMemDetails()}));
             ui->list_stats->sortItems(1, Qt::AscendingOrder);
         }
     }

@@ -63,6 +63,7 @@ void execBin::runBin(const QString &cmd) {
     this->cmd->setPlainText(processEnvironment().toStringList().join(" ") +" "+ cmd);
 }
 
+
 void execBin::execProcessReadOutput() {
     QString o = readAllStandardOutput();
 
@@ -95,6 +96,7 @@ void execBin::saveToFile() {
             f.close();
         }
 }
+
 
 void execBin::appendToLog(const QString &data) {
     this->logData.log.append(data);
