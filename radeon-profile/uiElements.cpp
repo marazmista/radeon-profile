@@ -95,10 +95,30 @@ void radeon_profile::setupGraphsStyle()
 void radeon_profile::setupTrayIcon() {
     qDebug() << "Setting up tray icon";
 
+    // Unity on Ubuntu 14.04 and earlier does not support tray icon
+    const QRegExp filter = QRegExp("VERSION_ID=\"(\\d+).\\d+\"");
+    const QStringList release = globalStuff::grabSystemInfo("cat /etc/os-release"),
+            versionID = release.filter(filter),
+            ps = globalStuff::grabSystemInfo("ps -A").filter(QRegExp(".*unity.*"));
+    if( ! ps.isEmpty() // Unity is the desktop enviroinment
+            && release.contains("ID=ubuntu") // This check works only for ubuntu
+            && ! versionID.isEmpty()){ // Release version is available
+            filter.indexIn(versionID[0]);
+            ushort version = filter.cap(1).toUShort();
+            trayIconAvailable = version > 14;
+            qDebug() << "Ubuntu " << version << ", trayIconAvailable: " << trayIconAvailable;
+    } else
+        trayIconAvailable = true;
+
+    if( ! trayIconAvailable){
+        qWarning() << "Tray icon is not supported on this system";
+        return;
+    }
+
     // maximize
-    show = new QAction(this);
-    show->setText(tr("Show"));
-    connect(show, SIGNAL(triggered()),this,SLOT(showNormal()));
+    trayBtn_show = new QAction(this);
+    trayBtn_show->setText(tr("Show"));
+    connect(trayBtn_show, SIGNAL(triggered()),this,SLOT(show()));
 
     //close //
     closeApp = new QAction(this);
@@ -146,7 +166,7 @@ void radeon_profile::setupTrayIcon() {
     trayMenu.addAction(changeProfile);
     trayMenu.addMenu(&dpmMenu);
     trayMenu.addSeparator();
-    trayMenu.addAction(show);
+    trayMenu.addAction(trayBtn_show);
     trayMenu.addAction(closeApp);
 
     // setup icon finally //

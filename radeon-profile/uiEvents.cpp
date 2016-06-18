@@ -162,13 +162,18 @@ void radeon_profile::setGraphOffset(const bool &checked) {
 void radeon_profile::changeEvent(QEvent *event)
 {
     logEvent "changeEvent " << event->type();
-    if(event->type() == QEvent::WindowStateChange && ui->cb_minimizeTray->isChecked()) {
-        if(isMinimized())
-            this->hide();
+    if(event->type() == QEvent::WindowStateChange
+            && trayIconAvailable
+            && ui->cb_minimizeTray->isChecked()
+            && isMinimized()){
+        this->hide();
 
         event->ignore();
     }
-    if (event->type() == QEvent::Close && ui->cb_closeTray) {
+
+    if (event->type() == QEvent::Close
+            && trayIconAvailable
+            && ui->cb_closeTray->isChecked()) {
         this->hide();
         event->ignore();
     }
@@ -181,9 +186,10 @@ void radeon_profile::on_combo_gpus_currentIndexChanged(int index)
     if(index != -1){ // Any profile is selected in combo_gpus
         device->changeGPU(static_cast<ushort>(index));
         timerEvent(0);
-        setupUiEnabledFeatures(device->features);
-        refreshBtnClicked(true);
     }
+
+    setupUiEnabledFeatures(device->features);
+    refreshBtnClicked(true);
 }
 
 void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
@@ -203,8 +209,10 @@ void radeon_profile::showEvent(QShowEvent *event){
 
 void radeon_profile::hideEvent(QHideEvent *event){
     logEvent "Hiding window";
-    event->accept();
-    show->setVisible(true);
+    if(trayIconAvailable){
+        event->accept();
+        trayBtn_show->setVisible(true);
+    }
 }
 
 void radeon_profile::closeEvent(QCloseEvent *e) {
@@ -227,6 +235,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
             e->ignore();
             return;
         }
+
         qDebug() << "Closing application";
         e->accept();
 

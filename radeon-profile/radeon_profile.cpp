@@ -201,11 +201,14 @@ void radeon_profile::setupUiEnabledFeatures(const driverFeatures &features) {
     ui->combo_pProfile->setEnabled(profilesAvailable);
 
     ui->stdProfiles->setEnabled(standardProfiles);
-    changeProfile->setEnabled(standardProfiles);
     ui->label_noStdProfiles->setVisible( ! standardProfiles);
 
+    if(trayIconAvailable){
+        changeProfile->setEnabled(standardProfiles);
+        dpmMenu.setEnabled(dpm);
+    }
+
     ui->dpmProfiles->setEnabled(dpm);
-    dpmMenu.setEnabled(dpm);
     ui->combo_pLevel->setEnabled(dpm);
 
     if(profilesAvailable) {
@@ -394,7 +397,7 @@ void radeon_profile::timerEvent(QTimerEvent * event) {
     if(event)
         event->accept();
 
-    if (!refreshWhenHidden->isChecked() && this->isHidden()) {
+    if (trayIconAvailable && !refreshWhenHidden->isChecked() && this->isHidden()) {
         // even if in tray, keep the fan control active (if enabled)
         device->updateTemperatureData();
         adjustFanSpeed();
@@ -424,7 +427,7 @@ void radeon_profile::timerEvent(QTimerEvent * event) {
 
         refreshUI();
 
-        if(this->isHidden())
+        if(trayIconAvailable && this->isHidden())
             refreshTooltip();
 
         if (ui->graphTab->isEnabled())
@@ -615,7 +618,7 @@ void radeon_profile::refreshTooltip()
     if(device->features.canChangeProfile)
         tooltipdata += "Power profile: "+ device->currentPowerProfile + "  " + device->currentPowerLevel +"\n";
 
-    for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++) {
+    for (ushort i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++) {
         tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
     }
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom

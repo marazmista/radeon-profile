@@ -735,8 +735,7 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
 }
 
 QStringList gpu::getGLXInfo(const QString & gpuName) const {
-    qDebug() << "Getting GLX info";
-    // List installed cards
+    qDebug() << "Listing installed cards";
     QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter(QRegExp(".+VGA.+|.+3D.+"));
     gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
     // loop for multi gpu
@@ -745,10 +744,10 @@ QStringList gpu::getGLXInfo(const QString & gpuName) const {
 
     QRegExp noEmptyLines = QRegExp(".+");
 
+    qDebug() << "Getting X DRI driver info";
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     if (!gpuName.isEmpty())
         env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
-    // Show the DRI driver
     const QStringList driver = globalStuff::grabSystemInfo("xdriinfo driver 0").filter(noEmptyLines);
     if(!driver.isEmpty())
         data << tr("Driver: ") + driver[0];
@@ -757,7 +756,7 @@ QStringList gpu::getGLXInfo(const QString & gpuName) const {
     // if (!driver.isEmpty())  // because of segfault when no xdriinfo
     //    data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
-    // Show OpenGL informations
+    qDebug() << "Getting OpenGL info";
     const QStringList glxinfo = globalStuff::grabSystemInfo("glxinfo -B", env).filter(noEmptyLines);
     if( ! glxinfo.isEmpty()){
         data.append("");
@@ -768,7 +767,7 @@ QStringList gpu::getGLXInfo(const QString & gpuName) const {
     // Consider only lines containing "direct rendering" or containing "OpenGL ... : ..." but not containing 'none
     // data.append(globalStuff::grabSystemInfo("glxinfo", env).filter(QRegExp("direct rendering|OpenGL.+:..(?!none)")));
 
-    // Show OpenCL information, if available
+    qDebug() << "Getting OpenCL info";
     const QStringList clinfo = globalStuff::grabSystemInfo("clinfo --human").filter(noEmptyLines);
     if( ! clinfo.isEmpty()){
         data.append("");
@@ -776,7 +775,7 @@ QStringList gpu::getGLXInfo(const QString & gpuName) const {
         data.append(clinfo);
     }
 
-    // Show vulkan information, if available
+    qDebug() << "Getting Vulkan info";
     // http://www.phoronix.com/scan.php?page=news_item&px=Vulkan-1.0-SKL-First-Test
     const QStringList vulkaninfo = globalStuff::grabSystemInfo("vulkaninfo").filter(QRegExp(".+= \\w"));
     if( ! vulkaninfo.isEmpty()){

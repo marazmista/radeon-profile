@@ -151,8 +151,9 @@ private:
     QMap<short, unsigned short> fanSteps;
     QMap<QString, unsigned short> pmStats;
     unsigned short rangeX, ticksCounter, statsTickCounter;
+    bool trayIconAvailable;
     QSystemTrayIcon trayIcon;
-    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden, *show;
+    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden, *trayBtn_show;
     QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;
     int timerID;
     QButtonGroup pwmGroup, exportFormat;

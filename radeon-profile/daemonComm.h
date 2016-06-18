@@ -71,21 +71,21 @@ public:
     /**
      * @brief sendReadClocks Ask the daemon to read clocks
      */
-
     void sendReadClocks (); // SIGNAL_READ_CLOCKS + SEPARATOR
+
     /**
      * @brief sendSetValue Write the value into the file indicated by the path
      * @param value
      * @param path
      */
-
     void sendSetValue (const QString & value, const QString & path); // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
+
     /**
      * @brief sendTimerOn Setup the daemon to automatically read the data
      * @param interval Seconds between a read and another
      */
-
     void sendTimerOn (const ushort seconds); // SIGNAL_TIMER_ON + SEPARATOR + INTERVAL + SEPARATOR
+
     /**
      * @brief sendTimerOff Disable the timer
      */
