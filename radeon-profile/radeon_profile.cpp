@@ -106,7 +106,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
         refreshUI();
 
     logTime << "Starting timer and adding runtime widgets";
-    timerID = startTimer(ui->spin_timerInterval->value()*1000);
+    on_spin_timerInterval_valueChanged(ui->spin_timerInterval->value());
     addRuntimeWidgets();
 
     showWindow();
@@ -484,7 +484,7 @@ void radeon_profile::adjustFanSpeed(const bool force)
 
 void radeon_profile::refreshGraphs() {
     // count the tick and move graph to right
-    ticksCounter++;
+    ticksCounter += ui->spin_timerInterval->value();
 
     // Temperature grqaph
     ui->plotTemp->graph(0)->addData(ticksCounter, static_cast<double>(device->gpuTemeperatureData.current));
