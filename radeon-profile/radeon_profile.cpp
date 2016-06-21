@@ -115,8 +115,14 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
 radeon_profile::~radeon_profile()
 {
+    qDebug() << "Deleting radeon_profile";
     delete ui;
     delete device;
+
+    // At this point if any executable was running the user has already been warned (see radeon_profile::closeEvent())
+    for(execBin * exe : execsRunning)
+        delete exe;
+    qDebug() << "Terminating";
 }
 
 gpu * radeon_profile::detectDriver(){

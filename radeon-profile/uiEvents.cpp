@@ -419,6 +419,7 @@ void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
     if (execsRunning.at(index)->state() != QProcess::Running || askConfirmation(tr("Process running"), tr("Process is still running. Close tab?"))){
 
         ui->tabs_execOutputs->removeTab(index);
+        delete execsRunning.at(index);
         execsRunning.removeAt(index);
 
         if (ui->tabs_execOutputs->count() == 0)

@@ -17,14 +17,13 @@
 #include <QWidget>
 #include <QString>
 #include <QLabel>
+#include <QDebug>
 
 class execBin : public QProcess {
     Q_OBJECT
 public:
     execBin();
-    ~execBin() {
-        delete tab;
-    }
+    ~execBin();
 
     void runBin(const QString &cmd);
     void appendToLog(const QString &data);

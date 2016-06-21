@@ -18,39 +18,44 @@
         <translation>Eseguibile</translation>
     </message>
     <message>
-        <location filename="exec_bin.ui" line="46"/>
+        <location filename="exec_bin.ui" line="20"/>
+        <source>Enviroinment</source>
+        <translation>Ambiente</translation>
+    </message>
+    <message>
+        <location filename="exec_bin.ui" line="72"/>
         <source>Output</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="exec_bin.ui" line="87"/>
+        <location filename="exec_bin.ui" line="113"/>
         <source>Process not started</source>
         <translation>Processo non partito</translation>
     </message>
     <message>
-        <location filename="exec_bin.ui" line="94"/>
+        <location filename="exec_bin.ui" line="120"/>
         <source>Save output to file</source>
         <translation>Salva output in un file</translation>
     </message>
     <message>
-        <location filename="exec_bin.ui" line="20"/>
+        <location filename="exec_bin.ui" line="46"/>
         <source>Command</source>
         <translation>Comando</translation>
     </message>
     <message>
-        <location filename="execbin.cpp" line="39"/>
+        <location filename="execbin.cpp" line="40"/>
         <source>Process running</source>
         <oldsource>Process state: running</oldsource>
         <translation>Processo in esecuzione</translation>
     </message>
     <message>
-        <location filename="execbin.cpp" line="51"/>
+        <location filename="execbin.cpp" line="52"/>
         <source>Process terminated</source>
         <oldsource>Process not running</oldsource>
         <translation>Processo terminato</translation>
     </message>
     <message>
-        <location filename="execbin.cpp" line="55"/>
+        <location filename="execbin.cpp" line="56"/>
         <source>Save</source>
         <translation>Salva</translation>
     </message>

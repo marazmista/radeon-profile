@@ -22,9 +22,20 @@ execBin::execBin() : QProcess() {
     setProcessChannelMode(MergedChannels);
 }
 
+execBin::~execBin() {
+    qDebug() << "Deleting " << name;
+    delete tab;
+
+    if (state() == Running){
+        qDebug() << name << " was still running, killing it";
+        kill();
+    }
+}
+
 void execBin::runBin(const QString &cmd) {
     start(cmd);
-    ui.text_command->setPlainText(processEnvironment().toStringList().join(" ") +" "+ cmd);
+    ui.text_enviroinment->setPlainText(processEnvironment().toStringList().join(' '));
+    ui.text_command->setPlainText(cmd);
 }
 
 
