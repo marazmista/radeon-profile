@@ -44,7 +44,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui(new Ui::radeon_profile)
 {
     rangeX = 180;
-    ticksCounter = statsTickCounter = graphOffset = 0;
+    timerID = ticksCounter = statsTickCounter = graphOffset = 0;
     closeFromTrayMenu = false;
 
     // checks if running as root

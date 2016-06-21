@@ -4,12 +4,8 @@
 <context>
     <name>dXorg</name>
     <message>
-        <source>Unknown</source>
-        <translation type="vanished">Sconosciuto</translation>
-    </message>
-    <message>
-        <location filename="dxorg.cpp" line="323"/>
-        <location filename="dxorg.cpp" line="331"/>
+        <location filename="dxorg.cpp" line="330"/>
+        <location filename="dxorg.cpp" line="338"/>
         <source>No info</source>
         <translation>Nessuna info</translation>
     </message>
@@ -17,34 +13,44 @@
 <context>
     <name>execBin</name>
     <message>
-        <location filename="execbin.cpp" line="42"/>
-        <source>Save output to file</source>
-        <translation>Salva output in un file</translation>
+        <location filename="exec_bin.ui" line="14"/>
+        <source>Executable</source>
+        <translation>Eseguibile</translation>
     </message>
     <message>
-        <location filename="execbin.cpp" line="46"/>
-        <source>Command</source>
-        <translation>Comando</translation>
-    </message>
-    <message>
-        <location filename="execbin.cpp" line="48"/>
+        <location filename="exec_bin.ui" line="46"/>
         <source>Output</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="execbin.cpp" line="74"/>
+        <location filename="exec_bin.ui" line="87"/>
+        <source>Process not started</source>
+        <translation>Processo non partito</translation>
+    </message>
+    <message>
+        <location filename="exec_bin.ui" line="94"/>
+        <source>Save output to file</source>
+        <translation>Salva output in un file</translation>
+    </message>
+    <message>
+        <location filename="exec_bin.ui" line="20"/>
+        <source>Command</source>
+        <translation>Comando</translation>
+    </message>
+    <message>
+        <location filename="execbin.cpp" line="39"/>
         <source>Process running</source>
         <oldsource>Process state: running</oldsource>
         <translation>Processo in esecuzione</translation>
     </message>
     <message>
-        <location filename="execbin.cpp" line="86"/>
+        <location filename="execbin.cpp" line="51"/>
         <source>Process terminated</source>
         <oldsource>Process not running</oldsource>
         <translation>Processo terminato</translation>
     </message>
     <message>
-        <location filename="execbin.cpp" line="90"/>
+        <location filename="execbin.cpp" line="55"/>
         <source>Save</source>
         <translation>Salva</translation>
     </message>
@@ -116,183 +122,194 @@
 <context>
     <name>gpu</name>
     <message>
-        <location filename="gpu.cpp" line="720"/>
+        <location filename="gpu.cpp" line="727"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
-    <message>
-        <location filename="gpu.cpp" line="388"/>
+    <message numerus="yes">
+        <location filename="gpu.cpp" line="394"/>
         <source>Virtual screen n°%n</source>
-        <translation>Schermo virtuale n°%n</translation>
+        <translation>
+            <numerusform>Schermo virtuale n°%n</numerusform>
+            <numerusform>Schermo virtuale n°%n</numerusform>
+        </translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="394"/>
-        <location filename="gpu.cpp" line="464"/>
+        <location filename="gpu.cpp" line="400"/>
+        <location filename="gpu.cpp" line="470"/>
         <source>Resolution</source>
         <translation>Risoluzione</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="402"/>
+        <location filename="gpu.cpp" line="408"/>
         <source>Minimum resolution</source>
         <translation>Risoluzione minima</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="405"/>
+        <location filename="gpu.cpp" line="411"/>
         <source>Maximum resolution</source>
         <translation>Risoluzione massima</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="408"/>
+        <location filename="gpu.cpp" line="414"/>
         <source>Virtual size</source>
         <translation>Dimensione virtuale</translation>
     </message>
-    <message>
-        <location filename="gpu.cpp" line="409"/>
+    <message numerus="yes">
+        <location filename="gpu.cpp" line="415"/>
         <source>%n mm x </source>
-        <translation></translation>
+        <translation>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <location filename="gpu.cpp" line="409"/>
+    <message numerus="yes">
+        <location filename="gpu.cpp" line="415"/>
         <source>%n mm</source>
-        <translation></translation>
+        <translation>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="419"/>
+        <location filename="gpu.cpp" line="425"/>
         <source>Outputs</source>
         <translation>Connessioni</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="440"/>
+        <location filename="gpu.cpp" line="446"/>
         <source>Disconnected</source>
         <translation>Disconnesso</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="453"/>
-        <location filename="gpu.cpp" line="455"/>
+        <location filename="gpu.cpp" line="459"/>
+        <location filename="gpu.cpp" line="461"/>
         <source>Active</source>
         <translation>Attivo</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="453"/>
+        <location filename="gpu.cpp" line="459"/>
         <source>No</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="455"/>
+        <location filename="gpu.cpp" line="461"/>
         <source>Yes</source>
         <translation>Si</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="470"/>
+        <location filename="gpu.cpp" line="476"/>
         <source>Refresh rate</source>
         <translation>Frequenza di aggiornamento</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="476"/>
+        <location filename="gpu.cpp" line="482"/>
         <source>Offset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="488"/>
+        <location filename="gpu.cpp" line="494"/>
         <source>Brightness (software)</source>
         <translation>Luminosità (software)</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="503"/>
+        <location filename="gpu.cpp" line="509"/>
         <source>Size</source>
         <translation>Dimensione</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="504"/>
+        <location filename="gpu.cpp" line="510"/>
         <source> mm x </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="505"/>
+        <location filename="gpu.cpp" line="511"/>
         <source> mm (</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="506"/>
+        <location filename="gpu.cpp" line="512"/>
         <source> inches)</source>
         <translation> pollici)</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="746"/>
+        <location filename="gpu.cpp" line="753"/>
         <source>Driver: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="756"/>
+        <location filename="gpu.cpp" line="763"/>
         <source>OpenGL info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="768"/>
+        <location filename="gpu.cpp" line="783"/>
         <source>Vulkan info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="776"/>
+        <location filename="gpu.cpp" line="774"/>
         <source>OpenCL info</source>
         <translation></translation>
     </message>
     <message>
-        <source>(%n inches)</source>
-        <translation type="vanished">(%n pollici)</translation>
-    </message>
-    <message>
-        <location filename="gpu.cpp" line="509"/>
+        <location filename="gpu.cpp" line="515"/>
         <source>Supported modes</source>
         <translation>Modalità supportate</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="534"/>
+        <location filename="gpu.cpp" line="540"/>
         <source> Hz vertical, </source>
         <translation> Hz verticale, </translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="537"/>
+        <location filename="gpu.cpp" line="543"/>
         <source> KHz horizontal, </source>
         <translation> KHz orizzontale, </translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="540"/>
+        <location filename="gpu.cpp" line="546"/>
         <source> MHz dot clock</source>
         <translation> MHz dot clock</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="558"/>
+        <location filename="gpu.cpp" line="564"/>
         <source>Properties</source>
         <translation>Proprietà</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="617"/>
+        <location filename="gpu.cpp" line="623"/>
         <source>Connected with </source>
         <translation>Connesso con </translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="625"/>
+        <location filename="gpu.cpp" line="631"/>
         <source>Not available</source>
         <translation>Non disponibile</translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="626"/>
+        <location filename="gpu.cpp" line="632"/>
         <source>Serial number</source>
         <translation>Numero di serie</translation>
     </message>
-    <message>
-        <location filename="gpu.cpp" line="686"/>
+    <message numerus="yes">
+        <location filename="gpu.cpp" line="692"/>
         <source>%n connected, </source>
-        <translation>%n connessi, </translation>
+        <translation>
+            <numerusform>%n connesso, </numerusform>
+            <numerusform>%n connessi, </numerusform>
+        </translation>
     </message>
-    <message>
-        <location filename="gpu.cpp" line="686"/>
+    <message numerus="yes">
+        <location filename="gpu.cpp" line="692"/>
         <source>%n active</source>
-        <translation>%n attivi</translation>
+        <translation>
+            <numerusform>%n attivo</numerusform>
+            <numerusform>%n attivi</numerusform>
+        </translation>
     </message>
     <message>
-        <location filename="gpu.cpp" line="736"/>
+        <location filename="gpu.cpp" line="743"/>
         <source>VGA:</source>
         <translation></translation>
     </message>
@@ -307,20 +324,20 @@
     </message>
     <message>
         <location filename="radeon_profile.ui" line="204"/>
-        <location filename="radeon_profile.cpp" line="344"/>
+        <location filename="radeon_profile.cpp" line="374"/>
         <source>GPU temperature</source>
         <translation>Temperatura della GPU</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="164"/>
-        <location filename="radeon_profile.cpp" line="325"/>
-        <location filename="uiElements.cpp" line="45"/>
+        <location filename="radeon_profile.cpp" line="355"/>
+        <location filename="uiElements.cpp" line="51"/>
         <source>GPU clock</source>
         <translation>Clock della GPU</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="92"/>
-        <location filename="uiElements.cpp" line="40"/>
+        <location filename="uiElements.cpp" line="46"/>
         <source>Fan speed</source>
         <translation>Velocità della ventola</translation>
     </message>
@@ -333,22 +350,22 @@
     </message>
     <message>
         <location filename="radeon_profile.ui" line="252"/>
-        <location filename="radeon_profile.cpp" line="330"/>
-        <location filename="uiElements.cpp" line="46"/>
+        <location filename="radeon_profile.cpp" line="360"/>
+        <location filename="uiElements.cpp" line="52"/>
         <source>Memory clock</source>
         <translation>Clock della memoria</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="276"/>
-        <location filename="radeon_profile.cpp" line="338"/>
-        <location filename="uiElements.cpp" line="52"/>
+        <location filename="radeon_profile.cpp" line="366"/>
+        <location filename="uiElements.cpp" line="58"/>
         <source>GPU voltage</source>
         <translation>Voltaggio della GPU</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="140"/>
-        <location filename="radeon_profile.cpp" line="336"/>
-        <location filename="uiElements.cpp" line="53"/>
+        <location filename="radeon_profile.cpp" line="368"/>
+        <location filename="uiElements.cpp" line="59"/>
         <source>I/O voltage</source>
         <translation>Voltaggio dell&apos;I/O</translation>
     </message>
@@ -381,44 +398,44 @@
     </message>
     <message>
         <location filename="radeon_profile.ui" line="526"/>
-        <location filename="uiElements.cpp" line="114"/>
+        <location filename="uiElements.cpp" line="140"/>
         <source>DPM</source>
         <translation></translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="553"/>
         <location filename="radeon_profile.ui" line="1390"/>
-        <location filename="uiElements.cpp" line="205"/>
+        <location filename="uiElements.cpp" line="231"/>
         <source>Auto</source>
         <translation></translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="566"/>
-        <location filename="uiElements.cpp" line="120"/>
+        <location filename="uiElements.cpp" line="146"/>
         <source>Battery</source>
         <translation>Batteria</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="586"/>
-        <location filename="uiElements.cpp" line="122"/>
+        <location filename="uiElements.cpp" line="148"/>
         <source>Balanced</source>
         <translation>Bilanciato</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="603"/>
-        <location filename="uiElements.cpp" line="124"/>
+        <location filename="uiElements.cpp" line="150"/>
         <source>Performance</source>
         <translation></translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="620"/>
-        <location filename="uiElements.cpp" line="208"/>
+        <location filename="uiElements.cpp" line="234"/>
         <source>Low</source>
         <translation>Basso</translation>
     </message>
     <message>
         <location filename="radeon_profile.ui" line="633"/>
-        <location filename="uiElements.cpp" line="211"/>
+        <location filename="uiElements.cpp" line="237"/>
         <source>High</source>
         <translation>Alto</translation>
     </message>
@@ -466,7 +483,7 @@
     <message>
         <location filename="radeon_profile.ui" line="306"/>
         <location filename="radeon_profile.ui" line="837"/>
-        <location filename="radeon_profile.cpp" line="320"/>
+        <location filename="radeon_profile.cpp" line="350"/>
         <source>Power level</source>
         <translation>Livello di potenza</translation>
     </message>
@@ -690,8 +707,8 @@
     </message>
     <message>
         <location filename="radeon_profile.ui" line="2183"/>
-        <location filename="execTab.cpp" line="144"/>
-        <location filename="execTab.cpp" line="205"/>
+        <location filename="execTab.cpp" line="151"/>
+        <location filename="execTab.cpp" line="216"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
@@ -703,7 +720,7 @@
     <message>
         <location filename="radeon_profile.ui" line="2222"/>
         <location filename="radeon_profile.ui" line="3105"/>
-        <location filename="execTab.cpp" line="319"/>
+        <location filename="execTab.cpp" line="338"/>
         <source>Run</source>
         <translation>Esegui</translation>
     </message>
@@ -1014,95 +1031,94 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="18"/>
-        <location filename="uiElements.cpp" line="20"/>
-        <location filename="uiElements.cpp" line="22"/>
+        <location filename="uiElements.cpp" line="19"/>
+        <location filename="uiElements.cpp" line="21"/>
+        <location filename="uiElements.cpp" line="23"/>
         <source>Time (s)</source>
         <translation>Tempo (s)</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="19"/>
-        <location filename="uiElements.cpp" line="39"/>
-        <location filename="uiEvents.cpp" line="419"/>
-        <location filename="uiEvents.cpp" line="472"/>
+        <location filename="uiElements.cpp" line="20"/>
+        <location filename="uiElements.cpp" line="45"/>
+        <location filename="uiEvents.cpp" line="440"/>
+        <location filename="uiEvents.cpp" line="493"/>
         <source>Temperature (°C)</source>
         <translation>Temperatura (°C)</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="21"/>
+        <location filename="uiElements.cpp" line="22"/>
         <source>Clock (MHz)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="23"/>
+        <location filename="uiElements.cpp" line="24"/>
         <source>Voltage (mV)</source>
         <translation>Voltaggio (mV)</translation>
     </message>
     <message>
-        <source>Maximize</source>
-        <translation type="vanished">Massimizza</translation>
-    </message>
-    <message>
-        <location filename="uiElements.cpp" line="94"/>
+        <location filename="uiElements.cpp" line="120"/>
         <source>Show</source>
         <translation>Mostra</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="99"/>
-        <location filename="uiEvents.cpp" line="220"/>
+        <location filename="uiElements.cpp" line="125"/>
+        <location filename="uiEvents.cpp" line="231"/>
         <source>Quit</source>
         <translation>Esci</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="104"/>
+        <location filename="uiElements.cpp" line="130"/>
         <source>Change standard profile</source>
         <translation>Cambia profilo standard</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="111"/>
+        <location filename="uiElements.cpp" line="137"/>
         <source>Keep refreshing when hidden</source>
         <translation>Continua a aggiornare quando nascosto</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="174"/>
+        <location filename="uiElements.cpp" line="200"/>
         <source>Reset min/max temperature</source>
         <translation>Resetta temperatura min/max</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="177"/>
+        <location filename="uiElements.cpp" line="203"/>
         <source>Reset graphs vertical scale</source>
         <translation>Resetta scala verticale dei grafici</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="180"/>
+        <location filename="uiElements.cpp" line="206"/>
         <source>Show legend</source>
         <translation>Mostra la legenda</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="185"/>
+        <location filename="uiElements.cpp" line="211"/>
         <source>Graph offset on right</source>
         <translation>Offset del grafico a destra</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="213"/>
+        <location filename="uiElements.cpp" line="239"/>
         <source>Force power level</source>
         <translation>Forza il livello di potenza</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="227"/>
-        <location filename="uiElements.cpp" line="233"/>
+        <location filename="uiElements.cpp" line="253"/>
+        <location filename="uiElements.cpp" line="259"/>
         <source>Copy to clipboard</source>
         <translation>Copia negli appunti</translation>
     </message>
     <message>
-        <location filename="uiElements.cpp" line="239"/>
+        <location filename="uiElements.cpp" line="265"/>
         <source>Reset statistics</source>
         <translation>Resetta le statistiche</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="radeon_profile.cpp" line="150"/>
         <source>version %n</source>
-        <translation>versione %n</translation>
+        <translation>
+            <numerusform>versione %n</numerusform>
+            <numerusform>versione %n</numerusform>
+        </translation>
     </message>
     <message>
         <location filename="radeon_profile.cpp" line="164"/>
@@ -1110,156 +1126,162 @@
         <translation>Ritorna ai profili</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="266"/>
+        <location filename="radeon_profile.cpp" line="290"/>
         <source>Your driver or your GPU does not support overclocking</source>
         <translation>Il tuo driver o la tua GPU non supporta l&apos;overclock</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="267"/>
-        <location filename="radeon_profile.cpp" line="341"/>
+        <location filename="radeon_profile.cpp" line="291"/>
+        <location filename="radeon_profile.cpp" line="371"/>
         <source>You need debugfs mounted and either root rights or the daemon running</source>
         <translation>È necessario che debugfs sia montato e che il demone sia attivo (o che il programma venga eseguito come root)</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="323"/>
+        <location filename="radeon_profile.cpp" line="353"/>
         <source>Maximum GPU clock</source>
         <translation>Clock della GPU massimo</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="327"/>
+        <location filename="radeon_profile.cpp" line="357"/>
         <source>Minimum GPU clock</source>
         <translation>Clock della GPU minimo</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="332"/>
-        <location filename="uiElements.cpp" line="47"/>
+        <location filename="radeon_profile.cpp" line="362"/>
+        <location filename="uiElements.cpp" line="53"/>
         <source>UVD core clock</source>
         <translation>Clock del UVD</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="334"/>
-        <location filename="uiElements.cpp" line="48"/>
+        <location filename="radeon_profile.cpp" line="364"/>
+        <location filename="uiElements.cpp" line="54"/>
         <source>UVD decoder clock</source>
         <translation>Clock del decoder UVD</translation>
     </message>
     <message>
-        <location filename="radeon_profile.cpp" line="341"/>
+        <location filename="radeon_profile.cpp" line="371"/>
         <source>Can&apos;t read data</source>
         <translation>Impossibile leggere i dati</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="58"/>
-        <location filename="execTab.cpp" line="63"/>
-        <location filename="execTab.cpp" line="73"/>
-        <location filename="execTab.cpp" line="291"/>
-        <location filename="uiEvents.cpp" line="424"/>
-        <location filename="uiEvents.cpp" line="442"/>
-        <location filename="uiEvents.cpp" line="464"/>
-        <location filename="uiEvents.cpp" line="537"/>
-        <location filename="uiEvents.cpp" line="540"/>
+        <location filename="execTab.cpp" line="62"/>
+        <location filename="execTab.cpp" line="67"/>
+        <location filename="execTab.cpp" line="77"/>
+        <location filename="execTab.cpp" line="264"/>
+        <location filename="execTab.cpp" line="266"/>
+        <location filename="uiEvents.cpp" line="445"/>
+        <location filename="uiEvents.cpp" line="463"/>
+        <location filename="uiEvents.cpp" line="485"/>
+        <location filename="uiEvents.cpp" line="558"/>
+        <location filename="uiEvents.cpp" line="561"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="58"/>
+        <location filename="execTab.cpp" line="62"/>
         <source>Profile name can&apos;t be empty!</source>
         <translation>Il nome del profilo non può essere vuoto!</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="63"/>
+        <location filename="execTab.cpp" line="67"/>
         <source>No binary is selected!</source>
         <translation>Nessun eseguibile selezionato!</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="73"/>
+        <location filename="execTab.cpp" line="77"/>
         <source>Binary not found in /usr/bin: </source>
         <translation>Eseguibile non trovato in /usr/bin: </translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="131"/>
+        <location filename="execTab.cpp" line="137"/>
         <source>Enter value</source>
         <translation>Inserisci valore</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="131"/>
+        <location filename="execTab.cpp" line="137"/>
         <source>Enter valid value for </source>
         <translation>Inserisci un valore valido per </translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="144"/>
-        <location filename="execTab.cpp" line="205"/>
+        <location filename="execTab.cpp" line="151"/>
+        <location filename="execTab.cpp" line="216"/>
         <source>Remove this item?</source>
         <translation>Rimuovere questo elemento?</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="213"/>
+        <location filename="execTab.cpp" line="225"/>
         <source>Select binary</source>
         <translation>Seleziona un eseguibile</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="221"/>
+        <location filename="execTab.cpp" line="234"/>
         <source>Select log file</source>
         <translation>Seleziona un file di log</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="291"/>
+        <location filename="execTab.cpp" line="264"/>
         <source>The selected binary does not exist!</source>
         <translation>Il percorso indicato non esiste!</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="319"/>
+        <location filename="execTab.cpp" line="266"/>
+        <source>The selected file is not executable!</source>
+        <translation>Il file selezionato non è eseguibile!</translation>
+    </message>
+    <message>
+        <location filename="execTab.cpp" line="338"/>
         <source>Run: &quot;</source>
         <translation>Eseguire &quot;</translation>
     </message>
     <message>
-        <location filename="execTab.cpp" line="319"/>
+        <location filename="execTab.cpp" line="338"/>
         <source>&quot;?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="220"/>
+        <location filename="uiEvents.cpp" line="231"/>
         <source> is still running, exit anyway?</source>
         <translation> è ancora in esecuzione, uscire comunque?</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="280"/>
-        <location filename="uiEvents.cpp" line="282"/>
-        <location filename="uiEvents.cpp" line="284"/>
+        <location filename="uiEvents.cpp" line="294"/>
+        <location filename="uiEvents.cpp" line="296"/>
+        <location filename="uiEvents.cpp" line="298"/>
         <source>GPU data is disabled</source>
         <translation>Dati della GPU disabilitati</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="331"/>
+        <location filename="uiEvents.cpp" line="349"/>
         <source>Stats disabled</source>
         <translation>Le statistiche sono disabilitate</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="374"/>
+        <location filename="uiEvents.cpp" line="394"/>
         <source>Select new power profile</source>
         <translation>Seleziona il profilo di potenza</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="374"/>
+        <location filename="uiEvents.cpp" line="394"/>
         <source>Profile selection</source>
         <translation>Selezione del profilo</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="398"/>
+        <location filename="uiEvents.cpp" line="419"/>
         <source>Process is still running. Close tab?</source>
         <translation>Il processo è ancora attivo. Chiudere comunque?</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="398"/>
+        <location filename="uiEvents.cpp" line="419"/>
         <source>Process running</source>
         <translation>Processo in esecuzione</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="412"/>
+        <location filename="uiEvents.cpp" line="433"/>
         <source>Fan control information</source>
         <translation>Informazioni sul controllo della ventola</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="413"/>
+        <location filename="uiEvents.cpp" line="434"/>
         <source>Don&apos;t overheat your card! Be careful! Don&apos;t use this if you don&apos;t know what you&apos;re doing! 
 
 Hovewer, looks like card won&apos;t apply too low values due its internal protection. 
@@ -1272,33 +1294,33 @@ Il sistema di protezione della scheda grafica non accetta valori troppo bassi.
 Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola su Auto. Se l&apos;applicazione va in crash, l&apos;ultimo valore usato rimarrà attivo. Sei stato avvertito!</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="424"/>
+        <location filename="uiEvents.cpp" line="445"/>
         <source>This step already exists. To edit it double click it</source>
         <translation>Questo elemento è gia presente. Per modificarlo fai doppio click</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="426"/>
-        <location filename="uiEvents.cpp" line="482"/>
+        <location filename="uiEvents.cpp" line="447"/>
+        <location filename="uiEvents.cpp" line="503"/>
         <source>Speed [%] (20-100)</source>
         <translation>Velocità [%] (20-100)</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="442"/>
+        <location filename="uiEvents.cpp" line="463"/>
         <source>You can&apos;t delete the first and the last item</source>
         <translation>Non puoi cancellare il primo e l&apos;ultimo elemento</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="464"/>
+        <location filename="uiEvents.cpp" line="485"/>
         <source>You can&apos;t edit the first and the last item</source>
         <translation>Non puoi modificare il primo e l&apos;ultimo elemento</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="537"/>
+        <location filename="uiEvents.cpp" line="558"/>
         <source>An error occurred, GPU overclock failed</source>
         <translation>Si è verificato un errore, overclock della GPU fallito</translation>
     </message>
     <message>
-        <location filename="uiEvents.cpp" line="540"/>
+        <location filename="uiEvents.cpp" line="561"/>
         <source>An error occurred, memory overclock failed</source>
         <translation>Si è verificato un errore, overclock della memoria fallito</translation>
     </message>

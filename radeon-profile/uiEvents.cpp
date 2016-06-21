@@ -635,5 +635,4 @@ void radeon_profile::on_list_execProfiles_itemSelectionChanged(){
     ui->btn_modifyExecProfile->setEnabled(true);
     ui->btn_removeExecProfile->setEnabled(true);
     ui->btn_runExecProfile->setEnabled(true);
-    ui->btn_viewOutput->setEnabled(true);
 }

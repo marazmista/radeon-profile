@@ -303,6 +303,8 @@ void radeon_profile::on_btn_runExecProfile_clicked()
         execsRunning.append(exe);
         ui->tabs_execOutputs->setCurrentWidget(exe->tab);
         updateExecLogs();
+
+        ui->btn_viewOutput->setEnabled(true);
     }
 }
 
