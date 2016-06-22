@@ -438,7 +438,7 @@ void radeon_profile::on_btn_fanInfo_clicked()
 void radeon_profile::on_btn_addFanStep_clicked()
 {
     logEvent "btn_addFanStep clicked";
-    const short temperature = static_cast<short>(askNumber(0, minFanStepsTemp, maxFanStepsTemp, tr("Temperature (°C)")));
+    const short temperature = static_cast<short>(askNumber(0, minFanStepsTemp, maxFanStepsTemp, tr("Temperature") + celsius));
     if (temperature == -1) // User clicked Cancel
         return;
 
@@ -491,7 +491,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
     int newTemp, newSpeed;
 
     if(column == 0){ // The user wants to change the temperature
-        newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, tr("Temperature (°C)"));
+        newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, tr("Temperature") + celsius);
         if(newTemp == -1) // User clicked cancel
             return;
 

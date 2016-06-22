@@ -17,7 +17,7 @@ void radeon_profile::setupGraphs()
     ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
 
     ui->plotTemp->xAxis->setLabel(tr("Time (s)"));
-    ui->plotTemp->yAxis->setLabel(tr("Temperature (°C)"));
+    ui->plotTemp->yAxis->setLabel(tr("Temperature") + celsius);
     ui->plotClocks->xAxis->setLabel(tr("Time (s)"));
     ui->plotClocks->yAxis->setLabel(tr("Clock (MHz)"));
     ui->plotVolts->xAxis->setLabel(tr("Time (s)"));
@@ -42,7 +42,7 @@ void radeon_profile::setupGraphs()
     ui->plotFanProfile->addGraph();
     ui->plotFanProfile->yAxis->setRange(0,100);
     ui->plotFanProfile->xAxis->setRange(0,110);
-    ui->plotFanProfile->xAxis->setLabel(tr("Temperature (°C)"));
+    ui->plotFanProfile->xAxis->setLabel(tr("Temperature") + celsius);
     ui->plotFanProfile->yAxis->setLabel(tr("Fan speed"));
 
     setupGraphsStyle();
@@ -90,6 +90,14 @@ void radeon_profile::setupGraphsStyle()
     ui->plotClocks->setBackground(QBrush(ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1)));
     ui->plotVolts->setBackground(QBrush(ui->graphColorsList->topLevelItem(VOLTS_BG)->backgroundColor(1)));
     ui->plotFanProfile->setBackground(QBrush(ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1)));
+
+    ui->plotTemp->graph(0)->setLineStyle(QCPGraph::lsLine);
+    ui->plotClocks->graph(0)->setLineStyle(QCPGraph::lsStepCenter);
+    ui->plotClocks->graph(1)->setLineStyle(QCPGraph::lsStepCenter);
+    ui->plotClocks->graph(2)->setLineStyle(QCPGraph::lsStepCenter);
+    ui->plotClocks->graph(3)->setLineStyle(QCPGraph::lsStepCenter);
+    ui->plotVolts->graph(0)->setLineStyle(QCPGraph::lsStepCenter);
+    ui->plotVolts->graph(1)->setLineStyle(QCPGraph::lsStepCenter);
 }
 
 void radeon_profile::setupTrayIcon() {
@@ -110,6 +118,8 @@ void radeon_profile::setupTrayIcon() {
     } else
         trayIconAvailable = true;
 
+    ui->cb_minimizeTray->setEnabled(trayIconAvailable);
+    ui->cb_closeTray->setEnabled(trayIconAvailable);
     if( ! trayIconAvailable){
         qWarning() << "Tray icon is not supported on this system";
         return;

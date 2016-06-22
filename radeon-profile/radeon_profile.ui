@@ -55,9 +55,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <property name="horizontalSpacing">
-        <number>3</number>
-       </property>
        <property name="verticalSpacing">
         <number>0</number>
        </property>
@@ -325,7 +322,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -339,16 +336,16 @@
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
         <property name="leftMargin">
-         <number>3</number>
+         <number>0</number>
         </property>
         <property name="topMargin">
-         <number>3</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
-         <number>3</number>
+         <number>0</number>
         </property>
         <property name="bottomMargin">
-         <number>3</number>
+         <number>0</number>
         </property>
         <item>
          <widget class="QWidget" name="widget" native="true">
@@ -366,7 +363,7 @@
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <property name="spacing">
-            <number>6</number>
+            <number>0</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -386,12 +383,6 @@
               <size>
                <width>261</width>
                <height>124</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>151</height>
               </size>
              </property>
              <property name="font">
@@ -436,22 +427,10 @@
            <item>
             <widget class="QTabWidget" name="tabs_pm">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>181</width>
-               <height>150</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>181</width>
-               <height>150</height>
-              </size>
              </property>
              <property name="tabPosition">
               <enum>QTabWidget::North</enum>
@@ -466,11 +445,32 @@
               <bool>false</bool>
              </property>
              <widget class="QWidget" name="stdProfiles">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <attribute name="title">
                <string>Profiles</string>
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout_16">
-               <item>
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
                 <widget class="QLabel" name="label_noStdProfiles">
                  <property name="font">
                   <font>
@@ -486,82 +486,43 @@
                  </property>
                 </widget>
                </item>
-               <item>
-                <spacer name="verticalSpacer_6">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
+               <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
                 <widget class="QPushButton" name="chProfile">
                  <property name="text">
                   <string>Change profile</string>
                  </property>
                 </widget>
                </item>
-               <item>
-                <spacer name="verticalSpacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
               </layout>
              </widget>
              <widget class="QWidget" name="dpmProfiles">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <attribute name="title">
                <string>DPM</string>
               </attribute>
-              <layout class="QGridLayout" name="gridLayout_4">
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <property name="spacing">
+                <number>0</number>
+               </property>
                <property name="leftMargin">
-                <number>2</number>
+                <number>0</number>
                </property>
                <property name="topMargin">
-                <number>2</number>
+                <number>0</number>
                </property>
                <property name="rightMargin">
-                <number>2</number>
+                <number>0</number>
                </property>
                <property name="bottomMargin">
-                <number>2</number>
+                <number>0</number>
                </property>
-               <property name="spacing">
-                <number>1</number>
-               </property>
-               <item row="5" column="0">
-                <widget class="QPushButton" name="btn_forceAuto">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Auto</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0" colspan="4">
+               <item>
                 <widget class="QPushButton" name="btn_dpmBattery">
-                 <property name="minimumSize">
-                  <size>
-                   <width>160</width>
-                   <height>28</height>
-                  </size>
-                 </property>
                  <property name="text">
                   <string>Battery</string>
                  </property>
@@ -569,19 +530,10 @@
                   <iconset resource="radeon-resource.qrc">
                    <normaloff>:/icon/symbols/arrow1.png</normaloff>:/icon/symbols/arrow1.png</iconset>
                  </property>
-                 <property name="flat">
-                  <bool>false</bool>
-                 </property>
                 </widget>
                </item>
-               <item row="1" column="0" colspan="4">
+               <item>
                 <widget class="QPushButton" name="btn_dpmBalanced">
-                 <property name="minimumSize">
-                  <size>
-                   <width>160</width>
-                   <height>28</height>
-                  </size>
-                 </property>
                  <property name="text">
                   <string>Balanced</string>
                  </property>
@@ -591,14 +543,8 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0" colspan="4">
+               <item>
                 <widget class="QPushButton" name="btn_dpmPerformance">
-                 <property name="minimumSize">
-                  <size>
-                   <width>160</width>
-                   <height>28</height>
-                  </size>
-                 </property>
                  <property name="text">
                   <string>Performance</string>
                  </property>
@@ -608,31 +554,33 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="3">
-                <widget class="QPushButton" name="btn_forceLow">
-                 <property name="maximumSize">
-                  <size>
-                   <width>50</width>
-                   <height>16777215</height>
-                  </size>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_18">
+                 <property name="spacing">
+                  <number>0</number>
                  </property>
-                 <property name="text">
-                  <string>Low</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="2">
-                <widget class="QPushButton" name="btn_forceHigh">
-                 <property name="maximumSize">
-                  <size>
-                   <width>50</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>High</string>
-                 </property>
-                </widget>
+                 <item>
+                  <widget class="QPushButton" name="btn_forceAuto">
+                   <property name="text">
+                    <string>Auto</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btn_forceLow">
+                   <property name="text">
+                    <string>Low</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btn_forceHigh">
+                   <property name="text">
+                    <string>High</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>

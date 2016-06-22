@@ -391,7 +391,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
         qDebug() << "Analyzing screen " << screenIndex;
 
         // Create root QTreeWidgetItem item for this screen
-        QTreeWidgetItem * screenItem = new QTreeWidgetItem({tr("Virtual screen n°%n", NULL, screenIndex)});
+        QTreeWidgetItem * screenItem = new QTreeWidgetItem({tr("Virtual screen %n", NULL, screenIndex)});
         cardConnectorsList.append(screenItem);
 
         // Add resolution

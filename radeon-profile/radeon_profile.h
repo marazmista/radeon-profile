@@ -31,6 +31,8 @@
 #define minFanStepsSpeed 20
 #define maxFanStepsSpeed 100
 
+#define celsius " (\u00B0C)"
+
 namespace Ui {
 class radeon_profile;
 }
