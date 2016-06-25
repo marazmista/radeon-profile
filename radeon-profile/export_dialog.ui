@@ -23,6 +23,9 @@
         <property name="text">
          <string>PDF</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>

@@ -781,7 +781,8 @@ QStringList gpu::getGLXInfo(const QString & gpuName) const {
     if( ! vulkaninfo.isEmpty()){
         data.append("");
         data.append(tr("Vulkan info"));
-        data.append(vulkaninfo);
+        for(const QString & line : vulkaninfo)
+            data.append(line.trimmed());
     }
 
 

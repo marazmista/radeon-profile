@@ -116,12 +116,27 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 radeon_profile::~radeon_profile()
 {
     qDebug() << "Deleting radeon_profile";
-    delete ui;
-    delete device;
+
+    killTimer(timerID);
+    this->hide();
+    trayIcon.hide();
+    saveConfig();
+
+    if (device->features.pwmAvailable) {
+        qDebug() << "Disabling pwm and saving fan profiles";
+        device->setPwmManualControl(false);
+        saveFanProfiles();
+        QApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
+    }
 
     // At this point if any executable was running the user has already been warned (see radeon_profile::closeEvent())
     for(execBin * exe : execsRunning)
         delete exe;
+
+    qDebug() << "Deleting UI and device";
+    delete ui;
+    delete device;
+
     qDebug() << "Terminating";
 }
 

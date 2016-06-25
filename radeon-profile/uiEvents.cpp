@@ -231,27 +231,13 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
                 exit = askConfirmation(tr("Quit"), process->name + tr(" is still running, exit anyway?"));
         }
 
-        if( ! exit){
+        if(exit){
+            qDebug() << "Closing application";
+            e->accept();
+            QApplication::quit();
+        } else
             e->ignore();
-            return;
-        }
 
-        qDebug() << "Closing application";
-        e->accept();
-
-        killTimer(timerID);
-        this->hide();
-        saveConfig();
-
-        if (device->features.pwmAvailable) {
-            qDebug() << "Disabling pwm and saving fan profiles";
-            device->setPwmManualControl(false);
-            saveFanProfiles();
-            QApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
-        }
-
-        qDebug() << "Closing";
-        QApplication::quit();
     }
 }
 
