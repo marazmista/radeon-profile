@@ -11,7 +11,7 @@
 #include <QDebug>
 
 
-dXorg::dXorg(QString module){
+dXorg::dXorg(QString module) : gpu() {
     if(module.isEmpty()){
         const QStringList lsmod = globalStuff::grabSystemInfo("lsmod");
         if(!lsmod.filter("radeon").isEmpty())
@@ -145,50 +145,48 @@ gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
 
         rx.setPattern("power\\slevel\\s\\d");
         rx.indexIn(data);
-        if (!rx.cap(0).isEmpty()){
-            tData.powerLevel = rx.cap(0).split(' ')[2].toShort();
-            tData.powerLevelOk = tData.powerLevel != -1;
-        }
+        if (!rx.cap(0).isEmpty())
+            tData.powerLevel = rx.cap(0).split(' ')[2].toUShort(&tData.powerLevelOk);
 
         rx.setPattern("sclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()){
-            tData.coreClk = static_cast<short>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100);
+            tData.coreClk = static_cast<freq>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100);
             tData.coreClkOk = tData.coreClk > 0;
         }
 
         rx.setPattern("mclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()){
-            tData.memClk = static_cast<short>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100);
+            tData.memClk = static_cast<freq>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100);
             tData.memClkOk = tData.memClk > 0;
         }
 
         rx.setPattern("vclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
-            tData.uvdCClk = static_cast<short>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100);
+            tData.uvdCClk = static_cast<freq>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100);
             tData.uvdCClkOk = tData.uvdCClk > 0;
         }
 
         rx.setPattern("dclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
-            tData.uvdDClk = static_cast<short>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100);
+            tData.uvdDClk = static_cast<freq>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100);
             tData.uvdDClkOk = tData.uvdDClk > 0;
         }
 
         rx.setPattern("vddc:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()){
-            tData.coreVolt = static_cast<short>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble());
+            tData.coreVolt = static_cast<voltage>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble());
             tData.coreVoltOk = tData.coreVolt > 0;
         }
 
         rx.setPattern("vddci:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()){
-            tData.memVolt = static_cast<short>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble());
+            tData.memVolt = static_cast<voltage>(rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble());
             tData.memVoltOk = tData.memVolt > 0;
         }
         break;
@@ -198,17 +196,17 @@ gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
         const int count = clocksData.count();
 
         if ((1 < count) && clocksData[1].contains("current engine clock")) {
-            tData.coreClk = static_cast<short>(clocksData[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000);
+            tData.coreClk = static_cast<freq>(clocksData[1].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000);
             tData.coreClkOk = tData.coreClk > 0;
         }
 
         if ((3 < count) && clocksData[3].contains("current memory clock")) {
-            tData.memClk = static_cast<short>(clocksData[3].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000);
+            tData.memClk = static_cast<freq>(clocksData[3].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000);
             tData.memClkOk = tData.memClk > 0;
         }
 
         if ((4 < count) && clocksData[4].contains("voltage")) {
-            tData.coreVolt = static_cast<short>(clocksData[4].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat());
+            tData.coreVolt = static_cast<voltage>(clocksData[4].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat());
             tData.coreVoltOk = tData.coreVolt > 0;
         }
         break;
@@ -221,7 +219,7 @@ gpuClocksStruct dXorg::getClocks(bool resolvingGpuFeatures) {
     return tData;
 }
 
-float dXorg::getTemperature() const {
+temp dXorg::getTemperature() const {
     QString temp;
 
     switch (currentTempSensor) {
@@ -444,14 +442,10 @@ gpuClocksStruct dXorg::getFeaturesFallback() {
 
     if(!s.isEmpty()){
         // just look for it, if it is, the value is not important at this point
-        if (s.contains("sclk") || s.contains("current engine clock"))
-            fallbackFeatures.coreClkOk = true;
-        if (s.contains("mclk") || s.contains("current memory clock"))
-            fallbackFeatures.memClkOk = true;
-        if (s.contains("vddc") || s.contains("voltage"))
-            fallbackFeatures.coreVoltOk = true;
-        if (s.contains("vddci"))
-            fallbackFeatures.memVoltOk = true;
+        fallbackFeatures.coreClkOk = s.contains("sclk") || s.contains("current engine clock");
+        fallbackFeatures.memClkOk = s.contains("mclk") || s.contains("current memory clock");
+        fallbackFeatures.coreVoltOk = s.contains("vddc") || s.contains("voltage");
+        fallbackFeatures.memVoltOk = s.contains("vddci");
     }
 
     return fallbackFeatures;

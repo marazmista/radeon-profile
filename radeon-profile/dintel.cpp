@@ -8,7 +8,7 @@
 
 
 
-dIntel::dIntel()
+dIntel::dIntel() : gpu()
 {
     driverModule = "i915";
 
@@ -32,11 +32,6 @@ void dIntel::changeGPU(ushort gpuIndex){
     minFreq = device + file_minFreq;
     maxFreq = device + file_maxFreq;
 
-    const QString max = readFile(maxFreq), min = readFile(minFreq);
-    maxCoreFreqString = max + "MHz";
-    minCoreFreqString = min + "MHz";
-    maxCoreFreq = max.toShort();
-    minCoreFreq = min.toShort();
 
     features = figureOutDriverFeatures();
 }
@@ -45,10 +40,7 @@ driverFeatures dIntel::figureOutDriverFeatures(){
     driverFeatures features;
 
     gpuClocksData = getClocks(true);
-    features.coreClockAvailable = gpuClocksData.coreClkOk > 0;
-
-    features.coreMaxClkAvailable = maxCoreFreq > 0;
-    features.coreMinClkAvailable = minCoreFreq > 0;
+    features.coreClockAvailable = gpuClocksData.coreClkOk;
 
     features.temperatureAvailable = getTemperature() > 0;
 
@@ -56,23 +48,36 @@ driverFeatures dIntel::figureOutDriverFeatures(){
 }
 
 gpuClocksStruct dIntel::getClocks(bool forFeatures) {
-    Q_UNUSED(forFeatures);
+    if(forFeatures){
+        const QString max = readFile(maxFreq), min = readFile(minFreq);
+
+        maxCoreFreq = max.toUShort(&maxCoreFreqAvailable);
+        maxCoreFreqAvailable &= maxCoreFreq > 0;
+        if(maxCoreFreqAvailable)
+            maxCoreFreqString = max + " MHz";
+
+        minCoreFreq = min.toUShort(&minCoreFreqAvailable);
+        minCoreFreqAvailable &= minCoreFreq > 0;
+        if(minCoreFreqAvailable)
+            minCoreFreqString = min + " MHz";
+    }
+
     gpuClocksStruct data;
-    data.coreClk = readFile(actFreq).toShort();
+    data.coreClk = readFile(actFreq).toUShort();
     data.coreClkOk = data.coreClk > 0;
     return data;
 }
 
-float dIntel::getTemperature() const {
+temp dIntel::getTemperature() const {
     // Integrated graphics temperature == CPU temperature
     const QStringList sensors = globalStuff::grabSystemInfo("sensors").filter("Core ");
 
     // Average temperature
-    float sum = 0;
+    temp sum = 0;
     ushort count = 0;
 
     for(const QString & line : sensors){
-        float temp = line.split(" ",QString::SkipEmptyParts)[2].remove("+").remove("C").remove("°").toFloat();
+        const float temp = line.split(" ",QString::SkipEmptyParts)[2].remove("+").remove("C").remove("°").toFloat();
         if(temp > 0){
             sum += temp;
             count++;

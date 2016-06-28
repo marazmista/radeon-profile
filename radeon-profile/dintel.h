@@ -12,7 +12,7 @@ public:
     driverFeatures figureOutDriverFeatures();
 
     gpuClocksStruct getClocks(bool forFeatures = false);
-    float getTemperature() const;
+    temp getTemperature() const;
 
 private:
     QString actFreq, curFreq, minFreq, maxFreq;

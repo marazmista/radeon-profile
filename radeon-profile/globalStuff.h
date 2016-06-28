@@ -61,6 +61,11 @@ public:
     } globalConfig;
 };
 
+typedef float temp; // Temperature in °C
+typedef unsigned short freq; // Frequency in MHz
+typedef unsigned short voltage; // Voltage in mV
+typedef unsigned short percentage;
+
 typedef enum powerProfiles {
     BATTERY, BALANCED, PERFORMANCE, AUTO, DEFAULT, LOW, MID, HIGH
 } powerProfiles;
@@ -91,15 +96,18 @@ typedef enum powerMethod {
 } powerMethod;
 
 typedef struct gpuClocksStruct {
-    short coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk, powerLevel;
+    freq coreClk, memClk;
+    voltage coreVolt, memVolt;
+    freq uvdCClk, uvdDClk;
+    unsigned short powerLevel;
     bool coreClkOk, memClkOk, coreVoltOk, memVoltOk, uvdCClkOk, uvdDClkOk, powerLevelOk;
 
     gpuClocksStruct() {
-        coreClk = memClk = coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = -1;
+        coreClk = memClk = coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = 0;
         coreClkOk = memClkOk = coreVoltOk = memVoltOk = uvdCClkOk = uvdDClkOk = powerLevelOk = false;
     }
 
-    gpuClocksStruct(short _coreClk, short _memClk, short _coreVolt, short _memVolt, short _uvdCClk, short _uvdDclk, short _pwrLevel ) {
+    gpuClocksStruct(freq _coreClk, freq _memClk, voltage _coreVolt, voltage _memVolt, freq _uvdCClk, freq _uvdDclk, ushort _pwrLevel ) {
         coreClk = _coreClk;
         memClk = _memClk;
         coreVolt = _coreVolt;
@@ -122,8 +130,6 @@ typedef struct gpuClocksStructString {
 typedef struct driverFeatures {
     bool canChangeProfile,
         coreClockAvailable,
-        coreMaxClkAvailable,
-        coreMinClkAvailable,
         memClockAvailable,
         coreVoltAvailable,
         memVoltAvailable,
@@ -135,9 +141,15 @@ typedef struct driverFeatures {
     ushort pwmMaxSpeed;
 
     driverFeatures() {
-        canChangeProfile = coreClockAvailable = coreMaxClkAvailable = coreMinClkAvailable =
-                memClockAvailable = coreVoltAvailable = memVoltAvailable = temperatureAvailable =
-                pwmAvailable = GPUoverClockAvailable = memoryOverclockAvailable = false;
+        canChangeProfile =
+                coreClockAvailable =
+                memClockAvailable =
+                coreVoltAvailable =
+                memVoltAvailable =
+                temperatureAvailable =
+                pwmAvailable =
+                GPUoverClockAvailable =
+                memoryOverclockAvailable = false;
         pm = PM_UNKNOWN;
         pwmMaxSpeed = 0;
     }
@@ -145,8 +157,8 @@ typedef struct driverFeatures {
 } driverFeatures;
 
 typedef struct gpuTemperatureStruct {
-    float current, currentBefore, max, min, sum;
-    ushort pwmSpeed; // Pwm speed percentage on max PWM speed
+    temp current, currentBefore, max, min, sum;
+    percentage pwmSpeed; // Pwm speed percentage on max PWM speed
 
     gpuTemperatureStruct(){
         current = currentBefore = max = min = sum = pwmSpeed = 0;

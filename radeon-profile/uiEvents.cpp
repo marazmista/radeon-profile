@@ -304,9 +304,11 @@ void radeon_profile::refreshBtnClicked(bool onlyCardDependant){
         ui->list_connectors->clear();
         ui->list_connectors->addTopLevelItems(device->getCardConnectors());
         ui->list_connectors->expandToDepth(2);
+        ui->list_connectors->resizeColumnToContents(0);
 
         ui->list_modInfo->clear();
         ui->list_modInfo->addTopLevelItems(device->getModuleInfo());
+        ui->list_modInfo->resizeColumnToContents(0);
     }
 
     resetStats();

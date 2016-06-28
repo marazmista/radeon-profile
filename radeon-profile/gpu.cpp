@@ -37,6 +37,7 @@ static const QStringList pnpIdFiles = {
 
 gpu::gpu(){
     currentGpuIndex = 0;
+    maxCoreFreqAvailable = minCoreFreqAvailable = false;
 }
 
 void gpu::reconfigureDaemon() {
@@ -102,7 +103,7 @@ gpuClocksStruct gpu::getClocks(bool forFeatures){
     return gpuClocksStruct(); // Empty struct
 }
 
-float gpu::getTemperature() const {
+temp gpu::getTemperature() const {
     qWarning() << "getTemperature is not implemented";
 
     return 0;
@@ -711,11 +712,12 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
         for (const QString & line : modInfo) { // For each parameter
             if (line.contains(":") && ! line.startsWith("modinfo: ERROR: ")) { // show nothing in case of an error
                const QStringList parts = line.split(":",QString::SkipEmptyParts);
-               QString paramName = parts[0], paramDesc = parts[1], paramValue;
+               const QString paramName = parts[0], paramDesc = parts[1];
 
                // Try reading the value though "systool -m <module> -A <parameter>
                const QStringList info = globalStuff::grabSystemInfo("systool -m " + driverModule + " -A " + paramName).filter(paramName);
 
+               QString paramValue;
                if( ! info.isEmpty()) // Systool available, parse parameter line: <parameter> = "<value>"
                    paramValue = info[0].split("=", QString::SkipEmptyParts).value(1).remove('"');
                else { // Systool not available, read parameter value from /sys/module/<module>/parameters/<parameter>

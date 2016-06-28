@@ -184,14 +184,18 @@ void radeon_profile::loadFanProfiles() {
     qDebug() << "Loading fan profiles from" << fanStepsPath;
     QFile fsPath(fanStepsPath);
     if (fsPath.open(QIODevice::ReadOnly)) {
-        QString profile = QString(fsPath.readAll());
-
-        QStringList steps = profile.split("|",QString::SkipEmptyParts);
+        const QStringList steps = QString(fsPath.readAll()).split("|",QString::SkipEmptyParts);
 
         if (steps.count() > 1) {
             for (int i = 1; i < steps.count(); ++i) {
                 QStringList pair = steps[i].split("#");
-                addFanStep(pair[0].toShort(), pair[1].toUShort(), true, true, false);
+                if(pair.size() == 2){
+                    bool tempOk, speedOk;
+                    const temp temperature = pair[0].toFloat(&tempOk);
+                    const percentage speed = pair[1].toUShort(&speedOk);
+                    if(tempOk && speedOk)
+                        addFanStep(temperature, speed, true, true, false);
+                }
             }
 
             fsPath.close();

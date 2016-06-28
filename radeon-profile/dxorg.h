@@ -26,7 +26,7 @@ public:
     dXorg(QString module = QString());
 
     gpuClocksStruct getClocks(bool forFeatures = false);
-    float getTemperature() const;
+    temp getTemperature() const;
     QString getCurrentPowerLevel() const;
     QString getCurrentPowerProfile() const;
     ushort getPwmSpeed() const;

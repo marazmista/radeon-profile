@@ -66,7 +66,7 @@ bool daemonComm::attachToMemory(){
 QByteArray daemonComm::readMemory() {
     if (!sharedMem.lock()){
         qWarning() << "Unable to lock the shared memory: " << sharedMem.errorString();
-        return "";
+        return QByteArray();
     }
 
     const char * to = static_cast<const char*>(sharedMem.constData());

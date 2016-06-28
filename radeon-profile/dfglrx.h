@@ -15,7 +15,7 @@ public:
     dFglrx();
 
     gpuClocksStruct getClocks(bool forFeatures = false);
-    float getTemperature() const;
+    temp getTemperature() const;
     QStringList getGLXInfo(const QString & gpuName) const;
     QStringList detectCards() const;
     driverFeatures figureOutDriverFeatures();

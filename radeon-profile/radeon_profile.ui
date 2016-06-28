@@ -702,12 +702,7 @@
                <font>
                 <family>Monospace</family>
                 <pointsize>8</pointsize>
-                <weight>50</weight>
-                <bold>false</bold>
                </font>
-              </property>
-              <property name="verticalScrollBarPolicy">
-               <enum>Qt::ScrollBarAlwaysOn</enum>
               </property>
               <property name="editTriggers">
                <set>QAbstractItemView::NoEditTriggers</set>

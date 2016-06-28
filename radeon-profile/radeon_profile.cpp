@@ -99,9 +99,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     logTime << "Filling tables with data at the start";
     refreshGpuData();
-    ui->list_connectors->addTopLevelItems(device->getCardConnectors());
-    ui->list_connectors->expandToDepth(2);
-    ui->list_modInfo->addTopLevelItems(device->getModuleInfo());
+    refreshBtnClicked();
     if(ui->cb_gpuData->isChecked())
         refreshUI();
 
@@ -118,6 +116,8 @@ radeon_profile::~radeon_profile()
     qDebug() << "Deleting radeon_profile";
 
     killTimer(timerID);
+
+    qDebug() << "Hiding";
     this->hide();
     trayIcon.hide();
     saveConfig();
@@ -130,6 +130,7 @@ radeon_profile::~radeon_profile()
     }
 
     // At this point if any executable was running the user has already been warned (see radeon_profile::closeEvent())
+    qDebug() << "Deleting executables";
     for(execBin * exe : execsRunning)
         delete exe;
 
@@ -370,11 +371,11 @@ void radeon_profile::refreshUI() {
         if (device->gpuClocksData.powerLevelOk)
             addChild(ui->list_currentGPUData, tr("Power level"), device->gpuClocksDataString.powerLevel);
 
-        if(device->features.coreMaxClkAvailable)
+        if(device->maxCoreFreqAvailable)
             addChild(ui->list_currentGPUData, tr("Maximum GPU clock"), device->maxCoreFreqString);
         if (device->gpuClocksData.coreClkOk)
             addChild(ui->list_currentGPUData, tr("GPU clock"), device->gpuClocksDataString.coreClk);
-        if(device->features.coreMinClkAvailable)
+        if(device->minCoreFreqAvailable)
             addChild(ui->list_currentGPUData, tr("Minimum GPU clock"), device->minCoreFreqString);
 
         if (device->gpuClocksData.memClkOk)
@@ -479,14 +480,15 @@ void radeon_profile::adjustFanSpeed(const bool force)
             (device->features.pwmAvailable && ui->btn_pwmProfile->isChecked() &&
             std::abs(device->gpuTemeperatureData.current - device->gpuTemeperatureData.currentBefore) > 0.1f)) { // current != currentBefore
 
-        const short temperature = static_cast<short>(device->gpuTemeperatureData.current);
-        float speed;
+        const temp temperature = device->gpuTemeperatureData.current;
+        percentage speed;
         if (fanSteps.contains(temperature)) // Exact match
             speed = fanSteps.value(temperature);
         else {
             // find bounds of current temperature
-            const QMap<short, unsigned short>::const_iterator high = fanSteps.upperBound(temperature),
+            const QMap<temp, percentage>::const_iterator high = fanSteps.upperBound(temperature),
                     low = high - 1;
+
             if(high == fanSteps.constBegin()) // Before the first step
                 speed = high.value();
             else if(low == fanSteps.constEnd()) // After the last step
@@ -498,7 +500,7 @@ void radeon_profile::adjustFanSpeed(const bool force)
         }
 
         qDebug() << device->gpuTemeperatureDataString.current << "-->" << speed << "%";
-        if(speed >= 0 && speed <= 100)
+        if(speed <= 100)
             device->setPwmValue(static_cast<ushort>(device->features.pwmMaxSpeed * speed / 100));
     }
 }
@@ -662,8 +664,8 @@ bool radeon_profile::fanStepIsValid(const int temperature, const int fanSpeed){
             fanSpeed <= maxFanStepsSpeed;
 }
 
-bool radeon_profile::addFanStep(const short temperature,
-                                const ushort fanSpeed,
+bool radeon_profile::addFanStep(const temp temperature,
+                                const percentage fanSpeed,
                                 const bool alsoToList,
                                 const bool alsoToGraph,
                                 const bool alsoAdjustSpeed){

@@ -30,8 +30,10 @@ public:
     QStringList gpuList;
     driverFeatures features;
     QString currentPowerProfile, currentPowerLevel;
-    short maxCoreFreq, minCoreFreq; // MHz
+
+    freq maxCoreFreq, minCoreFreq; // MHz
     QString maxCoreFreqString, minCoreFreqString;
+    bool maxCoreFreqAvailable, minCoreFreqAvailable;
 
     /*  Common functions, already implemented in gpu.cpp (can be re-implemented/extended by inheriting classes)  */
     gpu();
@@ -135,7 +137,7 @@ public:
      * @return current GPU temperature
      * @see features.temperatureAvailable
      */
-    virtual float getTemperature() const;
+    virtual temp getTemperature() const;
 
     /**
      * @brief getPwmSpeed

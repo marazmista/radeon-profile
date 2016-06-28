@@ -3,7 +3,7 @@
 #include "dfglrx.h"
 
 
-dFglrx::dFglrx(){
+dFglrx::dFglrx() : gpu() {
     driverModule = "fglrx";
 
     gpuList = detectCards();
@@ -27,15 +27,15 @@ gpuClocksStruct dFglrx::getClocks(bool forFeatures){
         rx.indexIn(out[0]);
         QStringList gData = rx.cap(0).trimmed().split("           ");
 
-        tData.coreClk = gData[0].toShort();
+        tData.coreClk = gData[0].toUShort();
         tData.coreClkOk = tData.coreClk > 0;
-        tData.memClk = gData[1].toShort();
+        tData.memClk = gData[1].toUShort();
         tData.memClkOk = tData.memClk > 0;
     }
     return tData;
 }
 
-float dFglrx::getTemperature() const {
+ temp dFglrx::getTemperature() const {
     QStringList out = globalStuff::grabSystemInfo("aticonfig --odgt --adapter=" + QString::number(currentGpuIndex));
     //    QFile f("/home/mm/odgt");
     //    f.open(QIODevice::ReadOnly);

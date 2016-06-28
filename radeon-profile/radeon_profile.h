@@ -150,16 +150,15 @@ private:
     gpu * device;
     static const QString settingsPath;
     QList<execBin*> execsRunning;
-    QMap<short, unsigned short> fanSteps;
+    QMap<temp, percentage> fanSteps;
     QMap<QString, unsigned short> pmStats;
-    unsigned short rangeX, ticksCounter, statsTickCounter;
+    unsigned short rangeX, ticksCounter, statsTickCounter, graphOffset;
     bool trayIconAvailable;
     QSystemTrayIcon trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden, *trayBtn_show;
     QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;
     int timerID;
     QButtonGroup pwmGroup, exportFormat;
-    ushort graphOffset;
     bool closeFromTrayMenu;
     QStringList selectedVariableVaules, envVars;
     QDialog exportDialog;
@@ -235,7 +234,7 @@ private:
      * @param alsoAdjustSpeed Updates the fan speed after adding the step.
      * @return If the operation was successful.
      */
-    bool addFanStep (short temperature, ushort fanSpeed, bool alsoToList = true, bool alsoToGraph = true, bool alsoAdjustSpeed = true);
+    bool addFanStep (temp temperature, percentage fanSpeed, bool alsoToList = true, bool alsoToGraph = true, bool alsoAdjustSpeed = true);
 
     /**
      * @brief askQuestion Creates a dialog to ask a question
