@@ -4,6 +4,7 @@
 #include "gpu.h"
 #include "daemonComm.h"
 #include "execbin.h"
+#include "ui_export_dialog.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -15,6 +16,9 @@
 #include <QProcessEnvironment>
 #include <QList>
 #include <QListWidgetItem>
+#include <QTimer>
+#include <QMenu>
+#include <QButtonGroup>
 
 #define startClocksScaleL 50
 #define startClocksScaleH 150
@@ -27,6 +31,8 @@
 #define minFanStepsSpeed 20
 #define maxFanStepsSpeed 100
 
+#define celsius " (\u00B0C)"
+
 namespace Ui {
 class radeon_profile;
 }
@@ -35,7 +41,7 @@ class radeon_profile : public QMainWindow
 {
     Q_OBJECT
 
-    // names in this enum equals indexes in Qtreewidged in ui for selecting clors
+    // names in this enum equals indexes in Qtreewidged in ui for selecting colors
     enum graphColors {
         TEMP_BG = 0,
         CLOCKS_BG,
@@ -49,6 +55,7 @@ class radeon_profile : public QMainWindow
         MEM_VOLTS_LINE
     };
 
+    // Elements of any any exec profile
     enum itemValues {
         PROFILE_NAME,
         BINARY,
@@ -62,23 +69,17 @@ class radeon_profile : public QMainWindow
 public:
     explicit radeon_profile(QStringList, QWidget *parent = 0);
     ~radeon_profile();
-    QString appHomePath;
-
-    QSystemTrayIcon *trayIcon;
-    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
-    QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
-    QTimer *timer;
 
 private slots:
-    void timerEvent();
+    void timerEvent(QTimerEvent *event);
     void on_btn_dpmBattery_clicked();
     void on_btn_dpmBalanced_clicked();
     void on_btn_dpmPerformance_clicked();
-    void changeTimeRange();
+    void on_timeSlider_valueChanged(int value);
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void on_cb_showFreqGraph_clicked(const bool &checked);
-    void on_cb_showTempsGraph_clicked(const bool &checked);
-    void on_cb_showVoltsGraph_clicked(const bool &checked);
+    void on_cb_showFreqGraph_toggled(const bool &checked);
+    void on_cb_showTempsGraph_toggled(const bool &checked);
+    void on_cb_showVoltsGraph_toggled(const bool &checked);
     void showLegend(const bool &checked);
     void setGraphOffset(const bool &checked);
     void resetGraphs();
@@ -89,20 +90,22 @@ private slots:
     void on_btn_forceAuto_clicked();
     void on_btn_forceHigh_clicked();
     void on_btn_forceLow_clicked();
-    void gpuChanged();
+    void on_combo_gpus_currentIndexChanged(int index);
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
     void closeEvent(QCloseEvent *);
     void closeFromTray();
     void on_spin_lineThick_valueChanged(int arg1);
-    void on_spin_timerInterval_valueChanged(double arg1);
-    void on_cb_graphs_clicked(bool checked);
-    void on_cb_gpuData_clicked(bool checked);
-    void refreshBtnClicked();
+    void on_spin_timerInterval_valueChanged(int arg1);
+    void on_cb_graphs_toggled(bool checked);
+    void on_cb_gpuData_toggled(bool checked);
+    void refreshBtnClicked(bool onlyCardDependant = false);
     void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
-    void on_cb_stats_clicked(bool checked);
+    void on_cb_stats_toggled(bool checked);
     void copyGlxInfoToClipboard();
     void copyConnectorsToClipboard();
     void resetStats();
-    void on_cb_alternateRow_clicked(bool checked);
+    void on_cb_alternateRow_toggled(bool checked);
     void on_chProfile_clicked();
     void on_btn_reconfigureDaemon_clicked();
     void on_btn_cancel_clicked();
@@ -114,7 +117,7 @@ private slots:
     void on_btn_removeExecProfile_clicked();
     void on_btn_selectBinary_clicked();
     void on_btn_selectLog_clicked();
-    void on_cb_manualEdit_clicked(bool checked);
+    void on_cb_manualEdit_toggled(bool checked);
     void on_btn_runExecProfile_clicked();
     void on_btn_viewOutput_clicked();
     void btnBackToProfilesClicked();
@@ -124,8 +127,8 @@ private slots:
     void on_btn_pwmFixed_clicked();
     void on_btn_pwmAuto_clicked();
     void on_btn_pwmProfile_clicked();
-    void changeProfileFromCombo();
-    void changePowerLevelFromCombo();
+    void on_combo_pProfile_currentIndexChanged(int index);
+    void on_combo_pLevel_currentIndexChanged(int index);
     void on_btn_fanInfo_clicked();
     void on_btn_addFanStep_clicked();
     void on_btn_removeFanStep_clicked();
@@ -133,20 +136,40 @@ private slots:
     void on_fanSpeedSlider_valueChanged(int value);
     void on_cb_enableOverclock_toggled(bool enable);
     void on_btn_applyOverclock_clicked();
-    void on_slider_overclock_valueChanged(int value);
-    void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
+    void on_slider_GPUoverclock_valueChanged(int value);
+    void on_slider_memoryOverclock_valueChanged(int value);
+    void on_cb_showAlwaysGpuSelector_toggled(bool checked);
+    void on_cb_showCombo_toggled(bool checked);
+    void on_mainTabs_currentChanged(int index);
+    void on_btn_exportGraph_clicked();
+    void exportGraphs();
+    void changeExportDirectory();
+    void on_list_execProfiles_itemSelectionChanged();
 
 private:
-    gpu device;
+    gpu * device;
     static const QString settingsPath;
-    QList<execBin*> *execsRunning;
-    QMap<int, unsigned int> fanSteps;
-    QMap<QString, unsigned int> pmStats;
-    unsigned int rangeX = 180, ticksCounter = 0, statsTickCounter = 0;
+    QList<execBin*> execsRunning;
+    QMap<temp, percentage> fanSteps;
+    QMap<QString, unsigned short> pmStats;
+    unsigned short rangeX, ticksCounter, statsTickCounter, graphOffset;
+    bool trayIconAvailable;
+    QSystemTrayIcon trayIcon;
+    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden, *trayBtn_show;
+    QMenu dpmMenu, trayMenu, optionsMenu, forcePowerMenu;
+    int timerID;
+    QButtonGroup pwmGroup, exportFormat;
+    bool closeFromTrayMenu;
+    QStringList selectedVariableVaules, envVars;
+    QDialog exportDialog;
 
+    Ui::export_graphs exportUi;
     Ui::radeon_profile *ui;
+
+    gpu * detectDriver();
     void setupGraphs();
     void setupTrayIcon();
+    void setupExportDialog();
     void setupOptionsMenu();
     void refreshTooltip();
     void setupForcePowerLevelMenu();
@@ -159,7 +182,8 @@ private:
     void setupContextMenus();
     void refreshGpuData();
     void refreshGraphs();
-    void setupUiEnabledFeatures(const globalStuff::driverFeatures &features);
+    void replotGraphs();
+    void setupUiEnabledFeatures(const driverFeatures &features);
     void loadVariables();
     void updateExecLogs();
     void addRuntimeWidgets();
@@ -168,7 +192,11 @@ private:
     int askNumber(const int value, const int min, const int max, const QString label);
     void makeFanProfileGraph();
     void refreshUI();
-    void connectSignals();
+    void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
+    void exportSingleGraph(QAbstractButton * format, QCustomPlot * graph, const QString & path);
+    QString getCoreDetails() const;
+    QString getMemDetails() const;
+    QString getNextPmStatsKey() const;
 
     /**
      * @brief adjustFanSpeed Sets the PWM fan speed indicated for the actual temperature on the fan profile.
@@ -206,7 +234,15 @@ private:
      * @param alsoAdjustSpeed Updates the fan speed after adding the step.
      * @return If the operation was successful.
      */
-    bool addFanStep (int temperature, int fanSpeed, bool alsoToList = true, bool alsoToGraph = true, bool alsoAdjustSpeed = true);
+    bool addFanStep (temp temperature, percentage fanSpeed, bool alsoToList = true, bool alsoToGraph = true, bool alsoAdjustSpeed = true);
+
+    /**
+     * @brief askQuestion Creates a dialog to ask a question
+     * @param title Title of the dialog
+     * @param question Question to ask
+     * @return True if the user clicked "Yes", false otherwise
+     */
+    bool askConfirmation(QString title, QString question);
 };
 
 #endif // RADEON_PROFILE_H

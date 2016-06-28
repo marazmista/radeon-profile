@@ -1,38 +1,42 @@
 // copyright marazmista @ 29.03.2014
 
 #include "dfglrx.h"
-//#include <QFile>
 
-// define static members //
-char dFglrx::gpuIndex = 0;
-// end //
 
-void dFglrx::configure(char _gpuIndex) {
-    gpuIndex = _gpuIndex;
+dFglrx::dFglrx() : gpu() {
+    driverModule = "fglrx";
+
+    gpuList = detectCards();
+
+    qDebug() << "Using fglrx driver";
 }
 
-globalStuff::gpuClocksStruct dFglrx::getClocks(){
-    QStringList out = globalStuff::grabSystemInfo("aticonfig --odgc --adapter=" + gpuIndex);
+// default changeGpu() implementation is used
+
+gpuClocksStruct dFglrx::getClocks(bool forFeatures){
+    Q_UNUSED(forFeatures);
+    const QStringList out = globalStuff::grabSystemInfo("aticonfig --odgc --adapter=" + QString::number(currentGpuIndex)).filter("Clocks");
     //     QFile f("/home/mm/odgc");
     //     f.open(QIODevice::ReadOnly);
     //     QStringList out = QString(f.readAll()).split('\n');
     //     f.close();
-    globalStuff::gpuClocksStruct tData(-1);
-    out = out.filter("Clocks");
+    gpuClocksStruct tData;
     if (!out.empty()) {
         QRegExp rx;
         rx.setPattern("\\s+\\d+\\s+\\d+");
         rx.indexIn(out[0]);
         QStringList gData = rx.cap(0).trimmed().split("           ");
 
-        tData.coreClk = gData[0].toInt();
-        tData.memClk = gData[1].toInt();
+        tData.coreClk = gData[0].toUShort();
+        tData.coreClkOk = tData.coreClk > 0;
+        tData.memClk = gData[1].toUShort();
+        tData.memClkOk = tData.memClk > 0;
     }
     return tData;
 }
 
-float dFglrx::getTemperature() {
-    QStringList out = globalStuff::grabSystemInfo("aticonfig --odgt --adapter=" + gpuIndex);
+ temp dFglrx::getTemperature() const {
+    QStringList out = globalStuff::grabSystemInfo("aticonfig --odgt --adapter=" + QString::number(currentGpuIndex));
     //    QFile f("/home/mm/odgt");
     //    f.open(QIODevice::ReadOnly);
     //    QStringList out = QString(f.readAll()).split('\n');
@@ -47,7 +51,7 @@ float dFglrx::getTemperature() {
     return 0;
 }
 
-QStringList dFglrx::detectCards() {
+QStringList dFglrx::detectCards() const {
 //     QFile f("/home/mm/lsa");
 //    f.open(QIODevice::ReadOnly);
 //    QStringList out = QString(f.readAll()).split('\n');
@@ -55,17 +59,18 @@ QStringList dFglrx::detectCards() {
     return globalStuff::grabSystemInfo("aticonfig --list-adapters").filter("Radeon");;
 }
 
-QStringList dFglrx::getGLXInfo() {
-    return globalStuff::grabSystemInfo("fglrxinfo").filter(QRegExp("\\.+"));
+QStringList dFglrx::getGLXInfo(const QString & gpuName) const {
+    QStringList list = globalStuff::grabSystemInfo("fglrxinfo").filter(QRegExp("\\.+"));
+    list.append(gpu::getGLXInfo(gpuName));
+    return list;
 }
 
-globalStuff::driverFeatures dFglrx::figureOutDriverFeatures() {
-    globalStuff::driverFeatures features;
+driverFeatures dFglrx::figureOutDriverFeatures() {
+    driverFeatures features;
     features.coreClockAvailable = true;
     features.memClockAvailable = true;
     features.temperatureAvailable = true;
-    features.pwmAvailable = false;
-    features.overClockAvailable = false;
+    // Other features are automatically initialized as false
     return features;
 }
 

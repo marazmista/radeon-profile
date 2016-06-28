@@ -6,23 +6,19 @@
 #define DFGLRX_H
 
 #include "globalStuff.h"
+#include "gpu.h"
 
-#include <QTreeWidgetItem>
 
-class dFglrx
+class dFglrx : public gpu
 {
 public:
-    dFglrx() { }
+    dFglrx();
 
-    static globalStuff::gpuClocksStruct getClocks();
-    static float getTemperature();
-    static QList<QTreeWidgetItem *> getCardConnectors();
-    static QStringList getGLXInfo();
-    static QStringList detectCards();
-    static void configure(char _gpuIndex);
-    static globalStuff::driverFeatures figureOutDriverFeatures();
-private:
-   static char gpuIndex;
+    gpuClocksStruct getClocks(bool forFeatures = false);
+    temp getTemperature() const;
+    QStringList getGLXInfo(const QString & gpuName) const;
+    QStringList detectCards() const;
+    driverFeatures figureOutDriverFeatures();
 
 };
 

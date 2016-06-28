@@ -7,6 +7,8 @@
 #ifndef EXECBIN_H
 #define EXECBIN_H
 
+#include "ui_exec_bin.h"
+
 #include <QProcess>
 #include <QPushButton>
 #include <QPlainTextEdit>
@@ -15,26 +17,15 @@
 #include <QWidget>
 #include <QString>
 #include <QLabel>
+#include <QDebug>
 
-class execBin : public QObject {
+class execBin : public QProcess {
     Q_OBJECT
 public:
     execBin();
-    ~execBin() {
-        delete p;
-        delete output;
-        delete cmd;
-        delete mainLay;
-        delete btnLay;
-        delete btnSave;
-        delete lStatus;
-        delete tab;
-    }
+    ~execBin();
 
-    void setupTab();
     void runBin(const QString &cmd);
-    void setEnv(const QProcessEnvironment &env);
-    QProcess::ProcessState getExecState();
     void appendToLog(const QString &data);
     void setLogFilename(const QString &name);
 
@@ -42,20 +33,14 @@ public:
     QWidget *tab;
     bool logEnabled;
 
-public slots:
+private slots:
     void execProcessReadOutput();
     void execProcesStart();
     void execProcesFinished();
     void saveToFile();
 
 private:
-    QProcess *p;
-    QPlainTextEdit *output;
-    QPlainTextEdit *cmd;
-    QVBoxLayout *mainLay;
-    QHBoxLayout *btnLay;
-    QLabel *lStatus;
-    QPushButton *btnSave;
+    Ui::execBin ui;
 
     struct {
         QString logFilename, launchTime;

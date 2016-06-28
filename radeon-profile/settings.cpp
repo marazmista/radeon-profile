@@ -19,6 +19,7 @@ const QString fanStepsPath = QDir::homePath() + "/.radeon-profile-fanSteps";
 globalStuff::globalCfgStruct globalStuff::globalConfig;
 
 void radeon_profile::saveConfig() {
+    qDebug() << "Saving config to" << radeon_profile::settingsPath;
     QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
 
     settings.setValue("startMinimized",ui->cb_startMinimized->isChecked());
@@ -35,15 +36,18 @@ void radeon_profile::saveConfig() {
     settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
     settings.setValue("aleternateRowColors",ui->cb_alternateRow->isChecked());
 
-    settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
-    settings.setValue("graphOffset",optionsMenu->actions().at(1)->isChecked());
+    settings.setValue("showLegend",optionsMenu.actions().at(0)->isChecked());
+    settings.setValue("graphOffset",optionsMenu.actions().at(1)->isChecked());
     settings.setValue("graphRange",ui->timeSlider->value());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
+    settings.setValue("showAlwaysGpuSelector", ui->cb_showAlwaysGpuSelector->isChecked());
+    settings.setValue("showCombo", ui->cb_showCombo->isChecked());
 
     settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
     settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
-    settings.setValue("overclockValue", ui->slider_overclock->value());
+    settings.setValue("GPUoverclockValue", ui->slider_GPUoverclock->value());
+    settings.setValue("memoryOverclockValue", ui->slider_memoryOverclock->value());
 
     // Graph settings
     settings.setValue("graphLineThickness",ui->spin_lineThick->value());
@@ -82,12 +86,13 @@ void radeon_profile::saveConfig() {
 }
 
 void radeon_profile::loadConfig() {
+    qDebug() << "Loading config from" << radeon_profile::settingsPath;
     QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
 
     ui->cb_startMinimized->setChecked(settings.value("startMinimized",false).toBool());
     ui->cb_minimizeTray->setChecked(settings.value("minimizeToTray",false).toBool());
     ui->cb_closeTray->setChecked(settings.value("closeToTray",false).toBool());
-    ui->spin_timerInterval->setValue(settings.value("updateInterval",1).toDouble());
+    ui->spin_timerInterval->setValue(settings.value("updateInterval",1).toInt());
     ui->cb_gpuData->setChecked(settings.value("updateGPUData",true).toBool());
     ui->cb_graphs->setChecked(settings.value("updateGraphs",true).toBool());
     ui->cb_glxInfo->setChecked(settings.value("updateGLXInfo",false).toBool());
@@ -99,9 +104,11 @@ void radeon_profile::loadConfig() {
     ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",true).toBool());
     ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
     ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",80).toInt());
+    ui->cb_showAlwaysGpuSelector->setChecked(settings.value("showAlwaysGpuSelector",true).toBool());
+    ui->cb_showCombo->setChecked(settings.value("showCombo",true).toBool());
 
-    optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
-    optionsMenu->actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());
+    optionsMenu.actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
+    optionsMenu.actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());
     ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
     // Graphs settings
     ui->spin_lineThick->setValue(settings.value("graphLineThickness",2).toInt());
@@ -126,7 +133,8 @@ void radeon_profile::loadConfig() {
 
     ui->cb_enableOverclock->setChecked(settings.value("overclockEnabled",false).toBool());
     ui->cb_overclockAtLaunch->setChecked(settings.value("overclockAtLaunch",false).toBool());
-    ui->slider_overclock->setValue(settings.value("overclockValue",0).toInt());
+    ui->slider_GPUoverclock->setValue(settings.value("GPUoverclockValue",0).toInt());
+    ui->slider_memoryOverclock->setValue(settings.value("memoryOverclockValue",0).toInt());
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
@@ -140,21 +148,7 @@ void radeon_profile::loadConfig() {
                          desktopSize.height() / 2); // Height
     }
 
-    ui->cb_graphs->setEnabled(ui->cb_gpuData->isChecked());
-    ui->cb_stats->setEnabled(ui->cb_gpuData->isChecked());
 
-    if (ui->cb_gpuData->isChecked()) {
-        if (ui->cb_stats->isChecked())
-            ui->tabs_systemInfo->setTabEnabled(3,true);
-        else
-            ui->tabs_systemInfo->setTabEnabled(3,false);
-    } else
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "GPU data is disabled."));
-
-    if (ui->cb_graphs->isChecked() && ui->cb_graphs->isEnabled())
-        ui->mainTabs->setTabEnabled(1,true);
-    else
-        ui->mainTabs->setTabEnabled(1,false);
 
     ui->list_currentGPUData->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_glxinfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
@@ -165,15 +159,14 @@ void radeon_profile::loadConfig() {
     ui->list_variables->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_vaules->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
 
-    showLegend(optionsMenu->actions().at(0)->isChecked());
-    changeTimeRange();
-    on_cb_showTempsGraph_clicked(ui->cb_showTempsGraph->isChecked());
-    on_cb_showFreqGraph_clicked(ui->cb_showFreqGraph->isChecked());
-    on_cb_showVoltsGraph_clicked(ui->cb_showVoltsGraph->isChecked());
+    showLegend(optionsMenu.actions().at(0)->isChecked());
+    ui->cb_showTempsGraph->setChecked(ui->cb_showTempsGraph->isChecked());
+    ui->cb_showFreqGraph->setChecked(ui->cb_showFreqGraph->isChecked());
+    ui->cb_showVoltsGraph->setChecked(ui->cb_showVoltsGraph->isChecked());
 
-    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
+    globalStuff::globalConfig.interval = static_cast<ushort>(ui->spin_timerInterval->value());
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
-    globalStuff::globalConfig.graphOffset = ((optionsMenu->actions().at(1)->isChecked()) ? 20 : 0);
+    graphOffset = ((optionsMenu.actions().at(1)->isChecked()) ? 20 : 0);
 
     QFile ef(execProfilesPath);
     if (ef.open(QIODevice::ReadOnly)) {
@@ -188,22 +181,29 @@ void radeon_profile::loadConfig() {
 }
 
 void radeon_profile::loadFanProfiles() {
+    qDebug() << "Loading fan profiles from" << fanStepsPath;
     QFile fsPath(fanStepsPath);
     if (fsPath.open(QIODevice::ReadOnly)) {
-        QString profile = QString(fsPath.readAll());
-
-        QStringList steps = profile.split("|",QString::SkipEmptyParts);
+        const QStringList steps = QString(fsPath.readAll()).split("|",QString::SkipEmptyParts);
 
         if (steps.count() > 1) {
             for (int i = 1; i < steps.count(); ++i) {
                 QStringList pair = steps[i].split("#");
-                addFanStep(pair[0].toInt(),pair[1].toInt(), true, true, false);
+                if(pair.size() == 2){
+                    bool tempOk, speedOk;
+                    const temp temperature = pair[0].toFloat(&tempOk);
+                    const percentage speed = pair[1].toUShort(&speedOk);
+                    if(tempOk && speedOk)
+                        addFanStep(temperature, speed, true, true, false);
+                }
             }
 
             fsPath.close();
         }
-    } else {
-        //default profile if no file found
+    }
+
+    if(fanSteps.isEmpty()){
+        qWarning() << "No saved fan steps found, using default profile";
         addFanStep(0,20,true, true, false);
         addFanStep(65,100,true, true, false);
         addFanStep(90,100, true, true, false);
@@ -215,17 +215,18 @@ void radeon_profile::loadFanProfiles() {
 void radeon_profile::makeFanProfileGraph() {
     ui->plotFanProfile->graph(0)->clearData();
 
-    for (int temperature : fanSteps.keys())
+    for (short temperature : fanSteps.keys())
         ui->plotFanProfile->graph(0)->addData(temperature, fanSteps.value(temperature));
 
     ui->plotFanProfile->replot();
 }
 
 void radeon_profile::saveFanProfiles() {
+    qDebug() << "Saving fan profiles to" << fanStepsPath;
     QFile fsPath(fanStepsPath);
     if (fsPath.open(QIODevice::WriteOnly)) {
         QString profile = "default|";
-        for (int temperature : fanSteps.keys())
+        for (short temperature : fanSteps.keys())
             profile.append(QString::number(temperature)+ "#" + QString::number(fanSteps.value(temperature))  + "|");
 
         fsPath.write(profile.toLatin1());

@@ -7,74 +7,47 @@
 #include <QLabel>
 #include <QFileDialog>
 
-execBin::execBin() : QObject() {
-    p = new QProcess();
-    mainLay = new QVBoxLayout();
-    btnLay = new QHBoxLayout();
+execBin::execBin() : QProcess() {
+    logEnabled = false;
+
     tab = new QWidget();
-    output = new QPlainTextEdit();
-    cmd = new QPlainTextEdit();
-    lStatus = new QLabel();
-    btnSave = new QPushButton();
 
-    setupTab();
+    ui.setupUi(tab);
 
-    connect(p,SIGNAL(readyReadStandardOutput()),this,SLOT(execProcessReadOutput()));
-    connect(p,SIGNAL(finished(int)),this,SLOT(execProcesFinished()));
-    connect(p,SIGNAL(started()),this,SLOT(execProcesStart()));
-    connect(btnSave,SIGNAL(clicked()),this,SLOT(saveToFile()));
+    connect(this,SIGNAL(readyReadStandardOutput()),this,SLOT(execProcessReadOutput()));
+    connect(this,SIGNAL(finished(int)),this,SLOT(execProcesFinished()));
+    connect(this,SIGNAL(started()),this,SLOT(execProcesStart()));
+    connect(ui.btn_save,SIGNAL(clicked()),this,SLOT(saveToFile()));
+
+    setProcessChannelMode(MergedChannels);
 }
 
-void execBin::setupTab() {
-    output->setReadOnly(true);
-    cmd->setReadOnly(true);
-    cmd->setMaximumHeight(60);
-    cmd->setFont(QFont("monospace", 8));
-    output->setFont(QFont("monospace", 8));
-    btnLay->setAlignment(Qt::AlignRight);
-    QFont f;
-    f.setBold(true);
-    lStatus->setFont(f);
-    p->setProcessChannelMode(QProcess::MergedChannels);
+execBin::~execBin() {
+    qDebug() << "Deleting " << name;
+    delete tab;
 
-
-    this->btnSave->setText(label_saveOutputToFile);
-
-    // just two labels out of nowhere, forget it
-    QLabel *l1 = new QLabel();
-    l1->setText(label_command);
-    QLabel *l2 = new QLabel();
-    l2->setText(label_output);
-
-    btnLay->addWidget(lStatus);
-    btnLay->addWidget(btnSave);
-
-    mainLay->addWidget(l1);
-    mainLay->addWidget(cmd);
-    mainLay->addWidget(l2);
-    mainLay->addWidget(output);
-    mainLay->addLayout(btnLay);
-    tab->setLayout(mainLay);
+    if (state() == Running){
+        qDebug() << name << " was still running, killing it";
+        kill();
+    }
 }
 
 void execBin::runBin(const QString &cmd) {
-    p->start(cmd);
-    this->cmd->setPlainText(p->processEnvironment().toStringList().join(" ") +" "+ cmd);
+    start(cmd);
+    ui.text_enviroinment->setPlainText(processEnvironment().toStringList().join(' '));
+    ui.text_command->setPlainText(cmd);
 }
 
-void execBin::setEnv(const QProcessEnvironment &env) {
-    this->p->setProcessEnvironment(env);
-}
 
 void execBin::execProcessReadOutput() {
-    QString o = this->p->readAllStandardOutput();
+    QString o = readAllStandardOutput();
 
     if (!o.isEmpty())
-        this->output->appendPlainText(o);
+        ui.text_output->appendPlainText(o);
 }
 
 void execBin::execProcesStart() {
-    this->lStatus->setText(label_processRunning);
+    ui.label_status->setText(tr("Process running"));
 }
 
 void execBin::execProcesFinished() {
@@ -86,22 +59,19 @@ void execBin::execProcesFinished() {
         this->logData.log.clear();
     }
 
-    this->lStatus->setText(label_processNotRunning);
+    ui.label_status->setText(tr("Process terminated"));
 }
 
 void execBin::saveToFile() {
-        QString filename = QFileDialog::getSaveFileName(0, label_save, QDir::homePath()+"/output_"+this->name);
+        QString filename = QFileDialog::getSaveFileName(0, tr("Save"), QDir::homePath()+"/output_"+this->name);
         if (!filename.isEmpty()) {
             QFile f(filename);
             f.open(QIODevice::WriteOnly);
-            f.write(this->output->toPlainText().toLatin1());
+            f.write(ui.text_output->toPlainText().toLatin1());
             f.close();
         }
 }
 
-QProcess::ProcessState execBin::getExecState() {
-    return this->p->state();
-}
 
 void execBin::appendToLog(const QString &data) {
     this->logData.log.append(data);
