@@ -183,6 +183,19 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
         loadFanProfiles();
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
+
+        if (ui->cb_saveFanMode->isChecked()) {
+            switch (ui->fanModesTabs->currentIndex()) {
+                case 1:
+                    ui->btn_pwmFixed->click();
+                    break;
+                case 2:
+                    device.getTemperature();
+                    ui->btn_pwmProfile->click();
+                    break;
+            }
+        }
+
     } else {
         qDebug() << "Fan control is not available";
         ui->mainTabs->setTabEnabled(2,false);
@@ -286,7 +299,10 @@ void radeon_profile::timerEvent() {
     if (!refreshWhenHidden->isChecked() && this->isHidden()) {
         // even if in tray, keep the fan control active (if enabled)
         device.getTemperature();
-        adjustFanSpeed();
+
+        if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked())
+            adjustFanSpeed();
+
         return;
     }
 
@@ -297,7 +313,9 @@ void radeon_profile::timerEvent() {
         if (device.features.pm == globalStuff::DPM)
             ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
 
-        adjustFanSpeed();
+        if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked())
+            adjustFanSpeed();
+
 
         // lets say coreClk is essential to get stats (it is disabled in ui anyway when features.clocksAvailable is false)
         if (ui->cb_stats->isChecked() && device.gpuClocksData.coreClk != -1) {
@@ -332,34 +350,42 @@ void radeon_profile::timerEvent() {
 
 void radeon_profile::adjustFanSpeed(const bool force)
 {
-    // If 'force' is true skip all checks.
-    if (force ||
-            // Otherwise check if PWM is available and enabled by the user and if the temperature has changed
-            (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked() &&
-            device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore)) {
+    // If 'force' is true skip all checks, otherwise check if PWM is available and enabled by the user and if the temperature has changed
+    if (force || (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore)) {
 
-        float speed;
-        if (fanSteps.contains(device.gpuTemeperatureData.current)) // Exact match
-            speed = fanSteps.value(device.gpuTemeperatureData.current);
-        else {
-            // find bounds of current temperature
-            const QMap<int,unsigned int>::const_iterator high = fanSteps.upperBound(device.gpuTemeperatureData.current),
-                    low = high - 1;
-            if(high == fanSteps.constBegin()) // Before the first step
-                speed = high.value();
-            else if(low == fanSteps.constEnd()) // After the last step
-                speed = low.value();
-            else  // In the middle
-                // calculate two point stright line equation based on boundaries of current temperature
-                // y = mx + b = (y2-y1)/(x2-x1)*(x-x1)+y1
-                speed=(float)(high.value()-low.value())/(high.key()-low.key())*(device.gpuTemeperatureData.current-low.key())+low.value();
+        if (fanSteps.contains(device.gpuTemeperatureData.current)) {  // Exact match
+            device.setPwmValue(device.features.pwmMaxSpeed * fanSteps.value(device.gpuTemeperatureData.current) / 100);
+            return;
         }
 
-        qDebug() << device.gpuTemeperatureDataString.current << " -->" << speed << "%";
-        if(speed >= 0 && speed <= 100)
-            device.setPwmValue(device.features.pwmMaxSpeed * speed / 100);
+        // find bounds of current temperature
+        const QMap<int,unsigned int>::const_iterator high = fanSteps.upperBound(device.gpuTemeperatureData.current),
+                low = high - 1;
+
+        int hSpeed = high.value(),
+                lSpeed = low.value();
+
+        if (high == fanSteps.constBegin()) {
+            device.setPwmValue(device.features.pwmMaxSpeed * hSpeed / 100);
+            return;
+        }
+
+        if (low == fanSteps.constEnd()) {
+            device.setPwmValue(device.features.pwmMaxSpeed * lSpeed / 100);
+            return;
+        }
+
+
+        // calculate two point stright line equation based on boundaries of current temperature
+        // y = mx + b = (y2-y1)/(x2-x1)*(x-x1)+y1
+        int hTemperature = high.key(),
+                lTemperature = low.key();
+
+        float speed = (float)((hSpeed - lSpeed) / (hTemperature - lTemperature) * (device.gpuTemeperatureData.current - lTemperature)) + lSpeed;
+        device.setPwmValue(device.features.pwmMaxSpeed * speed / 100);
     }
 }
+
 
 void radeon_profile::refreshGraphs() {
     // count the tick and move graph to right

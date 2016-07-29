@@ -86,7 +86,7 @@ void radeon_profile::changeProfileFromCombo() {
     if (device.features.pm == globalStuff::DPM)
         device.setPowerProfile(newPP);
     else {
-        index = index + 3; // frist three in enum is dpm so we need to increase
+        index += 3; // frist three in enum is dpm so we need to increase
         device.setPowerProfile(newPP);
     }
 }

@@ -2888,7 +2888,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_mainConfig">
            <attribute name="title">
@@ -3146,7 +3146,7 @@
             <property name="geometry">
              <rect>
               <x>210</x>
-              <y>120</y>
+              <y>140</y>
               <width>91</width>
               <height>24</height>
              </rect>
@@ -3166,7 +3166,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>120</y>
+              <y>140</y>
               <width>181</width>
               <height>21</height>
              </rect>
@@ -3179,7 +3179,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>142</y>
+              <y>162</y>
               <width>291</width>
               <height>21</height>
              </rect>
@@ -3189,6 +3189,19 @@
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="cb_saveFanMode">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>110</y>
+              <width>201</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Save selected fan control mode</string>
             </property>
            </widget>
           </widget>
