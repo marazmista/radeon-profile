@@ -17,6 +17,7 @@ int dXorg::sensorsGPUtempIndex;
 QChar dXorg::gpuSysIndex;
 QSharedMemory dXorg::sharedMem;
 dXorg::driverFilePaths dXorg::filePaths;
+dXorg::rxPatternsStruct dXorg::rxPatterns;
 // end //
 
 daemonComm *dcomm = new daemonComm();
@@ -25,6 +26,20 @@ void dXorg::configure(QString gpuName) {
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
+
+    if (gpu::driverModule == "radeon") {
+        dXorg::rxPatterns.powerLevel = "power\\slevel\\s\\d",
+            dXorg::rxPatterns.sclk = "sclk:\\s\\d+",
+            dXorg::rxPatterns.mclk = "mclk:\\s\\d+",
+            dXorg::rxPatterns.vclk = "vclk:\\s\\d+",
+            dXorg::rxPatterns.dclk = "dclk:\\s\\d+",
+            dXorg::rxPatterns.vddc = "vddc:\\s\\d+",
+            dXorg::rxPatterns.vddci = "vddci:\\s\\d+";
+    } else if (gpu::driverModule == "amdgpu") {
+        dXorg::rxPatterns.sclk = "\\[\\s+sclk\\s+\\]:\\s\\d+",
+            dXorg::rxPatterns.mclk = "\\[\\s+mclk\\s+\\]:\\s\\d+";
+    }
+
 
     if (!globalStuff::globalConfig.rootMode) {
         qDebug() << "Running in non-root mode, connecting and configuring the daemon";
@@ -170,41 +185,41 @@ globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
     case globalStuff::DPM: {
         QRegExp rx;
 
-        rx.setPattern("power\\slevel\\s\\d");
+        rx.setPattern(rxPatterns.powerLevel);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.powerLevel = rx.cap(0).split(' ')[2].toShort();
 
-        rx.setPattern("sclk:\\s\\d+");
+        rx.setPattern(rxPatterns.sclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
 
-        rx.setPattern("mclk:\\s\\d+");
+        rx.setPattern(rxPatterns.mclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
 
-        rx.setPattern("vclk:\\s\\d+");
+        rx.setPattern(rxPatterns.vclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
             tData.uvdCClk  = (tData.uvdCClk  == 0) ? -1 :  tData.uvdCClk;
         }
 
-        rx.setPattern("dclk:\\s\\d+");
+        rx.setPattern(rxPatterns.dclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble() / 100;
             tData.uvdDClk = (tData.uvdDClk == 0) ? -1 : tData.uvdDClk;
         }
 
-        rx.setPattern("vddc:\\s\\d+");
+        rx.setPattern(rxPatterns.vddc);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
 
-        rx.setPattern("vddci:\\s\\d+");
+        rx.setPattern(rxPatterns.vddci);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
             tData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[1].toDouble();
