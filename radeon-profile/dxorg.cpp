@@ -295,6 +295,9 @@ float dXorg::getTemperature() {
 }
 
 globalStuff::powerMethod dXorg::getPowerMethod() {
+    if (QFile::exists(filePaths.dpmStateFilePath))
+        return globalStuff::DPM;
+
     QFile powerMethodFile(filePaths.powerMethodFilePath);
     if (powerMethodFile.open(QIODevice::ReadOnly)) {
         QString s = powerMethodFile.readLine(20);
@@ -305,8 +308,9 @@ globalStuff::powerMethod dXorg::getPowerMethod() {
             return globalStuff::PROFILE;
         else
             return globalStuff::PM_UNKNOWN;
-    } else
-        return globalStuff::PM_UNKNOWN;
+    }
+
+    return globalStuff::PM_UNKNOWN;
 }
 
 dXorg::tempSensor dXorg::testSensor() {
