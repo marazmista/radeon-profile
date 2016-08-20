@@ -53,6 +53,7 @@ public:
 
     static void resetOverClock();
 
+    static globalStuff::drverModule currentDriverModule;
 
 private:
     enum tempSensor {
@@ -83,7 +84,9 @@ private:
             pwmMaxSpeedPath,
             overDrivePath;
     } filePaths;
+
     static int sensorsGPUtempIndex;
+    static short rxMatchIndex;
     static dXorg::tempSensor currentTempSensor;
     static globalStuff::powerMethod currentPowerMethod;
 
