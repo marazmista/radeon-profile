@@ -66,6 +66,10 @@ private:
     static QChar gpuSysIndex;
     static QSharedMemory sharedMem;
 
+    static struct rxPatternsStruct {
+        QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
+    } rxPatterns;
+
     static struct driverFilePaths {
         QString powerMethodFilePath,
             profilePath,
