@@ -217,13 +217,13 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
     }
 
-    // ui->mainTabs->setTabEnabled(2,features.overClockAvailable);
+     ui->mainTabs->setTabEnabled(2,features.overClockAvailable);
     // Overclock is still not tested (it will be fully available only with Linux 4.7/4.8), disable it in release mode
-#ifdef QT_DEBUG // TO BE REMOVED AFTER TESTING
-    ui->mainTabs->setTabEnabled(2,true);
-#else
-    ui->mainTabs->setTabEnabled(2,false);
-#endif
+//#ifdef QT_DEBUG // TO BE REMOVED AFTER TESTING
+//    ui->mainTabs->setTabEnabled(2,true);
+//#else
+//    ui->mainTabs->setTabEnabled(2,false);
+//#endif
 }
 
 void radeon_profile::refreshGpuData() {
