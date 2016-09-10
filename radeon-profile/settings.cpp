@@ -233,7 +233,8 @@ void radeon_profile::saveFanProfiles() {
         for (int temperature : fanSteps.keys())
             profile.append(QString::number(temperature)+ "#" + QString::number(fanSteps.value(temperature))  + "|");
 
-        fsPath.write(profile.toLatin1());
+        QTextStream ts(&fsPath);
+        ts << profile;
         fsPath.close();
     }
 }
