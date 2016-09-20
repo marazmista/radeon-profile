@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = radeon-profile
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += -std=c++11
+
 #   https://forum.qt.io/topic/10178/solved-qdebug-and-debug-release/2
 #   http://doc.qt.io/qt-5/qtglobal.html#QtMsgType-enum
 #   qDebug will work only when compiled for Debug
