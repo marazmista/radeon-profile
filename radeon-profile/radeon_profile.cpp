@@ -123,7 +123,7 @@ void radeon_profile::addRuntimeWidgets() {
     refreshBtn->show();
     connect(refreshBtn,SIGNAL(clicked()),this,SLOT(refreshBtnClicked()));
 
-    ui->label_version->setText(format_version);
+    ui->label_version->setText(tr("version %n", NULL, appVersion));
 
     // version label
     QLabel *l = new QLabel("v. " +QString().setNum(appVersion),this);
@@ -137,7 +137,7 @@ void radeon_profile::addRuntimeWidgets() {
 
     // button on exec pages
     QPushButton *btnBackProfiles = new QPushButton();
-    btnBackProfiles->setText(label_backToProfiles);
+    btnBackProfiles->setText(tr("Back to profiles"));
     ui->tabs_execOutputs->setCornerWidget(btnBackProfiles);
     btnBackProfiles->show();
     connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
@@ -186,7 +186,6 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 
         loadFanProfiles();
         setupFanProfilesMenu();
-        ui->l_fanSpeed->setMenu(fanProfilesMenu);
 
         if (ui->cb_saveFanMode->isChecked()) {
             switch (ui->fanModesTabs->currentIndex()) {
@@ -261,24 +260,24 @@ void radeon_profile::refreshUI() {
         ui->list_currentGPUData->clear();
 
         if (device.gpuClocksData.powerLevel != -1)
-            addChild(ui->list_currentGPUData, label_currentPowerLevel, device.gpuClocksDataString.powerLevel);
+            addChild(ui->list_currentGPUData, tr("Power level"), device.gpuClocksDataString.powerLevel);
         if (device.gpuClocksData.coreClk != -1)
-            addChild(ui->list_currentGPUData, label_currentGPUClock, device.gpuClocksDataString.coreClk);
+            addChild(ui->list_currentGPUData, tr("GPU clock"), device.gpuClocksDataString.coreClk);
         if (device.gpuClocksData.coreClk != -1)
-            addChild(ui->list_currentGPUData, label_currentMemClock, device.gpuClocksDataString.memClk);
+            addChild(ui->list_currentGPUData, tr("Memory clock"), device.gpuClocksDataString.memClk);
         if (device.gpuClocksData.uvdCClk != -1)
-            addChild(ui->list_currentGPUData, label_uvdVideoCoreClock, device.gpuClocksDataString.uvdCClk);
+            addChild(ui->list_currentGPUData, tr("UVD core clock (cclk)"), device.gpuClocksDataString.uvdCClk);
         if (device.gpuClocksData.uvdDClk != -1)
-            addChild(ui->list_currentGPUData, label_uvdDecoderClock, device.gpuClocksDataString.uvdDClk);
+            addChild(ui->list_currentGPUData, tr("UVD decoder clock (dclk)"), device.gpuClocksDataString.uvdDClk);
         if (device.gpuClocksData.coreVolt != -1)
-            addChild(ui->list_currentGPUData, label_vddc, device.gpuClocksDataString.memVolt);
+            addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuClocksDataString.memVolt);
         if (device.gpuClocksData.memVolt != -1)
-            addChild(ui->list_currentGPUData, label_vddci, device.gpuClocksDataString.coreVolt);
+            addChild(ui->list_currentGPUData, ("I/O voltage (vddci)"), device.gpuClocksDataString.coreVolt);
 
         if (ui->list_currentGPUData->topLevelItemCount() == 0)
-            addChild(ui->list_currentGPUData, label_errorReadingData, label_howToReadData);
+            addChild(ui->list_currentGPUData, tr("Can't read data"), tr("You need debugfs mounted and either root rights or the daemon running"));
 
-        addChild(ui->list_currentGPUData, label_currentGPUTemperature, device.gpuTemeperatureDataString.current);
+        addChild(ui->list_currentGPUData, tr("GPU temperature"), device.gpuTemeperatureDataString.current);
     }
 }
 

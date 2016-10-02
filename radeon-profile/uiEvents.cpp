@@ -53,6 +53,7 @@ void radeon_profile::on_btn_forceLow_clicked()
 void radeon_profile::on_btn_pwmFixedApply_clicked()
 {
     device.setPwmValue(ui->fanSpeedSlider->value());
+    fanProfilesMenu->actions()[1]->setText(tr("Fixed ") + ui->labelFixedSpeed->text()+"%");
 }
 
 void radeon_profile::on_btn_pwmFixed_clicked()
@@ -242,7 +243,7 @@ void radeon_profile::on_cb_gpuData_clicked(bool checked)
 
     if (!checked) {
         ui->list_currentGPUData->clear();
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << label_dataDisabled));
+        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << tr("GPU data is disabled")));
     }
 }
 
@@ -322,7 +323,7 @@ void radeon_profile::on_chProfile_clicked()
     QStringList profiles;
     profiles << profile_auto << profile_default << profile_high << profile_mid << profile_low;
 
-    QString selection = QInputDialog::getItem(this, label_selectProfile, label_profileSelection, profiles,0,false,&ok);
+    QString selection = QInputDialog::getItem(this, tr("Select new power profile"), tr("Profile selection"), profiles,0,false,&ok);
 
     if (ok) {
         if (selection == profile_default)
@@ -346,7 +347,7 @@ void radeon_profile::on_btn_reconfigureDaemon_clicked()
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 {
     if (execsRunning->at(index)->getExecState() == QProcess::Running) {
-        if (QMessageBox::question(this,"", label_processStillRunning, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
+        if (QMessageBox::question(this,"", tr("Process is still running. Close tab?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
             return;
     }
 
@@ -360,19 +361,19 @@ void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 
 void radeon_profile::on_btn_fanInfo_clicked()
 {
-    QMessageBox::information(this,label_fanControlInfo, label_fanControlWarning);
+    QMessageBox::information(this,tr("Fan control information"), tr("Don't overheat your card! Be careful! Don't use this if you don't know what you're doing! \n\nHovewer, looks like card won't apply too low values due its internal protection. \n\nClosing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned!"));
 }
 
 void radeon_profile::on_btn_addFanStep_clicked()
 {
-    const int temperature = askNumber(0, minFanStepsTemp, maxFanStepsTemp, label_temperature);
+    const int temperature = askNumber(0, minFanStepsTemp, maxFanStepsTemp, tr("Temperature"));
     if (temperature == -1) // User clicked Cancel
         return;
 
     if (currentFanProfile.contains(temperature)) // A step with this temperature already exists
-        QMessageBox::warning(this, label_error, label_howToEdit);
+        QMessageBox::warning(this, tr("Error"), tr("This step already exists. Double click on it, to change its value"));
     else { // This step does not exist, proceed
-        const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, label_fanSpeedRange);
+        const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (20-100)"));
         if (fanSpeed == -1) // User clicked Cancel
             return;
 
@@ -387,7 +388,7 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 
     if (ui->list_fanSteps->indexOfTopLevelItem(current) == 0 || ui->list_fanSteps->indexOfTopLevelItem(current) == ui->list_fanSteps->topLevelItemCount()-1) {
         // The selected item is the first or the last, it can't be deleted
-        QMessageBox::warning(this, label_error, label_cantDeleteThisItem);
+        QMessageBox::warning(this, tr("Error"), tr("You can't delete the first and the last item"));
         return;
     }
 
@@ -408,7 +409,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
 {
     if (ui->list_fanSteps->indexOfTopLevelItem(item) == 0 || ui->list_fanSteps->indexOfTopLevelItem(item) == ui->list_fanSteps->topLevelItemCount()-1) {
         // The selected item is the first or the last, it can't be edited
-        QMessageBox::warning(this, label_error, label_cantEditThisItem);
+        QMessageBox::warning(this, tr("Error"), tr("You can't edit the first and the last item"));
         return;
     }
 
@@ -416,7 +417,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
     int newTemp, newSpeed;
 
     if(column == 0){ // The user wants to change the temperature
-        newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, label_temperature);
+        newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, tr("Temperature"));
         if(newTemp != -1){
             newSpeed = oldSpeed;
             currentFanProfile.remove(oldTemp);
@@ -426,7 +427,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
         }
     } else { // The user wants to change the speed
         newTemp = oldTemp;
-        newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, label_fanSpeedRange);
+        newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (20-100)"));
         // addFanStep() will check the validity of newSpeed and overwrite the current step
         addFanStep(newTemp,newSpeed);
     }
@@ -464,7 +465,7 @@ void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
 
 void radeon_profile::on_btn_applyOverclock_clicked(){
     if( ! device.overclock(ui->slider_overclock->value()))
-        QMessageBox::warning(this, label_error, label_overclockFailed);
+        QMessageBox::warning(this, tr("Error"), tr("An error occurred, overclock failed"));
 }
 
 void radeon_profile::on_slider_overclock_valueChanged(const int value){

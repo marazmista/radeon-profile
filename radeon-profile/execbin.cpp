@@ -38,13 +38,13 @@ void execBin::setupTab() {
     p->setProcessChannelMode(QProcess::MergedChannels);
 
 
-    this->btnSave->setText(label_saveOutputToFile);
+    this->btnSave->setText(tr("Save output to file"));
 
     // just two labels out of nowhere, forget it
     QLabel *l1 = new QLabel();
-    l1->setText(label_command);
+    l1->setText(tr("Command"));
     QLabel *l2 = new QLabel();
-    l2->setText(label_output);
+    l2->setText(tr("Output"));
 
     btnLay->addWidget(lStatus);
     btnLay->addWidget(btnSave);
@@ -74,7 +74,7 @@ void execBin::execProcessReadOutput() {
 }
 
 void execBin::execProcesStart() {
-    this->lStatus->setText(label_processRunning);
+    this->lStatus->setText(tr("Process state: running"));
 }
 
 void execBin::execProcesFinished() {
@@ -86,11 +86,11 @@ void execBin::execProcesFinished() {
         this->logData.log.clear();
     }
 
-    this->lStatus->setText(label_processNotRunning);
+    this->lStatus->setText(tr("Process state: not running"));
 }
 
 void execBin::saveToFile() {
-        QString filename = QFileDialog::getSaveFileName(0, label_save, QDir::homePath()+"/output_"+this->name);
+        QString filename = QFileDialog::getSaveFileName(0, tr("Save"), QDir::homePath()+"/output_"+this->name);
         if (!filename.isEmpty()) {
             QFile f(filename);
             f.open(QIODevice::WriteOnly);

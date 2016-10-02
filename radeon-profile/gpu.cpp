@@ -82,7 +82,7 @@ QStringList gpu::initialize(bool skipDetectDriver) {
         f.pm = globalStuff::PM_UNKNOWN;
         f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
         features = f;
-        gpuList << label_unknown;
+        gpuList << QObject::tr("Unknown");
     }
     }
     return gpuList;
@@ -447,13 +447,13 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
         qDebug() << "Analyzing screen " << screenIndex;
 
         // Create root QTreeWidgetItem item for this screen
-        QTreeWidgetItem * screenItem = new QTreeWidgetItem(QStringList() << format_screenIndex);
+        QTreeWidgetItem * screenItem = new QTreeWidgetItem(QStringList() << QObject::tr("Virtual screen n°%n", NULL, screenIndex));
         cardConnectorsList.append(screenItem);
 
         // Add resolution
         QString screenResolution = QString::number(DisplayWidth(display,screenIndex));
         screenResolution += " x " + QString::number(DisplayHeight(display, screenIndex));
-        addChild(screenItem, label_resolution, screenResolution);
+        addChild(screenItem, QObject::tr("Resolution"), screenResolution);
 
         // Add screen minimum and maximum resolutions
         int screenMinWidth, screenMinHeight, screenMaxWidth, screenMaxHeight;
@@ -461,13 +461,13 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
         XRRGetScreenSizeRange(display, screenRoot, &screenMinWidth, &screenMinHeight, &screenMaxWidth, &screenMaxHeight);
 
         QString screenMinResolution = QString::number(screenMinWidth) + " x " + QString::number(screenMinHeight);
-        addChild(screenItem, label_minimumRes, screenMinResolution);
+        addChild(screenItem, QObject::tr("Minimum resolution"), screenMinResolution);
 
         QString screenMaxResolution = QString::number(screenMaxWidth) + " x " + QString::number(screenMaxHeight);
-        addChild(screenItem, label_maximumRes, screenMaxResolution);
+        addChild(screenItem, QObject::tr("Maximum resolution"), screenMaxResolution);
 
         // Adding screen virtual dimension
-        addChild(screenItem, label_virtualSize, format_scrWidthMM + format_scrHeightMM);
+        addChild(screenItem, QObject::tr("Virtual size"), QObject::tr("%n mm x ", NULL, DisplayWidthMM(display, screenIndex)) + QObject::tr("%n mm", NULL, DisplayHeightMM(display, screenIndex)));
 
         // Retrieve screen resources (connectors, configurations, timestamps etc.)
         XRRScreenResources * screenResources = XRRGetScreenResources(display, screenRoot);
@@ -477,7 +477,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
         }
 
         // Creating root QTreeWidgetItem for this screen's outputs
-        QTreeWidgetItem * outputListItem = new QTreeWidgetItem(QStringList() << label_outputs);
+        QTreeWidgetItem * outputListItem = new QTreeWidgetItem(QStringList() << QObject::tr("Outputs"));
         screenItem->addChild(outputListItem);
         int screenConnectedOutputs = 0, screenActiveOutputs = 0;
 
@@ -498,7 +498,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
             // Check the output connection state
             if(outputInfo->connection != 0){ // No connection
-                outputItem->setText(1, label_disconnected);
+                outputItem->setText(1, QObject::tr("Disconnected"));
                 XRRFreeOutputInfo(outputInfo); // Deallocate the memory of this output's info
                 continue; // Next output
             }
@@ -511,9 +511,9 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
             if(configInfo == NULL) { // This output is not active
                 qDebug() << "Output" << outputIndex << "has no active mode";
-                addChild(outputItem, label_active, label_no);
+                addChild(outputItem, QObject::tr("Active"), QObject::tr("No"));
             } else { // The output is active: add resolution, refresh rate and the offset
-                addChild(outputItem, label_active, label_yes);
+                addChild(outputItem, QObject::tr("Active"), QObject::tr("Yes"));
                 qDebug() << "    Analyzing active mode";
 
                 screenActiveOutputs++;
@@ -522,19 +522,19 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                 // Add current resolution
                 QString outputResolution = QString::number(configInfo->width) + " x " + QString::number(configInfo->height);
                 outputResolution += " (" + getAspectRatio(configInfo->width, configInfo->height) + ')';
-                addChild(outputItem, label_resolution, outputResolution);
+                addChild(outputItem, QObject::tr("Resolution"), outputResolution);
 
                 //Add refresh rate
                 float vRefreshRate = getVerticalRefreshRate(getModeInfo(screenResources, *activeMode));
                 if(vRefreshRate != -1){
                     QString outputVRate = QString::number(vRefreshRate, 'g', 3) + " Hz";
-                    addChild(outputItem, label_refreshRate, outputVRate);
+                    addChild(outputItem, QObject::tr("Refresh rate"), outputVRate);
                 }
 
                 // Add the position in the current configuration (useful only in multi-head)
                 // It's the offset from the top left corner
                 QString outputOffset = QString::number(configInfo->x) + ", " + QString::number(configInfo->y);
-                addChild(outputItem, label_offset, outputOffset);
+                addChild(outputItem, QObject::tr("Offset"), outputOffset);
 
                 // Calculate and add the screen software brightness level
                 XRRCrtcGamma * gammaInfo = XRRGetCrtcGamma(display, outputInfo->crtc);
@@ -546,7 +546,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                     // Source of the brightness formula: https://en.wikipedia.org/wiki/Relative_luminance
                     if(brightnessPercent > 0){
                         QString  softBrightness = QString::number(brightnessPercent, 'g', 3) + " %";
-                        addChild(outputItem, label_softBrightness, softBrightness);
+                        addChild(outputItem, QObject::tr("Brightness (software)"), softBrightness);
                     }
                     XRRFreeGamma(gammaInfo);
                 }
@@ -561,10 +561,10 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             // Get other details (monitor size, possible configurations and properties)
             // Add monitor size
             double diagonal = sqrt(pow(outputInfo->mm_width, 2) + pow(outputInfo->mm_height, 2)) * MILLIMETERS_PER_INCH;
-            addChild(outputItem, label_size, format_monWidth + format_monHeight + format_monDiagonal);
+            addChild(outputItem, QObject::tr("Size"), QObject::tr("%n mm x ", NULL, outputInfo->mm_width) + QObject::tr("%n mm ", NULL, outputInfo->mm_height) + QObject::tr("(%n inches)", NULL, diagonal));
 
             // Create the root QTreeWidgetItem of the possible modes (resolution, Refresh rate, HSync, VSync, etc) list
-            QTreeWidgetItem * modeListItem = new QTreeWidgetItem(QStringList() << label_supportedModes);
+            QTreeWidgetItem * modeListItem = new QTreeWidgetItem(QStringList() << QObject::tr("Supported modes"));
             outputItem->addChild(modeListItem);
 
             for(int modeIndex = 0; modeIndex < outputInfo->nmode; modeIndex++){ // For each possible mode
@@ -589,13 +589,13 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                             horizontalRefreshRate = getHorizontalRefreshRate(modeInfo);
 
                     if(verticalRefreshRate > 0)
-                        modeDetails += QString::number(verticalRefreshRate, 'g', 3) + label_verticalHz;
+                        modeDetails += QString::number(verticalRefreshRate, 'g', 3) + QObject::tr(" Hz vertical, ");
 
                     if(horizontalRefreshRate > 0)
-                        modeDetails += QString::number(horizontalRefreshRate / 1000, 'g', 3) + label_horizontalKHz;
+                        modeDetails += QString::number(horizontalRefreshRate / 1000, 'g', 3) + QObject::tr(" KHz horizontal, ");
 
                     if(modeInfo->dotClock > 0)
-                        modeDetails += QString::number((float) modeInfo->dotClock / 1000000, 'g', 3) + label_dotClock;
+                        modeDetails += QString::number((float) modeInfo->dotClock / 1000000, 'g', 3) + QObject::tr(" MHz dot clock");
                 }
 
                 // Check possible mode flags
@@ -613,7 +613,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             }
 
             // Create the root QTreeWidgetItem of the property list
-            QTreeWidgetItem * propertyListItem = new QTreeWidgetItem(QStringList() << label_properties);
+            QTreeWidgetItem * propertyListItem = new QTreeWidgetItem(QStringList() << QObject::tr("Properties"));
             outputItem->addChild(propertyListItem);
 
             // Get this output properties (EDID, audio, scaling mode, etc)
@@ -672,7 +672,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                         qWarning() << screenIndex << '/' << outputInfo->name << ": can't parse EDID, invalid header";
                     } else { // Valid header
                         // Add the monitor name to the tree as value of the Output Item
-                        outputItem->setText(1, label_connectedWith + getMonitorName(propertyRawData));
+                        outputItem->setText(1, QObject::tr("Connected with ") + getMonitorName(propertyRawData));
 
                         // Get the serial number
                         // For reference: https://github.com/KDE/libkscreen/blob/master/src/edid.cpp#L288-L295
@@ -680,8 +680,8 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                         serialNumber += propertyRawData[EDID_OFFSET_SERIAL_NUMBER + 1] * 0x100;
                         serialNumber += propertyRawData[EDID_OFFSET_SERIAL_NUMBER + 2] * 0x10000;
                         serialNumber += propertyRawData[EDID_OFFSET_SERIAL_NUMBER + 3] * 0x1000000;
-                        QString serial = (serialNumber > 0) ? QString::number(serialNumber) : label_notAvailable;
-                        addChild(propertyListItem, label_serialNumber, serial);
+                        QString serial = (serialNumber > 0) ? QString::number(serialNumber) : QObject::tr("Not available");
+                        addChild(propertyListItem, QObject::tr("Serial number"), serial);
                     }
                     //End of EDID
                 } else { //Not EDID
@@ -742,7 +742,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             XRRFreeOutputInfo(outputInfo);
         }
         // Screen completed: print output count (connected and active) and deallocate screenResources
-        outputListItem->setText(1, format_outputConnected + format_outputActive);
+        outputListItem->setText(1, QObject::tr("%n connected, ", NULL, screenConnectedOutputs) + QObject::tr("%n active", NULL, screenActiveOutputs));
         XRRFreeScreenResources(screenResources);
     }
 
@@ -758,7 +758,7 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
         break;
     case FGLRX:
     case DRIVER_UNKNOWN: {
-        list.append(new QTreeWidgetItem(QStringList() << label_noInfo));
+        list.append(new QTreeWidgetItem(QStringList() << QObject::tr("No info")));
     }
     }
 
