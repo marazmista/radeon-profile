@@ -75,7 +75,7 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 
     device.setPwmManualControl(true);
 
-    adjustFanSpeed(true);
+    adjustFanSpeed();
 }
 
 void radeon_profile::changeProfileFromCombo() {
@@ -154,7 +154,7 @@ void radeon_profile::setGraphOffset(const bool &checked) {
 
 void radeon_profile::changeEvent(QEvent *event)
 {
-    if(event->type() == QEvent::WindowStateChange && ui->cb_minimizeTray->isChecked()) {
+    if (event->type() == QEvent::WindowStateChange && ui->cb_minimizeTray->isChecked()) {
         if(isMinimized())
             this->hide();
 
@@ -365,7 +365,7 @@ void radeon_profile::on_btn_addFanStep_clicked()
     if (temperature == -1) // User clicked Cancel
         return;
 
-    if (fanSteps.contains(temperature)) // A step with this temperature already exists
+    if (currentFanProfile.contains(temperature)) // A step with this temperature already exists
         QMessageBox::warning(this, label_error, label_howToEdit);
     else { // This step does not exist, proceed
         const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, label_fanSpeedRange);
@@ -390,8 +390,8 @@ void radeon_profile::on_btn_removeFanStep_clicked()
     // The selected item can be removed, remove it
     int temperature = current->text(0).toInt();
 
-    fanSteps.remove(temperature);
-    adjustFanSpeed(true);
+    currentFanProfile.remove(temperature);
+    adjustFanSpeed();
 
     // Remove the step from the list and from the graph
     delete current;
@@ -415,7 +415,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
         newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, label_temperature);
         if(newTemp != -1){
             newSpeed = oldSpeed;
-            fanSteps.remove(oldTemp);
+            currentFanProfile.remove(oldTemp);
             delete item;
             ui->plotFanProfile->graph(0)->removeData(oldTemp);
             addFanStep(newTemp,newSpeed);
@@ -465,4 +465,20 @@ void radeon_profile::on_btn_applyOverclock_clicked(){
 
 void radeon_profile::on_slider_overclock_valueChanged(const int value){
     ui->label_overclockPercentage->setText(QString::number(value));
+}
+
+void radeon_profile::on_combo_fanProfiles_currentTextChanged(const QString &arg1)
+{
+    makeFanProfileListaAndGraph(fanProfiles.value(arg1));
+}
+
+void radeon_profile::on_btn_removeFanProfile_clicked()
+{
+    if (ui->combo_fanProfiles->currentText() == "default") {
+        QMessageBox::information(this, "", tr("Cannot remove default profile."), QMessageBox::Ok);
+        return;
+    }
+
+    fanProfiles.remove(ui->combo_fanProfiles->currentText());
+    ui->combo_fanProfiles->removeItem(ui->combo_fanProfiles->currentIndex());
 }

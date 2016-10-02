@@ -33,7 +33,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     ui(new Ui::radeon_profile)
 {
     ui->setupUi(this);
-    timer = new QTimer();
+    timer = new QTimer(this);
     execsRunning = new QList<execBin*>();
 
     // checks if running as root
@@ -348,33 +348,29 @@ void radeon_profile::timerEvent() {
     refreshTooltip();
 }
 
-void radeon_profile::adjustFanSpeed(const bool force)
-{
-    // If 'force' is true skip all checks, otherwise check if PWM is available and enabled by the user and if the temperature has changed
-    if (force || (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore)) {
-
-        if (fanSteps.contains(device.gpuTemeperatureData.current)) {  // Exact match
-            device.setPwmValue(device.features.pwmMaxSpeed * fanSteps.value(device.gpuTemeperatureData.current) / 100);
+void radeon_profile::adjustFanSpeed() {
+    if (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore) {
+        if (currentFanProfile.contains(device.gpuTemeperatureData.current)) {  // Exact match
+            device.setPwmValue(device.features.pwmMaxSpeed * currentFanProfile.value(device.gpuTemeperatureData.current) / 100);
             return;
         }
 
         // find bounds of current temperature
-        const QMap<int,unsigned int>::const_iterator high = fanSteps.upperBound(device.gpuTemeperatureData.current),
+        const QMap<int,unsigned int>::const_iterator high = currentFanProfile.upperBound(device.gpuTemeperatureData.current),
                 low = high - 1;
 
         int hSpeed = high.value(),
                 lSpeed = low.value();
 
-        if (high == fanSteps.constBegin()) {
+        if (high == currentFanProfile.constBegin()) {
             device.setPwmValue(device.features.pwmMaxSpeed * hSpeed / 100);
             return;
         }
 
-        if (low == fanSteps.constEnd()) {
+        if (low == currentFanProfile.constEnd()) {
             device.setPwmValue(device.features.pwmMaxSpeed * lSpeed / 100);
             return;
         }
-
 
         // calculate two point stright line equation based on boundaries of current temperature
         // y = mx + b = (y2-y1)/(x2-x1)*(x-x1)+y1
@@ -470,51 +466,46 @@ void radeon_profile::configureDaemonAutoRefresh (bool enabled, int interval) {
     device.reconfigureDaemon();
 }
 
-bool radeon_profile::fanStepIsValid(const int temperature, const int fanSpeed){
-    return temperature >= minFanStepsTemp &&
-            temperature <= maxFanStepsTemp &&
-            fanSpeed >= minFanStepsSpeed &&
-            fanSpeed <= maxFanStepsSpeed;
+void radeon_profile::setCurrentFanProfile(const fanProfileSteps &profile) {
+    currentFanProfile = profile;
+    adjustFanSpeed();
 }
 
-bool radeon_profile::addFanStep(const int temperature,
-                                const int fanSpeed,
-                                const bool alsoToList,
-                                const bool alsoToGraph,
-                                const bool alsoAdjustSpeed){
-
-    if (!fanStepIsValid(temperature, fanSpeed)) {
-        qWarning() << "Invalid value, can't be inserted into the fan step list:" << temperature << fanSpeed;
-        return false;
-    }
-
-    qDebug() << "Adding step to fanSteps" << temperature << fanSpeed;
-    fanSteps.insert(temperature,fanSpeed);
-
-    if (alsoToList){
-        qDebug() << "Adding step to list_fanSteps";
-        const QString temperatureString = QString::number(temperature),
-                speedString = QString::number(fanSpeed);
-        const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString,Qt::MatchExactly);
-
-        if(existing.isEmpty()){ // The element does not exist
-            ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << temperatureString << speedString));
-            ui->list_fanSteps->sortItems(0, Qt::AscendingOrder);
-        } else // The element exists already, overwrite it
-            existing.first()->setText(1,speedString);
-    }
-
-    if (alsoToGraph){
-        qDebug() << "Adding step to plotFanProfile";
-        ui->plotFanProfile->graph(0)->removeData(temperature);
-        ui->plotFanProfile->graph(0)->addData(temperature, fanSpeed);
-        ui->plotFanProfile->replot();
-    }
-
-    if (alsoAdjustSpeed){
-        qDebug() << "Adjusting fan speed";
-        adjustFanSpeed(true);
-    }
-
-    return true;
+void radeon_profile::on_btn_activateFanProfile_clicked()
+{
+    setCurrentFanProfile(fanProfiles.value(ui->combo_fanProfiles->currentText()));
+    ui->l_currentFanProfile->setText(ui->combo_fanProfiles->currentText());
 }
+
+void radeon_profile::on_btn_saveFanProfile_clicked()
+{
+    fanProfiles.insert(ui->combo_fanProfiles->currentText(), stepsListToMap());
+    setCurrentFanProfile(stepsListToMap());
+}
+
+void radeon_profile::on_btn_saveAsFanProfile_clicked()
+{
+    QString name =  QInputDialog::getText(this, "", tr("Fan profile name:"));
+
+    if (name.contains('|')) {
+        QMessageBox::information(this, "", tr("Profile name musn't contain '|' character."), QMessageBox::Ok);
+        return;
+    }
+
+    if (fanProfiles.contains(name)) {
+        QMessageBox::information(this, "", tr("Cannot add another profile with the same name that already exists."),QMessageBox::Ok);
+        return;
+    }
+
+    ui->combo_fanProfiles->addItem(name);
+    fanProfiles.insert(name, stepsListToMap());
+}
+
+radeon_profile::fanProfileSteps radeon_profile::stepsListToMap() {
+    fanProfileSteps steps;
+    for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++ i)
+        steps.insert(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(),ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
+
+    return steps;
+}
+

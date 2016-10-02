@@ -58,6 +58,8 @@ class radeon_profile : public QMainWindow
         LOG_FILE_DATE_APPEND
     };
 
+    typedef QMap<int, unsigned int> fanProfileSteps;
+
 
 public:
     explicit radeon_profile(QStringList, QWidget *parent = 0);
@@ -136,11 +138,24 @@ private slots:
     void on_slider_overclock_valueChanged(int value);
     void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
 
+    void on_combo_fanProfiles_currentTextChanged(const QString &arg1);
+
+    void on_btn_activateFanProfile_clicked();
+
+    void on_btn_removeFanProfile_clicked();
+
+    void on_btn_saveFanProfile_clicked();
+
+    void on_btn_saveAsFanProfile_clicked();
+
 private:
     gpu device;
     static const QString settingsPath;
     QList<execBin*> *execsRunning;
-    QMap<int, unsigned int> fanSteps;
+
+    fanProfileSteps currentFanProfile;
+    QMap<QString, fanProfileSteps> fanProfiles;
+
     QMap<QString, unsigned int> pmStats;
     unsigned int rangeX = 180, ticksCounter = 0, statsTickCounter = 0;
 
@@ -166,15 +181,12 @@ private:
     void loadFanProfiles();
     void saveFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
-    void makeFanProfileGraph();
+    void makeFanProfileListaAndGraph(const fanProfileSteps &profile);
     void refreshUI();
     void connectSignals();
-
-    /**
-     * @brief adjustFanSpeed Sets the PWM fan speed indicated for the actual temperature on the fan profile.
-     * @param force Adjust the fan speed even if the temperature has not changed
-     */
-    void adjustFanSpeed(bool force = false);
+    void setCurrentFanProfile(const fanProfileSteps &profile);
+    void adjustFanSpeed();
+    fanProfileSteps stepsListToMap();
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.
@@ -201,12 +213,9 @@ private:
      * If another step with the same temperature exists already it is overwritten.
      * @param temperature
      * @param fanSpeed
-     * @param alsoToList Adds the step also to the ui->list_fanSteps list.
-     * @param alsoToGraph Adds the step also to the fan steps graph (does NOT replot).
-     * @param alsoAdjustSpeed Updates the fan speed after adding the step.
      * @return If the operation was successful.
      */
-    bool addFanStep (int temperature, int fanSpeed, bool alsoToList = true, bool alsoToGraph = true, bool alsoAdjustSpeed = true);
+    void addFanStep (int temperature, int fanSpeed);
 };
 
 #endif // RADEON_PROFILE_H

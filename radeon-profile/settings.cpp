@@ -194,48 +194,104 @@ void radeon_profile::loadConfig() {
 
 void radeon_profile::loadFanProfiles() {
     QFile fsPath(fanStepsPath);
+
     if (fsPath.open(QIODevice::ReadOnly)) {
-        QString profile = QString(fsPath.readAll());
+        QStringList profiles = QString(fsPath.readAll()).split('\n',QString::SkipEmptyParts);
 
-        QStringList steps = profile.split("|",QString::SkipEmptyParts);
+        for (QString profileLine : profiles) {
+            QStringList profileData = profileLine.split("|",QString::SkipEmptyParts);
 
-        if (steps.count() > 1) {
-            for (int i = 1; i < steps.count(); ++i) {
-                QStringList pair = steps[i].split("#");
-                addFanStep(pair[0].toInt(),pair[1].toInt(), true, true, false);
+            fanProfileSteps p;
+
+            for (int i = 1; i < profileData.count(); ++i) {
+                QStringList pair = profileData[i].split("#");
+                p.insert(pair[0].toInt(),pair[1].toInt());
             }
 
-            fsPath.close();
+
+            ui->combo_fanProfiles->addItem(profileData[0]);
+            fanProfiles.insert(profileData[0], p);
         }
+
+        fsPath.close();
     } else {
         //default profile if no file found
-        addFanStep(0,20,true, true, false);
-        addFanStep(65,100,true, true, false);
-        addFanStep(90,100, true, true, false);
 
+        fanProfileSteps p;
+        p.insert(0,20);
+        p.insert(65,100);
+        p.insert(90,100);
+
+        fanProfiles.insert("default", p);
     }
+
+    currentFanProfile = fanProfiles.value("default");
+    makeFanProfileListaAndGraph(currentFanProfile);
 
 }
 
-void radeon_profile::makeFanProfileGraph() {
+void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {
     ui->plotFanProfile->graph(0)->clearData();
+    ui->list_fanSteps->clear();
 
-    for (int temperature : fanSteps.keys())
-        ui->plotFanProfile->graph(0)->addData(temperature, fanSteps.value(temperature));
+    for (int temperature : profile.keys()) {
+        ui->plotFanProfile->graph(0)->addData(temperature, profile.value(temperature));
+        ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.value(temperature))));
+    }
 
     ui->plotFanProfile->replot();
 }
 
 void radeon_profile::saveFanProfiles() {
     QFile fsPath(fanStepsPath);
-    if (fsPath.open(QIODevice::WriteOnly)) {
-        QString profile = "default|";
-        for (int temperature : fanSteps.keys())
-            profile.append(QString::number(temperature)+ "#" + QString::number(fanSteps.value(temperature))  + "|");
 
-        fsPath.write(profile.toLatin1());
+    if (fsPath.open(QIODevice::WriteOnly)) {
+        QString profileString;
+
+        for (QString profile : fanProfiles.keys()) {
+            profileString.append(profile+"|");
+
+            fanProfileSteps steps = fanProfiles.value(profile);
+
+            for (int temperature : steps.keys())
+                profileString.append(QString::number(temperature)+ "#" + QString::number(steps.value(temperature))  + "|");
+
+
+            profileString.append('\n');
+        }
+
+        fsPath.write(profileString.toLatin1());
         fsPath.close();
     }
+}
+
+bool radeon_profile::fanStepIsValid(const int temperature, const int fanSpeed) {
+    return temperature >= minFanStepsTemp &&
+            temperature <= maxFanStepsTemp &&
+            fanSpeed >= minFanStepsSpeed &&
+            fanSpeed <= maxFanStepsSpeed;
+}
+
+void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
+
+    if (!fanStepIsValid(temperature, fanSpeed)) {
+        qWarning() << "Invalid value, can't be inserted into the fan step list:" << temperature << fanSpeed;
+        return;
+    }
+
+    currentFanProfile.insert(temperature,fanSpeed);
+
+    const QString temperatureString = QString::number(temperature),
+            speedString = QString::number(fanSpeed);
+    const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString,Qt::MatchExactly);
+
+    if (existing.isEmpty()) { // The element does not exist
+        ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << temperatureString << speedString));
+        ui->list_fanSteps->sortItems(0, Qt::AscendingOrder);
+    } else // The element exists already, overwrite it
+        existing.first()->setText(1,speedString);
+
+    makeFanProfileListaAndGraph(currentFanProfile);
 }
 
 void radeon_profile::showWindow() {

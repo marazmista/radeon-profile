@@ -160,9 +160,9 @@
       <widget class="QLabel" name="l_fanSpeed">
        <property name="geometry">
         <rect>
-         <x>530</x>
+         <x>529</x>
          <y>0</y>
-         <width>70</width>
+         <width>71</width>
          <height>50</height>
         </rect>
        </property>
@@ -1418,8 +1418,14 @@
         </item>
         <item>
          <widget class="QStackedWidget" name="fanModesTabs">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="page"/>
           <widget class="QWidget" name="page_fixed">
@@ -1505,17 +1511,199 @@
            </widget>
           </widget>
           <widget class="QWidget" name="page_profile">
-           <layout class="QHBoxLayout" name="horizontalLayout_10">
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_15">
-              <property name="sizeConstraint">
-               <enum>QLayout::SetDefaultConstraint</enum>
+           <layout class="QGridLayout" name="gridLayout_13">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="spacing">
+             <number>2</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QWidget" name="widget_3" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>211</width>
+                <height>101</height>
+               </size>
               </property>
-              <item>
+              <property name="maximumSize">
+               <size>
+                <width>211</width>
+                <height>101</height>
+               </size>
+              </property>
+              <widget class="QComboBox" name="combo_fanProfiles">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>30</y>
+                 <width>131</width>
+                 <height>22</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btn_activateFanProfile">
+               <property name="geometry">
+                <rect>
+                 <x>140</x>
+                 <y>30</y>
+                 <width>71</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Activate</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_14">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>91</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Current profile:</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="l_currentFanProfile">
+               <property name="geometry">
+                <rect>
+                 <x>90</x>
+                 <y>0</y>
+                 <width>111</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btn_saveFanProfile">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>57</y>
+                 <width>91</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Save</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btn_saveAsFanProfile">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>80</y>
+                 <width>91</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Save as</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btn_removeFanProfile">
+               <property name="geometry">
+                <rect>
+                 <x>120</x>
+                 <y>80</y>
+                 <width>91</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Remove profile</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
+            <item row="0" column="1" rowspan="2">
+             <widget class="QCustomPlot" name="plotFanProfile" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>300</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="1" column="0">
+               <widget class="QPushButton" name="btn_addFanStep">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>101</width>
+                  <height>21</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>101</width>
+                  <height>21</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Add step</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="btn_removeFanStep">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>101</width>
+                  <height>21</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>101</width>
+                  <height>21</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Remove step</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="2">
                <widget class="QTreeWidget" name="list_fanSteps">
                 <property name="maximumSize">
                  <size>
-                  <width>211</width>
+                  <width>208</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -1534,59 +1722,7 @@
                 </column>
                </widget>
               </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_9">
-                <item>
-                 <widget class="QPushButton" name="btn_addFanStep">
-                  <property name="minimumSize">
-                   <size>
-                    <width>101</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>101</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Add step</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="btn_removeFanStep">
-                  <property name="minimumSize">
-                   <size>
-                    <width>101</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>101</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Remove step</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
              </layout>
-            </item>
-            <item>
-             <widget class="QCustomPlot" name="plotFanProfile" native="true">
-              <property name="minimumSize">
-               <size>
-                <width>300</width>
-                <height>0</height>
-               </size>
-              </property>
-             </widget>
             </item>
            </layout>
           </widget>
