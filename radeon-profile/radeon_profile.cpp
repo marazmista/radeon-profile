@@ -78,6 +78,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     if(ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
         ui->btn_applyOverclock->click();
 
+
     connectSignals();
 
     // timer init
@@ -181,8 +182,11 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     if (features.pwmAvailable && (globalStuff::globalConfig.rootMode || device.daemonConnected())) {
         qDebug() << "Fan control is available , configuring the fan control tab";
         ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
-        loadFanProfiles();
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
+
+        loadFanProfiles();
+        setupFanProfilesMenu();
+        ui->l_fanSpeed->setMenu(fanProfilesMenu);
 
         if (ui->cb_saveFanMode->isChecked()) {
             switch (ui->fanModesTabs->currentIndex()) {
@@ -466,21 +470,28 @@ void radeon_profile::configureDaemonAutoRefresh (bool enabled, int interval) {
     device.reconfigureDaemon();
 }
 
-void radeon_profile::setCurrentFanProfile(const fanProfileSteps &profile) {
+void radeon_profile::setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile) {
+    ui->l_currentFanProfile->setText(profileName);
     currentFanProfile = profile;
     adjustFanSpeed();
 }
 
 void radeon_profile::on_btn_activateFanProfile_clicked()
 {
-    setCurrentFanProfile(fanProfiles.value(ui->combo_fanProfiles->currentText()));
-    ui->l_currentFanProfile->setText(ui->combo_fanProfiles->currentText());
+    setCurrentFanProfile(ui->combo_fanProfiles->currentText(), fanProfiles.value(ui->combo_fanProfiles->currentText()));
+
+    for (QAction *a : fanProfilesMenu->actions()) {
+        if (a->text() == ui->combo_fanProfiles->currentText()) {
+            a->setChecked(true);
+            return;
+        }
+    }
 }
 
 void radeon_profile::on_btn_saveFanProfile_clicked()
 {
     fanProfiles.insert(ui->combo_fanProfiles->currentText(), stepsListToMap());
-    setCurrentFanProfile(stepsListToMap());
+    setCurrentFanProfile(ui->combo_fanProfiles->currentText(),stepsListToMap());
 }
 
 void radeon_profile::on_btn_saveAsFanProfile_clicked()
@@ -499,6 +510,7 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
 
     ui->combo_fanProfiles->addItem(name);
     fanProfiles.insert(name, stepsListToMap());
+    setupFanProfilesMenu(true);
 }
 
 radeon_profile::fanProfileSteps radeon_profile::stepsListToMap() {

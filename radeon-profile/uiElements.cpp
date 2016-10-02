@@ -86,20 +86,20 @@ void radeon_profile::setupGraphsStyle()
 }
 
 void radeon_profile::setupTrayIcon() {
-    trayMenu = new QMenu();
+    trayMenu = new QMenu(this);
     setWindowState(Qt::WindowMinimized);
     //close //
-    closeApp = new QAction(this);
+    closeApp = new QAction(trayMenu);
     closeApp->setText(label_quit);
     connect(closeApp,SIGNAL(triggered()),this,SLOT(closeFromTray()));
 
     // standard profiles
-    changeProfile = new QAction(this);
+    changeProfile = new QAction(trayMenu);
     changeProfile->setText(label_changeProfile);
     connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
 
     // refresh when hidden
-    refreshWhenHidden = new QAction(this);
+    refreshWhenHidden = new QAction(trayMenu);
     refreshWhenHidden->setCheckable(true);
     refreshWhenHidden->setChecked(true);
     refreshWhenHidden->setText(label_refreshWhenHidden);
@@ -108,9 +108,9 @@ void radeon_profile::setupTrayIcon() {
     dpmMenu = new QMenu(this);
     dpmMenu->setTitle(label_dpm);
 
-    dpmSetBattery = new QAction(this);
-    dpmSetBalanced = new QAction(this);
-    dpmSetPerformance = new QAction(this);
+    dpmSetBattery = new QAction(dpmMenu);
+    dpmSetBalanced = new QAction(dpmMenu);
+    dpmSetPerformance = new QAction(dpmMenu);
 
     dpmSetBattery->setText(label_battery);
     dpmSetBattery->setIcon(QIcon(":/icon/symbols/arrow1.png"));
@@ -150,18 +150,18 @@ void radeon_profile::setupOptionsMenu()
     optionsMenu = new QMenu(this);
     ui->btn_options->setMenu(optionsMenu);
 
-    QAction *resetMinMax = new QAction(this);
+    QAction *resetMinMax = new QAction(optionsMenu);
     resetMinMax->setText(label_resetMinMax);
 
-    QAction *resetGraphs = new QAction(this);
+    QAction *resetGraphs = new QAction(optionsMenu);
     resetGraphs->setText(label_resetGraphs);
 
-    QAction *showLegend = new QAction(this);
+    QAction *showLegend = new QAction(optionsMenu);
     showLegend->setText(label_showLegend);
     showLegend->setCheckable(true);
     showLegend->setChecked(true);
 
-    QAction *graphOffset = new QAction(this);
+    QAction *graphOffset = new QAction(optionsMenu);
     graphOffset->setText(label_graphOffset);
     graphOffset->setCheckable(true);
     graphOffset->setChecked(true);
@@ -181,13 +181,13 @@ void radeon_profile::setupOptionsMenu()
 void radeon_profile::setupForcePowerLevelMenu() {
     forcePowerMenu = new QMenu(this);
 
-    QAction *forceAuto = new QAction(this);
+    QAction *forceAuto = new QAction(forcePowerMenu);
     forceAuto->setText(label_auto);
 
-    QAction *forceLow = new QAction(this);
+    QAction *forceLow = new QAction(forcePowerMenu);
     forceLow->setText(label_low);
 
-    QAction *forceHigh = new QAction(this);
+    QAction *forceHigh = new QAction(forcePowerMenu);
     forceHigh->setText(label_high);
 
     forcePowerMenu->setTitle(label_forcePowerLevel);
@@ -220,5 +220,54 @@ void radeon_profile::setupContextMenus() {
     ui->list_stats->addAction(reset);
     connect(reset,SIGNAL(triggered()),this,SLOT(resetStats()));
 }
+
+
+void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
+    if (rebuildMode)
+        delete fanProfilesMenu;
+
+    fanProfilesMenu = new QMenu(this);
+    connect(fanProfilesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fanProfileMenuActionClicked(QAction*)));
+    QActionGroup *ag = new QActionGroup(fanProfilesMenu);
+
+    QAction *fanAuto = new QAction(fanProfilesMenu);
+    fanAuto->setText(tr("Auto"));
+    fanAuto->setCheckable(true);
+    fanAuto->setActionGroup(ag);
+    connect(fanAuto, SIGNAL(triggered()), this, SLOT(on_btn_pwmAuto_clicked()));
+
+    QAction *fanFixed = new QAction(fanProfilesMenu);
+    fanFixed->setText(tr("Fixed ") + ui->labelFixedSpeed->text()+"%");
+    fanFixed->setCheckable(true);
+    fanFixed->setActionGroup(ag);
+    connect(fanFixed, SIGNAL(triggered()), this, SLOT(on_btn_pwmFixed_clicked()));
+
+    fanProfilesMenu->addAction(fanAuto);
+    fanProfilesMenu->addAction(fanFixed);
+
+    fanProfilesMenu->addSeparator();
+
+    for (QString p : fanProfiles.keys()) {
+        QAction *a = new QAction(fanProfilesMenu);
+        a->setText(p);
+        a->setCheckable(true);
+        a->setActionGroup(ag);
+        fanProfilesMenu->addAction(a);
+    }
+}
+
+void radeon_profile::fanProfileMenuActionClicked(QAction *a) {
+    if (a->isSeparator())
+        return;
+
+    if (a == fanProfilesMenu->actions()[0] || a == fanProfilesMenu->actions()[1])
+        return;
+
+    if (!ui->btn_pwmProfile->isChecked())
+        ui->btn_pwmProfile->clicked(true);
+
+    setCurrentFanProfile(a->text(),fanProfiles.value(a->text()));
+}
+
 //========
 

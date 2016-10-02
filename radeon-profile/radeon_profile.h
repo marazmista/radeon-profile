@@ -68,7 +68,7 @@ public:
 
     QSystemTrayIcon *trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
-    QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu;
+    QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu, *fanProfilesMenu;
     QTimer *timer;
 
 private slots:
@@ -136,17 +136,12 @@ private slots:
     void on_cb_enableOverclock_toggled(bool enable);
     void on_btn_applyOverclock_clicked();
     void on_slider_overclock_valueChanged(int value);
-    void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
-
     void on_combo_fanProfiles_currentTextChanged(const QString &arg1);
-
     void on_btn_activateFanProfile_clicked();
-
     void on_btn_removeFanProfile_clicked();
-
     void on_btn_saveFanProfile_clicked();
-
     void on_btn_saveAsFanProfile_clicked();
+    void fanProfileMenuActionClicked(QAction *a);
 
 private:
     gpu device;
@@ -184,9 +179,11 @@ private:
     void makeFanProfileListaAndGraph(const fanProfileSteps &profile);
     void refreshUI();
     void connectSignals();
-    void setCurrentFanProfile(const fanProfileSteps &profile);
+    void setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile);
     void adjustFanSpeed();
     fanProfileSteps stepsListToMap();
+    void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
+    void setupFanProfilesMenu(const bool rebuildMode = false);
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.

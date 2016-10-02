@@ -57,6 +57,8 @@ void radeon_profile::on_btn_pwmFixedApply_clicked()
 
 void radeon_profile::on_btn_pwmFixed_clicked()
 {
+    ui->btn_pwmFixed->setChecked(true);
+    fanProfilesMenu->actions()[1]->setChecked(true);
     ui->fanModesTabs->setCurrentIndex(1);
 
     device.setPwmManualControl(true);
@@ -65,17 +67,19 @@ void radeon_profile::on_btn_pwmFixed_clicked()
 
 void radeon_profile::on_btn_pwmAuto_clicked()
 {
+    ui->btn_pwmAuto->setChecked(true);
+    fanProfilesMenu->actions()[0]->setChecked(true);
     device.setPwmManualControl(false);
     ui->fanModesTabs->setCurrentIndex(0);
 }
 
 void radeon_profile::on_btn_pwmProfile_clicked()
 {
+    ui->btn_pwmProfile->setChecked(true);
     ui->fanModesTabs->setCurrentIndex(2);
 
     device.setPwmManualControl(true);
-
-    adjustFanSpeed();
+    on_btn_activateFanProfile_clicked();
 }
 
 void radeon_profile::changeProfileFromCombo() {
@@ -481,4 +485,5 @@ void radeon_profile::on_btn_removeFanProfile_clicked()
 
     fanProfiles.remove(ui->combo_fanProfiles->currentText());
     ui->combo_fanProfiles->removeItem(ui->combo_fanProfiles->currentIndex());
+    setupFanProfilesMenu(true);
 }
