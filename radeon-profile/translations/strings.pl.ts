@@ -534,13 +534,13 @@ Rozmiar</translation>
         <location filename="../radeon_profile.ui" line="641"/>
         <location filename="../uiElements.cpp" line="188"/>
         <source>Low</source>
-        <translation>Basso</translation>
+        <translation>Min</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="654"/>
         <location filename="../uiElements.cpp" line="191"/>
         <source>High</source>
-        <translation>Alto</translation>
+        <translation>Max</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="672"/>
