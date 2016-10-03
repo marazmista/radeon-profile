@@ -42,6 +42,7 @@ void radeon_profile::saveConfig() {
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
     settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
     settings.setValue("fanMode",ui->fanModesTabs->currentIndex());
+    settings.setValue("fanProfileName",ui->l_currentFanProfile->text());
 
     settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
     settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
@@ -102,8 +103,10 @@ void radeon_profile::loadConfig() {
     ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
     ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",80).toInt());
     ui->cb_saveFanMode->setChecked(settings.value("saveSelectedFanMode",false).toBool());
-    if (ui->cb_saveFanMode->isChecked())
+    if (ui->cb_saveFanMode->isChecked()) {
         ui->fanModesTabs->setCurrentIndex(settings.value("fanMode",0).toInt());
+        ui->l_currentFanProfile->setText(settings.value("fanProfileName","default").toString());
+    }
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
     optionsMenu->actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());
@@ -225,9 +228,7 @@ void radeon_profile::loadFanProfiles() {
         fanProfiles.insert("default", p);
     }
 
-    currentFanProfile = fanProfiles.value("default");
-    makeFanProfileListaAndGraph(currentFanProfile);
-
+    ui->combo_fanProfiles->setCurrentText(ui->l_currentFanProfile->text());
 }
 
 void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {

@@ -258,19 +258,3 @@ void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
 
     ui->l_fanSpeed->setMenu(fanProfilesMenu);
 }
-
-void radeon_profile::fanProfileMenuActionClicked(QAction *a) {
-    if (a->isSeparator())
-        return;
-
-    if (a == fanProfilesMenu->actions()[0] || a == fanProfilesMenu->actions()[1])
-        return;
-
-    if (!ui->btn_pwmProfile->isChecked())
-        ui->btn_pwmProfile->clicked(true);
-
-    setCurrentFanProfile(a->text(),fanProfiles.value(a->text()));
-}
-
-//========
-

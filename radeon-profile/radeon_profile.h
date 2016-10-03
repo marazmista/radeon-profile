@@ -186,7 +186,7 @@ private:
     fanProfileSteps stepsListToMap();
     void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
     void setupFanProfilesMenu(const bool rebuildMode = false);
-
+    int findCurrentFanProfileMenuIndex();
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.
      * @param enabled If true enables auto-refresh, otherwise disables it.

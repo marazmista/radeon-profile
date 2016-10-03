@@ -1410,7 +1410,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="page"/>
           <widget class="QWidget" name="page_fixed">
@@ -1572,7 +1572,7 @@
                 </rect>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string/>
                </property>
               </widget>
               <widget class="QPushButton" name="btn_saveFanProfile">
