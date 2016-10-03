@@ -464,12 +464,12 @@ Rozmiar</translation>
     <message>
         <location filename="../radeon_profile.ui" line="299"/>
         <source>GPU voltage</source>
-        <translation>Napięcie GPU</translation>
+        <translation>Napięcie rdzenia GPU (vddc)</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="339"/>
         <source>I/O voltage</source>
-        <translation>Napięcie I/O</translation>
+        <translation type="unfinished">Napięcie I/O (vddci) </translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="391"/>
@@ -712,7 +712,7 @@ Rozmiar</translation>
         <location filename="../radeon_profile.ui" line="1149"/>
         <source>Be careful! Overclock can harm your GPU, use it only if you know what you are doing!</source>
         <oldsource>Be careful! Overclock can harm your GPU, use it at your own risk!</oldsource>
-        <translation type="unfinished">Bądź ostrożny! Podkręcanie może trwale uszkodzić elementy komputera.</translation>
+        <translation>Bądź ostrożny! Podkręcanie może trwale uszkodzić elementy komputera.</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1174"/>
@@ -1282,7 +1282,7 @@ Rozmiar</translation>
         <location filename="../radeon_profile.cpp" line="273"/>
         <location filename="../uiElements.cpp" line="51"/>
         <source>GPU voltage (vddc)</source>
-        <translation>Napięcie GPU</translation>
+        <translation>Napięcie rdzenia GPU (vddc)</translation>
     </message>
     <message>
         <source>Your driver or your GPU does not support overclocking</source>

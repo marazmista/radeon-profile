@@ -272,7 +272,7 @@ void radeon_profile::refreshUI() {
         if (device.gpuClocksData.coreVolt != -1)
             addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuClocksDataString.memVolt);
         if (device.gpuClocksData.memVolt != -1)
-            addChild(ui->list_currentGPUData, ("I/O voltage (vddci)"), device.gpuClocksDataString.coreVolt);
+            addChild(ui->list_currentGPUData, tr("I/O voltage (vddci)"), device.gpuClocksDataString.coreVolt);
 
         if (ui->list_currentGPUData->topLevelItemCount() == 0)
             addChild(ui->list_currentGPUData, tr("Can't read data"), tr("You need debugfs mounted and either root rights or the daemon running"));
