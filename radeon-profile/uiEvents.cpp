@@ -160,15 +160,17 @@ void radeon_profile::setGraphOffset(const bool &checked) {
 void radeon_profile::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::WindowStateChange && ui->cb_minimizeTray->isChecked()) {
-        if(isMinimized())
+        if (isMinimized())
             this->hide();
 
-        event->ignore();
+        event->accept();
+        return;
     }
-    if (event->type() == QEvent::Close && ui->cb_closeTray) {
-        this->hide();
-        event->ignore();
-    }
+
+//    if (event->type() == QEvent::Close && ui->cb_closeTray->isChecked()) {
+//        this->hide();
+//        event->accept();
+//    }
 }
 
 void radeon_profile::gpuChanged()
@@ -196,18 +198,19 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     if (ui->cb_closeTray->isChecked() && !closeFromTrayMenu) {
         this->hide();
         e->ignore();
-    } else {
-
-        timer->stop();
-        saveConfig();
-
-        if (device.features.pwmAvailable) {
-            device.setPwmManualControl(false);
-            saveFanProfiles();
-        }
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
-        QApplication::quit();
+        return;
     }
+
+    timer->stop();
+    saveConfig();
+
+    if (device.features.pwmAvailable) {
+        device.setPwmManualControl(false);
+        saveFanProfiles();
+    }
+
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
+    QApplication::quit();
 }
 
 void radeon_profile::closeFromTray() {

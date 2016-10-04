@@ -296,6 +296,9 @@ void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
 }
 
 void radeon_profile::showWindow() {
+    if (ui->cb_minimizeTray->isChecked() && ui->cb_startMinimized->isChecked())
+        return;
+
     if (ui->cb_startMinimized->isChecked())
         this->showMinimized();
     else
