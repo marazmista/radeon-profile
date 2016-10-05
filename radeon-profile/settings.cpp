@@ -227,8 +227,6 @@ void radeon_profile::loadFanProfiles() {
 
         fanProfiles.insert("default", p);
     }
-
-    ui->combo_fanProfiles->setCurrentText(ui->l_currentFanProfile->text());
 }
 
 void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {

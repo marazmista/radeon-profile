@@ -10,6 +10,7 @@
 #include <QClipboard>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QMenu>
 
 bool closeFromTrayMenu;
 
@@ -557,8 +558,10 @@ void radeon_profile::fanProfileMenuActionClicked(QAction *a) {
     if (a == fanProfilesMenu->actions()[0] || a == fanProfilesMenu->actions()[1])
         return;
 
-    if (!ui->btn_pwmProfile->isChecked())
-        ui->btn_pwmProfile->clicked(true);
+    if (!ui->btn_pwmProfile->isChecked()) {
+        ui->btn_pwmProfile->click();
+        ui->btn_pwmProfile->setChecked(true);
+    }
 
     setCurrentFanProfile(a->text(),fanProfiles.value(a->text()));
 }
