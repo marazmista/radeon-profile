@@ -167,11 +167,6 @@ void radeon_profile::changeEvent(QEvent *event)
         event->accept();
         return;
     }
-
-//    if (event->type() == QEvent::Close && ui->cb_closeTray->isChecked()) {
-//        this->hide();
-//        event->accept();
-//    }
 }
 
 void radeon_profile::gpuChanged()
