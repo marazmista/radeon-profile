@@ -300,12 +300,12 @@ void radeon_profile::updateExecLogs() {
 // === Main timer loop  === //
 void radeon_profile::timerEvent() {
     if (!refreshWhenHidden->isChecked() && this->isHidden()) {
+
         // even if in tray, keep the fan control active (if enabled)
-        device.getTemperature();
-
-        if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked())
+        if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked()) {
+            device.getTemperature();
             adjustFanSpeed();
-
+        }
         return;
     }
 
