@@ -10,6 +10,7 @@
 #include <QClipboard>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QMenu>
 
 bool closeFromTrayMenu;
 
@@ -160,14 +161,11 @@ void radeon_profile::setGraphOffset(const bool &checked) {
 void radeon_profile::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::WindowStateChange && ui->cb_minimizeTray->isChecked()) {
-        if(isMinimized())
+        if (isMinimized())
             this->hide();
 
-        event->ignore();
-    }
-    if (event->type() == QEvent::Close && ui->cb_closeTray) {
-        this->hide();
-        event->ignore();
+        event->accept();
+        return;
     }
 }
 
@@ -196,18 +194,19 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     if (ui->cb_closeTray->isChecked() && !closeFromTrayMenu) {
         this->hide();
         e->ignore();
-    } else {
-
-        timer->stop();
-        saveConfig();
-
-        if (device.features.pwmAvailable) {
-            device.setPwmManualControl(false);
-            saveFanProfiles();
-        }
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
-        QApplication::quit();
+        return;
     }
+
+    timer->stop();
+    saveConfig();
+
+    if (device.features.pwmAvailable) {
+        device.setPwmManualControl(false);
+        saveFanProfiles();
+    }
+
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
+    QApplication::quit();
 }
 
 void radeon_profile::closeFromTray() {
@@ -554,8 +553,10 @@ void radeon_profile::fanProfileMenuActionClicked(QAction *a) {
     if (a == fanProfilesMenu->actions()[0] || a == fanProfilesMenu->actions()[1])
         return;
 
-    if (!ui->btn_pwmProfile->isChecked())
-        ui->btn_pwmProfile->clicked(true);
+    if (!ui->btn_pwmProfile->isChecked()) {
+        ui->btn_pwmProfile->click();
+        ui->btn_pwmProfile->setChecked(true);
+    }
 
     setCurrentFanProfile(a->text(),fanProfiles.value(a->text()));
 }

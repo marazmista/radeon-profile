@@ -469,7 +469,7 @@ Rozmiar</translation>
     <message>
         <location filename="../radeon_profile.ui" line="339"/>
         <source>I/O voltage</source>
-        <translation type="unfinished">Napięcie I/O (vddci) </translation>
+        <translation>Napięcie I/O (vddci) </translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="391"/>
@@ -1137,7 +1137,7 @@ Rozmiar</translation>
     <message>
         <location filename="../radeon_profile.ui" line="3325"/>
         <source>Save selected fan control mode</source>
-        <translation type="unfinished">Zapisz ustawienia kontroli wentylatora</translation>
+        <translation>Zapisz ustawienia kontroli wentylatora</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="3626"/>
