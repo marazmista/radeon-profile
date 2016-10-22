@@ -8,14 +8,10 @@
         <source>Unknown</source>
         <translation>Nieznany</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <location filename="../gpu.cpp" line="450"/>
-        <source>Virtual screen n°%n</source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <source>Virtual screen nÂ°%n</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../gpu.cpp" line="456"/>
@@ -38,24 +34,16 @@
         <source>Virtual size</source>
         <translation>Rozmiar wirtualny</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <location filename="../gpu.cpp" line="470"/>
         <location filename="../gpu.cpp" line="564"/>
         <source>%n mm x </source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <location filename="../gpu.cpp" line="470"/>
         <source>%n mm</source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../gpu.cpp" line="480"/>
@@ -105,23 +93,15 @@ Nie</translation>
         <translation>
 Rozmiar</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <location filename="../gpu.cpp" line="564"/>
         <source>%n mm </source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <location filename="../gpu.cpp" line="564"/>
         <source>(%n inches)</source>
-        <translation type="unfinished">
-            <numerusform>(%n cali)</numerusform>
-            <numerusform>(%n cal)</numerusform>
-            <numerusform>(%n cali)</numerusform>
-        </translation>
+        <translation type="unfinished">(%n cali)</translation>
     </message>
     <message>
         <location filename="../gpu.cpp" line="567"/>
@@ -163,23 +143,15 @@ Rozmiar</translation>
         <source>Serial number</source>
         <translation>Numer seryjny</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <location filename="../gpu.cpp" line="745"/>
         <source>%n connected, </source>
-        <translation>
-            <numerusform>%n podłaczony, </numerusform>
-            <numerusform>%n podłaczony, </numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished">%n podłaczony, </translation>
     </message>
-    <message numerus="yes">
+    <message>
         <location filename="../gpu.cpp" line="745"/>
         <source>%n active</source>
-        <translation>
-            <numerusform>%n aktywny</numerusform>
-            <numerusform>%n aktywny</numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished">%n aktywny</translation>
     </message>
     <message>
         <location filename="../gpu.cpp" line="761"/>
@@ -191,18 +163,18 @@ Rozmiar</translation>
     <name>dXorg</name>
     <message>
         <source>No info</source>
-        <translation type="vanished">Brak informacji</translation>
+        <translation type="obsolete">Brak informacji</translation>
     </message>
 </context>
 <context>
     <name>execBin</name>
     <message>
         <source>Executable</source>
-        <translation type="vanished">Plik wykonywalny</translation>
+        <translation type="obsolete">Plik wykonywalny</translation>
     </message>
     <message>
         <source>Enviroinment</source>
-        <translation type="vanished">Zmienne środowiskowe</translation>
+        <translation type="obsolete">Zmienne środowiskowe</translation>
     </message>
     <message>
         <location filename="../execbin.cpp" line="47"/>
@@ -211,7 +183,7 @@ Rozmiar</translation>
     </message>
     <message>
         <source>Process not started</source>
-        <translation type="vanished">Proces nie uruchomiony</translation>
+        <translation type="obsolete">Proces nie uruchomiony</translation>
     </message>
     <message>
         <location filename="../execbin.cpp" line="41"/>
@@ -236,12 +208,12 @@ Rozmiar</translation>
     <message>
         <source>Process running</source>
         <oldsource>Process state: running</oldsource>
-        <translation type="vanished">Proces uruchomiony</translation>
+        <translation type="obsolete">Proces uruchomiony</translation>
     </message>
     <message>
         <source>Process terminated</source>
         <oldsource>Process not running</oldsource>
-        <translation type="vanished">Porces zakończony</translation>
+        <translation type="obsolete">Porces zakończony</translation>
     </message>
     <message>
         <location filename="../execbin.cpp" line="93"/>
@@ -253,48 +225,48 @@ Rozmiar</translation>
     <name>export_graphs</name>
     <message>
         <source>Export graphs</source>
-        <translation type="vanished">Eksportuj wykresy</translation>
+        <translation type="obsolete">Eksportuj wykresy</translation>
     </message>
     <message>
         <source>Output format</source>
-        <translation type="vanished">Format</translation>
+        <translation type="obsolete">Format</translation>
     </message>
     <message>
         <source>Graphs to export</source>
-        <translation type="vanished">Wykres</translation>
+        <translation type="obsolete">Wykres</translation>
     </message>
     <message>
         <source>Temperature</source>
-        <translation type="vanished">Temperatura</translation>
+        <translation type="obsolete">Temperatura</translation>
     </message>
     <message>
         <source>Frequency</source>
-        <translation type="vanished">Częstotliwości</translation>
+        <translation type="obsolete">Częstotliwości</translation>
     </message>
     <message>
         <source>Voltage</source>
         <oldsource>Volts</oldsource>
-        <translation type="vanished">Napięcia</translation>
+        <translation type="obsolete">Napięcia</translation>
     </message>
     <message>
         <source>Output directory</source>
-        <translation type="vanished">Ścieżka eksportu</translation>
+        <translation type="obsolete">Ścieżka eksportu</translation>
     </message>
     <message>
         <source>Change</source>
-        <translation type="vanished">Zmień</translation>
+        <translation type="obsolete">Zmień</translation>
     </message>
 </context>
 <context>
     <name>gpu</name>
     <message>
         <source>Unknown</source>
-        <translation type="vanished">Nieznany</translation>
+        <translation type="obsolete">Nieznany</translation>
     </message>
     <message numerus="yes">
         <source>Virtual screen %n</source>
         <oldsource>Virtual screen n°%n</oldsource>
-        <translation type="vanished">
+        <translation type="obsolete">
             <numerusform>Ekran %n</numerusform>
             <numerusform>Ekran %n</numerusform>
             <numerusform></numerusform>
@@ -302,89 +274,89 @@ Rozmiar</translation>
     </message>
     <message>
         <source>Resolution</source>
-        <translation type="vanished">Rozdzielczość</translation>
+        <translation type="obsolete">Rozdzielczość</translation>
     </message>
     <message>
         <source>Minimum resolution</source>
-        <translation type="vanished">Minimalna rozdzielczość</translation>
+        <translation type="obsolete">Minimalna rozdzielczość</translation>
     </message>
     <message>
         <source>Maximum resolution</source>
-        <translation type="vanished">Maksymalna rozdzielczość</translation>
+        <translation type="obsolete">Maksymalna rozdzielczość</translation>
     </message>
     <message>
         <source>Virtual size</source>
-        <translation type="vanished">Rozmiar wirtualny</translation>
+        <translation type="obsolete">Rozmiar wirtualny</translation>
     </message>
     <message>
         <source>Outputs</source>
-        <translation type="vanished">Wyjścia</translation>
+        <translation type="obsolete">Wyjścia</translation>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation type="vanished">Nie podłączony</translation>
+        <translation type="obsolete">Nie podłączony</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation type="vanished">Aktywny</translation>
+        <translation type="obsolete">Aktywny</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="vanished">
+        <translation type="obsolete">
 Nie</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="vanished">Tak</translation>
+        <translation type="obsolete">Tak</translation>
     </message>
     <message>
         <source>Refresh rate</source>
-        <translation type="vanished">Odświeżanie</translation>
+        <translation type="obsolete">Odświeżanie</translation>
     </message>
     <message>
         <source>Offset</source>
-        <translation type="vanished">Przesunięcie</translation>
+        <translation type="obsolete">Przesunięcie</translation>
     </message>
     <message>
         <source>Brightness (software)</source>
-        <translation type="vanished">Jasność (programowa)</translation>
+        <translation type="obsolete">Jasność (programowa)</translation>
     </message>
     <message>
         <source>Size</source>
-        <translation type="vanished">
+        <translation type="obsolete">
 Rozmiar</translation>
     </message>
     <message>
         <source> inches)</source>
-        <translation type="vanished">cali)</translation>
+        <translation type="obsolete">cali)</translation>
     </message>
     <message>
         <source>Driver: </source>
-        <translation type="vanished">Sterownik: </translation>
+        <translation type="obsolete">Sterownik: </translation>
     </message>
     <message>
         <source>OpenGL info</source>
-        <translation type="vanished">Informacje OpenGL</translation>
+        <translation type="obsolete">Informacje OpenGL</translation>
     </message>
     <message>
         <source>Vulkan info</source>
-        <translation type="vanished">Informacje Vulkan</translation>
+        <translation type="obsolete">Informacje Vulkan</translation>
     </message>
     <message>
         <source>OpenCL info</source>
-        <translation type="vanished">Informacje OpenCL</translation>
+        <translation type="obsolete">Informacje OpenCL</translation>
     </message>
     <message>
         <source>Supported modes</source>
-        <translation type="vanished">Obsługiwane tryby</translation>
+        <translation type="obsolete">Obsługiwane tryby</translation>
     </message>
     <message>
         <source> Hz vertical, </source>
-        <translation type="vanished">Hz pionowo</translation>
+        <translation type="obsolete">Hz pionowo</translation>
     </message>
     <message>
         <source> KHz horizontal, </source>
-        <translation type="vanished"> KHz poziomo, </translation>
+        <translation type="obsolete"> KHz poziomo, </translation>
     </message>
     <message>
         <source> MHz dot clock</source>
@@ -392,23 +364,23 @@ Rozmiar</translation>
     </message>
     <message>
         <source>Properties</source>
-        <translation type="vanished">Właściwości</translation>
+        <translation type="obsolete">Właściwości</translation>
     </message>
     <message>
         <source>Connected with </source>
-        <translation type="vanished">Połączony z: </translation>
+        <translation type="obsolete">Połączony z: </translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation type="vanished">Nie dostępny</translation>
+        <translation type="obsolete">Nie dostępny</translation>
     </message>
     <message>
         <source>Serial number</source>
-        <translation type="vanished">Numer seryjny</translation>
+        <translation type="obsolete">Numer seryjny</translation>
     </message>
     <message numerus="yes">
         <source>%n connected, </source>
-        <translation type="vanished">
+        <translation type="obsolete">
             <numerusform>%n podłaczony, </numerusform>
             <numerusform>%n podłaczony, </numerusform>
             <numerusform></numerusform>
@@ -416,7 +388,7 @@ Rozmiar</translation>
     </message>
     <message numerus="yes">
         <source>%n active</source>
-        <translation type="vanished">
+        <translation type="obsolete">
             <numerusform>%n aktywny</numerusform>
             <numerusform>%n aktywny</numerusform>
             <numerusform></numerusform>
@@ -697,11 +669,11 @@ Rozmiar</translation>
     </message>
     <message>
         <source>Memory</source>
-        <translation type="vanished">Pamięć</translation>
+        <translation type="obsolete">Pamięć</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="vanished">Eksportuj</translation>
+        <translation type="obsolete">Eksportuj</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1120"/>
@@ -720,7 +692,6 @@ Rozmiar</translation>
         <translation>Włącz podkręcanie</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1449"/>
         <location filename="../radeon_profile.ui" line="1478"/>
         <source>20%</source>
         <translation></translation>
@@ -733,8 +704,8 @@ Rozmiar</translation>
     <message>
         <location filename="../radeon_profile.ui" line="1700"/>
         <location filename="../uiElements.cpp" line="38"/>
-        <location filename="../uiEvents.cpp" line="369"/>
-        <location filename="../uiEvents.cpp" line="420"/>
+        <location filename="../uiEvents.cpp" line="368"/>
+        <location filename="../uiEvents.cpp" line="424"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
@@ -757,6 +728,11 @@ Rozmiar</translation>
         <location filename="../radeon_profile.ui" line="1184"/>
         <source>Apply at launch</source>
         <translation>Zastosuj przy uruchomieniu</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="1449"/>
+        <source>10%</source>
+        <translation>10%</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1549"/>
@@ -899,7 +875,7 @@ Rozmiar</translation>
     </message>
     <message>
         <source>Apply at application launch</source>
-        <translation type="vanished">Zastosuj przy starcie aplikacji</translation>
+        <translation type="obsolete">Zastosuj przy starcie aplikacji</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="2468"/>
@@ -1013,11 +989,11 @@ Rozmiar</translation>
     </message>
     <message>
         <source>Always show gpu selector</source>
-        <translation type="vanished">Pokaż listę GPU</translation>
+        <translation type="obsolete">Pokaż listę GPU</translation>
     </message>
     <message>
         <source>Show profile and power level selector</source>
-        <translation type="vanished">Pokaż listę profili GPU</translation>
+        <translation type="obsolete">Pokaż listę profili GPU</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="3343"/>
@@ -1172,9 +1148,8 @@ Rozmiar</translation>
         <translation>Czas (s)</translation>
     </message>
     <message>
-        <location filename="../uiElements.cpp" line="18"/>
         <source>Temperature (°C)</source>
-        <translation>Temperatura (°C)</translation>
+        <translation type="obsolete">Temperatura (°C)</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="20"/>
@@ -1188,12 +1163,18 @@ Rozmiar</translation>
     </message>
     <message>
         <source>Show</source>
-        <translation type="vanished">Pokaż</translation>
+        <translation type="obsolete">Pokaż</translation>
     </message>
     <message>
+        <location filename="../radeon_profile.cpp" line="275"/>
         <location filename="../uiElements.cpp" line="52"/>
         <source>I/O voltage (vddci)</source>
         <translation>Napięcie I/O (vddci) </translation>
+    </message>
+    <message>
+        <location filename="../uiElements.cpp" line="18"/>
+        <source>Temperature (Â°C)</source>
+        <translation>Temperatura (°C)</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="93"/>
@@ -1248,18 +1229,14 @@ Rozmiar</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="241"/>
-        <location filename="../uiEvents.cpp" line="56"/>
+        <location filename="../uiEvents.cpp" line="57"/>
         <source>Fixed </source>
         <translation>Stała </translation>
     </message>
-    <message numerus="yes">
+    <message>
         <location filename="../radeon_profile.cpp" line="126"/>
         <source>version %n</source>
-        <translation>
-            <numerusform>wersja %n</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation>wersja %n</translation>
     </message>
     <message>
         <location filename="../radeon_profile.cpp" line="140"/>
@@ -1286,7 +1263,7 @@ Rozmiar</translation>
     </message>
     <message>
         <source>Your driver or your GPU does not support overclocking</source>
-        <translation type="vanished">Sterownik nie obsuguje podkręcania</translation>
+        <translation type="obsolete">Sterownik nie obsuguje podkręcania</translation>
     </message>
     <message>
         <location filename="../radeon_profile.cpp" line="278"/>
@@ -1295,19 +1272,19 @@ Rozmiar</translation>
     </message>
     <message>
         <source>Maximum GPU clock</source>
-        <translation type="vanished">Maksymalny zegar GPU</translation>
+        <translation type="obsolete">Maksymalny zegar GPU</translation>
     </message>
     <message>
         <source>Minimum GPU clock</source>
-        <translation type="vanished">Minimalny zegar GPU</translation>
+        <translation type="obsolete">Minimalny zegar GPU</translation>
     </message>
     <message>
         <source>UVD core clock</source>
-        <translation type="vanished">Zegar UVD</translation>
+        <translation type="obsolete">Zegar UVD</translation>
     </message>
     <message>
         <source>UVD decoder clock</source>
-        <translation type="vanished">Zegar dekodera UVD</translation>
+        <translation type="obsolete">Zegar dekodera UVD</translation>
     </message>
     <message>
         <location filename="../radeon_profile.cpp" line="278"/>
@@ -1319,10 +1296,11 @@ Rozmiar</translation>
         <location filename="../execTab.cpp" line="64"/>
         <location filename="../execTab.cpp" line="74"/>
         <location filename="../execTab.cpp" line="288"/>
-        <location filename="../uiEvents.cpp" line="374"/>
-        <location filename="../uiEvents.cpp" line="391"/>
-        <location filename="../uiEvents.cpp" line="412"/>
-        <location filename="../uiEvents.cpp" line="468"/>
+        <location filename="../uiEvents.cpp" line="373"/>
+        <location filename="../uiEvents.cpp" line="390"/>
+        <location filename="../uiEvents.cpp" line="411"/>
+        <location filename="../uiEvents.cpp" line="416"/>
+        <location filename="../uiEvents.cpp" line="472"/>
         <source>Error</source>
         <translation>Błąd</translation>
     </message>
@@ -1379,11 +1357,11 @@ Rozmiar</translation>
     </message>
     <message>
         <source>The selected binary does not exist!</source>
-        <translation type="vanished">Wskazany plik wykonywalny nie istnieje!</translation>
+        <translation type="obsolete">Wskazany plik wykonywalny nie istnieje!</translation>
     </message>
     <message>
         <source>The selected file is not executable!</source>
-        <translation type="vanished">Wskazany plik nie jest wykonywalny!</translation>
+        <translation type="obsolete">Wskazany plik nie jest wykonywalny!</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="316"/>
@@ -1392,73 +1370,89 @@ Rozmiar</translation>
     </message>
     <message>
         <source> is still running, exit anyway?</source>
-        <translation type="vanished"> jest uruchomiony. Zamknąć mimo to?</translation>
+        <translation type="obsolete"> jest uruchomiony. Zamknąć mimo to?</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="246"/>
+        <location filename="../uiEvents.cpp" line="245"/>
         <source>GPU data is disabled</source>
         <translation>Informacje GPU wyłączone</translation>
     </message>
     <message>
         <source>Stats disabled</source>
-        <translation type="vanished">Statystyki wyłączone</translation>
+        <translation type="obsolete">Statystyki wyłączone</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="326"/>
+        <location filename="../uiEvents.cpp" line="325"/>
         <source>Select new power profile</source>
         <translation>Wskaż nowy profil</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="326"/>
+        <location filename="../uiEvents.cpp" line="325"/>
         <source>Profile selection</source>
         <translation>Wybór profilu</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="350"/>
+        <location filename="../uiEvents.cpp" line="349"/>
         <source>Process is still running. Close tab?</source>
         <translation>Proces jest uruchomiony. Zamknąć zakładkę?</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="374"/>
+        <location filename="../uiEvents.cpp" line="373"/>
         <source>This step already exists. Double click on it, to change its value</source>
         <translation>Ta wartość już istnieje. Kliknij dwukrotnie aby edytować.</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="468"/>
+        <location filename="../uiEvents.cpp" line="411"/>
+        <source>You can&apos;t edit the last item</source>
+        <translation>Edycja ostatniej pozycji zablokowana</translation>
+    </message>
+    <message>
+        <location filename="../uiEvents.cpp" line="416"/>
+        <source>You can&apos;t edit temperature of the first item</source>
+        <translation>Edycja temperatury pierwszej pozycji zablokowana</translation>
+    </message>
+    <message>
+        <location filename="../uiEvents.cpp" line="375"/>
+        <location filename="../uiEvents.cpp" line="434"/>
+        <source>Speed [%] (10-100)</source>
+        <translation>Prędkość [%] (10-100) {10-100)?}</translation>
+    </message>
+    <message>
+        <location filename="../uiEvents.cpp" line="472"/>
         <source>An error occurred, overclock failed</source>
         <translation>Wystąpił błąd, podkręcanie nie powiodło się.</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="483"/>
+        <location filename="../uiEvents.cpp" line="487"/>
         <source>Cannot remove default profile.</source>
         <translation>Nie można usunąć profilu &apos;defalut&apos;</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="510"/>
+        <location filename="../uiEvents.cpp" line="514"/>
         <source>Fan profile name:</source>
         <translation>Nazwa profilu:</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="513"/>
+        <location filename="../uiEvents.cpp" line="517"/>
         <source>Profile name musn&apos;t contain &apos;|&apos; character.</source>
         <translation>Nazwa profilu nie może zawierać znaku &apos;|&apos;</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="518"/>
+        <location filename="../uiEvents.cpp" line="522"/>
         <source>Cannot add another profile with the same name that already exists.</source>
         <translation>Nie można dodać kolejnego profilu o tej samej nazwie.</translation>
     </message>
     <message>
         <source>Process running</source>
-        <translation type="vanished">Proces uruchomiony</translation>
+        <translation type="obsolete">Proces uruchomiony</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="364"/>
+        <location filename="../uiEvents.cpp" line="363"/>
         <source>Fan control information</source>
         <translation>Informacje o wentylatorze</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="364"/>
+        <location filename="../uiEvents.cpp" line="363"/>
         <source>Don&apos;t overheat your card! Be careful! Don&apos;t use this if you don&apos;t know what you&apos;re doing! 
 
 Hovewer, looks like card won&apos;t apply too low values due its internal protection. 
@@ -1472,31 +1466,28 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <source>This step already exists. To edit it double click it</source>
-        <translation type="vanished">Taka wartość już instnieje. Kliknij dwa razy żeby poprawić.</translation>
+        <translation type="obsolete">Taka wartość już instnieje. Kliknij dwa razy żeby poprawić.</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="376"/>
-        <location filename="../uiEvents.cpp" line="430"/>
         <source>Speed [%] (20-100)</source>
-        <translation>Prędkość [%] (20-100)</translation>
+        <translation type="obsolete">Prędkość [%] (10-100)</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="391"/>
+        <location filename="../uiEvents.cpp" line="390"/>
         <source>You can&apos;t delete the first and the last item</source>
         <translation>Nie można usunąć pierwszej i ostatniej wartości</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="412"/>
         <source>You can&apos;t edit the first and the last item</source>
-        <translation>Nie można edytować pierwszej i ostatniej wartości</translation>
+        <translation type="obsolete">Nie można edytować pierwszej i ostatniej wartości</translation>
     </message>
     <message>
         <source>An error occurred, GPU overclock failed</source>
-        <translation type="vanished">Wystąpił błąd, podkręcanie nie powiodło się.</translation>
+        <translation type="obsolete">Wystąpił błąd, podkręcanie nie powiodło się.</translation>
     </message>
     <message>
         <source>An error occurred, memory overclock failed</source>
-        <translation type="vanished">Wystąpił błąd, podkręcanie pamięci nie powiodło się.</translation>
+        <translation type="obsolete">Wystąpił błąd, podkręcanie pamięci nie powiodło się.</translation>
     </message>
 </context>
 </TS>

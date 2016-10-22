@@ -372,7 +372,7 @@ void radeon_profile::on_btn_addFanStep_clicked()
     if (currentFanProfile.contains(temperature)) // A step with this temperature already exists
         QMessageBox::warning(this, tr("Error"), tr("This step already exists. Double click on it, to change its value"));
     else { // This step does not exist, proceed
-        const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (20-100)"));
+        const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (10-100)"));
         if (fanSpeed == -1) // User clicked Cancel
             return;
 
@@ -406,16 +406,21 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 
 void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    if (ui->list_fanSteps->indexOfTopLevelItem(item) == 0 || ui->list_fanSteps->indexOfTopLevelItem(item) == ui->list_fanSteps->topLevelItemCount()-1) {
+    if (ui->list_fanSteps->indexOfTopLevelItem(item) == ui->list_fanSteps->topLevelItemCount()-1) {
         // The selected item is the first or the last, it can't be edited
-        QMessageBox::warning(this, tr("Error"), tr("You can't edit the first and the last item"));
+        QMessageBox::warning(this, tr("Error"), tr("You can't edit the last item"));
+        return;
+    }
+
+    if (ui->list_fanSteps->indexOfTopLevelItem(item) == 0 && column == 0) {
+        QMessageBox::warning(this, tr("Error"), tr("You can't edit temperature of the first item"));
         return;
     }
 
     const int oldTemp = item->text(0).toInt(), oldSpeed = item->text(1).toInt();
     int newTemp, newSpeed;
 
-    if(column == 0){ // The user wants to change the temperature
+    if (column == 0) { // The user wants to change the temperature
         newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, tr("Temperature"));
         if(newTemp != -1){
             newSpeed = oldSpeed;
@@ -426,7 +431,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
         }
     } else { // The user wants to change the speed
         newTemp = oldTemp;
-        newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (20-100)"));
+        newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (10-100)"));
         // addFanStep() will check the validity of newSpeed and overwrite the current step
         addFanStep(newTemp,newSpeed);
     }

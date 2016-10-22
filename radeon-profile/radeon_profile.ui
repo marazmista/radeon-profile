@@ -384,7 +384,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -1410,7 +1410,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="page"/>
           <widget class="QWidget" name="page_fixed">
@@ -1446,14 +1446,14 @@
                 </font>
                </property>
                <property name="text">
-                <string>20%</string>
+                <string>10%</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QSlider" name="fanSpeedSlider">
                <property name="minimum">
-                <number>51</number>
+                <number>33</number>
                </property>
                <property name="maximum">
                 <number>255</number>

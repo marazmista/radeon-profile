@@ -221,9 +221,9 @@ void radeon_profile::loadFanProfiles() {
         //default profile if no file found
 
         fanProfileSteps p;
-        p.insert(0,20);
-        p.insert(65,100);
-        p.insert(90,100);
+        p.insert(0,minFanStepsSpeed);
+        p.insert(65,maxFanStepsSpeed);
+        p.insert(90,maxFanStepsSpeed);
 
         fanProfiles.insert("default", p);
     }
