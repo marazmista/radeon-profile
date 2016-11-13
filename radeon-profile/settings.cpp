@@ -195,7 +195,7 @@ void radeon_profile::loadConfig() {
 void radeon_profile::loadFanProfiles() {
     QFile fsPath(fanStepsPath);
     if (fsPath.open(QIODevice::ReadOnly)) {
-        QString profile = QString(fsPath.readAll());
+        QString profile = QString(fsPath.readAll().trimmed());
 
         QStringList steps = profile.split("|",QString::SkipEmptyParts);
 
