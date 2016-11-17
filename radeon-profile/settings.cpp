@@ -103,10 +103,9 @@ void radeon_profile::loadConfig() {
     ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
     ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",80).toInt());
     ui->cb_saveFanMode->setChecked(settings.value("saveSelectedFanMode",false).toBool());
-    if (ui->cb_saveFanMode->isChecked()) {
+    ui->l_currentFanProfile->setText(settings.value("fanProfileName","default").toString());
+    if (ui->cb_saveFanMode->isChecked())
         ui->fanModesTabs->setCurrentIndex(settings.value("fanMode",0).toInt());
-        ui->l_currentFanProfile->setText(settings.value("fanProfileName","default").toString());
-    }
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
     optionsMenu->actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());

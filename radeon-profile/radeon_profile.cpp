@@ -380,7 +380,7 @@ void radeon_profile::adjustFanSpeed() {
         int hTemperature = high.key(),
                 lTemperature = low.key();
 
-        float speed = (float)((hSpeed - lSpeed) / (hTemperature - lTemperature) * (device.gpuTemeperatureData.current - lTemperature)) + lSpeed;
+        float speed = (float)(hSpeed - lSpeed) / (float)(hTemperature - lTemperature)  * (device.gpuTemeperatureData.current - lTemperature)  + lSpeed;
         device.setPwmValue(device.features.pwmMaxSpeed * speed / 100);
     }
 }

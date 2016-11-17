@@ -1410,7 +1410,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="page"/>
           <widget class="QWidget" name="page_fixed">
@@ -1539,7 +1539,7 @@
               <widget class="QPushButton" name="btn_activateFanProfile">
                <property name="geometry">
                 <rect>
-                 <x>140</x>
+                 <x>138</x>
                  <y>30</y>
                  <width>71</width>
                  <height>21</height>
@@ -1571,8 +1571,18 @@
                  <height>21</height>
                 </rect>
                </property>
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <underline>false</underline>
+                </font>
+               </property>
                <property name="text">
                 <string/>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
               <widget class="QPushButton" name="btn_saveFanProfile">
@@ -1604,9 +1614,9 @@
               <widget class="QPushButton" name="btn_removeFanProfile">
                <property name="geometry">
                 <rect>
-                 <x>120</x>
+                 <x>108</x>
                  <y>80</y>
-                 <width>91</width>
+                 <width>101</width>
                  <height>21</height>
                 </rect>
                </property>
