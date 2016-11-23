@@ -212,9 +212,11 @@ private:
      * If another step with the same temperature exists already it is overwritten.
      * @param temperature
      * @param fanSpeed
-     * @return If the operation was successful.
      */
     void addFanStep (int temperature, int fanSpeed);
+
+    void fillConnectors();
+    void fillModInfo();
 };
 
 #endif // RADEON_PROFILE_H
