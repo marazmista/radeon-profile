@@ -3,6 +3,8 @@ Simple application to read current clocks of ATi Radeon cards (xf86-video-ati an
 # xf86-video-ati driver
 Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-profile-daemon) for using this app as normal user. Otherwise app need to be run with root privilages for read clocks and changing profiles. You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`. Here is tip for run app as normal user but involves change permissions to system files: http://bit.ly/1dvQMhS
 
+Fan control is available only on Radeon HD 7000 series and above.
+
 Can be forced by `--driver xorg` parameter.
 
 # fglrx driver
