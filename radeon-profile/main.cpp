@@ -6,9 +6,11 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QTranslator * translator = new QTranslator();
-    if(translator->load(QLocale(), "strings", ".", "/usr/share/radeon-profile") || translator->load(QLocale(), "strings", "."))
-        a.installTranslator(translator);
+    QTranslator translator(&a);
+    if(translator.load(QLocale(), "strings", ".")
+            || translator.load(QLocale(), "strings", ".", QApplication::applicationDirPath())
+            || translator.load(QLocale(), "strings", ".", "/usr/share/radeon-profile"))
+        a.installTranslator(&translator);
     else
         qWarning() << "Failed loading translation";
 

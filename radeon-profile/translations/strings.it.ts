@@ -371,7 +371,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message numerus="yes">
         <location filename="../gpu.cpp" line="470"/>
         <source>%n mm</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
@@ -379,7 +379,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message numerus="yes">
         <location filename="../gpu.cpp" line="564"/>
         <source>%n mm </source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
@@ -387,16 +387,16 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message numerus="yes">
         <location filename="../gpu.cpp" line="564"/>
         <source>(%n inches)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>(%n pollici)</numerusform>
-            <numerusform></numerusform>
+            <numerusform>(%n pollici)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../gpu.cpp" line="470"/>
         <location filename="../gpu.cpp" line="564"/>
         <source>%n mm x </source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
@@ -404,26 +404,26 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message numerus="yes">
         <location filename="../gpu.cpp" line="745"/>
         <source>%n connected, </source>
-        <translation type="unfinished">
-            <numerusform>%n connessi, </numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n connesso, </numerusform>
+            <numerusform>%n connessi,</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../gpu.cpp" line="745"/>
         <source>%n active</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n attivo</numerusform>
             <numerusform>%n attivi</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../gpu.cpp" line="450"/>
         <source>Virtual screen n°%n</source>
         <translatorcomment>Per un qualche motivo non viene tradotto correttamente a runtime, investigare</translatorcomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Schermo virtuale n°%n</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Schermo virtuale n°%n</numerusform>
         </translation>
     </message>
 </context>
@@ -432,32 +432,32 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message>
         <location filename="../execbin.cpp" line="41"/>
         <source>Save output to file</source>
-        <translation type="unfinished">Salva output in un file</translation>
+        <translation>Salva output in un file</translation>
     </message>
     <message>
         <location filename="../execbin.cpp" line="45"/>
         <source>Command</source>
-        <translation type="unfinished">Comando</translation>
+        <translation>Comando</translation>
     </message>
     <message>
         <location filename="../execbin.cpp" line="47"/>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../execbin.cpp" line="77"/>
         <source>Process state: running</source>
-        <translation type="unfinished">Processo in esecuzione</translation>
+        <translation>Processo in esecuzione</translation>
     </message>
     <message>
         <location filename="../execbin.cpp" line="89"/>
         <source>Process state: not running</source>
-        <translation type="unfinished">Processo terminato</translation>
+        <translation>Processo terminato</translation>
     </message>
     <message>
         <location filename="../execbin.cpp" line="93"/>
         <source>Save</source>
-        <translation type="unfinished">Salva</translation>
+        <translation>Salva</translation>
     </message>
 </context>
 <context>
@@ -486,22 +486,22 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <location filename="../uiElements.cpp" line="19"/>
         <location filename="../uiElements.cpp" line="21"/>
         <source>Time (s)</source>
-        <translation type="unfinished">Tempo (s)</translation>
+        <translation>Tempo (s)</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="18"/>
         <source>Temperature (°C)</source>
-        <translation type="unfinished">Temperatura (°C)</translation>
+        <translation>Temperatura (°C)</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="20"/>
         <source>Clock (MHz)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="22"/>
         <source>Voltage (mV)</source>
-        <translation type="unfinished">Voltaggio (mV)</translation>
+        <translation>Voltaggio (mV)</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="39"/>
@@ -511,64 +511,64 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message>
         <location filename="../uiElements.cpp" line="52"/>
         <source>I/O voltage (vddci)</source>
-        <translation type="unfinished">Voltaggio dell&apos;I/O</translation>
+        <translation>Voltaggio dell&apos;I/O</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="93"/>
         <source>Quit</source>
-        <translation type="unfinished">Esci</translation>
+        <translation>Esci</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="98"/>
         <source>Change standard profile</source>
-        <translation type="unfinished">Cambia profilo standard</translation>
+        <translation>Cambia profilo standard</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="105"/>
         <source>Keep refreshing when hidden</source>
-        <translation type="unfinished">Continua a aggiornare quando nascosto</translation>
+        <translation>Continua a aggiornare quando nascosto</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="154"/>
         <source>Reset min/max temperature</source>
-        <translation type="unfinished">Resetta temperatura min/max</translation>
+        <translation>Resetta temperatura min/max</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="157"/>
         <source>Reset graphs vertical scale</source>
-        <translation type="unfinished">Resetta scala verticale dei grafici</translation>
+        <translation>Resetta scala verticale dei grafici</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="160"/>
         <source>Show legend</source>
-        <translation type="unfinished">Mostra la legenda</translation>
+        <translation>Mostra la legenda</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="165"/>
         <source>Graph offset on right</source>
-        <translation type="unfinished">Offset del grafico a destra</translation>
+        <translation>Offset del grafico a destra</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="193"/>
         <source>Force power level</source>
-        <translation type="unfinished">Forza il livello di potenza</translation>
+        <translation>Forza il livello di potenza</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="206"/>
         <location filename="../uiElements.cpp" line="212"/>
         <source>Copy to clipboard</source>
-        <translation type="unfinished">Copia negli appunti</translation>
+        <translation>Copia negli appunti</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="218"/>
         <source>Reset statistics</source>
-        <translation type="unfinished">Resetta le statistiche</translation>
+        <translation>Resetta le statistiche</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="241"/>
         <location filename="../uiEvents.cpp" line="56"/>
         <source>Fixed </source>
-        <translation type="unfinished"></translation>
+        <translation>Fisso</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="67"/>
@@ -875,27 +875,27 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message>
         <location filename="../radeon_profile.ui" line="1549"/>
         <source>Activate</source>
-        <translation type="unfinished"></translation>
+        <translation>Attiva</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1562"/>
         <source>Current profile:</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilo attuale:</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1588"/>
         <source>Save</source>
-        <translation type="unfinished">Salva</translation>
+        <translation>Salva</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1601"/>
         <source>Save as</source>
-        <translation type="unfinished"></translation>
+        <translation>Salva come</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1614"/>
         <source>Remove profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Rimuovi profilo</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1683"/>
@@ -1124,7 +1124,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message>
         <location filename="../radeon_profile.ui" line="3325"/>
         <source>Save selected fan control mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Salva il profilo della ventola selezionato</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="3343"/>
@@ -1276,129 +1276,129 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <location filename="../uiEvents.cpp" line="412"/>
         <location filename="../uiEvents.cpp" line="468"/>
         <source>Error</source>
-        <translation type="unfinished">Errore</translation>
+        <translation>Errore</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="59"/>
         <source>Profile name can&apos;t be empty!</source>
-        <translation type="unfinished">Il nome del profilo non può essere vuoto!</translation>
+        <translation>Il nome del profilo non può essere vuoto!</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="64"/>
         <source>No binary is selected!</source>
-        <translation type="unfinished">Nessun eseguibile selezionato!</translation>
+        <translation>Nessun eseguibile selezionato!</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="74"/>
         <source>Binary not found in /usr/bin: </source>
-        <translation type="unfinished">Eseguibile non trovato in /usr/bin: </translation>
+        <translation>Eseguibile non trovato in /usr/bin: </translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="131"/>
         <source>Enter value</source>
-        <translation type="unfinished">Inserisci valore</translation>
+        <translation>Inserisci valore</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="131"/>
         <source>Enter valid value for </source>
-        <translation type="unfinished">Inserisci un valore valido per </translation>
+        <translation>Inserisci un valore valido per </translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="146"/>
         <source>Question</source>
-        <translation type="unfinished"></translation>
+        <translation>Domanda</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="146"/>
         <location filename="../execTab.cpp" line="206"/>
         <source>Remove this item?</source>
-        <translation type="unfinished">Rimuovere questo elemento?</translation>
+        <translation>Rimuovere questo elemento?</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="214"/>
         <source>Select binary</source>
-        <translation type="unfinished">Seleziona un eseguibile</translation>
+        <translation>Seleziona un eseguibile</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="222"/>
         <source>Select log file</source>
-        <translation type="unfinished">Seleziona un file di log</translation>
+        <translation>Seleziona un file di log</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="288"/>
         <source>Can&apos;t run something that not exists!</source>
-        <translation type="unfinished">Non posso eseguire qualcosa che non esiste!</translation>
+        <translation>Non posso eseguire qualcosa che non esiste!</translation>
     </message>
     <message>
         <location filename="../execTab.cpp" line="316"/>
         <source>Run: &quot;</source>
-        <translation type="unfinished">Eseguire &quot;</translation>
+        <translation>Eseguire &quot;</translation>
     </message>
     <message numerus="yes">
         <location filename="../radeon_profile.cpp" line="126"/>
         <source>version %n</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>versione %n</numerusform>
-            <numerusform></numerusform>
+            <numerusform>versione %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../radeon_profile.cpp" line="140"/>
         <source>Back to profiles</source>
-        <translation type="unfinished">Ritorna ai profili</translation>
+        <translation>Ritorna ai profili</translation>
     </message>
     <message>
         <location filename="../radeon_profile.cpp" line="269"/>
         <location filename="../uiElements.cpp" line="46"/>
         <source>UVD core clock (cclk)</source>
-        <translation type="unfinished">Clock del UVD (cclk)</translation>
+        <translation>Clock del UVD (cclk)</translation>
     </message>
     <message>
         <location filename="../radeon_profile.cpp" line="271"/>
         <location filename="../uiElements.cpp" line="47"/>
         <source>UVD decoder clock (dclk)</source>
-        <translation type="unfinished">Clock del decoder UVD (dclk)</translation>
+        <translation>Clock del decoder UVD (dclk)</translation>
     </message>
     <message>
         <location filename="../radeon_profile.cpp" line="273"/>
         <location filename="../uiElements.cpp" line="51"/>
         <source>GPU voltage (vddc)</source>
-        <translation type="unfinished">Voltaggio GPU (vddc)</translation>
+        <translation>Voltaggio GPU (vddc)</translation>
     </message>
     <message>
         <location filename="../radeon_profile.cpp" line="278"/>
         <source>Can&apos;t read data</source>
-        <translation type="unfinished">Impossibile leggere i dati</translation>
+        <translation>Impossibile leggere i dati</translation>
     </message>
     <message>
         <location filename="../radeon_profile.cpp" line="278"/>
         <source>You need debugfs mounted and either root rights or the daemon running</source>
-        <translation type="unfinished">È necessario che debugfs sia montato e che il demone sia attivo (o che il programma venga eseguito come root)</translation>
+        <translation>È necessario che debugfs sia montato e che il demone sia attivo (o che il programma venga eseguito come root)</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="246"/>
         <source>GPU data is disabled</source>
-        <translation type="unfinished">Dati della GPU disabilitati</translation>
+        <translation>Dati della GPU disabilitati</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="326"/>
         <source>Select new power profile</source>
-        <translation type="unfinished">Seleziona un nuovo profilo di potenza</translation>
+        <translation>Seleziona un nuovo profilo di potenza</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="326"/>
         <source>Profile selection</source>
-        <translation type="unfinished">Selezione del profilo</translation>
+        <translation>Selezione del profilo</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="350"/>
         <source>Process is still running. Close tab?</source>
-        <translation type="unfinished">Il processo è ancora attivo. Chiudere comunque?</translation>
+        <translation>Il processo è ancora attivo. Chiudere comunque?</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="364"/>
         <source>Fan control information</source>
-        <translation type="unfinished">Informazioni sul controllo della ventola</translation>
+        <translation>Informazioni sul controllo della ventola</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="364"/>
@@ -1407,7 +1407,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
 Hovewer, looks like card won&apos;t apply too low values due its internal protection. 
 
 Closing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned!</source>
-        <translation type="unfinished">Non surriscaldare la tua scheda grafica! Usa questo sistema solo se sai quello che stai facendo!
+        <translation>Non surriscaldare la tua scheda grafica! Usa questo sistema solo se sai quello che stai facendo!
 
 Il sistema di protezione della scheda grafica non accetta valori troppo bassi.
 
@@ -1416,48 +1416,48 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message>
         <location filename="../uiEvents.cpp" line="374"/>
         <source>This step already exists. Double click on it, to change its value</source>
-        <translation type="unfinished"></translation>
+        <translation>Questa temperatura esiste già. Doppio click per modificarla</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="376"/>
         <location filename="../uiEvents.cpp" line="430"/>
         <source>Speed [%] (20-100)</source>
-        <translation type="unfinished">Velocità [%] (20-100)</translation>
+        <translation>Velocità [%] (20-100)</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="391"/>
         <source>You can&apos;t delete the first and the last item</source>
-        <translation type="unfinished">Non puoi cancellare il primo e l&apos;ultimo elemento</translation>
+        <translation>Non puoi cancellare il primo e l&apos;ultimo elemento</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="412"/>
         <source>You can&apos;t edit the first and the last item</source>
-        <translation type="unfinished">Non puoi modificare il primo e l&apos;ultimo elemento</translation>
+        <translation>Non puoi modificare il primo e l&apos;ultimo elemento</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="468"/>
         <source>An error occurred, overclock failed</source>
-        <translation type="unfinished">Si è verificato un errore, overclock fallito</translation>
+        <translation>Si è verificato un errore, overclock fallito</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="483"/>
         <source>Cannot remove default profile.</source>
-        <translation type="unfinished"></translation>
+        <translation>Non puoi rimuovere il profilo di default.</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="510"/>
         <source>Fan profile name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome del profilo:</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="513"/>
         <source>Profile name musn&apos;t contain &apos;|&apos; character.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il nome del profilo non può contenere il carattere &apos;|&apos;.</translation>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="518"/>
         <source>Cannot add another profile with the same name that already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esiste già un profilo con questo nome.</translation>
     </message>
 </context>
 </TS>

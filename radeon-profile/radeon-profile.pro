@@ -60,8 +60,10 @@ LIBS += -lXrandr -lX11
 # This produces compiled translation files (strings.*.qm), that need to be packaged together with the runnable
 # These can be placed in "/usr/share/radeon-profile/" or in the same folder of the binary (useful for development)
 TRANSLATIONS += translations/strings.it.ts \
-    translations/strings.pl.ts
+    translations/strings.pl.ts \
+    translations/strings.hr.ts
 
 DISTFILES += \
     translations/strings.it.ts \
-    translations/strings.pl.ts
+    translations/strings.pl.ts \
+    translations/strings.hr.ts
