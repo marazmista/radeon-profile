@@ -201,7 +201,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 
     } else {
         qDebug() << "Fan control is not available";
-        ui->mainTabs->setTabEnabled(2,false);
+        ui->mainTabs->setTabEnabled(3,false);
         ui->l_fanSpeed->setVisible(false);
     }
 
