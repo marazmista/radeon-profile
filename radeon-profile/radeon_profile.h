@@ -217,6 +217,8 @@ private:
 
     void fillConnectors();
     void fillModInfo();
+
+    bool askConfirmation(const QString title, const QString question);
 };
 
 #endif // RADEON_PROFILE_H

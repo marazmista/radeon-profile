@@ -465,3 +465,8 @@ void radeon_profile::configureDaemonAutoRefresh (bool enabled, int interval) {
 
     device.reconfigureDaemon();
 }
+
+bool radeon_profile::askConfirmation(const QString title, const QString question){
+    return QMessageBox::Yes ==
+            QMessageBox::question(this, title, question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+}
