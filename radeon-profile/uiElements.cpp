@@ -258,3 +258,16 @@ void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
 
     ui->l_fanSpeed->setMenu(fanProfilesMenu);
 }
+
+void radeon_profile::fillConnectors(){
+    ui->list_connectors->clear();
+    ui->list_connectors->addTopLevelItems(device.getCardConnectors());
+    ui->list_connectors->expandToDepth(2);
+    ui->list_connectors->header()->resizeSections(QHeaderView::ResizeToContents);
+}
+
+void radeon_profile::fillModInfo(){
+    ui->list_modInfo->clear();
+    ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
+    ui->list_modInfo->header()->resizeSections(QHeaderView::ResizeToContents);
+}

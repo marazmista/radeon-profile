@@ -87,9 +87,8 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     // fill tables with data at the start //
     refreshGpuData();
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
-    ui->list_connectors->addTopLevelItems(device.getCardConnectors());
-    ui->list_connectors->expandToDepth(2);
-    ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
+    fillConnectors();
+    fillModInfo();
     refreshUI();
 
     timer->start();
@@ -339,13 +338,10 @@ void radeon_profile::timerEvent() {
         ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
     }
     if (ui->cb_connectors->isChecked()) {
-        ui->list_connectors->clear();
-        ui->list_connectors->addTopLevelItems(device.getCardConnectors());
-        ui->list_connectors->expandToDepth(2);
+        fillConnectors();
     }
     if (ui->cb_modParams->isChecked()) {
-        ui->list_modInfo->clear();
-        ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
+        fillModInfo();
     }
 
     refreshTooltip();
@@ -441,6 +437,7 @@ void radeon_profile::doTheStats() {
     else { // This power level does not exist, create it
         pmStats.insert(pmLevelName, 1);
         ui->list_stats->addTopLevelItem(new QTreeWidgetItem(QStringList() << pmLevelName));
+        ui->list_stats->header()->resizeSections(QHeaderView::ResizeToContents);
     }
 }
 
@@ -467,4 +464,9 @@ void radeon_profile::configureDaemonAutoRefresh (bool enabled, int interval) {
         globalStuff::globalConfig.interval = interval;
 
     device.reconfigureDaemon();
+}
+
+bool radeon_profile::askConfirmation(const QString title, const QString question){
+    return QMessageBox::Yes ==
+            QMessageBox::question(this, title, question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 }

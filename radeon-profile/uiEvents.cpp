@@ -197,6 +197,15 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
         return;
     }
 
+    //Check if a process is still running
+    for(execBin * process : *execsRunning) {
+        if(process->getExecState() == QProcess::Running
+                && ! askConfirmation(tr("Quit"), process->name + tr(" is still running, exit anyway?"))) {
+            e->ignore();
+            return;
+        }
+    }
+
     timer->stop();
     saveConfig();
 
@@ -216,6 +225,7 @@ void radeon_profile::closeFromTray() {
 
 void radeon_profile::on_spin_lineThick_valueChanged(int arg1)
 {
+    Q_UNUSED(arg1)
     setupGraphsStyle();
 }
 
@@ -250,16 +260,14 @@ void radeon_profile::refreshBtnClicked() {
     ui->list_glxinfo->clear();
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
 
-    ui->list_connectors->clear();
-    ui->list_connectors->addTopLevelItems(device.getCardConnectors());
-    ui->list_connectors->expandToDepth(2);
+    fillConnectors();
 
-    ui->list_modInfo->clear();
-    ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
+    fillModInfo();
 }
 
 void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
+    Q_UNUSED(column)
     QColor c = QColorDialog::getColor(item->backgroundColor(1));
     if (c.isValid()) {
         item->setBackgroundColor(1,c);
