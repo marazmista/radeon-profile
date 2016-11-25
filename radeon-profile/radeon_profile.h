@@ -144,6 +144,7 @@ private slots:
     void on_btn_saveFanProfile_clicked();
     void on_btn_saveAsFanProfile_clicked();
     void fanProfileMenuActionClicked(QAction *a);
+    void on_btn_export_clicked();
 
 private:
     gpu device;

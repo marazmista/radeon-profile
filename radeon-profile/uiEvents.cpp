@@ -573,3 +573,13 @@ void radeon_profile::fanProfileMenuActionClicked(QAction *a) {
 
     setCurrentFanProfile(a->text(),fanProfiles.value(a->text()));
 }
+
+void radeon_profile::on_btn_export_clicked(){
+    QString folder = QFileDialog::getExistingDirectory(this, "Export destination directory");
+    if( ! folder.isEmpty()){
+        qDebug() << "Exporting graphs into " << folder;
+        ui->plotTemp->savePng(folder + "/temperature.png");
+        ui->plotClocks->savePng(folder + "/clocks.png");
+        ui->plotVolts->savePng(folder + "/voltages.png");
+    }
+}
