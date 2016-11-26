@@ -11,6 +11,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QMenu>
+#include <QFileDialog>
 
 bool closeFromTrayMenu;
 

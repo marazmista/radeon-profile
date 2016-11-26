@@ -155,7 +155,7 @@ private:
     QMap<QString, fanProfileSteps> fanProfiles;
 
     QMap<QString, unsigned int> pmStats;
-    unsigned int rangeX = 180, ticksCounter = 0, statsTickCounter = 0;
+    unsigned int rangeX, ticksCounter, statsTickCounter;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
