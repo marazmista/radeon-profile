@@ -37,25 +37,23 @@ static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
     "/usr/share/hwdata/pnp.ids"
 };
 
-QString gpu::driverModuleName;
-
 gpu::driver gpu::detectDriver() {
     QStringList out = globalStuff::grabSystemInfo("lsmod");
 
-    if (!out.filter("radeon").isEmpty()) {
-        gpu::driverModuleName = "radeon";
-        dXorg::currentDriverModule = globalStuff::RADEON;
-        return XORG;
-    }
-    if (!out.filter("amdgpu").isEmpty()) {
-        gpu::driverModuleName = "amdgpu";
-        dXorg::currentDriverModule = globalStuff::AMDGPU;
-        return XORG;
-    }
+    // todo: detect when driver compiled inside kernel
+
+//    if (!out.filter("radeon").isEmpty()) {
+//        return XORG;
+//    }
+//    if (!out.filter("amdgpu").isEmpty()) {
+//        return XORG;
+//    }
+
     if (!out.filter("fglrx").isEmpty())
         return FGLRX;
 
-    return DRIVER_UNKNOWN;
+    return XORG;
+//    return DRIVER_UNKNOWN;
 }
 
 void gpu::reconfigureDaemon() {

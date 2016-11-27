@@ -81,10 +81,6 @@ public:
         PM_UNKNOWN = 2
     };
 
-    enum drverModule {
-        RADEON, AMDGPU
-    };
-
     struct gpuClocksStruct {
         int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
         char powerLevel;
