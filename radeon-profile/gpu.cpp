@@ -42,18 +42,13 @@ gpu::driver gpu::detectDriver() {
 
     // todo: detect when driver compiled inside kernel
 
-//    if (!out.filter("radeon").isEmpty()) {
-//        return XORG;
-//    }
-//    if (!out.filter("amdgpu").isEmpty()) {
-//        return XORG;
-//    }
+    if (!out.filter("radeon").isEmpty() || !out.filter("amdgpu").isEmpty())
+        return XORG;
 
     if (!out.filter("fglrx").isEmpty())
         return FGLRX;
 
-    return XORG;
-//    return DRIVER_UNKNOWN;
+    return DRIVER_UNKNOWN;
 }
 
 void gpu::reconfigureDaemon() {
