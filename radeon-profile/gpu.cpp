@@ -37,25 +37,6 @@ static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
     "/usr/share/hwdata/pnp.ids"
 };
 
-gpu::driver gpu::detectDriver() {
-    QStringList out = globalStuff::grabSystemInfo("lsmod");
-
-    // todo: detect when driver compiled inside kernel
-
-//    if (!out.filter("radeon").isEmpty()) {
-//        return XORG;
-//    }
-//    if (!out.filter("amdgpu").isEmpty()) {
-//        return XORG;
-//    }
-
-    if (!out.filter("fglrx").isEmpty())
-        return FGLRX;
-
-    return XORG;
-//    return DRIVER_UNKNOWN;
-}
-
 void gpu::reconfigureDaemon() {
     dXorg::reconfigureDaemon();
 }
@@ -66,35 +47,48 @@ bool gpu::daemonConnected() {
 
 // method for resolve which driver gpu instance will use
 // and call some things that need to be done before read data
-QStringList gpu::initialize(bool skipDetectDriver) {
-    if (!skipDetectDriver)
-        currentDriver = detectDriver();
+QStringList gpu::initialize() {
 
     QStringList gpuList;
 
-    switch (currentDriver) {
-    case XORG: {
-        gpuList = dXorg::detectCards();
-        dXorg::configure(gpuList[currentGpuIndex]);
-        features = dXorg::figureOutDriverFeatures();
-        break;
-    }
-    case FGLRX: {
-        gpuList = dFglrx::detectCards();
-        dFglrx::configure(currentGpuIndex);
-        features = dFglrx::figureOutDriverFeatures();
-        break;
-    }
-    case DRIVER_UNKNOWN: {
-        globalStuff::driverFeatures f;
-        f.pm = globalStuff::PM_UNKNOWN;
-        f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
-        features = f;
-        gpuList << QObject::tr("Unknown");
-    }
-    }
+    gpuList = gpu::initialize(gpu::XORG);
+    if (gpuList.length() > 0)
+        return gpuList;
+
+    gpuList = gpu::initialize(gpu::FGLRX);
+    if (gpuList.length() > 0)
+        return gpuList;
+
+    gpuList = gpu::initialize(gpu::DRIVER_UNKNOWN);
     return gpuList;
 }
+
+QStringList gpu::initialize(gpu::driver driver) {
+    currentDriver = driver;
+    QStringList gpuList;
+
+    switch (currentDriver) {
+        case gpu::XORG:
+            gpuList = dXorg::detectCards();
+            dXorg::configure(gpuList[currentGpuIndex]);
+            features = dXorg::figureOutDriverFeatures();
+            break;
+        case gpu::FGLRX:
+            dFglrx::configure(currentGpuIndex);
+            features = dFglrx::figureOutDriverFeatures();
+            break;
+        case gpu::DRIVER_UNKNOWN:
+            globalStuff::driverFeatures f;
+            f.pm = globalStuff::PM_UNKNOWN;
+            f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
+            features = f;
+            gpuList << QObject::tr("Unknown");
+            break;
+    }
+
+    return gpuList;
+}
+
 
 globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuClocksStruct &data) {
     globalStuff::gpuClocksStructString tmp;
@@ -132,10 +126,6 @@ globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuf
     tmp.pwmSpeed = QString::number(data.pwmSpeed)+"%";
 
     return tmp;
-}
-
-void gpu::driverByParam(gpu::driver paramDriver) {
-    this->currentDriver = paramDriver;
 }
 
 void gpu::changeGpu(char index) {

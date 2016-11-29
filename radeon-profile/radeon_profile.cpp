@@ -61,15 +61,11 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     //figure out parameters
     QString params = a.join(" ");
-    if (params.contains("--driver xorg")) {
-        device.driverByParam(gpu::XORG);
-        ui->combo_gpus->addItems(device.initialize(true));
-    }
-    else if (params.contains("--driver fglrx")) {
-        device.driverByParam(gpu::FGLRX);
-        ui->combo_gpus->addItems(device.initialize(true));
-    }
-    else // driver object detects cards in pc and fill the list in ui //
+    if (params.contains("--driver xorg"))
+        ui->combo_gpus->addItems(device.initialize(gpu::XORG));
+    else if (params.contains("--driver fglrx"))
+        ui->combo_gpus->addItems(device.initialize(gpu::FGLRX));
+    else
         ui->combo_gpus->addItems(device.initialize());
 
     ui->configGroups->setTabEnabled(2,device.daemonConnected());
