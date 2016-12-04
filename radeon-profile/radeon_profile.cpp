@@ -32,6 +32,9 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
 {
+    rangeX = 180;
+    ticksCounter = 0;
+    statsTickCounter = 0;
     ui->setupUi(this);
     timer = new QTimer(this);
     execsRunning = new QList<execBin*>();

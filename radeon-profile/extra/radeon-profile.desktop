@@ -1,9 +1,10 @@
 [Desktop Entry]
 Name=Radeon Profile
+GenericName=Control panel
 Comment=Monitor Radeon GPU parameters and switch power profiles
 Exec=radeon-profile
 Icon=radeon-profile
 Terminal=false
 Type=Application
-Categories=System;
+Categories=System;Monitor;HardwareSettings;TrayIcon;
 StartupNotify=false
