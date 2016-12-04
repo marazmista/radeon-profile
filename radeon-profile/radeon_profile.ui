@@ -1013,6 +1013,13 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="5">
+            <widget class="QPushButton" name="btn_export">
+             <property name="text">
+              <string>Export</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>

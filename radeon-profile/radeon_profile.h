@@ -144,6 +144,7 @@ private slots:
     void on_btn_saveFanProfile_clicked();
     void on_btn_saveAsFanProfile_clicked();
     void fanProfileMenuActionClicked(QAction *a);
+    void on_btn_export_clicked();
 
 private:
     gpu device;
@@ -154,7 +155,7 @@ private:
     QMap<QString, fanProfileSteps> fanProfiles;
 
     QMap<QString, unsigned int> pmStats;
-    unsigned int rangeX = 180, ticksCounter = 0, statsTickCounter = 0;
+    unsigned int rangeX, ticksCounter, statsTickCounter;
 
     Ui::radeon_profile *ui;
     void setupGraphs();

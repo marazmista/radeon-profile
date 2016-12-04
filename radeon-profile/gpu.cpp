@@ -27,12 +27,14 @@ extern "C" {
 
 // List of files mapping PnP IDs to vendor names
 // List found through pkgfile --verbose --search pnp.ids (on arch linux)
-#define PNP_ID_FILE_COUNT 6
+#define PNP_ID_FILE_COUNT 8
 static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
+    "/usr/share/misc/pnp.ids",
     "/usr/share/libgnome-desktop-3.0/pnp.ids",
     "/usr/share/libgnome-desktop/pnp.ids",
     "/usr/share/libcinnamon-desktop/pnp.ids",
     "/usr/share/dispcalGUI/pnp.ids",
+    "/usr/share/DisplayCAL/pnp.ids",
     "/usr/share/libmate-desktop/pnp.ids",
     "/usr/share/hwdata/pnp.ids"
 };
