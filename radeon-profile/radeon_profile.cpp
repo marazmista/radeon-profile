@@ -61,15 +61,11 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     //figure out parameters
     QString params = a.join(" ");
-    if (params.contains("--driver xorg")) {
-        device.driverByParam(gpu::XORG);
-        ui->combo_gpus->addItems(device.initialize(true));
-    }
-    else if (params.contains("--driver fglrx")) {
-        device.driverByParam(gpu::FGLRX);
-        ui->combo_gpus->addItems(device.initialize(true));
-    }
-    else // driver object detects cards in pc and fill the list in ui //
+    if (params.contains("--driver xorg"))
+        ui->combo_gpus->addItems(device.initialize(gpu::XORG));
+    else if (params.contains("--driver fglrx"))
+        ui->combo_gpus->addItems(device.initialize(gpu::FGLRX));
+    else
         ui->combo_gpus->addItems(device.initialize());
 
     ui->configGroups->setTabEnabled(2,device.daemonConnected());
@@ -216,13 +212,13 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
     }
 
-    // ui->mainTabs->setTabEnabled(2,features.overClockAvailable);
+     ui->mainTabs->setTabEnabled(2,features.overClockAvailable);
     // Overclock is still not tested (it will be fully available only with Linux 4.7/4.8), disable it in release mode
-#ifdef QT_DEBUG // TO BE REMOVED AFTER TESTING
-    ui->mainTabs->setTabEnabled(2,true);
-#else
-    ui->mainTabs->setTabEnabled(2,false);
-#endif
+//#ifdef QT_DEBUG // TO BE REMOVED AFTER TESTING
+//    ui->mainTabs->setTabEnabled(2,true);
+//#else
+//    ui->mainTabs->setTabEnabled(2,false);
+//#endif
 }
 
 void radeon_profile::refreshGpuData() {

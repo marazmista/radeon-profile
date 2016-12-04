@@ -49,13 +49,13 @@ public:
     void getPwmSpeed();
 
     void changeGpu(char index);
-    void driverByParam(gpu::driver);
     void setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const;
     void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const;
     void setPwmManualControl(bool manual) const;
     void setPwmValue(int value) const;
 
-    QStringList initialize(bool skipDetectDriver = false);
+    QStringList initialize(gpu::driver);
+    QStringList initialize();
     void reconfigureDaemon();
     bool daemonConnected();
 
@@ -64,7 +64,6 @@ public:
 
 private:
     driver currentDriver;
-    driver detectDriver();
 
 };
 

@@ -37,12 +37,14 @@ public:
     static void setPwmValue(int value);
 
     static QStringList detectCards();
-    static void figureOutGpuDataFilePaths(QString gpuName);
-    static void configure(QString gpuName);
+    static void figureOutGpuDataFilePaths(const QString &gpuName);
+    static void configure(const QString &gpuName);
     static globalStuff::driverFeatures figureOutDriverFeatures();
     static void reconfigureDaemon();
     static bool daemonConnected();
     static globalStuff::gpuClocksStruct getFeaturesFallback();
+    static void setupDriverModule(const QString &gpuName);
+    static void setupRegex(const QString &data);
 
     /**
      * @brief overClock Overclocks the GPU
@@ -52,7 +54,6 @@ public:
     static bool overClock(int percentage);
 
     static void resetOverClock();
-
 
 private:
     enum tempSensor {
@@ -65,6 +66,11 @@ private:
 
     static QChar gpuSysIndex;
     static QSharedMemory sharedMem;
+    static QString driverModuleName;
+
+    static struct rxPatternsStruct {
+        QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
+    } rxPatterns;
 
     static struct driverFilePaths {
         QString powerMethodFilePath,
@@ -79,7 +85,9 @@ private:
             pwmMaxSpeedPath,
             overDrivePath;
     } filePaths;
+
     static int sensorsGPUtempIndex;
+    static short rxMatchIndex, clocksValueDivider;
     static dXorg::tempSensor currentTempSensor;
     static globalStuff::powerMethod currentPowerMethod;
 
