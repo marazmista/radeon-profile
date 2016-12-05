@@ -43,6 +43,7 @@ void radeon_profile::saveConfig() {
     settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
     settings.setValue("fanMode",ui->fanModesTabs->currentIndex());
     settings.setValue("fanProfileName",ui->l_currentFanProfile->text());
+    settings.setValue("enableZeroPercentFanSpeed", ui->cb_zeroPercentFanSpeed->isChecked());
 
     settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
     settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
@@ -104,6 +105,7 @@ void radeon_profile::loadConfig() {
     ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",80).toInt());
     ui->cb_saveFanMode->setChecked(settings.value("saveSelectedFanMode",false).toBool());
     ui->l_currentFanProfile->setText(settings.value("fanProfileName","default").toString());
+    ui->cb_zeroPercentFanSpeed->setChecked(settings.value("enableZeroPercentFanSpeed",false).toBool());
     if (ui->cb_saveFanMode->isChecked())
         ui->fanModesTabs->setCurrentIndex(settings.value("fanMode",0).toInt());
 
@@ -162,6 +164,9 @@ void radeon_profile::loadConfig() {
         ui->mainTabs->setTabEnabled(1,true);
     else
         ui->mainTabs->setTabEnabled(1,false);
+
+    if (ui->cb_zeroPercentFanSpeed->isChecked())
+        setupMinFanSpeedSetting(0);
 
     ui->list_currentGPUData->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_glxinfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());

@@ -384,7 +384,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -1445,7 +1445,7 @@
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_8">
              <item>
-              <widget class="QLabel" name="label_25">
+              <widget class="QLabel" name="l_minFanSpeed">
                <property name="font">
                 <font>
                  <family>Monospace</family>
@@ -3026,7 +3026,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_mainConfig">
            <attribute name="title">
@@ -3284,7 +3284,7 @@
             <property name="geometry">
              <rect>
               <x>210</x>
-              <y>140</y>
+              <y>170</y>
               <width>91</width>
               <height>24</height>
              </rect>
@@ -3304,7 +3304,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>140</y>
+              <y>170</y>
               <width>181</width>
               <height>21</height>
              </rect>
@@ -3317,7 +3317,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>162</y>
+              <y>192</y>
               <width>291</width>
               <height>21</height>
              </rect>
@@ -3340,6 +3340,19 @@
             </property>
             <property name="text">
              <string>Save selected fan control mode</string>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="cb_zeroPercentFanSpeed">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>130</y>
+              <width>291</width>
+              <height>16</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Enable 0% fan speed</string>
             </property>
            </widget>
           </widget>

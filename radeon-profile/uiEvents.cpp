@@ -381,12 +381,11 @@ void radeon_profile::on_btn_addFanStep_clicked()
     if (currentFanProfile.contains(temperature)) // A step with this temperature already exists
         QMessageBox::warning(this, tr("Error"), tr("This step already exists. Double click on it, to change its value"));
     else { // This step does not exist, proceed
-        const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (10-100)"));
+        const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%]"));
         if (fanSpeed == -1) // User clicked Cancel
             return;
 
         addFanStep(temperature,fanSpeed);
-
     }
 }
 
@@ -583,4 +582,20 @@ void radeon_profile::on_btn_export_clicked(){
         ui->plotClocks->savePng(folder + "/clocks.png");
         ui->plotVolts->savePng(folder + "/voltages.png");
     }
+}
+
+void radeon_profile::on_cb_zeroPercentFanSpeed_clicked(bool checked)
+{
+    if (checked && !askConfirmation(tr("Question"), tr("This option may cause overheat of your card and it is your responsibility if this happens. Do you want to enable it?"))) {
+        ui->cb_zeroPercentFanSpeed->setChecked(false);
+        return;
+    }
+
+    setupMinFanSpeedSetting((checked) ? 0 : 10);
+}
+
+void radeon_profile::setupMinFanSpeedSetting(unsigned int speed) {
+    minFanStepsSpeed = speed;
+    ui->l_minFanSpeed->setText(QString::number(minFanStepsSpeed)+"%");
+    ui->fanSpeedSlider->setMinimum((minFanStepsSpeed * 255) / 100);
 }
