@@ -575,12 +575,19 @@ void radeon_profile::fanProfileMenuActionClicked(QAction *a) {
 }
 
 void radeon_profile::on_btn_export_clicked(){
-    QString folder = QFileDialog::getExistingDirectory(this, "Export destination directory");
-    if( ! folder.isEmpty()){
+    QString folder = QFileDialog::getExistingDirectory(this, tr("Export destination directory"));
+
+    if (!folder.isEmpty()) {
         qDebug() << "Exporting graphs into " << folder;
-        ui->plotTemp->savePng(folder + "/temperature.png");
-        ui->plotClocks->savePng(folder + "/clocks.png");
-        ui->plotVolts->savePng(folder + "/voltages.png");
+
+        if (ui->cb_showTempsGraph->isChecked())
+            ui->plotTemp->savePng(folder + "/temperature.png");
+
+        if (ui->cb_showFreqGraph->isChecked())
+            ui->plotClocks->savePng(folder + "/clocks.png");
+
+        if (ui->cb_showVoltsGraph->isChecked())
+            ui->plotVolts->savePng(folder + "/voltages.png");
     }
 }
 

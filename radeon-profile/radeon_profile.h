@@ -211,7 +211,7 @@ private:
      * @param fanSpeed
      * @return If the step is valid.
      */
-    bool fanStepIsValid(int temperature, int fanSpeed);
+    bool fanStepIsValid(unsigned int temperature, unsigned int fanSpeed);
 
     /**
      * @brief addFanStep Adds a single fan step to the custom curve steps.

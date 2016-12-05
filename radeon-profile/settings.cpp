@@ -270,9 +270,8 @@ void radeon_profile::saveFanProfiles() {
     }
 }
 
-bool radeon_profile::fanStepIsValid(const int temperature, const int fanSpeed) {
-    return temperature >= minFanStepsTemp &&
-            temperature <= maxFanStepsTemp &&
+bool radeon_profile::fanStepIsValid(const unsigned int temperature, const unsigned int fanSpeed) {
+    return temperature <= maxFanStepsTemp &&
             fanSpeed >= minFanStepsSpeed &&
             fanSpeed <= maxFanStepsSpeed;
 }
