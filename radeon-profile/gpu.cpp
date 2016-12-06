@@ -72,8 +72,10 @@ QStringList gpu::initialize(gpu::driver driver) {
     switch (currentDriver) {
         case gpu::XORG:
             gpuList = dXorg::detectCards();
-            dXorg::configure(gpuList[currentGpuIndex]);
-            features = dXorg::figureOutDriverFeatures();
+            if(currentGpuIndex < gpuList.size()){
+                dXorg::configure(gpuList[currentGpuIndex]);
+                features = dXorg::figureOutDriverFeatures();
+            }
             break;
         case gpu::FGLRX:
             dFglrx::configure(currentGpuIndex);
