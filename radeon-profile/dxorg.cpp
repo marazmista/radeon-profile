@@ -83,6 +83,11 @@ void dXorg::setupDriverModule(const QString &gpuName) {
             dXorg::driverModuleName = "amdgpu";
             return;
         }
+
+        if (line == "DRIVER=i915") {
+            dXorg::driverModuleName = "i915";
+            return;
+        }
     }
 }
 
@@ -111,33 +116,47 @@ bool dXorg::daemonConnected() {
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
+    filePaths.moduleParamsPath = "/sys/module/"+dXorg::driverModuleName+"/parameters/";
 
-    filePaths.powerMethodFilePath = devicePath + file_PowerMethod;
-    filePaths.profilePath = devicePath + file_powerProfile;
-    filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
-    filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
-    filePaths.moduleParamsPath = devicePath + "driver/module/holders/"+dXorg::driverModuleName+"/parameters/";
-    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+dXorg::driverModuleName+"_pm_info"; // this path contains only index
-    filePaths.overDrivePath = devicePath + file_overclockLevel;
+    if(dXorg::driverModuleName == "radeon" || dXorg::driverModuleName == "amdgpu"){
+        filePaths.powerMethodFilePath = devicePath + file_PowerMethod;
+        filePaths.profilePath = devicePath + file_powerProfile;
+        filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
+        filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
+        filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+dXorg::driverModuleName+"_pm_info"; // this path contains only index
+        filePaths.overDrivePath = devicePath + file_overclockLevel;
 
 
-    QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
-    hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0" : hwmonDevicePath));
+        QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
+        hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0" : hwmonDevicePath));
 
-    filePaths.sysfsHwmonTempPath = hwmonDevicePath  + "/temp1_input";
+        filePaths.sysfsHwmonTempPath = hwmonDevicePath  + "/temp1_input";
 
-    if (QFile::exists(hwmonDevicePath + "/pwm1_enable")) {
-        filePaths.pwmEnablePath = hwmonDevicePath + "/pwm1_enable";
+        if (QFile::exists(hwmonDevicePath + "/pwm1_enable")) {
+            filePaths.pwmEnablePath = hwmonDevicePath + "/pwm1_enable";
 
-        if (QFile::exists(hwmonDevicePath + "/pwm1"))
-            filePaths.pwmSpeedPath = hwmonDevicePath + "/pwm1";
+            if (QFile::exists(hwmonDevicePath + "/pwm1"))
+                filePaths.pwmSpeedPath = hwmonDevicePath + "/pwm1";
 
-        if (QFile::exists(hwmonDevicePath + "/pwm1_max"))
-            filePaths.pwmMaxSpeedPath = hwmonDevicePath + "/pwm1_max";
-    } else {
-        filePaths.pwmEnablePath = "";
-        filePaths.pwmSpeedPath = "";
-        filePaths.pwmMaxSpeedPath = "";
+            if (QFile::exists(hwmonDevicePath + "/pwm1_max"))
+                filePaths.pwmMaxSpeedPath = hwmonDevicePath + "/pwm1_max";
+        } else {
+            filePaths.pwmEnablePath = "";
+            filePaths.pwmSpeedPath = "";
+            filePaths.pwmMaxSpeedPath = "";
+        }
+    } else if(dXorg::driverModuleName == "i915"){
+        filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/i915_frequency_info";
+
+        //filePaths.overDrivePath = devicePath + "gt_act_freq_mhz";
+
+        QStringList coretempHwmon = globalStuff::grabSystemInfo("ls /sys/devices/platform/coretemp.0/hwmon/");
+        if(!coretempHwmon.isEmpty()){
+            QString coretempPath = "/sys/class/hwmon/" + coretempHwmon[0] + "/";
+            QStringList coretemps = globalStuff::grabSystemInfo("ls " + coretempPath).filter("input");
+            if(!coretemps.isEmpty())
+                filePaths.sysfsHwmonTempPath = coretempPath + coretemps[0];
+        }
     }
 }
 
@@ -406,7 +425,7 @@ QStringList dXorg::detectCards() {
         if (f.open(QIODevice::ReadOnly)) {
             QString line = f.readLine(50).trimmed();
 
-            if (line == "DRIVER=radeon" || line == "DRIVER=amdgpu")
+            if (line == "DRIVER=radeon" || line == "DRIVER=amdgpu" || line == "DRIVER=i915")
                 data.append(f.fileName().split('/')[4]);
         }
     }
