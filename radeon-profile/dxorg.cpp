@@ -386,7 +386,7 @@ QString dXorg::findSysfsHwmonForGPU() {
 }
 
 QStringList dXorg::getGLXInfo(QProcessEnvironment env) {
-    return globalStuff::grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
+    return globalStuff::grabSystemInfo("glxinfo -B",env);
 }
 
 QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
@@ -593,32 +593,36 @@ int dXorg::getPwmSpeed() {
 void dXorg::setupRegex(const QString &data) {
     QRegExp rx;
 
-    rx.setPattern("sclk:\\s\\d+");
-    rx.indexIn(data);
-    if (!rx.cap(0).isEmpty()) {
-        dXorg::rxPatterns.powerLevel = "power\\slevel\\s\\d",
-                dXorg::rxPatterns.sclk = "sclk:\\s\\d+",
-                dXorg::rxPatterns.mclk = "mclk:\\s\\d+",
-                dXorg::rxPatterns.vclk = "vclk:\\s\\d+",
-                dXorg::rxPatterns.dclk = "dclk:\\s\\d+",
-                dXorg::rxPatterns.vddc = "vddc:\\s\\d+",
-                dXorg::rxPatterns.vddci = "vddci:\\s\\d+";
+    if(dXorg::driverModuleName == "radeon" || dXorg::driverModuleName == "amdgpu"){
+        rx.setPattern("sclk:\\s\\d+");
+        rx.indexIn(data);
+        if (!rx.cap(0).isEmpty()) {
+            dXorg::rxPatterns.powerLevel = "power\\slevel\\s\\d";
+            dXorg::rxPatterns.sclk = "sclk:\\s\\d+";
+            dXorg::rxPatterns.mclk = "mclk:\\s\\d+";
+            dXorg::rxPatterns.vclk = "vclk:\\s\\d+";
+            dXorg::rxPatterns.dclk = "dclk:\\s\\d+";
+            dXorg::rxPatterns.vddc = "vddc:\\s\\d+";
+            dXorg::rxPatterns.vddci = "vddci:\\s\\d+";
 
-        rxMatchIndex = 1;
-        clocksValueDivider = 100;
-
-        return;
-    }
-
-    rx.setPattern("\\[\\s+sclk\\s+\\]:\\s\\d+");
-    rx.indexIn(data);
-    if (!rx.cap(0).isEmpty()) {
-        dXorg::rxPatterns.sclk = "\\[\\s+sclk\\s+\\]:\\s\\d+",
+            rxMatchIndex = 1;
+            clocksValueDivider = 100;
+        } else {
+            rx.setPattern("\\[\\s+sclk\\s+\\]:\\s\\d+");
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty()) {
+                dXorg::rxPatterns.sclk = "\\[\\s+sclk\\s+\\]:\\s\\d+";
                 dXorg::rxPatterns.mclk = "\\[\\s+mclk\\s+\\]:\\s\\d+";
 
+                rxMatchIndex = 3;
+                clocksValueDivider = 1;
+            }
+        }
+    } else if(dXorg::driverModuleName == "i915"){
+        dXorg::rxPatterns.sclk = "actual\\sGPU\\sfreq:\\s\\d+";
+        dXorg::rxPatterns.mclk = "DDR\\sfreq:\\s\\d+";
         rxMatchIndex = 3;
         clocksValueDivider = 1;
-        return;
     }
 }
 
