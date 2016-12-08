@@ -27,7 +27,7 @@
 //#define minFanStepsSpeed 10
 #define maxFanStepsSpeed 100
 
-#define appVersion 20161205
+#define appVersion 20161208
 
 namespace Ui {
 class radeon_profile;
@@ -138,15 +138,14 @@ private slots:
     void on_cb_enableOverclock_toggled(bool enable);
     void on_btn_applyOverclock_clicked();
     void on_slider_overclock_valueChanged(int value);
-    void on_combo_fanProfiles_currentTextChanged(const QString &arg1);
     void on_btn_activateFanProfile_clicked();
     void on_btn_removeFanProfile_clicked();
     void on_btn_saveFanProfile_clicked();
     void on_btn_saveAsFanProfile_clicked();
     void fanProfileMenuActionClicked(QAction *a);
     void on_btn_export_clicked();
-
     void on_cb_zeroPercentFanSpeed_clicked(bool checked);
+    void on_combo_fanProfiles_currentIndexChanged(const QString &arg1);
 
 private:
     gpu device;

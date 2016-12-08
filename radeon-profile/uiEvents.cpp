@@ -484,7 +484,7 @@ void radeon_profile::on_slider_overclock_valueChanged(const int value){
     ui->label_overclockPercentage->setText(QString::number(value));
 }
 
-void radeon_profile::on_combo_fanProfiles_currentTextChanged(const QString &arg1)
+void radeon_profile::on_combo_fanProfiles_currentIndexChanged(const QString &arg1)
 {
     makeFanProfileListaAndGraph(fanProfiles.value(arg1));
 }
