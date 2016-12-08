@@ -355,11 +355,11 @@ void radeon_profile::adjustFanSpeed() {
         }
 
         // find bounds of current temperature
-        const QMap<int,unsigned int>::const_iterator high = currentFanProfile.upperBound(device.gpuTemeperatureData.current),
-                low = high - 1;
+        QMap<int,unsigned int>::iterator high = currentFanProfile.upperBound(device.gpuTemeperatureData.current);
+        QMap<int,unsigned int>::iterator low = (currentFanProfile.size() > 1 ? high - 1 : high);
 
         int hSpeed = high.value(),
-                lSpeed = low.value();
+			lSpeed = low.value();
 
         if (high == currentFanProfile.constBegin()) {
             device.setPwmValue(device.features.pwmMaxSpeed * hSpeed / 100);
