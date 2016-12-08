@@ -230,9 +230,11 @@ void radeon_profile::loadFanProfiles() {
         p.insert(90,maxFanStepsSpeed);
 
         fanProfiles.insert("default", p);
+        ui->combo_fanProfiles->addItem("default");
+        ui->l_currentFanProfile->setText("default");
     }
 
-    makeFanProfileListaAndGraph(fanProfiles.value("default"));
+    makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));
 }
 
 void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {
@@ -283,7 +285,8 @@ void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
         return;
     }
 
-    currentFanProfile.insert(temperature,fanSpeed);
+    fanProfileSteps editedFanProfile = fanProfiles.value(ui->combo_fanProfiles->currentText(), currentFanProfile);
+    editedFanProfile.insert(temperature,fanSpeed);
 
     const QString temperatureString = QString::number(temperature),
             speedString = QString::number(fanSpeed);
@@ -295,7 +298,7 @@ void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
     } else // The element exists already, overwrite it
         existing.first()->setText(1,speedString);
 
-    makeFanProfileListaAndGraph(currentFanProfile);
+    makeFanProfileListaAndGraph(editedFanProfile);
 }
 
 void radeon_profile::showWindow() {
