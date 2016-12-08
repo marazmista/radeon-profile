@@ -194,12 +194,16 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
             qWarning() << "Unable to lock the shared memory: " << sharedMem.errorString();
     }
 
-    if (data.isEmpty())
-        qWarning() << "No data was found";
-    else if (resolvingGpuFeatures)
-        qDebug() << data;
+    QString out = data.trimmed();
 
-    return (QString)data.trimmed();
+    if(resolvingGpuFeatures){
+        if (out.isEmpty())
+            qWarning() << "No data was found (you need debugfs active and either root access or radeon-profile-daemon)";
+        else
+            qDebug() << data;
+    }
+
+    return out;
 }
 
 globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
@@ -297,6 +301,7 @@ globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
         if (!rx.cap(0).isEmpty())
             tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[3].toFloat();
         else {
+            qDebug() << "Access to debugfs failed, getting fallback data from /sys/class/drm/";
             QFile f(filePaths.overDrivePath);
             if(f.open(QIODevice::ReadOnly))
                 tData.coreClk = f.readLine().trimmed().toFloat();
