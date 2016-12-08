@@ -196,6 +196,8 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 
     if (data.isEmpty())
         qWarning() << "No data was found";
+    else if (resolvingGpuFeatures)
+        qDebug() << data;
 
     return (QString)data.trimmed();
 }

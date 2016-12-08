@@ -262,7 +262,7 @@ void radeon_profile::refreshUI() {
             addChild(ui->list_currentGPUData, tr("Power level"), device.gpuClocksDataString.powerLevel);
         if (device.gpuClocksData.coreClk != -1)
             addChild(ui->list_currentGPUData, tr("GPU clock"), device.gpuClocksDataString.coreClk);
-        if (device.gpuClocksData.coreClk != -1)
+        if (device.gpuClocksData.memClk != -1)
             addChild(ui->list_currentGPUData, tr("Memory clock"), device.gpuClocksDataString.memClk);
         if (device.gpuClocksData.uvdCClk != -1)
             addChild(ui->list_currentGPUData, tr("UVD core clock (cclk)"), device.gpuClocksDataString.uvdCClk);
