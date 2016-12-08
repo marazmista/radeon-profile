@@ -226,7 +226,8 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 }
 
 void radeon_profile::refreshGpuData() {
-    device.refreshPowerLevel();
+    if(device.features.canChangeProfile)
+        device.refreshPowerLevel();
     device.getClocks();
     device.getTemperature();
 
@@ -311,9 +312,11 @@ void radeon_profile::timerEvent() {
     if (ui->cb_gpuData->isChecked()) {
         refreshGpuData();
 
-        ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerProfile));
-        if (device.features.pm == globalStuff::DPM)
-            ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
+        if(device.features.canChangeProfile){
+            ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerProfile));
+            if (device.features.pm == globalStuff::DPM)
+                ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
+        }
 
         if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked())
             adjustFanSpeed();
@@ -452,7 +455,9 @@ void radeon_profile::updateStatsTable() {
 
 void radeon_profile::refreshTooltip()
 {
-    QString tooltipdata = radeon_profile::windowTitle() + "\nCurrent profile: "+ device.currentPowerProfile + "  " + device.currentPowerLevel +"\n";
+    QString tooltipdata = radeon_profile::windowTitle() + "\n";
+    if(device.features.canChangeProfile)
+        tooltipdata += "Current profile: "+ device.currentPowerProfile + "  " + device.currentPowerLevel +"\n";
     for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++) {
         tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
     }
