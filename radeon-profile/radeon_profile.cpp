@@ -25,7 +25,6 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QDebug>
-#include <iostream>
 
 radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QMainWindow(parent),
