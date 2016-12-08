@@ -148,7 +148,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     } else if(dXorg::driverModuleName == "i915"){
         filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/i915_frequency_info";
 
-        //filePaths.overDrivePath = devicePath + "gt_act_freq_mhz";
+        filePaths.overDrivePath = "/sys/class/drm/"+gpuName+"/gt_act_freq_mhz";
 
         QStringList coretempHwmon = globalStuff::grabSystemInfo("ls /sys/devices/platform/coretemp.0/hwmon/");
         if(!coretempHwmon.isEmpty()){
@@ -203,90 +203,108 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
     globalStuff::gpuClocksStruct tData(-1); // empty struct
 
-    // if nothing is there returns empty (-1) struct
-    if (data.isEmpty()){
-        qDebug() << "Can't get clocks, no data available";
-        return tData;
-    }
+    QRegExp rx;
+    if(dXorg::driverModuleName == "radeon" || dXorg::driverModuleName == "amdgpu"){
+        // if nothing is there returns empty (-1) struct
+        if (data.isEmpty()){
+            qDebug() << "Can't get clocks, no data available";
+            return tData;
+        }
 
-    switch (currentPowerMethod) {
-    case globalStuff::DPM: {
-        QRegExp rx;
+        switch (currentPowerMethod) {
+        case globalStuff::DPM: {
 
-        rx.setPattern(rxPatterns.powerLevel);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
-            tData.powerLevel = rx.cap(0).split(' ')[2].toShort();
+            rx.setPattern(rxPatterns.powerLevel);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                tData.powerLevel = rx.cap(0).split(' ')[2].toShort();
 
+            rx.setPattern(rxPatterns.sclk);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+
+            rx.setPattern(rxPatterns.mclk);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+
+            rx.setPattern(rxPatterns.vclk);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty()) {
+                tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+                tData.uvdCClk  = (tData.uvdCClk  == 0) ? -1 :  tData.uvdCClk;
+            }
+
+            rx.setPattern(rxPatterns.dclk);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty()) {
+                tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+                tData.uvdDClk = (tData.uvdDClk == 0) ? -1 : tData.uvdDClk;
+            }
+
+            rx.setPattern(rxPatterns.vddc);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                tData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
+
+            rx.setPattern(rxPatterns.vddci);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                tData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
+
+            return tData;
+            break;
+        }
+        case globalStuff::PROFILE: {
+            QStringList clocksData = data.split("\n");
+            for (int i=0; i< clocksData.count(); i++) {
+                switch (i) {
+                case 1: {
+                    if (clocksData[i].contains("current engine clock")) {
+                        tData.coreClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
+                        break;
+                    }
+                };
+                case 3: {
+                    if (clocksData[i].contains("current memory clock")) {
+                        tData.memClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
+                        break;
+                    }
+                }
+                case 4: {
+                    if (clocksData[i].contains("voltage")) {
+                        tData.coreVolt = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toFloat();
+                        break;
+                    }
+                }
+                }
+            }
+            return tData;
+            break;
+        }
+        case globalStuff::PM_UNKNOWN: {
+            qWarning() << "Unknown power method, can't get clocks";
+            return tData;
+            break;
+        }
+        }
+    } else if(dXorg::driverModuleName == "i915"){
         rx.setPattern(rxPatterns.sclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
-            tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+            tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[3].toFloat();
+        else {
+            QFile f(filePaths.overDrivePath);
+            if(f.open(QIODevice::ReadOnly))
+                tData.coreClk = f.readLine().trimmed().toFloat();
+            f.close();
+        }
 
         rx.setPattern(rxPatterns.mclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
-            tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
-
-        rx.setPattern(rxPatterns.vclk);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty()) {
-            tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
-            tData.uvdCClk  = (tData.uvdCClk  == 0) ? -1 :  tData.uvdCClk;
-        }
-
-        rx.setPattern(rxPatterns.dclk);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty()) {
-            tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
-            tData.uvdDClk = (tData.uvdDClk == 0) ? -1 : tData.uvdDClk;
-        }
-
-        rx.setPattern(rxPatterns.vddc);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
-            tData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
-
-        rx.setPattern(rxPatterns.vddci);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
-            tData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
-
-        return tData;
-        break;
-    }
-    case globalStuff::PROFILE: {
-        QStringList clocksData = data.split("\n");
-        for (int i=0; i< clocksData.count(); i++) {
-            switch (i) {
-            case 1: {
-                if (clocksData[i].contains("current engine clock")) {
-                    tData.coreClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
-                    break;
-                }
-            };
-            case 3: {
-                if (clocksData[i].contains("current memory clock")) {
-                    tData.memClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
-                    break;
-                }
-            }
-            case 4: {
-                if (clocksData[i].contains("voltage")) {
-                    tData.coreVolt = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toFloat();
-                    break;
-                }
-            }
-            }
-        }
-        return tData;
-        break;
-    }
-    case globalStuff::PM_UNKNOWN: {
-        qWarning() << "Unknown power method, can't get clocks";
-        return tData;
-        break;
-    }
+            tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[2].toFloat();
     }
     return tData;
 }
@@ -621,8 +639,6 @@ void dXorg::setupRegex(const QString &data) {
     } else if(dXorg::driverModuleName == "i915"){
         dXorg::rxPatterns.sclk = "actual\\sGPU\\sfreq:\\s\\d+";
         dXorg::rxPatterns.mclk = "DDR\\sfreq:\\s\\d+";
-        rxMatchIndex = 3;
-        clocksValueDivider = 1;
     }
 }
 
@@ -693,25 +709,33 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
 }
 
 globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
-    QFile f("/tmp/"+dXorg::driverModuleName+"_pm_info");
-    if (f.open(QIODevice::ReadOnly)) {
-        globalStuff::gpuClocksStruct fallbackFeatures;
-        QString s = QString(f.readAll());
+    globalStuff::gpuClocksStruct fallbackFeatures(-1);
 
-        // just look for it, if it is, the value is not important at this point
-        if (s.contains("sclk"))
-            fallbackFeatures.coreClk = 0;
-        if (s.contains("mclk"))
-            fallbackFeatures.memClk = 0;
-        if (s.contains("vddc"))
-            fallbackFeatures.coreClk = 0;
-        if (s.contains("vddci"))
-            fallbackFeatures.memClk = 0;
+    if(dXorg::driverModuleName == "radeon" || dXorg::driverModuleName == "amdgpu"){
+        QFile f("/tmp/"+dXorg::driverModuleName+"_pm_info");
+        if (f.open(QIODevice::ReadOnly)) {
+            QString s = QString(f.readAll());
 
+            // just look for it, if it is, the value is not important at this point
+            if (s.contains("sclk"))
+                fallbackFeatures.coreClk = 0;
+            if (s.contains("mclk"))
+                fallbackFeatures.memClk = 0;
+            if (s.contains("vddc"))
+                fallbackFeatures.coreClk = 0;
+            if (s.contains("vddci"))
+                fallbackFeatures.memClk = 0;
+
+            f.close();
+        }
+    } else if(dXorg::driverModuleName == "i915"){
+        QFile f(filePaths.overDrivePath);
+        if(f.open(QIODevice::ReadOnly))
+            fallbackFeatures.coreClk = 0;
         f.close();
-        return fallbackFeatures;
-    } else
-        return globalStuff::gpuClocksStruct(-1);
+    }
+
+    return fallbackFeatures;
 }
 
 bool dXorg::overClock(const int percentage){
