@@ -622,6 +622,11 @@ void dXorg::setupRegex(const QString &data) {
         rx.setPattern("sclk:\\s\\d+");
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
+            /* Format:
+                uvd    vclk: 0 dclk: 0
+                power level 0    sclk: 20000 mclk: 60000 vddc: 900 vddci: 0
+             */
+
             dXorg::rxPatterns.powerLevel = "power\\slevel\\s\\d";
             dXorg::rxPatterns.sclk = "sclk:\\s\\d+";
             dXorg::rxPatterns.mclk = "mclk:\\s\\d+";
@@ -636,6 +641,11 @@ void dXorg::setupRegex(const QString &data) {
             rx.setPattern("\\[\\s+sclk\\s+\\]:\\s\\d+");
             rx.indexIn(data);
             if (!rx.cap(0).isEmpty()) {
+                /* Format:
+                    [ mclk ]: 300 MHz
+                    [ sclk ]: 300 MHz
+                 */
+
                 dXorg::rxPatterns.sclk = "\\[\\s+sclk\\s+\\]:\\s\\d+";
                 dXorg::rxPatterns.mclk = "\\[\\s+mclk\\s+\\]:\\s\\d+";
 
@@ -644,6 +654,19 @@ void dXorg::setupRegex(const QString &data) {
             }
         }
     } else if(dXorg::driverModuleName == "i915"){
+        /* Format:
+            DDR freq: 1333 MHz
+            actual GPU freq: 854 MHz
+            current GPU freq: 854 MHz
+            max GPU freq: 854 MHz
+            min GPU freq: 187 MHz
+            idle GPU freq: 187 MHz
+            efficient (RPe) frequency: 417 MHz
+            Current CD clock frequency: 266667 kHz
+            Max CD clock frequency: 400000 kHz
+            Max pixel clock frequency: 360000 kHz
+         */
+
         dXorg::rxPatterns.sclk = "actual\\sGPU\\sfreq:\\s\\d+";
         dXorg::rxPatterns.mclk = "DDR\\sfreq:\\s\\d+";
     }
