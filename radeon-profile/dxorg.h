@@ -83,6 +83,7 @@ private:
             pwmEnablePath,
             pwmSpeedPath,
             pwmMaxSpeedPath,
+            coreClockPath,
             overDrivePath;
     } filePaths;
 

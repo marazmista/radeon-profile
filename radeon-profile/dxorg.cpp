@@ -148,7 +148,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     } else if(dXorg::driverModuleName == "i915"){
         filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/i915_frequency_info";
 
-        filePaths.overDrivePath = "/sys/class/drm/"+gpuName+"/gt_act_freq_mhz";
+        filePaths.coreClockPath = "/sys/class/drm/"+gpuName+"/gt_act_freq_mhz";
 
         QStringList coretempHwmon = globalStuff::grabSystemInfo("ls /sys/devices/platform/coretemp.0/hwmon/");
         if(!coretempHwmon.isEmpty()){
@@ -177,7 +177,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
         // because we need correctly figure out what is available
         // see: https://stackoverflow.com/a/11487434/2347196
         if (resolvingGpuFeatures) {
-            QTime delayTime = QTime::currentTime().addMSecs(1000);
+            QTime delayTime = QTime::currentTime().addMSecs(1100);
             while (QTime::currentTime() < delayTime)
                 QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
         }
@@ -196,12 +196,10 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 
     QString out = data.trimmed();
 
-    if(resolvingGpuFeatures){
-        if (out.isEmpty())
-            qWarning() << "No data was found (you need debugfs active and either root access or radeon-profile-daemon)";
-        else
-            qDebug() << data;
-    }
+     if (out.isEmpty())
+         qWarning() << "No data was found (you need debugfs active and either root access or radeon-profile-daemon)";
+     else if (resolvingGpuFeatures)
+         qDebug() << out;
 
     return out;
 }
@@ -302,7 +300,7 @@ globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
             tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[3].toFloat();
         else {
             qDebug() << "Access to debugfs failed, getting fallback data from /sys/class/drm/";
-            QFile f(filePaths.overDrivePath);
+            QFile f(filePaths.coreClockPath);
             if(f.open(QIODevice::ReadOnly))
                 tData.coreClk = f.readLine().trimmed().toFloat();
             f.close();
@@ -736,7 +734,7 @@ globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
             f.close();
         }
     } else if(dXorg::driverModuleName == "i915"){
-        QFile f(filePaths.overDrivePath);
+        QFile f(filePaths.coreClockPath);
         if(f.open(QIODevice::ReadOnly))
             fallbackFeatures.coreClk = 0;
         f.close();

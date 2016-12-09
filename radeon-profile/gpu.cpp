@@ -569,8 +569,8 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             QTreeWidgetItem * modeListItem = new QTreeWidgetItem(QStringList() << QObject::tr("Supported modes"));
             outputItem->addChild(modeListItem);
 
+            qDebug() << "    Analyzing available modes";
             for(int modeIndex = 0; modeIndex < outputInfo->nmode; modeIndex++){ // For each possible mode
-                qDebug() << "    Analyzing available mode" << modeIndex;
 
                 XRRModeInfo * modeInfo = getModeInfo(screenResources, outputInfo->modes[modeIndex]);
                 if(modeInfo == NULL) // Mode info not found
@@ -705,9 +705,9 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                         // Proceed to print the range or the list alternatives
                         propertyValue += (propertyInfo->range) ? " (Range: " : " (Supported: ";
 
+                        qDebug() << "      Printing alternatives";
                         for(int valuesIndex = 0; valuesIndex < propertyInfo->num_values; valuesIndex++){
                             // Until there is another alternative/range available
-                            qDebug() << "      Printing alternative " << valuesIndex;
 
                             if(propertyInfo->range) { // This is a range, print the maximum value
                                 propertyValue += translateProperty(display,
