@@ -150,9 +150,10 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 
         filePaths.coreClockPath = "/sys/class/drm/"+gpuName+"/gt_act_freq_mhz";
 
-        QStringList coretempHwmon = globalStuff::grabSystemInfo("ls /sys/devices/platform/coretemp.0/hwmon/");
+        const QString coretempBasePath = "/sys/devices/platform/coretemp.0/hwmon/";
+        const QStringList coretempHwmon = globalStuff::grabSystemInfo("ls " + coretempBasePath);
         if(!coretempHwmon.isEmpty()){
-            QString coretempPath = "/sys/class/hwmon/" + coretempHwmon[0] + "/";
+            const QString coretempPath = coretempBasePath + coretempHwmon[0] + "/";
             QStringList coretemps = globalStuff::grabSystemInfo("ls " + coretempPath).filter("input");
             if(!coretemps.isEmpty())
                 filePaths.sysfsHwmonTempPath = coretempPath + coretemps[0];
@@ -392,6 +393,7 @@ dXorg::tempSensor dXorg::testSensor() {
 }
 
 QString dXorg::findSysfsHwmonForGPU() {
+    const QByteArray label = (dXorg::driverModuleName == "i915") ? "Core 0" : "VGA_TEMP";
     QStringList hwmonDev = globalStuff::grabSystemInfo("ls /sys/class/hwmon/");
     for (int i = 0; i < hwmonDev.count(); i++) {
         QStringList temp = globalStuff::grabSystemInfo("ls /sys/class/hwmon/"+hwmonDev[i]+"/device/").filter("label");
@@ -399,7 +401,7 @@ QString dXorg::findSysfsHwmonForGPU() {
         for (int o = 0; o < temp.count(); o++) {
             QFile f("/sys/class/hwmon/"+hwmonDev[i]+"/device/"+temp[o]);
             if (f.open(QIODevice::ReadOnly))
-                if (f.readLine(20).contains("VGA_TEMP")) {
+                if (f.readLine(20).contains(label)) {
                     f.close();
                     return f.fileName().replace("label", "input");
                 }
