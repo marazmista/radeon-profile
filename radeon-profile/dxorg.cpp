@@ -175,10 +175,13 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
             qWarning() << "Unable to lock the shared memory: " << sharedMem.errorString();
     }
 
-    if (data.isEmpty())
-        qWarning() << "No data was found";
+    QString out = data.trimmed();
+     if (out.isEmpty())
+         qWarning() << "No data was found (you need debugfs active and either root access or radeon-profile-daemon)";
+     else if (resolvingGpuFeatures)
+         qDebug() << out;
 
-    return (QString)data.trimmed();
+    return out;
 }
 
 globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
@@ -367,7 +370,7 @@ QString dXorg::findSysfsHwmonForGPU() {
 }
 
 QStringList dXorg::getGLXInfo(QProcessEnvironment env) {
-    return globalStuff::grabSystemInfo("glxinfo",env).filter(QRegExp("direct|OpenGL.+:.+"));
+    return globalStuff::grabSystemInfo("glxinfo -B",env).filter(QRegExp(".+"));
 }
 
 QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
