@@ -38,7 +38,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     ui->setupUi(this);
     timer = new QTimer(this);
-    execsRunning = new QList<execBin*>();
 
     // checks if running as root
     if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
@@ -142,10 +141,9 @@ void radeon_profile::addRuntimeWidgets() {
     connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
 
     // set pwm buttons in group
-    QButtonGroup *pwmGroup = new QButtonGroup();
-    pwmGroup->addButton(ui->btn_pwmAuto);
-    pwmGroup->addButton(ui->btn_pwmFixed);
-    pwmGroup->addButton(ui->btn_pwmProfile);
+    pwmGroup.addButton(ui->btn_pwmAuto);
+    pwmGroup.addButton(ui->btn_pwmFixed);
+    pwmGroup.addButton(ui->btn_pwmProfile);
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
@@ -217,12 +215,6 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     }
 
      ui->mainTabs->setTabEnabled(2,features.overClockAvailable);
-    // Overclock is still not tested (it will be fully available only with Linux 4.7/4.8), disable it in release mode
-//#ifdef QT_DEBUG // TO BE REMOVED AFTER TESTING
-//    ui->mainTabs->setTabEnabled(2,true);
-//#else
-//    ui->mainTabs->setTabEnabled(2,false);
-//#endif
 }
 
 void radeon_profile::refreshGpuData() {
@@ -282,8 +274,8 @@ void radeon_profile::refreshUI() {
 }
 
 void radeon_profile::updateExecLogs() {
-    for (int i = 0; i < execsRunning->count(); i++) {
-        if (execsRunning->at(i)->getExecState() == QProcess::Running && execsRunning->at(i)->logEnabled) {
+    for (int i = 0; i < execsRunning.count(); i++) {
+        if (execsRunning.at(i)->getExecState() == QProcess::Running && execsRunning.at(i)->logEnabled) {
             QString logData = QDateTime::currentDateTime().toString(logDateFormat) +";" + device.gpuClocksDataString.powerLevel + ";" +
                     device.gpuClocksDataString.coreClk + ";"+
                     device.gpuClocksDataString.memClk + ";"+
@@ -292,7 +284,7 @@ void radeon_profile::updateExecLogs() {
                     device.gpuClocksDataString.coreVolt + ";"+
                     device.gpuClocksDataString.memVolt + ";"+
                     device.gpuTemeperatureDataString.current;
-            execsRunning->at(i)->appendToLog(logData);
+            execsRunning.at(i)->appendToLog(logData);
         }
     }
 }
