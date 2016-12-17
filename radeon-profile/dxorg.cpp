@@ -680,23 +680,14 @@ globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
         QString s = QString(f.readAll());
 
         // just look for it, if it is, the value is not important at this point
-        if (s.indexOf(rxPatterns.sclk) != -1)
+        if (s.contains("sclk"))
             fallbackFeatures.coreClk = 0;
-
-        if (s.indexOf(rxPatterns.mclk) != -1)
+        if (s.contains("mclk"))
             fallbackFeatures.memClk = 0;
-
-        if (s.indexOf(rxPatterns.vddc) != -1)
+        if (s.contains("vddc"))
             fallbackFeatures.coreVolt = 0;
-
-        if (s.indexOf(rxPatterns.vddci) != -1)
+        if (s.contains("vddci"))
             fallbackFeatures.memVolt = 0;
-
-        if(s.indexOf(rxPatterns.vclk) != -1)
-            fallbackFeatures.uvdCClk = 0;
-
-        if(s.indexOf(rxPatterns.dclk) != -1)
-            fallbackFeatures.uvdDClk = 0;
 
         f.close();
     }
