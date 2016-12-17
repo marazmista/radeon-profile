@@ -88,14 +88,11 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 void radeon_profile::changeProfileFromCombo() {
     int index = ui->combo_pProfile->currentIndex();
 
-    globalStuff::powerProfiles newPP = (globalStuff::powerProfiles)index;
 
-    if (device.features.pm == globalStuff::DPM)
-        device.setPowerProfile(newPP);
-    else {
+    if (device.features.pm != globalStuff::DPM)
         index += 3; // frist three in enum is dpm so we need to increase
-        device.setPowerProfile(newPP);
-    }
+
+    device.setPowerProfile((globalStuff::powerProfiles)index);
 }
 
 void radeon_profile::changePowerLevelFromCombo() {
