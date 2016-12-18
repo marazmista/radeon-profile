@@ -606,6 +606,18 @@ void dXorg::setupRegex(const QString &data) {
         clocksValueDivider = 1;
         return;
     }
+
+
+    rx.setPattern("\\d+\\s\\w+\\s\\(SCLK\\)");
+    rx.indexIn(data);
+    if (!rx.cap(0).isEmpty()) {
+        dXorg::rxPatterns.sclk = "\\d+\\s\\w+\\s\\(SCLK\\)",
+                dXorg::rxPatterns.mclk = "\\d+\\s\\w+\\s\\(MCLK\\)";
+
+        rxMatchIndex = 0;
+        clocksValueDivider = 1;
+        return;
+    }
 }
 
 globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
