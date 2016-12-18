@@ -282,7 +282,7 @@ void radeon_profile::on_btn_runExecProfile_clicked()
             exe->appendToLog("Profile: " +item->text(PROFILE_NAME) +"; App: " + item->text(BINARY) + "; Params: " + item->text(BINARY_PARAMS) + "; Env: " + item->text(ENV_SETTINGS));
             exe->appendToLog("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci); temp");
         }
-        execsRunning->append(exe);
+        execsRunning.append(exe);
         ui->tabs_execOutputs->setCurrentIndex(ui->tabs_execOutputs->count() - 1);
     }
     else {

@@ -15,6 +15,7 @@
 #include <QProcessEnvironment>
 #include <QList>
 #include <QListWidgetItem>
+#include <QButtonGroup>
 
 #define startClocksScaleL 50
 #define startClocksScaleH 150
@@ -150,7 +151,7 @@ private slots:
 private:
     gpu device;
     static const QString settingsPath;
-    QList<execBin*> *execsRunning;
+    QList<execBin*> execsRunning;
     unsigned int minFanStepsSpeed;
 
     fanProfileSteps currentFanProfile;
@@ -158,6 +159,7 @@ private:
 
     QMap<QString, unsigned int> pmStats;
     unsigned int rangeX, ticksCounter, statsTickCounter;
+    QButtonGroup pwmGroup;
 
     Ui::radeon_profile *ui;
     void setupGraphs();

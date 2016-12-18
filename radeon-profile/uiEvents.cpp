@@ -88,14 +88,11 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 void radeon_profile::changeProfileFromCombo() {
     int index = ui->combo_pProfile->currentIndex();
 
-    globalStuff::powerProfiles newPP = (globalStuff::powerProfiles)index;
 
-    if (device.features.pm == globalStuff::DPM)
-        device.setPowerProfile(newPP);
-    else {
+    if (device.features.pm != globalStuff::DPM)
         index += 3; // frist three in enum is dpm so we need to increase
-        device.setPowerProfile(newPP);
-    }
+
+    device.setPowerProfile((globalStuff::powerProfiles)index);
 }
 
 void radeon_profile::changePowerLevelFromCombo() {
@@ -199,7 +196,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     }
 
     //Check if a process is still running
-    for(execBin * process : *execsRunning) {
+    for(execBin * process : execsRunning) {
         if(process->getExecState() == QProcess::Running
                 && ! askConfirmation(tr("Quit"), process->name + tr(" is still running, exit anyway?"))) {
             e->ignore();
@@ -354,13 +351,13 @@ void radeon_profile::on_btn_reconfigureDaemon_clicked()
 
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 {
-    if (execsRunning->at(index)->getExecState() == QProcess::Running) {
+    if (execsRunning.at(index)->getExecState() == QProcess::Running) {
         if (QMessageBox::question(this,"", tr("Process is still running. Close tab?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
             return;
     }
 
     ui->tabs_execOutputs->removeTab(index);
-    execsRunning->removeAt(index);
+    execsRunning.removeAt(index);
 
     if (ui->tabs_execOutputs->count() == 0)
         btnBackToProfilesClicked();

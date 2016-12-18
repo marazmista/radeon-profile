@@ -674,9 +674,9 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
 }
 
 globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
+    globalStuff::gpuClocksStruct fallbackFeatures(-1);
     QFile f("/tmp/"+dXorg::driverModuleName+"_pm_info");
     if (f.open(QIODevice::ReadOnly)) {
-        globalStuff::gpuClocksStruct fallbackFeatures;
         QString s = QString(f.readAll());
 
         // just look for it, if it is, the value is not important at this point
@@ -685,14 +685,14 @@ globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
         if (s.contains("mclk"))
             fallbackFeatures.memClk = 0;
         if (s.contains("vddc"))
-            fallbackFeatures.coreClk = 0;
+            fallbackFeatures.coreVolt = 0;
         if (s.contains("vddci"))
-            fallbackFeatures.memClk = 0;
+            fallbackFeatures.memVolt = 0;
 
         f.close();
-        return fallbackFeatures;
-    } else
-        return globalStuff::gpuClocksStruct(-1);
+    }
+
+    return fallbackFeatures;
 }
 
 bool dXorg::overClock(const int percentage){
