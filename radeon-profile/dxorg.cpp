@@ -20,11 +20,8 @@ QChar dXorg::gpuSysIndex;
 QSharedMemory dXorg::sharedMem;
 dXorg::driverFilePaths dXorg::filePaths;
 dXorg::rxPatternsStruct dXorg::rxPatterns;
+daemonComm *dXorg::dcomm = new daemonComm();
 // end //
-
-daemonComm *dcomm = new daemonComm();
-
-
 
 void dXorg::configure(const QString &gpuName) {
     setupDriverModule(gpuName);
@@ -32,39 +29,43 @@ void dXorg::configure(const QString &gpuName) {
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
 
-    if (!globalStuff::globalConfig.rootMode) {
-        qDebug() << "Running in non-root mode, connecting and configuring the daemon";
-        // create the shared mem block. The if comes from that configure method
-        // is called on every change gpu, so later, shared mem already exists
-        if (!sharedMem.isAttached()) {
-            qDebug() << "Shared memory is not attached, creating it";
-            sharedMem.setKey("radeon-profile");
-           if (!sharedMem.create(SHARED_MEM_SIZE)){
-                if(sharedMem.error() == QSharedMemory::AlreadyExists){
-                    qDebug() << "Shared memory already exists, attaching to it";
-                    if (!sharedMem.attach())
-                        qCritical() << "Unable to attach to the shared memory: " << sharedMem.errorString();
-                } else
-                    qCritical() << "Unable to create the shared memory: " << sharedMem.errorString();
-           }
-           // If QSharedMemory::create() returns true, it has already automatically attached
+    if (globalStuff::globalConfig.rootMode)
+        return;
+
+    qDebug() << "Running in non-root mode, connecting and configuring the daemon";
+    // create the shared mem block. The if comes from that configure method
+    // is called on every change gpu, so later, shared mem already exists
+    if (!sharedMem.isAttached()) {
+        qDebug() << "Shared memory is not attached, creating it";
+        sharedMem.setKey("radeon-profile");
+
+        if (!sharedMem.create(SHARED_MEM_SIZE)) {
+            if (sharedMem.error() == QSharedMemory::AlreadyExists){
+                qDebug() << "Shared memory already exists, attaching to it";
+
+                if (!sharedMem.attach())
+                    qCritical() << "Unable to attach to the shared memory: " << sharedMem.errorString();
+
+            } else
+                qCritical() << "Unable to create the shared memory: " << sharedMem.errorString();
         }
-
-        dcomm->connectToDaemon();
-        if (daemonConnected()) {
-            qDebug() << "Daemon is connected, configuring it";
-            //  Configure the daemon to read the data
-            QString command; // SIGNAL_CONFIG + SEPARATOR + CLOCKS_PATH + SEPARATOR
-            command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR); // Configuration flag
-            command.append(filePaths.clocksPath).append(SEPARATOR); // Path where the daemon will read clocks
-
-            qDebug() << "Sending daemon config command: " << command;
-            dcomm->sendCommand(command);
-
-            reconfigureDaemon(); // Set up timer
-        } else
-            qCritical() << "Daemon is not connected, therefore it can't be configured";
+        // If QSharedMemory::create() returns true, it has already automatically attached
     }
+
+    dcomm->connectToDaemon();
+    if (daemonConnected()) {
+        qDebug() << "Daemon is connected, configuring it";
+        //  Configure the daemon to read the data
+        QString command; // SIGNAL_CONFIG + SEPARATOR + CLOCKS_PATH + SEPARATOR
+        command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR); // Configuration flag
+        command.append(filePaths.clocksPath).append(SEPARATOR); // Path where the daemon will read clocks
+
+        qDebug() << "Sending daemon config command: " << command;
+        dcomm->sendCommand(command);
+
+        reconfigureDaemon(); // Set up timer
+    } else
+        qCritical() << "Daemon is not connected, therefore it can't be configured";
 }
 
 void dXorg::setupDriverModule(const QString &gpuName) {

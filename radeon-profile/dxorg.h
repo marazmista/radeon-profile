@@ -19,8 +19,14 @@
 class dXorg
 {
 public:
-    dXorg() {}
-    ~dXorg() {sharedMem.deleteLater();} // Before being deleted, the class deletes the sharedMem
+    dXorg() { }
+
+    ~dXorg() {
+        delete dcomm;
+
+        // Before being deleted, the class deletes the sharedMem
+        sharedMem.deleteLater();
+    }
 
     static globalStuff::gpuClocksStruct getClocks(const QString &data);
     static QString getClocksRawData(bool forFeatures = false);
@@ -67,6 +73,7 @@ private:
     static QChar gpuSysIndex;
     static QSharedMemory sharedMem;
     static QString driverModuleName;
+    static daemonComm *dcomm;
 
     static struct rxPatternsStruct {
         QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
