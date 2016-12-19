@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20161218
+#define appVersion 20161219
 
 namespace Ui {
 class radeon_profile;
@@ -151,13 +151,10 @@ private:
     gpu device;
     static const QString settingsPath;
     QList<execBin*> execsRunning;
-    unsigned int minFanStepsSpeed;
-
     fanProfileSteps currentFanProfile;
     QMap<QString, fanProfileSteps> fanProfiles;
-
     QMap<QString, unsigned int> pmStats;
-    unsigned int rangeX, ticksCounter, statsTickCounter;
+    unsigned int rangeX, ticksCounter, statsTickCounter, minFanStepsSpeed;
     QButtonGroup pwmGroup;
 
     Ui::radeon_profile *ui;
@@ -183,6 +180,7 @@ private:
     void saveFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
     void makeFanProfileListaAndGraph(const fanProfileSteps &profile);
+    void makeFanProfilePlot();
     void refreshUI();
     void connectSignals();
     void setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile);

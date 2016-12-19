@@ -422,24 +422,26 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
         return;
     }
 
-    const int oldTemp = item->text(0).toInt(), oldSpeed = item->text(1).toInt();
-    int newTemp, newSpeed;
+    switch (column) {
+        case 0: {
+            int newTemp = askNumber(item->text(column).toInt(), minFanStepsTemp, maxFanStepsTemp, tr("Temperature"));
 
-    if (column == 0) { // The user wants to change the temperature
-        newTemp = askNumber(oldTemp, minFanStepsTemp, maxFanStepsTemp, tr("Temperature"));
-        if(newTemp != -1){
-            newSpeed = oldSpeed;
-            currentFanProfile.remove(oldTemp);
-            delete item;
-            ui->plotFanProfile->graph(0)->removeData(oldTemp);
-            addFanStep(newTemp,newSpeed);
+            if (newTemp != -1)
+                item->setText(column, QString::number(newTemp));
+
+            break;
         }
-    } else { // The user wants to change the speed
-        newTemp = oldTemp;
-        newSpeed = askNumber(oldSpeed, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%] (10-100)"));
-        // addFanStep() will check the validity of newSpeed and overwrite the current step
-        addFanStep(newTemp,newSpeed);
+        case 1: {
+            int newSpeed = askNumber(item->text(column).toInt(), minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%]"));
+
+            if (newSpeed != -1)
+                item->setText(column, QString::number(newSpeed));
+
+            break;
+        }
     }
+
+    makeFanProfilePlot();
 }
 
 int radeon_profile::askNumber(const int value, const int min, const int max, const QString label) {
@@ -501,8 +503,10 @@ void radeon_profile::on_btn_removeFanProfile_clicked()
 
 void radeon_profile::on_btn_saveFanProfile_clicked()
 {
-    fanProfiles.insert(ui->combo_fanProfiles->currentText(), stepsListToMap());
-    setCurrentFanProfile(ui->combo_fanProfiles->currentText(),stepsListToMap());
+    auto stepsMap = stepsListToMap();
+
+    fanProfiles.insert(ui->combo_fanProfiles->currentText(), stepsMap);
+    setCurrentFanProfile(ui->combo_fanProfiles->currentText(), stepsMap);
 }
 
 int radeon_profile::findCurrentFanProfileMenuIndex() {
