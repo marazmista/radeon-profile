@@ -176,6 +176,16 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     if (!features.coreClockAvailable && !features.temperatureAvailable && !features.coreVoltAvailable)
         ui->mainTabs->setTabEnabled(1,false);
 
+    if (!features.coreClockAvailable && !features.memClockAvailable) {
+        ui->l_cClk->setVisible(false);
+        ui->l_mClk->setVisible(false);
+    }
+
+    if (!features.coreVoltAvailable && !features.memVoltAvailable) {
+        ui->l_cVolt->setVisible(false);
+        ui->l_mVolt->setVisible(false);
+    }
+
     if (features.pwmAvailable && (globalStuff::globalConfig.rootMode || device.daemonConnected())) {
         qDebug() << "Fan control is available , configuring the fan control tab";
         ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
