@@ -190,6 +190,7 @@ private:
     void setupFanProfilesMenu(const bool rebuildMode = false);
     int findCurrentFanProfileMenuIndex();
     void setupMinFanSpeedSetting(unsigned int speed);
+    void markFanProfileUnsaved(bool unsaved);
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.
@@ -209,7 +210,7 @@ private:
      * @param fanSpeed
      * @return If the step is valid.
      */
-    bool fanStepIsValid(unsigned int temperature, unsigned int fanSpeed);
+    bool isFanStepValid(unsigned int temperature, unsigned int fanSpeed);
 
     /**
      * @brief addFanStep Adds a single fan step to the custom curve steps.

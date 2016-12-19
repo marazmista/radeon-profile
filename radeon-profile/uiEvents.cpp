@@ -426,21 +426,24 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
         case 0: {
             int newTemp = askNumber(item->text(column).toInt(), minFanStepsTemp, maxFanStepsTemp, tr("Temperature"));
 
-            if (newTemp != -1)
-                item->setText(column, QString::number(newTemp));
+            if (newTemp == -1)
+                return;
 
+            item->setText(column, QString::number(newTemp));
             break;
         }
         case 1: {
             int newSpeed = askNumber(item->text(column).toInt(), minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%]"));
 
-            if (newSpeed != -1)
-                item->setText(column, QString::number(newSpeed));
+            if (newSpeed == -1)
+                return;
 
+            item->setText(column, QString::number(newSpeed));
             break;
         }
     }
 
+    markFanProfileUnsaved(true);
     makeFanProfilePlot();
 }
 
@@ -495,6 +498,10 @@ void radeon_profile::on_btn_removeFanProfile_clicked()
         return;
     }
 
+    if (!askConfirmation("", tr("Remove profile: ")+ui->combo_fanProfiles->currentText()+"?"))
+        return;
+
+
     fanProfiles.remove(ui->combo_fanProfiles->currentText());
     ui->combo_fanProfiles->removeItem(ui->combo_fanProfiles->currentIndex());
     setupFanProfilesMenu(true);
@@ -503,10 +510,8 @@ void radeon_profile::on_btn_removeFanProfile_clicked()
 
 void radeon_profile::on_btn_saveFanProfile_clicked()
 {
-    auto stepsMap = stepsListToMap();
-
-    fanProfiles.insert(ui->combo_fanProfiles->currentText(), stepsMap);
-    setCurrentFanProfile(ui->combo_fanProfiles->currentText(), stepsMap);
+    markFanProfileUnsaved(false);
+    fanProfiles.insert(ui->combo_fanProfiles->currentText(), stepsListToMap());
 }
 
 int radeon_profile::findCurrentFanProfileMenuIndex() {
@@ -532,13 +537,22 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
         return;
     }
 
-    ui->combo_fanProfiles->addItem(name);
+    markFanProfileUnsaved(false);
+
     fanProfiles.insert(name, stepsListToMap());
+    ui->combo_fanProfiles->addItem(name);
+    ui->combo_fanProfiles->setCurrentText(name);
     setupFanProfilesMenu(true);
+    fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
 }
 
 void radeon_profile::on_btn_activateFanProfile_clicked()
 {
+    if (ui->l_fanProfileUnsavedIndicator->isVisible() && askConfirmation("", tr("Cannot activate unsaved profile. Do you want to save it?"))) {
+        ui->btn_saveFanProfile->click();
+    } else
+        return;
+
     setCurrentFanProfile(ui->combo_fanProfiles->currentText(), fanProfiles.value(ui->combo_fanProfiles->currentText()));
     fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
 }

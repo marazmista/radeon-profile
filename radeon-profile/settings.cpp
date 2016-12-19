@@ -201,6 +201,7 @@ void radeon_profile::loadConfig() {
 
 void radeon_profile::loadFanProfiles() {
     QFile fsPath(fanStepsPath);
+    ui->l_fanProfileUnsavedIndicator->setVisible(false);
 
     if (fsPath.open(QIODevice::ReadOnly)) {
         QStringList profiles = QString(fsPath.readAll()).trimmed().split('\n',QString::SkipEmptyParts);
@@ -282,7 +283,7 @@ void radeon_profile::saveFanProfiles() {
     }
 }
 
-bool radeon_profile::fanStepIsValid(const unsigned int temperature, const unsigned int fanSpeed) {
+bool radeon_profile::isFanStepValid(const unsigned int temperature, const unsigned int fanSpeed) {
     return temperature <= maxFanStepsTemp &&
             fanSpeed >= minFanStepsSpeed &&
             fanSpeed <= maxFanStepsSpeed;
@@ -290,13 +291,12 @@ bool radeon_profile::fanStepIsValid(const unsigned int temperature, const unsign
 
 void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
 
-    if (!fanStepIsValid(temperature, fanSpeed)) {
+    if (!isFanStepValid(temperature, fanSpeed)) {
         qWarning() << "Invalid value, can't be inserted into the fan step list:" << temperature << fanSpeed;
         return;
     }
 
-//    editedFanProfile = fanProfiles.value(ui->combo_fanProfiles->currentText(), currentFanProfile);
-//    editedFanProfile.insert(temperature,fanSpeed);
+    ui->combo_fanProfiles->setCurrentText(ui->combo_fanProfiles->currentText()+"*");
 
     const QString temperatureString = QString::number(temperature),
             speedString = QString::number(fanSpeed);
@@ -308,7 +308,12 @@ void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
     } else // The element exists already, overwrite it
         existing.first()->setText(1,speedString);
 
+    markFanProfileUnsaved(true);
     makeFanProfilePlot();
+}
+
+void radeon_profile::markFanProfileUnsaved(bool unsaved) {
+    ui->l_fanProfileUnsavedIndicator->setVisible(unsaved);
 }
 
 void radeon_profile::showWindow() {
