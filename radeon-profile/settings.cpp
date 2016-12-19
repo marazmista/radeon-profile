@@ -296,8 +296,6 @@ void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
         return;
     }
 
-    ui->combo_fanProfiles->setCurrentText(ui->combo_fanProfiles->currentText()+"*");
-
     const QString temperatureString = QString::number(temperature),
             speedString = QString::number(fanSpeed);
     const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString,Qt::MatchExactly);
