@@ -1517,19 +1517,19 @@
              <number>0</number>
             </property>
             <property name="spacing">
-             <number>2</number>
+             <number>3</number>
             </property>
             <item row="0" column="0">
              <widget class="QWidget" name="widget_3" native="true">
               <property name="minimumSize">
                <size>
-                <width>211</width>
+                <width>241</width>
                 <height>101</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>211</width>
+                <width>261</width>
                 <height>101</height>
                </size>
               </property>
@@ -1538,7 +1538,7 @@
                 <rect>
                  <x>0</x>
                  <y>30</y>
-                 <width>131</width>
+                 <width>171</width>
                  <height>22</height>
                 </rect>
                </property>
@@ -1546,9 +1546,9 @@
               <widget class="QPushButton" name="btn_activateFanProfile">
                <property name="geometry">
                 <rect>
-                 <x>138</x>
+                 <x>180</x>
                  <y>30</y>
-                 <width>71</width>
+                 <width>81</width>
                  <height>21</height>
                 </rect>
                </property>
@@ -1572,9 +1572,9 @@
               <widget class="QLabel" name="l_currentFanProfile">
                <property name="geometry">
                 <rect>
-                 <x>90</x>
+                 <x>80</x>
                  <y>0</y>
-                 <width>111</width>
+                 <width>181</width>
                  <height>21</height>
                 </rect>
                </property>
@@ -1597,7 +1597,7 @@
                 <rect>
                  <x>0</x>
                  <y>57</y>
-                 <width>91</width>
+                 <width>111</width>
                  <height>21</height>
                 </rect>
                </property>
@@ -1610,7 +1610,7 @@
                 <rect>
                  <x>0</x>
                  <y>80</y>
-                 <width>91</width>
+                 <width>111</width>
                  <height>21</height>
                 </rect>
                </property>
@@ -1621,9 +1621,9 @@
               <widget class="QPushButton" name="btn_removeFanProfile">
                <property name="geometry">
                 <rect>
-                 <x>108</x>
+                 <x>140</x>
                  <y>80</y>
-                 <width>101</width>
+                 <width>121</width>
                  <height>21</height>
                 </rect>
                </property>
@@ -1665,12 +1665,6 @@
                   <height>21</height>
                  </size>
                 </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>101</width>
-                  <height>21</height>
-                 </size>
-                </property>
                 <property name="text">
                  <string>Add step</string>
                 </property>
@@ -1690,12 +1684,6 @@
                   <height>21</height>
                  </size>
                 </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>101</width>
-                  <height>21</height>
-                 </size>
-                </property>
                 <property name="text">
                  <string>Remove step</string>
                 </property>
@@ -1703,12 +1691,6 @@
               </item>
               <item row="0" column="0" colspan="2">
                <widget class="QTreeWidget" name="list_fanSteps">
-                <property name="maximumSize">
-                 <size>
-                  <width>208</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
                 <property name="indentation">
                  <number>2</number>
                 </property>
