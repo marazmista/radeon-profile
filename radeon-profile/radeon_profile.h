@@ -72,6 +72,7 @@ public:
     QTimer *timer;
     typedef QMap<int, unsigned int> fanProfileSteps;
 
+
 private slots:
     void timerEvent();
     void on_btn_dpmBattery_clicked();
@@ -205,10 +206,12 @@ private:
     void markFanProfileUnsaved(bool unsaved);
     void checkEvents();
     void activateEvent(const RPEvent &rpe);
-    void saveRpevents();
-    void loadRpevents();
+    void saveRpevents(QXmlStreamWriter &xml);
+    void loadRpevent(const QXmlStreamReader &xml);
     void revokeEvent();
     void hideEventControls(bool hide);
+    void saveExecProfiles(QXmlStreamWriter &xml);
+    void loadExecProfile(const QXmlStreamReader &xml);
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.

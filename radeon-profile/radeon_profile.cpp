@@ -62,7 +62,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     setupTrayIcon();
 
     loadConfig();
-    loadRpevents();
 
     //figure out parameters
     QString params = a.join(" ");
