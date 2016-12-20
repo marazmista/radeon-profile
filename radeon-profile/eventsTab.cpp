@@ -132,6 +132,9 @@ void radeon_profile::on_btn_eventsInfo_clicked()
 
 void radeon_profile::on_btn_modifyEvent_clicked()
 {
+    if (!ui->list_events->currentItem())
+        return;
+
     Dialog_RPEvent *d = new Dialog_RPEvent(this);
     d->setFeatures(device.features, fanProfiles.keys());
     d->setEditedEvent(events.value(ui->list_events->currentItem()->text(1)));
@@ -156,6 +159,9 @@ void radeon_profile::on_btn_modifyEvent_clicked()
 
 void radeon_profile::on_btn_removeEvent_clicked()
 {
+    if (!ui->list_events->currentItem())
+        return;
+
     if (ui->list_events->currentItem()->text(1) == ui->l_currentActiveEvent->text()) {
         QMessageBox::information(this, "", tr("Cannot remove event that is currently active."));
         return;
