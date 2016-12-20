@@ -206,6 +206,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
 
     timer->stop();
     saveConfig();
+    saveRpevents();
 
     if (device.features.pwmAvailable) {
         device.setPwmManualControl(false);
@@ -619,5 +620,5 @@ void radeon_profile::on_cb_zeroPercentFanSpeed_clicked(bool checked)
 void radeon_profile::setupMinFanSpeedSetting(unsigned int speed) {
     minFanStepsSpeed = speed;
     ui->l_minFanSpeed->setText(QString::number(minFanStepsSpeed)+"%");
-    ui->fanSpeedSlider->setMinimum((minFanStepsSpeed * 255) / 100);
+    ui->fanSpeedSlider->setMinimum((minFanStepsSpeed * device.features.pwmMaxSpeed) / 100);
 }

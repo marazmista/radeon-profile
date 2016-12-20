@@ -238,28 +238,6 @@ void radeon_profile::loadFanProfiles() {
     makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));
 }
 
-void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {
-    ui->plotFanProfile->graph(0)->clearData();
-    ui->list_fanSteps->clear();
-
-    for (int temperature : profile.keys()) {
-        ui->plotFanProfile->graph(0)->addData(temperature, profile.value(temperature));
-        ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.value(temperature))));
-    }
-
-    ui->plotFanProfile->replot();
-}
-
-void radeon_profile::makeFanProfilePlot() {
-    ui->plotFanProfile->graph(0)->clearData();
-
-    for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i)
-        ui->plotFanProfile->graph(0)->addData(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(),
-                                              ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
-
-    ui->plotFanProfile->replot();
-}
-
 void radeon_profile::saveFanProfiles() {
     QFile fsPath(fanStepsPath);
 
@@ -282,6 +260,102 @@ void radeon_profile::saveFanProfiles() {
         fsPath.close();
     }
 }
+
+void radeon_profile::saveRpevents() {
+    QString s;
+
+    QXmlStreamWriter xml(&s);
+    xml.setAutoFormatting(true);
+    xml.writeStartDocument();
+
+    xml.writeStartElement("RPEvents");
+
+    for (QString k : events.keys()) {
+        RPEvent rpe = events.value(k);
+        xml.writeStartElement(k);
+        xml.writeAttribute("name", k);
+        xml.writeAttribute("enabled", QString::number(rpe.enabled));
+        xml.writeAttribute("tiggerType", QString::number(rpe.type));
+        xml.writeAttribute("activationBinary", rpe.activationBinary);
+        xml.writeAttribute("activationTemperature", QString::number(rpe.activationTemperature));
+        xml.writeAttribute("dpmProfileChange", QString::number(rpe.dpmProfileChange));
+        xml.writeAttribute("powerLevelChange", QString::number(rpe.powerLevelChange));
+        xml.writeAttribute("fixedFanSpeedChange", QString::number(rpe.fixedFanSpeedChange));
+        xml.writeAttribute("fanProfileNameChange",rpe.fanProfileNameChange);
+        xml.writeAttribute("fanComboIndex", QString::number(rpe.fanComboIndex));
+        xml.writeEndElement();
+    }
+
+    xml.writeEndElement();
+    xml.writeEndDocument();
+
+    QFile f("/home/marazmista/rpxml");
+    if (f.open(QIODevice::WriteOnly))  {
+        f.write(s.toLatin1());
+        f.close();
+    }
+}
+
+void radeon_profile::loadRpevents() {
+    QFile f("/home/marazmista/rpxml");
+
+    if (!f.open(QIODevice::ReadOnly))
+        return;
+
+    QXmlStreamReader xml(&f);
+
+    while (!xml.atEnd()) {
+        if (xml.readNextStartElement()) {
+            if (xml.attributes().count() == 0)
+                continue;
+
+            RPEvent rpe;
+
+            rpe.name = xml.attributes().value("name").toString();
+            rpe.enabled = (xml.attributes().value("enabled") == "1");
+            rpe.type = static_cast<rpeventType>(xml.attributes().value("tiggerType").toInt());
+            rpe.activationBinary = xml.attributes().value("activationBinary").toString();
+            rpe.activationTemperature = xml.attributes().value("activationTemperature").toInt();
+            rpe.dpmProfileChange = static_cast<globalStuff::powerProfiles>(xml.attributes().value("dpmProfileChange").toInt());
+            rpe.powerLevelChange = static_cast<globalStuff::forcePowerLevels>(xml.attributes().value("powerLevelChange").toInt());
+            rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toInt();
+            rpe.fanProfileNameChange = xml.attributes().value("fanProfileNameChange").toString();
+            rpe.fanComboIndex = xml.attributes().value("fanComboIndex").toInt();
+
+            events.insert(rpe.name, rpe);
+
+            QTreeWidgetItem *item = new QTreeWidgetItem();
+            item->setText(1, rpe.name);
+            item->setCheckState(0,(rpe.enabled) ? Qt::Checked : Qt::Unchecked);
+            ui->list_events->addTopLevelItem(item);
+        }
+    }
+
+    f.close();
+}
+
+void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {
+    ui->plotFanProfile->graph(0)->clearData();
+    ui->list_fanSteps->clear();
+
+    for (int temperature : profile.keys()) {
+        ui->plotFanProfile->graph(0)->addData(temperature, profile.value(temperature));
+        ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.value(temperature))));
+    }
+
+    ui->plotFanProfile->replot();
+}
+
+void radeon_profile::makeFanProfilePlot() {
+    ui->plotFanProfile->graph(0)->clearData();
+
+    for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i)
+        ui->plotFanProfile->graph(0)->addData(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(),
+                                              ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
+
+    ui->plotFanProfile->replot();
+}
+
 
 bool radeon_profile::isFanStepValid(const unsigned int temperature, const unsigned int fanSpeed) {
     return temperature <= maxFanStepsTemp &&

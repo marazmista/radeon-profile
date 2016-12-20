@@ -17,6 +17,7 @@
 
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
+#include <dialog_rpevent.h>
 
 #include <QTimer>
 #include <QTextStream>
@@ -61,6 +62,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     setupTrayIcon();
 
     loadConfig();
+    loadRpevents();
 
     //figure out parameters
     QString params = a.join(" ");
@@ -350,6 +352,9 @@ void radeon_profile::timerEvent() {
     }
 
     refreshTooltip();
+
+    if (ui->cb_enableEvents->isChecked())
+        checkEvents();
 }
 
 void radeon_profile::adjustFanSpeed() {
@@ -458,11 +463,13 @@ void radeon_profile::updateStatsTable() {
 void radeon_profile::refreshTooltip()
 {
     QString tooltipdata = radeon_profile::windowTitle() + "\n";
-    if(device.features.canChangeProfile)
+
+    if (device.features.canChangeProfile)
         tooltipdata += "Current profile: "+ device.currentPowerProfile + "  " + device.currentPowerLevel +"\n";
-    for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++) {
+
+    for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++)
         tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
-    }
+
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
@@ -480,3 +487,4 @@ bool radeon_profile::askConfirmation(const QString title, const QString question
     return QMessageBox::Yes ==
             QMessageBox::question(this, title, question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 }
+

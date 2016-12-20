@@ -30,7 +30,9 @@ SOURCES += main.cpp\
     settings.cpp \
     daemonComm.cpp \
     execTab.cpp \
-    execbin.cpp
+    execbin.cpp \
+    dialog_rpevent.cpp \
+    eventsTab.cpp
 
 HEADERS  += radeon_profile.h \
     qcustomplot.h \
@@ -39,9 +41,12 @@ HEADERS  += radeon_profile.h \
     dfglrx.h \
     globalStuff.h \
     daemonComm.h \
-    execbin.h
+    execbin.h \
+    dialog_rpevent.h \
+    rpevent.h
 
-FORMS    += radeon_profile.ui
+FORMS    += radeon_profile.ui \
+    dialog_rpevent.ui
 
 RESOURCES += \
     radeon-resource.qrc
