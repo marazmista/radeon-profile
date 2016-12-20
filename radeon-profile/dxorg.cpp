@@ -218,14 +218,12 @@ globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
-            tData.uvdCClk  = (tData.uvdCClk  == 0) ? -1 :  tData.uvdCClk;
         }
 
         rx.setPattern(rxPatterns.dclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
             tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
-            tData.uvdDClk = (tData.uvdDClk == 0) ? -1 : tData.uvdDClk;
         }
 
         rx.setPattern(rxPatterns.vddc);

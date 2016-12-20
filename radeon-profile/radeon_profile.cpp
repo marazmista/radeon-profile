@@ -263,18 +263,18 @@ void radeon_profile::refreshUI() {
 
         if (device.gpuClocksData.powerLevel != -1)
             addChild(ui->list_currentGPUData, tr("Power level"), device.gpuClocksDataString.powerLevel);
-        if (device.gpuClocksData.coreClk != -1)
+        if (device.gpuClocksData.coreClk > 0)
             addChild(ui->list_currentGPUData, tr("GPU clock"), device.gpuClocksDataString.coreClk);
-        if (device.gpuClocksData.memClk != -1)
+        if (device.gpuClocksData.memClk > 0)
             addChild(ui->list_currentGPUData, tr("Memory clock"), device.gpuClocksDataString.memClk);
-        if (device.gpuClocksData.uvdCClk != -1)
+        if (device.gpuClocksData.uvdCClk > 0)
             addChild(ui->list_currentGPUData, tr("UVD core clock (cclk)"), device.gpuClocksDataString.uvdCClk);
-        if (device.gpuClocksData.uvdDClk != -1)
+        if (device.gpuClocksData.uvdDClk > 0)
             addChild(ui->list_currentGPUData, tr("UVD decoder clock (dclk)"), device.gpuClocksDataString.uvdDClk);
-        if (device.gpuClocksData.coreVolt != -1)
-            addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuClocksDataString.memVolt);
-        if (device.gpuClocksData.memVolt != -1)
-            addChild(ui->list_currentGPUData, tr("I/O voltage (vddci)"), device.gpuClocksDataString.coreVolt);
+        if (device.gpuClocksData.coreVolt > 0)
+            addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuClocksDataString.coreVolt);
+        if (device.gpuClocksData.memVolt > 0)
+            addChild(ui->list_currentGPUData, tr("I/O voltage (vddci)"), device.gpuClocksDataString.memVolt);
 
         if (ui->list_currentGPUData->topLevelItemCount() == 0)
             addChild(ui->list_currentGPUData, tr("Can't read data"), tr("You need debugfs mounted and either root rights or the daemon running"));
@@ -433,12 +433,21 @@ void radeon_profile::doTheStats() {
     statsTickCounter++;
 
     // figure out pm level based on data provided
-    QString pmLevelName = (device.gpuClocksData.powerLevel == -1) ? "" : "Power level:" + device.gpuClocksDataString.powerLevel, volt;
-    volt = (device.gpuClocksData.coreVolt == -1) ? "" : "(" + device.gpuClocksDataString.coreVolt+")";
-    pmLevelName = (device.gpuClocksData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +device.gpuClocksDataString.coreClk + volt;
+    QString pmLevelName;
+    if(device.gpuClocksData.powerLevel != -1)
+        pmLevelName += "Power level:" + device.gpuClocksDataString.powerLevel;
 
-    volt = (device.gpuClocksData.memVolt == -1) ? "" : "(" + device.gpuClocksDataString.memVolt + ")";
-    pmLevelName = (device.gpuClocksData.memClk == -1) ? pmLevelName : pmLevelName + " Mem:" + device.gpuClocksDataString.memClk +  volt;
+    if(device.gpuClocksData.coreClk > 0)
+        pmLevelName += " Core:" + device.gpuClocksDataString.coreClk;
+
+    if(device.gpuClocksData.coreVolt > 0)
+        pmLevelName += "(" + device.gpuClocksDataString.coreVolt + ")";
+
+    if(device.gpuClocksData.memClk > 0)
+        pmLevelName += " Mem:" + device.gpuClocksDataString.memClk;
+
+    if(device.gpuClocksData.memVolt > 0)
+        pmLevelName += "(" + device.gpuClocksDataString.memVolt + ")";
 
     if (pmStats.contains(pmLevelName)) // This power level already exists, increment its count
         pmStats[pmLevelName]++;
