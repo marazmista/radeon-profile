@@ -207,10 +207,8 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     timer->stop();
     saveConfig();
 
-    if (device.features.pwmAvailable) {
+    if (device.features.pwmAvailable)
         device.setPwmManualControl(false);
-        saveFanProfiles();
-    }
 
     QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
     QApplication::quit();

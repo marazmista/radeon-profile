@@ -70,8 +70,8 @@ public:
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu, *fanProfilesMenu;
     QTimer *timer;
-    typedef QMap<int, unsigned int> fanProfileSteps;
 
+    typedef QMap<int, unsigned int> fanProfileSteps;
 
 private slots:
     void timerEvent();
@@ -190,7 +190,6 @@ private:
     void updateExecLogs();
     void addRuntimeWidgets();
     void loadFanProfiles();
-    void saveFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
     void makeFanProfileListaAndGraph(const fanProfileSteps &profile);
     void makeFanProfilePlot();
@@ -212,6 +211,9 @@ private:
     void hideEventControls(bool hide);
     void saveExecProfiles(QXmlStreamWriter &xml);
     void loadExecProfile(const QXmlStreamReader &xml);
+    void saveFanProfiles(QXmlStreamWriter &xml);
+    void loadFanProfile(QXmlStreamReader &xml);
+    void createDefaultFanProfile();
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.

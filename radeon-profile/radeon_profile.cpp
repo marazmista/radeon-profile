@@ -191,8 +191,8 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         qDebug() << "Fan control is available , configuring the fan control tab";
         ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
+        ui->l_fanProfileUnsavedIndicator->setVisible(false);
 
-        loadFanProfiles();
         setupFanProfilesMenu();
 
         if (ui->cb_saveFanMode->isChecked()) {
@@ -364,8 +364,8 @@ void radeon_profile::adjustFanSpeed() {
         }
 
         // find bounds of current temperature
-        QMap<int,unsigned int>::iterator high = currentFanProfile.upperBound(device.gpuTemeperatureData.current);
-        QMap<int,unsigned int>::iterator low = (currentFanProfile.size() > 1 ? high - 1 : high);
+        QMap<int,unsigned int>::const_iterator high = currentFanProfile.upperBound(device.gpuTemeperatureData.current);
+        QMap<int,unsigned int>::const_iterator low = (currentFanProfile.size() > 1 ? high - 1 : high);
 
         int hSpeed = high.value(),
 			lSpeed = low.value();
