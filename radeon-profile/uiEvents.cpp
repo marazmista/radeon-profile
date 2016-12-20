@@ -323,10 +323,8 @@ void radeon_profile::on_cb_alternateRow_clicked(bool checked) {
 void radeon_profile::on_chProfile_clicked()
 {
     bool ok;
-    QStringList profiles;
-    profiles << profile_auto << profile_default << profile_high << profile_mid << profile_low;
 
-    QString selection = QInputDialog::getItem(this, tr("Select new power profile"), tr("Profile selection"), profiles,0,false,&ok);
+    QString selection = QInputDialog::getItem(this, tr("Select new power profile"), tr("Profile selection"), globalStuff::createProfileCombo(), 0, false, &ok);
 
     if (ok) {
         if (selection == profile_default)

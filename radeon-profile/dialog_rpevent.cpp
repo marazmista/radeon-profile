@@ -12,9 +12,8 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
     setFixedSize(size());
 
     setFixedFanSpeedVisibility(false);
-    ui->combo_dpmChange->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
-    ui->combo_powerLevelChange->addItems(QStringList() << dpm_auto << dpm_low << dpm_high);
-
+    ui->combo_dpmChange->addItems(globalStuff::createDPMCombo());
+    ui->combo_powerLevelChange->addItems(globalStuff::createPowerLevelCombo();
 }
 
 Dialog_RPEvent::~Dialog_RPEvent()

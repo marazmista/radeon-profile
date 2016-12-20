@@ -215,15 +215,15 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     }
 
     if (features.pm == globalStuff::DPM) {
-        ui->combo_pProfile->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
-        ui->combo_pLevel->addItems(QStringList() << dpm_auto << dpm_low << dpm_high);
+        ui->combo_pProfile->addItems(globalStuff::createDPMCombo());
+        ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo());
 
         ui->combo_pProfile->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
         ui->combo_pLevel->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerLevel));
 
     } else {
         ui->combo_pLevel->setEnabled(false);
-        ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
+        ui->combo_pProfile->addItems(globalStuff::createProfileCombo());
     }
 
      ui->mainTabs->setTabEnabled(2,features.overClockAvailable);
