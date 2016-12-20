@@ -38,7 +38,7 @@ class radeon_profile : public QMainWindow
 {
     Q_OBJECT
 
-    // names in this enum equals indexes in Qtreewidged in ui for selecting clors
+    // names in this enum equals indexes in Qtreewidget in ui for selecting colors
     enum graphColors {
         TEMP_BG = 0,
         CLOCKS_BG,
@@ -70,6 +70,7 @@ public:
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu, *fanProfilesMenu;
     QTimer *timer;
+    static unsigned int minFanStepsSpeed;
 
     typedef QMap<int, unsigned int> fanProfileSteps;
 
@@ -168,7 +169,7 @@ private:
     QMap<QString, fanProfileSteps> fanProfiles;
     QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
-    unsigned int rangeX, ticksCounter, statsTickCounter, minFanStepsSpeed;
+    unsigned int rangeX, ticksCounter, statsTickCounter;
     QButtonGroup pwmGroup;
     currentStateInfo *savedState;
 

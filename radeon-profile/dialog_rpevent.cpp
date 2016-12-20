@@ -1,5 +1,7 @@
 #include "dialog_rpevent.h"
 #include "ui_dialog_rpevent.h"
+#include "radeon_profile.h"
+#include "globalStuff.h"
 
 #include <QLineEdit>
 #include <QMap>
@@ -12,8 +14,38 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
     setFixedSize(size());
 
     setFixedFanSpeedVisibility(false);
-    ui->combo_dpmChange->addItems(globalStuff::createDPMCombo());
-    ui->combo_powerLevelChange->addItems(globalStuff::createPowerLevelCombo();
+    ui->spin_fixedFanSpeed->setMinimum(radeon_profile::minFanStepsSpeed);
+}
+
+void Dialog_RPEvent::setFeatures(const globalStuff::driverFeatures &features, const QList<QString> &profiles) {
+    switch (features.pm) {
+        case globalStuff::powerMethod::DPM:
+            ui->combo_dpmChange->addItems(globalStuff::createDPMCombo());
+            ui->combo_powerLevelChange->addItems(globalStuff::createPowerLevelCombo());
+            break;
+        case globalStuff::powerMethod::PROFILE:
+            ui->combo_dpmChange->addItems(globalStuff::createProfileCombo());
+            ui->combo_powerLevelChange->setVisible(false);
+            ui->l_powerLevel->setVisible(false);
+
+            ui->l_profile->setText(tr("Set Profile to:"));
+            break;
+        default:
+            break;
+    }
+
+    ui->combo_fanChange->addItem(tr("Auto"));
+    ui->combo_fanChange->addItem(tr("Fixed speed"));
+
+    for (QString p : profiles)
+        ui->combo_fanChange->addItem(p);
+
+    ui->spin_fixedFanSpeed->setMaximum(features.pwmMaxSpeed);
+
+    if (!features.pwmAvailable) {
+        ui->combo_fanChange->setVisible(false);
+        ui->l_fan->setVisible(false);
+    }
 }
 
 Dialog_RPEvent::~Dialog_RPEvent()
@@ -31,7 +63,6 @@ void Dialog_RPEvent::on_btn_save_clicked()
     if (ui->edt_eventName->text().isEmpty())
         return;
 
-
     this->setResult(QDialog::Accepted);
 
     switch (ui->combo_eventTrigger->currentIndex()) {
@@ -40,10 +71,15 @@ void Dialog_RPEvent::on_btn_save_clicked()
             break;
         case 1:
             createdEvent.type = rpeventType::BIANRY;
+
+            if (ui->edt_binary->text().isEmpty()) {
+                QMessageBox::information(this, "", tr("Selected trigger type is Binary, so the binary field cannot be empty."),QMessageBox::Ok);
+                return;
+            }
             break;
     }
 
-    createdEvent.enabled = true;
+    createdEvent.enabled = ui->cb_enabled->isChecked();
     createdEvent.name = ui->edt_eventName->text();
 
     createdEvent.activationBinary = ui->edt_binary->text();
@@ -69,7 +105,7 @@ void Dialog_RPEvent::setEditedEvent(const RPEvent &rpe) {
     createdEvent = rpe;
 
     ui->combo_eventTrigger->setCurrentIndex(rpe.type);
-
+    ui->cb_enabled->setChecked(rpe.enabled);
     ui->edt_eventName->setText(rpe.name);
     ui->spin_tempActivate->setValue(rpe.activationTemperature);
     ui->edt_binary->setText(rpe.activationBinary);
@@ -82,15 +118,6 @@ void Dialog_RPEvent::setEditedEvent(const RPEvent &rpe) {
         ui->combo_fanChange->setCurrentIndex(rpe.fanComboIndex);
 
     ui->spin_fixedFanSpeed->setValue(rpe.fixedFanSpeedChange);
-}
-
-void Dialog_RPEvent::setAvialibleFanProfiles(const QList<QString> &profiles) {
-    ui->combo_fanChange->addItem(tr("Auto"));
-    ui->combo_fanChange->addItem(tr("Fixed speed"));
-
-    for (QString p : profiles)
-        ui->combo_fanChange->addItem(p);
-
 }
 
 void Dialog_RPEvent::setFixedFanSpeedVisibility(bool visibility) {

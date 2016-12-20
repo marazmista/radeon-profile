@@ -65,7 +65,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
+     <y>6</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -127,7 +127,7 @@
     </property>
     <layout class="QGridLayout" name="gridLayout">
      <item row="1" column="0">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="l_powerLevel">
        <property name="text">
         <string>Set power level:</string>
        </property>
@@ -152,7 +152,7 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="l_fan">
        <property name="text">
         <string>Set fan:</string>
        </property>
@@ -168,7 +168,7 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="l_profile">
        <property name="text">
         <string>Set DPM to:</string>
        </property>
@@ -282,6 +282,22 @@
      </property>
     </widget>
    </widget>
+  </widget>
+  <widget class="QCheckBox" name="cb_enabled">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>9</y>
+     <width>141</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::RightToLeft</enum>
+   </property>
+   <property name="text">
+    <string>Enabled</string>
+   </property>
   </widget>
  </widget>
  <resources/>

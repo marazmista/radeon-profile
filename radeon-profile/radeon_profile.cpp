@@ -26,6 +26,8 @@
 #include <QMessageBox>
 #include <QDebug>
 
+unsigned int radeon_profile::minFanStepsSpeed = 10;
+
 radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
@@ -33,8 +35,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     rangeX = 180;
     ticksCounter = 0;
     statsTickCounter = 0;
-    minFanStepsSpeed = 10;
-
 
     ui->setupUi(this);
     timer = new QTimer(this);

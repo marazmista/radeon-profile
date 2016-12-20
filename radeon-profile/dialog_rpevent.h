@@ -17,7 +17,7 @@ class Dialog_RPEvent : public QDialog
 public:
     explicit Dialog_RPEvent(QWidget *parent = 0);
     ~Dialog_RPEvent();
-    void setAvialibleFanProfiles(const QList<QString> &profiles);
+    void setFeatures(const globalStuff::driverFeatures &features, const QList<QString> &profiles);
     void setEditedEvent(const RPEvent &rpe);
     RPEvent getCreatedEvent();
 

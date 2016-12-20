@@ -205,6 +205,8 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     }
 
     timer->stop();
+    delete timer;
+
     saveConfig();
 
     if (device.features.pwmAvailable)

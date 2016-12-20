@@ -8,7 +8,7 @@
 void radeon_profile::on_btn_addEvent_clicked()
 {
     Dialog_RPEvent *d = new Dialog_RPEvent(this);
-    d->setAvialibleFanProfiles(fanProfiles.keys());
+    d->setFeatures(device.features, fanProfiles.keys());
 
     if (d->exec() == QDialog::Accepted) {
         RPEvent rpe = d->getCreatedEvent();
@@ -127,7 +127,6 @@ void radeon_profile::on_list_events_itemChanged(QTreeWidgetItem *item, int colum
     events.insert(e.name, e);
 }
 
-
 void radeon_profile::on_btn_eventsInfo_clicked()
 {
 }
@@ -135,7 +134,7 @@ void radeon_profile::on_btn_eventsInfo_clicked()
 void radeon_profile::on_btn_modifyEvent_clicked()
 {
     Dialog_RPEvent *d = new Dialog_RPEvent(this);
-    d->setAvialibleFanProfiles(fanProfiles.keys());
+    d->setFeatures(device.features, fanProfiles.keys());
     d->setEditedEvent(events.value(ui->list_events->currentItem()->text(1)));
 
     if (d->exec() == QDialog::Accepted) {

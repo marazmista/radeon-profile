@@ -379,7 +379,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -393,16 +393,16 @@
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
         <property name="leftMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <item>
          <widget class="QWidget" name="widget" native="true">
@@ -872,16 +872,16 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
         <property name="leftMargin">
-         <number>5</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>5</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>5</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>5</number>
+         <number>4</number>
         </property>
         <property name="spacing">
          <number>4</number>
@@ -1122,6 +1122,18 @@
         <string>Overclock</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_7">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
         <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
@@ -1310,6 +1322,18 @@
         <string>Fan Control</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_14">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
@@ -1769,11 +1793,23 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="eventsTab">
        <attribute name="title">
         <string>Events</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_15">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <item>
@@ -1910,16 +1946,16 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_12">
         <property name="leftMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <item row="0" column="0">
          <widget class="QStackedWidget" name="execPages">
@@ -3181,16 +3217,16 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_11">
         <property name="leftMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <item row="0" column="0">
          <widget class="QTabWidget" name="configGroups">
@@ -3694,11 +3730,23 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="aboutTab">
        <attribute name="title">
         <string>About</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_19">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
         <item>
          <spacer name="verticalSpacer_8">
           <property name="orientation">
