@@ -38,24 +38,4 @@ public:
 
 };
 
-//template <typename T>
-//class Event : public IEvent {
-
-//public:
-//    T value;
-
-//    Event() { }
-//    Event(const T &v) {
-//        value = v;
-//    }
-
-//    virtual bool isActivationConditonFullfilled(const T &checkValue) {
-//       return false;
-
-//    }
-
-//    void setValue(const T &v) {
-//        this->value = v;
-//    }
-//};
 #endif // EVENT_H

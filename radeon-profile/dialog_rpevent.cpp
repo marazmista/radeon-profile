@@ -13,7 +13,7 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
 
     setFixedFanSpeedVisibility(false);
     ui->combo_dpmChange->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
-    ui->combo_powerLevelChange->addItems(QStringList() << dpm_auto << dpm_high << dpm_low);
+    ui->combo_powerLevelChange->addItems(QStringList() << dpm_auto << dpm_low << dpm_high);
 
 }
 
@@ -95,8 +95,7 @@ void Dialog_RPEvent::setAvialibleFanProfiles(const QList<QString> &profiles) {
 }
 
 void Dialog_RPEvent::setFixedFanSpeedVisibility(bool visibility) {
-    ui->spin_fixedFanSpeed->setVisible(visibility);
-    ui->l_percent->setVisible(visibility);
+    ui->widget_fixedFanSpeed->setVisible(visibility);
 }
 
 void Dialog_RPEvent::on_combo_fanChange_currentIndexChanged(int index)

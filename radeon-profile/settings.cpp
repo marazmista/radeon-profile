@@ -12,7 +12,7 @@
 #include <QRect>
 
 const QString radeon_profile::settingsPath = QDir::homePath() + "/.radeon-profile-settings";
-const QString auxStuffPath = QDir::homePath() + "/radeon-profile-auxstuff";
+const QString auxStuffPath = QDir::homePath() + "/.radeon-profile-auxstuff";
 
 // init of static struct with setting exposed to global scope
 globalStuff::globalCfgStruct globalStuff::globalConfig;
@@ -66,6 +66,7 @@ void radeon_profile::saveConfig() {
     settings.setValue("showVoltsGraphOnStart",ui->cb_showVoltsGraph->isChecked());
     settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
     settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
+    settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
 
 
     QString xmlString;
@@ -195,6 +196,7 @@ void radeon_profile::loadConfig() {
     ui->cb_showFreqGraph->setChecked(settings.value("showFreqGraphOnStart",true).toBool());
     ui->cb_showVoltsGraph->setChecked(settings.value("showVoltsGraphOnStart",false).toBool());
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
+    ui->cb_eventsTracking->setChecked(settings.value("eventsTracking", false).toBool());
 
     ui->cb_enableOverclock->setChecked(settings.value("overclockEnabled",false).toBool());
     ui->cb_overclockAtLaunch->setChecked(settings.value("overclockAtLaunch",false).toBool());
@@ -245,6 +247,8 @@ void radeon_profile::loadConfig() {
     on_cb_showTempsGraph_clicked(ui->cb_showTempsGraph->isChecked());
     on_cb_showFreqGraph_clicked(ui->cb_showFreqGraph->isChecked());
     on_cb_showVoltsGraph_clicked(ui->cb_showVoltsGraph->isChecked());
+
+    hideEventControls(true);
 
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();

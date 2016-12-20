@@ -152,6 +152,8 @@ private slots:
     void on_btn_modifyEvent_clicked();
     void on_btn_removeEvent_clicked();
 
+    void on_btn_revokeEvent_clicked();
+
 private:
     struct currentStateInfo {
         globalStuff::powerProfiles profile;

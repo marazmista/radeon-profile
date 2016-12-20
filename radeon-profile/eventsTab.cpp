@@ -50,6 +50,9 @@ void radeon_profile::checkEvents() {
 }
 
 void radeon_profile::activateEvent(const RPEvent &rpe) {
+    if (!globalStuff::globalConfig.rootMode && !device.daemonConnected())
+        return;
+
     savedState = new currentStateInfo();
     savedState->profile = static_cast<globalStuff::powerProfiles>(ui->combo_pProfile->currentIndex());
     savedState->powerLevel = static_cast<globalStuff::forcePowerLevels>(ui->combo_pLevel->currentIndex());
@@ -93,7 +96,9 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
 void radeon_profile::revokeEvent() {
     device.setPowerProfile(static_cast<globalStuff::powerProfiles>(savedState->profile));
     device.setForcePowerLevel(static_cast<globalStuff::forcePowerLevels>(savedState->powerLevel));
-    fanProfilesMenu->actions()[savedState->fanIndex]->trigger();
+
+    if (device.features.pwmAvailable)
+        fanProfilesMenu->actions()[savedState->fanIndex]->trigger();
 
     ui->l_currentActiveEvent->clear();
     hideEventControls(true);
@@ -147,4 +152,9 @@ void radeon_profile::on_btn_removeEvent_clicked()
 {
     events.remove(ui->list_events->currentItem()->text(1));
     delete ui->list_events->currentItem();
+}
+
+void radeon_profile::on_btn_revokeEvent_clicked()
+{
+    revokeEvent();
 }

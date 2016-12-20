@@ -1777,7 +1777,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <item>
-           <widget class="QCheckBox" name="cb_enableEvents">
+           <widget class="QCheckBox" name="cb_eventsTracking">
             <property name="text">
              <string>Enable event tracking</string>
             </property>

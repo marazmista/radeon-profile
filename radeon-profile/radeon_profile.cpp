@@ -162,6 +162,8 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         dpmMenu->setEnabled(false);
         ui->combo_pLevel->setEnabled(false);
         ui->combo_pProfile->setEnabled(false);
+        ui->cb_eventsTracking->setEnabled(false);
+        ui->cb_eventsTracking->setChecked(false);
     }
 
     ui->cb_showFreqGraph->setEnabled(features.coreClockAvailable);
@@ -229,8 +231,9 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 }
 
 void radeon_profile::refreshGpuData() {
-    if(device.features.canChangeProfile)
+    if (device.features.canChangeProfile)
         device.refreshPowerLevel();
+
     device.getClocks();
     device.getTemperature();
 
@@ -352,7 +355,7 @@ void radeon_profile::timerEvent() {
 
     refreshTooltip();
 
-    if (ui->cb_enableEvents->isChecked())
+    if (ui->cb_eventsTracking->isChecked())
         checkEvents();
 }
 
@@ -486,4 +489,3 @@ bool radeon_profile::askConfirmation(const QString title, const QString question
     return QMessageBox::Yes ==
             QMessageBox::question(this, title, question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 }
-
