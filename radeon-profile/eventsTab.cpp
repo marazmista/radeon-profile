@@ -14,9 +14,8 @@ void radeon_profile::on_btn_addEvent_clicked()
         RPEvent rpe = d->getCreatedEvent();
         events.insert(rpe.name, rpe);
 
-
         QTreeWidgetItem *item = new QTreeWidgetItem();
-        item->setCheckState(0, Qt::Checked);
+        item->setCheckState(0, (rpe.enabled) ? Qt::Checked : Qt::Unchecked);
         item->setText(1, rpe.name);
 
         ui->list_events->addTopLevelItem(item);

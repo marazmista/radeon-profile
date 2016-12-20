@@ -301,6 +301,9 @@
    <property name="text">
     <string>Enabled</string>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <resources/>
