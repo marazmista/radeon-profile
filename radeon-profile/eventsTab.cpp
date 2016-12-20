@@ -30,8 +30,11 @@ void radeon_profile::checkEvents() {
     data.checkTemperature = device.gpuTemeperatureData.current;
 
     if (savedState)  {
-
         RPEvent e = events.value(ui->l_currentActiveEvent->text());
+
+        // one degree handicap to avid constant activation when on the fence
+        data.checkTemperature += 1;
+
         if (!e.isActivationConditonFullfilled(data))
             revokeEvent();
 
@@ -52,6 +55,8 @@ void radeon_profile::checkEvents() {
 void radeon_profile::activateEvent(const RPEvent &rpe) {
     if (!globalStuff::globalConfig.rootMode && !device.daemonConnected())
         return;
+
+    qDebug() << "Activating event: " + rpe.name;
 
     savedState = new currentStateInfo();
     savedState->profile = static_cast<globalStuff::powerProfiles>(ui->combo_pProfile->currentIndex());
@@ -94,6 +99,8 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
 }
 
 void radeon_profile::revokeEvent() {
+    qDebug() << "Deactivating event: " + ui->l_currentActiveEvent->text();
+
     device.setPowerProfile(static_cast<globalStuff::powerProfiles>(savedState->profile));
     device.setForcePowerLevel(static_cast<globalStuff::forcePowerLevels>(savedState->powerLevel));
 
@@ -150,6 +157,14 @@ void radeon_profile::on_btn_modifyEvent_clicked()
 
 void radeon_profile::on_btn_removeEvent_clicked()
 {
+    if (ui->list_events->currentItem()->text(1) == ui->l_currentActiveEvent->text()) {
+        QMessageBox::information(this, "", tr("Cannot remove event that is currently active."));
+        return;
+    }
+
+    if (!askConfirmation("", tr("Do you want to remove event: ")+ui->list_events->currentItem()->text(1)+"?"))
+        return;
+
     events.remove(ui->list_events->currentItem()->text(1));
     delete ui->list_events->currentItem();
 }
