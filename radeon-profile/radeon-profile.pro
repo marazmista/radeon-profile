@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     execTab.cpp \
     execbin.cpp \
     dialog_rpevent.cpp \
-    eventsTab.cpp
+    eventsTab.cpp \
+    fanControlTab.cpp
 
 HEADERS  += radeon_profile.h \
     qcustomplot.h \

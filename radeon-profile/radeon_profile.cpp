@@ -17,7 +17,6 @@
 
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
-#include <dialog_rpevent.h>
 
 #include <QTimer>
 #include <QTextStream>
@@ -488,4 +487,14 @@ void radeon_profile::configureDaemonAutoRefresh (bool enabled, int interval) {
 bool radeon_profile::askConfirmation(const QString title, const QString question){
     return QMessageBox::Yes ==
             QMessageBox::question(this, title, question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+}
+
+void radeon_profile::showWindow() {
+    if (ui->cb_minimizeTray->isChecked() && ui->cb_startMinimized->isChecked())
+        return;
+
+    if (ui->cb_startMinimized->isChecked())
+        this->showMinimized();
+    else
+        this->showNormal();
 }
