@@ -164,7 +164,7 @@ void radeon_profile::loadConfig() {
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
     ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",true).toBool());
     ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
-    ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",80).toInt());
+    ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",20).toInt());
     ui->cb_saveFanMode->setChecked(settings.value("saveSelectedFanMode",false).toBool());
     ui->l_currentFanProfile->setText(settings.value("fanProfileName","default").toString());
     ui->cb_zeroPercentFanSpeed->setChecked(settings.value("enableZeroPercentFanSpeed",false).toBool());
@@ -384,5 +384,5 @@ void radeon_profile::loadFanProfiles() {
 void radeon_profile::setupMinFanSpeedSetting(unsigned int speed) {
     minFanStepsSpeed = speed;
     ui->l_minFanSpeed->setText(QString::number(minFanStepsSpeed)+"%");
-    ui->fanSpeedSlider->setMinimum((minFanStepsSpeed * device.features.pwmMaxSpeed) / 100);
+    ui->fanSpeedSlider->setMinimum(minFanStepsSpeed);
 }

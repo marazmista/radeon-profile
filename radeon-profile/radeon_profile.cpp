@@ -190,7 +190,6 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 
     if (features.pwmAvailable && (globalStuff::globalConfig.rootMode || device.daemonConnected())) {
         qDebug() << "Fan control is available , configuring the fan control tab";
-        ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
         ui->l_fanProfileUnsavedIndicator->setVisible(false);
 
@@ -361,7 +360,7 @@ void radeon_profile::timerEvent() {
 void radeon_profile::adjustFanSpeed() {
     if (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore) {
         if (currentFanProfile.contains(device.gpuTemeperatureData.current)) {  // Exact match
-            device.setPwmValue(device.features.pwmMaxSpeed * currentFanProfile.value(device.gpuTemeperatureData.current) / 100);
+            device.setPwmValue(currentFanProfile.value(device.gpuTemeperatureData.current));
             return;
         }
 
@@ -373,12 +372,12 @@ void radeon_profile::adjustFanSpeed() {
 			lSpeed = low.value();
 
         if (high == currentFanProfile.constBegin()) {
-            device.setPwmValue(device.features.pwmMaxSpeed * hSpeed / 100);
+            device.setPwmValue(hSpeed);
             return;
         }
 
         if (low == currentFanProfile.constEnd()) {
-            device.setPwmValue(device.features.pwmMaxSpeed * lSpeed / 100);
+            device.setPwmValue(lSpeed);
             return;
         }
 
@@ -391,7 +390,7 @@ void radeon_profile::adjustFanSpeed() {
 
         speed = (speed < minFanStepsSpeed) ? minFanStepsSpeed : speed;
 
-        device.setPwmValue(device.features.pwmMaxSpeed * speed / 100);
+        device.setPwmValue(speed);
     }
 }
 

@@ -40,8 +40,6 @@ void Dialog_RPEvent::setFeatures(const globalStuff::driverFeatures &features, co
     for (QString p : profiles)
         ui->combo_fanChange->addItem(p);
 
-    ui->spin_fixedFanSpeed->setMaximum(features.pwmMaxSpeed);
-
     if (!features.pwmAvailable) {
         ui->combo_fanChange->setVisible(false);
         ui->l_fan->setVisible(false);

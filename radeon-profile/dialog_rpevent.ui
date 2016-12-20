@@ -198,6 +198,9 @@
           <height>23</height>
          </rect>
         </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
        </widget>
       </widget>
      </item>
@@ -227,7 +230,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Activate above (temperature above this will trigger event)</string>
+      <string>Activate above this temperature:</string>
      </property>
     </widget>
     <widget class="QSpinBox" name="spin_tempActivate">
@@ -249,9 +252,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>9</y>
        <width>361</width>
-       <height>20</height>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">

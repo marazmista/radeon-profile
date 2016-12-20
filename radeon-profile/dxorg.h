@@ -40,7 +40,7 @@ public:
     static void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
     static void setForcePowerLevel(globalStuff::forcePowerLevels);
     static void setPwmManuaControl(bool manual);
-    static void setPwmValue(int value);
+    static void setPwmValue(unsigned int value);
 
     static QStringList detectCards();
     static void figureOutGpuDataFilePaths(const QString &gpuName);

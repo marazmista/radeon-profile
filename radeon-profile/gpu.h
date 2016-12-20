@@ -52,7 +52,7 @@ public:
     void setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const;
     void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const;
     void setPwmManualControl(bool manual) const;
-    void setPwmValue(int value) const;
+    void setPwmValue(unsigned int value) const;
 
     QStringList initialize(gpu::driver);
     QStringList initialize();

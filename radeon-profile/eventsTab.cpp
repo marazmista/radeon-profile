@@ -88,7 +88,7 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
                 break;
             case 2:
                 device.setPwmManualControl(true);
-                device.setPwmValue(rpe.fixedFanSpeedChange * device.features.pwmMaxSpeed / 100);
+                device.setPwmValue(rpe.fixedFanSpeedChange);
                 break;
             default:
                 ui->btn_pwmProfile->click();
