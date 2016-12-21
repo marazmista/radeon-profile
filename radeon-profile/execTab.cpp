@@ -37,7 +37,7 @@ void radeon_profile::on_btn_modifyExecProfile_clicked()
     ui->label_15->setVisible(false);
     ui->cb_manualEdit->setChecked(false);
 
-    if (ui->list_execProfiles->selectedItems().count() == 0)
+    if (!ui->list_execProfiles->currentItem())
         return;
 
     ui->txt_profileName->setText(ui->list_execProfiles->currentItem()->text(PROFILE_NAME));
@@ -201,13 +201,13 @@ void radeon_profile::on_list_vaules_itemClicked(QListWidgetItem *item)
 
 void radeon_profile::on_btn_removeExecProfile_clicked()
 {
-    if (ui->list_execProfiles->selectedItems().count() == 0)
+    if (!ui->list_execProfiles->currentItem())
         return;
 
-   if (QMessageBox::question(this, tr("Remove"), tr("Remove this item?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
-        delete ui->list_execProfiles->selectedItems()[0];
-   else
-       return;
+    if (QMessageBox::question(this, tr("Remove"), tr("Remove this item?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
+        return;
+
+    delete ui->list_execProfiles->currentItem();
 }
 
 void radeon_profile::on_btn_selectBinary_clicked()

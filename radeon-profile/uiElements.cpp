@@ -221,7 +221,6 @@ void radeon_profile::setupContextMenus() {
     connect(reset,SIGNAL(triggered()),this,SLOT(resetStats()));
 }
 
-
 void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
     if (rebuildMode)
         delete fanProfilesMenu;
@@ -238,7 +237,7 @@ void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
     connect(fanAuto, SIGNAL(triggered()), this, SLOT(on_btn_pwmAuto_clicked()));
 
     QAction *fanFixed = new QAction(fanProfilesMenu);
-    fanFixed->setText(tr("Fixed ") + ui->labelFixedSpeed->text()+"%");
+    fanFixed->setText(tr("Fixed ") + ui->labelFixedSpeed->text());
     fanFixed->setCheckable(true);
     fanFixed->setActionGroup(ag);
     connect(fanFixed, SIGNAL(triggered()), this, SLOT(on_btn_pwmFixed_clicked()));

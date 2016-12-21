@@ -26,6 +26,8 @@
 #include <QMessageBox>
 #include <QDebug>
 
+unsigned int radeon_profile::minFanStepsSpeed = 10;
+
 radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
@@ -33,8 +35,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     rangeX = 180;
     ticksCounter = 0;
     statsTickCounter = 0;
-    minFanStepsSpeed = 10;
-
 
     ui->setupUi(this);
     timer = new QTimer(this);
@@ -161,6 +161,8 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         dpmMenu->setEnabled(false);
         ui->combo_pLevel->setEnabled(false);
         ui->combo_pProfile->setEnabled(false);
+        ui->cb_eventsTracking->setEnabled(false);
+        ui->cb_eventsTracking->setChecked(false);
     }
 
     ui->cb_showFreqGraph->setEnabled(features.coreClockAvailable);
@@ -188,10 +190,9 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 
     if (features.pwmAvailable && (globalStuff::globalConfig.rootMode || device.daemonConnected())) {
         qDebug() << "Fan control is available , configuring the fan control tab";
-        ui->fanSpeedSlider->setMaximum(device.features.pwmMaxSpeed);
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
+        ui->l_fanProfileUnsavedIndicator->setVisible(false);
 
-        loadFanProfiles();
         setupFanProfilesMenu();
 
         if (ui->cb_saveFanMode->isChecked()) {
@@ -213,23 +214,24 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     }
 
     if (features.pm == globalStuff::DPM) {
-        ui->combo_pProfile->addItems(QStringList() << dpm_battery << dpm_balanced << dpm_performance);
-        ui->combo_pLevel->addItems(QStringList() << dpm_auto << dpm_low << dpm_high);
+        ui->combo_pProfile->addItems(globalStuff::createDPMCombo());
+        ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo());
 
         ui->combo_pProfile->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
         ui->combo_pLevel->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerLevel));
 
     } else {
         ui->combo_pLevel->setEnabled(false);
-        ui->combo_pProfile->addItems(QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low);
+        ui->combo_pProfile->addItems(globalStuff::createProfileCombo());
     }
 
      ui->mainTabs->setTabEnabled(2,features.overClockAvailable);
 }
 
 void radeon_profile::refreshGpuData() {
-    if(device.features.canChangeProfile)
+    if (device.features.canChangeProfile)
         device.refreshPowerLevel();
+
     device.getClocks();
     device.getTemperature();
 
@@ -350,29 +352,32 @@ void radeon_profile::timerEvent() {
     }
 
     refreshTooltip();
+
+    if (ui->cb_eventsTracking->isChecked())
+        checkEvents();
 }
 
 void radeon_profile::adjustFanSpeed() {
     if (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore) {
         if (currentFanProfile.contains(device.gpuTemeperatureData.current)) {  // Exact match
-            device.setPwmValue(device.features.pwmMaxSpeed * currentFanProfile.value(device.gpuTemeperatureData.current) / 100);
+            device.setPwmValue(currentFanProfile.value(device.gpuTemeperatureData.current));
             return;
         }
 
         // find bounds of current temperature
-        QMap<int,unsigned int>::iterator high = currentFanProfile.upperBound(device.gpuTemeperatureData.current);
-        QMap<int,unsigned int>::iterator low = (currentFanProfile.size() > 1 ? high - 1 : high);
+        QMap<int,unsigned int>::const_iterator high = currentFanProfile.upperBound(device.gpuTemeperatureData.current);
+        QMap<int,unsigned int>::const_iterator low = (currentFanProfile.size() > 1 ? high - 1 : high);
 
         int hSpeed = high.value(),
 			lSpeed = low.value();
 
         if (high == currentFanProfile.constBegin()) {
-            device.setPwmValue(device.features.pwmMaxSpeed * hSpeed / 100);
+            device.setPwmValue(hSpeed);
             return;
         }
 
         if (low == currentFanProfile.constEnd()) {
-            device.setPwmValue(device.features.pwmMaxSpeed * lSpeed / 100);
+            device.setPwmValue(lSpeed);
             return;
         }
 
@@ -385,7 +390,7 @@ void radeon_profile::adjustFanSpeed() {
 
         speed = (speed < minFanStepsSpeed) ? minFanStepsSpeed : speed;
 
-        device.setPwmValue(device.features.pwmMaxSpeed * speed / 100);
+        device.setPwmValue(speed);
     }
 }
 
@@ -467,11 +472,13 @@ void radeon_profile::updateStatsTable() {
 void radeon_profile::refreshTooltip()
 {
     QString tooltipdata = radeon_profile::windowTitle() + "\n";
-    if(device.features.canChangeProfile)
+
+    if (device.features.canChangeProfile)
         tooltipdata += "Current profile: "+ device.currentPowerProfile + "  " + device.currentPowerLevel +"\n";
-    for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++) {
+
+    for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++)
         tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
-    }
+
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
 }
@@ -488,4 +495,14 @@ void radeon_profile::configureDaemonAutoRefresh (bool enabled, int interval) {
 bool radeon_profile::askConfirmation(const QString title, const QString question){
     return QMessageBox::Yes ==
             QMessageBox::question(this, title, question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+}
+
+void radeon_profile::showWindow() {
+    if (ui->cb_minimizeTray->isChecked() && ui->cb_startMinimized->isChecked())
+        return;
+
+    if (ui->cb_startMinimized->isChecked())
+        this->showMinimized();
+    else
+        this->showNormal();
 }

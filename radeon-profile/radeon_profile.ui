@@ -393,16 +393,16 @@
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
         <property name="leftMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <item>
          <widget class="QWidget" name="widget" native="true">
@@ -872,16 +872,16 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
         <property name="leftMargin">
-         <number>5</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>5</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>5</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>5</number>
+         <number>4</number>
         </property>
         <property name="spacing">
          <number>4</number>
@@ -1122,6 +1122,18 @@
         <string>Overclock</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_7">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
         <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
@@ -1310,6 +1322,18 @@
         <string>Fan Control</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_14">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
@@ -1419,7 +1443,7 @@
            <widget class="QPushButton" name="btn_pwmFixedApply">
             <property name="geometry">
              <rect>
-              <x>190</x>
+              <x>230</x>
               <y>70</y>
               <width>161</width>
               <height>27</height>
@@ -1434,7 +1458,7 @@
              <rect>
               <x>10</x>
               <y>20</y>
-              <width>561</width>
+              <width>581</width>
               <height>41</height>
              </rect>
             </property>
@@ -1444,7 +1468,7 @@
                <property name="font">
                 <font>
                  <family>Monospace</family>
-                 <pointsize>8</pointsize>
+                 <pointsize>10</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -1455,16 +1479,25 @@
              <item>
               <widget class="QSlider" name="fanSpeedSlider">
                <property name="minimum">
-                <number>33</number>
+                <number>10</number>
                </property>
                <property name="maximum">
-                <number>255</number>
+                <number>100</number>
                </property>
                <property name="value">
-                <number>80</number>
+                <number>20</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="invertedControls">
+                <bool>false</bool>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksBothSides</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
                </property>
               </widget>
              </item>
@@ -1473,24 +1506,11 @@
                <property name="font">
                 <font>
                  <family>Monospace</family>
-                 <pointsize>8</pointsize>
+                 <pointsize>10</pointsize>
                 </font>
                </property>
                <property name="text">
                 <string>20%</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_22">
-               <property name="font">
-                <font>
-                 <family>Monospace</family>
-                 <pointsize>8</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string> / 100%</string>
                </property>
               </widget>
              </item>
@@ -1769,22 +1789,169 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="eventsTab">
+       <attribute name="title">
+        <string>Events</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_15">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QCheckBox" name="cb_eventsTracking">
+            <property name="text">
+             <string>Enable event tracking</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>30</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Current active event:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="l_currentActiveEvent">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_revokeEvent">
+            <property name="text">
+             <string>Revoke current event</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTreeWidget" name="list_events">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="showDropIndicator" stdset="0">
+           <bool>false</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="indentation">
+           <number>20</number>
+          </property>
+          <property name="itemsExpandable">
+           <bool>false</bool>
+          </property>
+          <property name="expandsOnDoubleClick">
+           <bool>false</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>Enabled</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Event name</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QPushButton" name="btn_addEvent">
+            <property name="text">
+             <string>Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_modifyEvent">
+            <property name="text">
+             <string>Modify</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_removeEvent">
+            <property name="text">
+             <string>Remove</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>30</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_eventsInfo">
+            <property name="text">
+             <string>Info</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="execTab">
        <attribute name="title">
         <string>Exec</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_12">
         <property name="leftMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <item row="0" column="0">
          <widget class="QStackedWidget" name="execPages">
@@ -3046,16 +3213,16 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_11">
         <property name="leftMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>3</number>
+         <number>4</number>
         </property>
         <item row="0" column="0">
          <widget class="QTabWidget" name="configGroups">
@@ -3559,11 +3726,23 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="aboutTab">
        <attribute name="title">
         <string>About</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_19">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
         <item>
          <spacer name="verticalSpacer_8">
           <property name="orientation">

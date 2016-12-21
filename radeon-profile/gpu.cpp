@@ -844,10 +844,10 @@ void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) 
     }
 }
 
-void gpu::setPwmValue(int value) const {
+void gpu::setPwmValue(unsigned int value) const {
     switch (currentDriver) {
     case XORG:
-        dXorg::setPwmValue(value);
+        dXorg::setPwmValue(features.pwmMaxSpeed * value / 100);
         break;
     case FGLRX:
     case DRIVER_UNKNOWN:
