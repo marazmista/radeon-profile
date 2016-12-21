@@ -97,16 +97,16 @@ QStringList gpu::initialize(gpu::driver driver) {
 globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuClocksStruct &data) {
     globalStuff::gpuClocksStructString tmp;
 
-    if (data.coreClk > 0)
+    if (data.coreClk != -1)
         tmp.coreClk =  QString().setNum(data.coreClk)+"MHz";
 
-    if (data.memClk > 0)
+    if (data.memClk != -1)
         tmp.memClk =  QString().setNum(data.memClk)+"MHz";
 
-    if (data.memVolt > 0)
+    if (data.memVolt != -1)
         tmp.memVolt =  QString().setNum(data.memVolt)+"mV";
 
-    if (data.coreVolt > 0)
+    if (data.coreVolt != -1)
         tmp.coreVolt =  QString().setNum(data.coreVolt)+"mV";
 
     if (data.powerLevel != -1)
