@@ -5,6 +5,8 @@
 
 #include <QLineEdit>
 #include <QMap>
+#include <QMessageBox>
+#include <QFileDialog>
 
 Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
     QDialog(parent),

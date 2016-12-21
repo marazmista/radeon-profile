@@ -5,6 +5,8 @@
 #include "dialog_rpevent.h"
 #include "globalStuff.h"
 
+#include <QMessageBox>
+
 void radeon_profile::on_btn_addEvent_clicked()
 {
     Dialog_RPEvent *d = new Dialog_RPEvent(this);
