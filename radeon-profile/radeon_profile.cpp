@@ -269,9 +269,9 @@ void radeon_profile::refreshUI() {
             addChild(ui->list_currentGPUData, tr("GPU clock"), device.gpuClocksDataString.coreClk);
         if (device.gpuClocksData.memClk != -1)
             addChild(ui->list_currentGPUData, tr("Memory clock"), device.gpuClocksDataString.memClk);
-        if (device.gpuClocksData.uvdCClk > 0)
+        if (device.gpuClocksData.uvdCClk != -1)
             addChild(ui->list_currentGPUData, tr("UVD core clock (cclk)"), device.gpuClocksDataString.uvdCClk);
-        if (device.gpuClocksData.uvdDClk > 0)
+        if (device.gpuClocksData.uvdDClk != -1)
             addChild(ui->list_currentGPUData, tr("UVD decoder clock (dclk)"), device.gpuClocksDataString.uvdDClk);
         if (device.gpuClocksData.coreVolt != -1)
             addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuClocksDataString.coreVolt);

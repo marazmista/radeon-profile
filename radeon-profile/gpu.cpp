@@ -112,10 +112,10 @@ globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuCloc
     if (data.powerLevel != -1)
         tmp.powerLevel =  QString().setNum(data.powerLevel);
 
-    if (data.uvdCClk > 0)
+    if (data.uvdCClk != -1)
         tmp.uvdCClk =  QString().setNum(data.uvdCClk)+"MHz";
 
-    if (data.uvdDClk > 0)
+    if (data.uvdDClk != -1)
         tmp.uvdDClk =  QString().setNum(data.uvdDClk)+"MHz";
 
     return tmp;
