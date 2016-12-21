@@ -34,7 +34,7 @@ void radeon_profile::checkEvents() {
         // one degree handicap to avid constant activation when on the fence
         data.checkTemperature += 1;
 
-        if (!e.isActivationConditonFullfilled(data))
+        if (!e.isActivationConditonFulfilled(data))
             revokeEvent();
 
         return;
@@ -44,7 +44,7 @@ void radeon_profile::checkEvents() {
         if (!e.enabled)
             continue;
 
-        if (e.isActivationConditonFullfilled(data)) {
+        if (e.isActivationConditonFulfilled(data)) {
             activateEvent(e);
             return;
         }
@@ -151,6 +151,11 @@ void radeon_profile::on_list_events_itemChanged(QTreeWidgetItem *item, int colum
 
 void radeon_profile::on_btn_eventsInfo_clicked()
 {
+    QMessageBox::information(this, tr("Events info"),
+                             tr("Here you can define events. Each event has a defined condition, and when this condition is fulfilled, event is activated. \n\n"
+                                "After activation, defined power profile, power level and fan profile are applied. When one of events is activated, tracking is suspended.\n\n"
+                                "When active event condition is no longer true, event is revoked and power profile, power level and fan profile are restored to state before event was activated."),
+                             QMessageBox::Ok);
 }
 
 void radeon_profile::on_btn_modifyEvent_clicked()

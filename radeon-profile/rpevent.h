@@ -23,7 +23,7 @@ public:
     unsigned short fixedFanSpeedChange, activationTemperature, fanComboIndex;
     rpeventType type;
 
-    bool isActivationConditonFullfilled(const checkInfoStruct &check) {
+    bool isActivationConditonFulfilled(const checkInfoStruct &check) {
         switch (type) {
             case rpeventType::TEMPEREATURE:
                 return activationTemperature < check.checkTemperature;

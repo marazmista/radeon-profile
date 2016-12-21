@@ -217,6 +217,7 @@ private:
     void saveFanProfiles(QXmlStreamWriter &xml);
     void loadFanProfile(QXmlStreamReader &xml);
     void createDefaultFanProfile();
+    void loadExecProfiles();
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.

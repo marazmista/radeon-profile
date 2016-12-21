@@ -147,6 +147,8 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
     xml.writeEndElement();
 }
 
+
+
 void radeon_profile::loadConfig() {
     QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
 
@@ -279,18 +281,7 @@ void radeon_profile::loadConfig() {
     }
 
     // legacy load
-    QFile ef(QDir::homePath() + "/.radeon-profile-execProfiles");
-    if (ef.open(QIODevice::ReadOnly) && ui->list_execProfiles->topLevelItemCount() == 0) {
-        QStringList profiles = QString(ef.readAll()).split('\n');
-
-        for (int i=0;i < profiles.count(); i++) {
-            if (!profiles[i].isEmpty())
-                ui->list_execProfiles->addTopLevelItem(new QTreeWidgetItem(QStringList() << profiles[i].split("###")));
-        }
-        // remove old file
-        ef.remove();
-        ef.close();
-    }
+    loadExecProfiles();
 
     // legacy load
     loadFanProfiles();
@@ -378,6 +369,23 @@ void radeon_profile::loadFanProfiles() {
         // remove old file
         fsPath.remove();
         fsPath.close();
+    }
+}
+
+// legacy load
+void radeon_profile::loadExecProfiles()
+{
+    QFile ef(QDir::homePath() + "/.radeon-profile-execProfiles");
+    if (ef.open(QIODevice::ReadOnly) && ui->list_execProfiles->topLevelItemCount() == 0) {
+        QStringList profiles = QString(ef.readAll()).split('\n');
+
+        for (int i=0;i < profiles.count(); i++) {
+            if (!profiles[i].isEmpty())
+                ui->list_execProfiles->addTopLevelItem(new QTreeWidgetItem(QStringList() << profiles[i].split("###")));
+        }
+        // remove old file
+        ef.remove();
+        ef.close();
     }
 }
 
