@@ -438,21 +438,12 @@ void radeon_profile::doTheStats() {
     statsTickCounter++;
 
     // figure out pm level based on data provided
-    QString pmLevelName;
-    if(device.gpuClocksData.powerLevel != -1)
-        pmLevelName += "Power level:" + device.gpuClocksDataString.powerLevel;
+    QString pmLevelName = (device.gpuClocksData.powerLevel == -1) ? "" : "Power level:" + device.gpuClocksDataString.powerLevel, volt;
+    volt = (device.gpuClocksData.coreVolt == -1) ? "" : "(" + device.gpuClocksDataString.coreVolt+")";
+    pmLevelName = (device.gpuClocksData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +device.gpuClocksDataString.coreClk + volt;
 
-    if(device.gpuClocksData.coreClk != -1)
-        pmLevelName += " Core:" + device.gpuClocksDataString.coreClk;
-
-    if(device.gpuClocksData.coreVolt != -1)
-        pmLevelName += "(" + device.gpuClocksDataString.coreVolt + ")";
-
-    if(device.gpuClocksData.memClk != -1)
-        pmLevelName += " Mem:" + device.gpuClocksDataString.memClk;
-
-    if(device.gpuClocksData.memVolt != -1)
-        pmLevelName += "(" + device.gpuClocksDataString.memVolt + ")";
+    volt = (device.gpuClocksData.memVolt == -1) ? "" : "(" + device.gpuClocksDataString.memVolt + ")";
+    pmLevelName = (device.gpuClocksData.memClk == -1) ? pmLevelName : pmLevelName + " Mem:" + device.gpuClocksDataString.memClk +  volt;
 
     if (pmStats.contains(pmLevelName)) // This power level already exists, increment its count
         pmStats[pmLevelName]++;
