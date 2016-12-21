@@ -298,14 +298,14 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     RPEvent rpe;
     rpe.name = xml.attributes().value("name").toString();
     rpe.enabled = (xml.attributes().value("enabled") == "1");
-    rpe.type = static_cast<rpeventType>(xml.attributes().value("tiggerType").toInt());
+    rpe.type = static_cast<rpeventType>(xml.attributes().value("tiggerType").toString().toInt());
     rpe.activationBinary = xml.attributes().value("activationBinary").toString();
-    rpe.activationTemperature = xml.attributes().value("activationTemperature").toInt();
-    rpe.dpmProfileChange = static_cast<globalStuff::powerProfiles>(xml.attributes().value("dpmProfileChange").toInt());
-    rpe.powerLevelChange = static_cast<globalStuff::forcePowerLevels>(xml.attributes().value("powerLevelChange").toInt());
-    rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toInt();
+    rpe.activationTemperature = xml.attributes().value("activationTemperature").toString().toInt();
+    rpe.dpmProfileChange = static_cast<globalStuff::powerProfiles>(xml.attributes().value("dpmProfileChange").toString().toInt());
+    rpe.powerLevelChange = static_cast<globalStuff::forcePowerLevels>(xml.attributes().value("powerLevelChange").toString().toInt());
+    rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toString().toInt();
     rpe.fanProfileNameChange = xml.attributes().value("fanProfileNameChange").toString();
-    rpe.fanComboIndex = xml.attributes().value("fanComboIndex").toInt();
+    rpe.fanComboIndex = xml.attributes().value("fanComboIndex").toString().toInt();
 
     events.insert(rpe.name, rpe);
 
@@ -334,8 +334,8 @@ void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
     fanProfileSteps fps;
     while (xml.readNext()) {
         if (xml.name().toString() == "step")
-            fps.insert(xml.attributes().value("temperature").toInt(),
-                       xml.attributes().value("speed").toInt());
+            fps.insert(xml.attributes().value("temperature").toString().toInt(),
+                       xml.attributes().value("speed").toString().toInt());
 
         if (xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "fanProfile") {
             fanProfiles.insert(fpName, fps);

@@ -17,6 +17,7 @@
 #include <QList>
 #include <QListWidgetItem>
 #include <QButtonGroup>
+#include <QXmlStreamWriter>
 
 #define startClocksScaleL 50
 #define startClocksScaleH 150

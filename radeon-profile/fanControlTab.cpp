@@ -1,6 +1,9 @@
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
 
+#include <QMessageBox>
+#include <QMenu>
+#include <QInputDialog>
 
 void radeon_profile::createDefaultFanProfile() {
     fanProfileSteps p;
