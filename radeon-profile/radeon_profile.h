@@ -28,7 +28,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20161219
+#define appVersion 20161221
 
 namespace Ui {
 class radeon_profile;
@@ -159,6 +159,7 @@ private:
         globalStuff::powerProfiles profile;
         globalStuff::forcePowerLevels powerLevel;
         short fanIndex;
+        QString fanProfileName;
     };
 
     gpu device;

@@ -138,10 +138,12 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
 
 void radeon_profile::on_btn_activateFanProfile_clicked()
 {
-    if (ui->l_fanProfileUnsavedIndicator->isVisible() && askConfirmation("", tr("Cannot activate unsaved profile. Do you want to save it?"))) {
+    if (ui->l_fanProfileUnsavedIndicator->isVisible()) {
+        if (!askConfirmation("", tr("Cannot activate unsaved profile. Do you want to save it?")))
+            return;
+
         ui->btn_saveFanProfile->click();
-    } else
-        return;
+    }
 
     setCurrentFanProfile(ui->combo_fanProfiles->currentText(), fanProfiles.value(ui->combo_fanProfiles->currentText()));
     fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);

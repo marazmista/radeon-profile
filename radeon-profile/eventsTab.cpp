@@ -52,7 +52,7 @@ void radeon_profile::checkEvents() {
 }
 
 void radeon_profile::activateEvent(const RPEvent &rpe) {
-    if (!globalStuff::globalConfig.rootMode && !device.daemonConnected())
+    if (!device.features.canChangeProfile)
         return;
 
     qDebug() << "Activating event: " + rpe.name;
@@ -62,11 +62,15 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
     savedState->powerLevel = static_cast<globalStuff::forcePowerLevels>(ui->combo_pLevel->currentIndex());
 
     if (device.features.pwmAvailable) {
-        for (int i = 0; i < fanProfilesMenu->actions().count(); ++i) {
-            if (fanProfilesMenu->actions()[i]->isChecked()) {
-                savedState->fanIndex = i;
+        switch (ui->fanModesTabs->currentIndex()) {
+            case 0:
+            case 1:
+             savedState->fanIndex = ui->fanModesTabs->currentIndex();
                 break;
-            }
+            case 2:
+                savedState->fanProfileName = ui->l_currentFanProfile->text();
+                savedState->fanIndex = ui->fanModesTabs->currentIndex();
+                break;
         }
     }
 
@@ -80,7 +84,7 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
     if (rpe.powerLevelChange > -1)
         device.setForcePowerLevel(static_cast<globalStuff::forcePowerLevels>(rpe.powerLevelChange));
 
-    if (rpe.fanComboIndex > 0) {
+    if (rpe.fanComboIndex > 0 && device.features.pwmAvailable) {
         switch (rpe.fanComboIndex) {
             case 1:
                 ui->btn_pwmAuto->click();
@@ -90,8 +94,11 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
                 device.setPwmValue(rpe.fixedFanSpeedChange);
                 break;
             default:
+                if (!fanProfiles.contains(rpe.fanProfileNameChange))
+                    break;
+
+                ui->l_currentFanProfile->setText(rpe.fanProfileNameChange);
                 ui->btn_pwmProfile->click();
-                setCurrentFanProfile(rpe.fanProfileNameChange, fanProfiles.value(rpe.fanProfileNameChange));
                 break;
         }
     }
@@ -103,12 +110,28 @@ void radeon_profile::revokeEvent() {
     device.setPowerProfile(static_cast<globalStuff::powerProfiles>(savedState->profile));
     device.setForcePowerLevel(static_cast<globalStuff::forcePowerLevels>(savedState->powerLevel));
 
-    if (device.features.pwmAvailable)
-        fanProfilesMenu->actions()[savedState->fanIndex]->trigger();
+    if (device.features.pwmAvailable) {
+        switch (savedState->fanIndex) {
+            case 0:
+                ui->btn_pwmAuto->click();
+                break;
+            case 1:
+                ui->btn_pwmFixed->click();
+                break;
+            default:
+                if (!fanProfiles.contains(savedState->fanProfileName))
+                    break;
+
+                ui->l_currentFanProfile->setText(savedState->fanProfileName);
+                ui->btn_pwmProfile->click();
+        }
+
+    }
 
     ui->l_currentActiveEvent->clear();
     hideEventControls(true);
 
+    delete savedState;
     savedState = nullptr;
 }
 

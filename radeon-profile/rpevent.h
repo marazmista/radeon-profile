@@ -36,6 +36,10 @@ public:
         return false;
     }
 
+    template <typename T>
+    T getEnumFromCombo(const unsigned int comboIndex) {
+        return static_cast<T>(comboIndex - 1);
+    }
 };
 
 #endif // EVENT_H

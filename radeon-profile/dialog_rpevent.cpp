@@ -83,8 +83,8 @@ void Dialog_RPEvent::on_btn_save_clicked()
     createdEvent.activationBinary = ui->edt_binary->text();
     createdEvent.activationTemperature = ui->spin_tempActivate->value();
 
-    createdEvent.dpmProfileChange = static_cast<globalStuff::powerProfiles>(ui->combo_dpmChange->currentIndex() - 1);
-    createdEvent.powerLevelChange = static_cast<globalStuff::forcePowerLevels>(ui->combo_powerLevelChange->currentIndex() - 1);
+    createdEvent.dpmProfileChange = createdEvent.getEnumFromCombo<globalStuff::powerProfiles>(ui->combo_dpmChange->currentIndex());
+    createdEvent.powerLevelChange = createdEvent.getEnumFromCombo<globalStuff::forcePowerLevels>(ui->combo_powerLevelChange->currentIndex());
 
     createdEvent.fixedFanSpeedChange  = ui->spin_fixedFanSpeed->value();
     createdEvent.fanComboIndex = ui->combo_fanChange->currentIndex();
