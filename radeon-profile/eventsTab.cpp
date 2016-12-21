@@ -28,7 +28,7 @@ void radeon_profile::checkEvents() {
     checkInfoStruct data;
     data.checkTemperature = device.gpuTemeperatureData.current;
 
-    if (savedState)  {
+    if (savedState != nullptr)  {
         RPEvent e = events.value(ui->l_currentActiveEvent->text());
 
         // one degree handicap to avid constant activation when on the fence
