@@ -4,6 +4,7 @@
 #include "gpu.h"
 #include "daemonComm.h"
 #include "execbin.h"
+#include "rpevent.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -27,7 +28,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20161219
+#define appVersion 20161221
 
 namespace Ui {
 class radeon_profile;
@@ -37,7 +38,7 @@ class radeon_profile : public QMainWindow
 {
     Q_OBJECT
 
-    // names in this enum equals indexes in Qtreewidged in ui for selecting clors
+    // names in this enum equals indexes in Qtreewidget in ui for selecting colors
     enum graphColors {
         TEMP_BG = 0,
         CLOCKS_BG,
@@ -60,9 +61,6 @@ class radeon_profile : public QMainWindow
         LOG_FILE_DATE_APPEND
     };
 
-    typedef QMap<int, unsigned int> fanProfileSteps;
-
-
 public:
     explicit radeon_profile(QStringList, QWidget *parent = 0);
     ~radeon_profile();
@@ -72,6 +70,9 @@ public:
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu, *fanProfilesMenu;
     QTimer *timer;
+    static unsigned int minFanStepsSpeed;
+
+    typedef QMap<int, unsigned int> fanProfileSteps;
 
 private slots:
     void timerEvent();
@@ -146,16 +147,31 @@ private slots:
     void on_btn_export_clicked();
     void on_cb_zeroPercentFanSpeed_clicked(bool checked);
     void on_combo_fanProfiles_currentIndexChanged(const QString &arg1);
+    void on_btn_addEvent_clicked();
+    void on_list_events_itemChanged(QTreeWidgetItem *item, int column);
+    void on_btn_eventsInfo_clicked();
+    void on_btn_modifyEvent_clicked();
+    void on_btn_removeEvent_clicked();
+    void on_btn_revokeEvent_clicked();
 
 private:
+    struct currentStateInfo {
+        globalStuff::powerProfiles profile;
+        globalStuff::forcePowerLevels powerLevel;
+        short fanIndex;
+        QString fanProfileName;
+    };
+
     gpu device;
     static const QString settingsPath;
     QList<execBin*> execsRunning;
     fanProfileSteps currentFanProfile;
     QMap<QString, fanProfileSteps> fanProfiles;
+    QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
-    unsigned int rangeX, ticksCounter, statsTickCounter, minFanStepsSpeed;
+    unsigned int rangeX, ticksCounter, statsTickCounter;
     QButtonGroup pwmGroup;
+    currentStateInfo *savedState;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
@@ -177,7 +193,6 @@ private:
     void updateExecLogs();
     void addRuntimeWidgets();
     void loadFanProfiles();
-    void saveFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
     void makeFanProfileListaAndGraph(const fanProfileSteps &profile);
     void makeFanProfilePlot();
@@ -191,6 +206,18 @@ private:
     int findCurrentFanProfileMenuIndex();
     void setupMinFanSpeedSetting(unsigned int speed);
     void markFanProfileUnsaved(bool unsaved);
+    void checkEvents();
+    void activateEvent(const RPEvent &rpe);
+    void saveRpevents(QXmlStreamWriter &xml);
+    void loadRpevent(const QXmlStreamReader &xml);
+    void revokeEvent();
+    void hideEventControls(bool hide);
+    void saveExecProfiles(QXmlStreamWriter &xml);
+    void loadExecProfile(const QXmlStreamReader &xml);
+    void saveFanProfiles(QXmlStreamWriter &xml);
+    void loadFanProfile(QXmlStreamReader &xml);
+    void createDefaultFanProfile();
+    void loadExecProfiles();
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.

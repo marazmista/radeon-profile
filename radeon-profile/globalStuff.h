@@ -63,6 +63,18 @@ public:
         return a.split('\n');
     }
 
+    static QStringList createDPMCombo() {
+        return QStringList() << dpm_battery << dpm_balanced << dpm_performance;
+    }
+
+    static QStringList createPowerLevelCombo() {
+        return QStringList() << dpm_auto << dpm_low << dpm_high;
+    }
+
+    static QStringList createProfileCombo() {
+        return QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low;
+    }
+
     enum powerProfiles {
         BATTERY, BALANCED, PERFORMANCE, AUTO, DEFAULT, LOW, MID, HIGH
     };

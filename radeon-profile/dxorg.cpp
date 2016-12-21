@@ -535,7 +535,7 @@ void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel
         setNewValue(filePaths.forcePowerLevelFilePath, newValue);
 }
 
-void dXorg::setPwmValue(int value) {
+void dXorg::setPwmValue(unsigned int value) {
     if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
         command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
