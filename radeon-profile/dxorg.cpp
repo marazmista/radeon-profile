@@ -145,11 +145,15 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 // method for gather info about clocks from deamon or from debugfs if root
 QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     QFile clocksFile(filePaths.clocksPath);
-    QByteArray data;
+    QString data;
 
-    if (clocksFile.open(QIODevice::ReadOnly)) // check for debugfs access
-            data = clocksFile.readAll();
-    else if (daemonConnected()) {
+    if (clocksFile.open(QIODevice::ReadOnly)) {
+        data = QString(clocksFile.readAll()).trimmed();
+        clocksFile.close();
+        return data;
+    }
+
+    if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh){
             qDebug() << "Asking the daemon to read clocks";
             dcomm->sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR)); // SIGNAL_READ_CLOCKS + SEPARATOR
@@ -158,7 +162,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
         // fist call, so notihing is in sharedmem and we need to wait for data
         // because we need correctly figure out what is available
         // see: https://stackoverflow.com/a/11487434/2347196
-        if (resolvingGpuFeatures) {
+        if (Q_UNLIKELY(resolvingGpuFeatures)) {
             QTime delayTime = QTime::currentTime().addMSecs(1200);
             qDebug() << "Waiting for first daemon data read...";
             while (QTime::currentTime() < delayTime)
@@ -169,7 +173,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
             const char *to = (const char*)sharedMem.constData();
             if (to != NULL) {
                 qDebug() << "Reading data from shared memory";
-                data = QByteArray::fromRawData(to, SHARED_MEM_SIZE);
+                data = QString(QByteArray::fromRawData(to, SHARED_MEM_SIZE)).trimmed();
             } else
                 qWarning() << "Shared memory data pointer is invalid: " << sharedMem.errorString();
             sharedMem.unlock();
@@ -177,13 +181,12 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
             qWarning() << "Unable to lock the shared memory: " << sharedMem.errorString();
     }
 
-    QString out = data.trimmed();
-     if (out.isEmpty())
-         qWarning() << "No data was found (you need debugfs active and either root access or radeon-profile-daemon)";
-     else if (resolvingGpuFeatures)
-         qDebug() << out;
+    #ifdef QT_DEBUG
+         if (resolvingGpuFeatures)
+             qDebug() << data;
+    #endif
 
-    return out;
+    return data;
 }
 
 globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {

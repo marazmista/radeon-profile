@@ -570,8 +570,6 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             outputItem->addChild(modeListItem);
 
             for(int modeIndex = 0; modeIndex < outputInfo->nmode; modeIndex++){ // For each possible mode
-                qDebug() << "    Analyzing available mode" << modeIndex;
-
                 XRRModeInfo * modeInfo = getModeInfo(screenResources, outputInfo->modes[modeIndex]);
                 if(modeInfo == NULL) // Mode info not found
                     continue; // Proceed to next mode
@@ -624,8 +622,6 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
             // Cycle through this output's properties
             for(int propertyIndex = 0; propertyIndex < propertyCount; propertyIndex++){
-                qDebug() << "    Analyzing property" << propertyIndex;
-
                 // Prepare this property's name and value
                 char * propertyAtomName = XGetAtomName(display, properties[propertyIndex]);
                 QString propertyName = QString::fromLocal8Bit(propertyAtomName);
@@ -707,8 +703,6 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
                         for(int valuesIndex = 0; valuesIndex < propertyInfo->num_values; valuesIndex++){
                             // Until there is another alternative/range available
-                            qDebug() << "      Printing alternative " << valuesIndex;
-
                             if(propertyInfo->range) { // This is a range, print the maximum value
                                 propertyValue += translateProperty(display,
                                                             32, // Value data has 32-bit format
