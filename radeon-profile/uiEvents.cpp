@@ -55,7 +55,7 @@ void radeon_profile::on_btn_forceLow_clicked()
 void radeon_profile::on_btn_pwmFixedApply_clicked()
 {
     device.setPwmValue(ui->fanSpeedSlider->value());
-    fanProfilesMenu->actions()[1]->setText(tr("Fixed ") + ui->labelFixedSpeed->text()+"%");
+    fanProfilesMenu->actions()[1]->setText(tr("Fixed ") + ui->labelFixedSpeed->text());
 }
 
 void radeon_profile::on_btn_pwmFixed_clicked()
