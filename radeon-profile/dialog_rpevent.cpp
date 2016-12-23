@@ -134,7 +134,8 @@ void Dialog_RPEvent::on_combo_fanChange_currentIndexChanged(int index)
 
 void Dialog_RPEvent::on_btn_setBinary_clicked()
 {
-    QString binaryPath = QFileDialog::getOpenFileName(this, tr("Select binary"));
+    QString binaryPath = QFileDialog::getOpenFileName(this, tr("Select binary"),
+                                                      (!ui->edt_binary->text().isEmpty()) ? QFileInfo(ui->edt_binary->text()).absoluteFilePath() : "");
 
     if (!binaryPath.isEmpty())
         ui->edt_binary->setText(binaryPath);

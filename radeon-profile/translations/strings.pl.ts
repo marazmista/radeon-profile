@@ -1711,7 +1711,7 @@ When active event condition is no longer true, event is revoked and power profil
 
 Po aktywacji, zdefiniowany profil i poziom zarządzania energią oraz profil wiatraka zostają przestawione. Kiedy jedno ze zdarzeń jest aktywne, sprawdzanie pozostałych jest wstrzymane.
 
-Kiedy warunek włączenia aktywnego zdarzenie nie jest prawdziwy, zostaje ono wyłaczone, a profil i poziom zarządzania energią oraz profil wiartaka zostają przywrócone poprzedniego stanu.</translation>
+Kiedy warunek włączenia aktywnego zdarzenie nie jest prawdziwy, zostaje ono wyłaczone a profil i poziom zarządzania energią oraz profil wiartaka zostają przywrócone do poprzedniego stanu.</translation>
     </message>
     <message>
         <location filename="../eventsTab.cpp" line="194"/>

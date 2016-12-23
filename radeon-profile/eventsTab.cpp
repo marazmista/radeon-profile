@@ -208,3 +208,11 @@ void radeon_profile::on_btn_revokeEvent_clicked()
 {
     revokeEvent();
 }
+
+void radeon_profile::on_list_events_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    Q_UNUSED(item)
+    Q_UNUSED(column);
+
+    ui->btn_modifyEvent->click();
+}
