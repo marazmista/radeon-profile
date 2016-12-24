@@ -89,8 +89,7 @@ appdata.path = /usr/share/appdata/
 appdata.files = extra/radeon-profile.appdata.xml
 # translate: /usr/share/radeon-profile/strings.*.qm
 translate.path = /usr/share/radeon-profile/
-translate.extra = lrelease-qt5 radeon-profile.pro || lrelease-qt4 radeon-profile.pro; \
-	cd translations; \
-	for tr in *.qm; do echo \$$tr; install -Dm644 \$$tr $(INSTALL_ROOT)/usr/share/radeon-profile/\$$tr; done
+translate.commands = lrelease-qt5 radeon-profile.pro || lrelease-qt4 radeon-profile.pro;
+translate.commands += for tr in translations/*.qm; do echo \$$tr; install -Dm644 \$$tr $(INSTALL_ROOT)/usr/share/radeon-profile/\$$tr; done
 INSTALLS += binary icon desktop appdata translate
 
