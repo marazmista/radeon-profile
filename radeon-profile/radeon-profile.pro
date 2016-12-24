@@ -73,3 +73,24 @@ DISTFILES += \
     translations/strings.it.ts \
     translations/strings.pl.ts \
     translations/strings.hr.ts
+
+# http://doc.qt.io/qt-5/qmake-advanced-usage.html#installing-files
+# binary: /usr/bin/radeon-profile
+binary.path = /usr/bin/
+binary.files = radeon-profile
+# icon: /usr/share/pixmaps/radeon-profile.png
+icon.path = /usr/share/pixmaps/
+icon.files = extra/radeon-profile.png
+# desktop: /usr/share/applications/radeon-profile.desktop
+desktop.path = /usr/share/applications/
+desktop.files = extra/radeon-profile.desktop
+# appdata: /usr/share/appdata/radeon-profile.appdata.xml
+appdata.path = /usr/share/appdata/
+appdata.files = extra/radeon-profile.appdata.xml
+# translate: /usr/share/radeon-profile/strings.*.qm
+translate.path = /usr/share/radeon-profile/
+translate.extra = lrelease-qt5 radeon-profile.pro || lrelease-qt4 radeon-profile.pro; \
+	cd translations; \
+	for tr in *.qm; do echo \$$tr; install -Dm644 \$$tr $(INSTALL_ROOT)/usr/share/radeon-profile/\$$tr; done
+INSTALLS += binary icon desktop appdata translate
+
