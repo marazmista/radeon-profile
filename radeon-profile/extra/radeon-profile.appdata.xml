@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Goes into /usr/share/appdata/ -->
+<component type="desktop">
+  <id>radeon-profile.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0+</project_license>
+  <name>Radeon Profile</name>
+  <summary>App for display info about radeon cards</summary>
+  <description>
+    <p>Read clocks, voltages and temperature; Manage power profiles and fan speed (on HD7000 series cards and above); Overclock your GPU (on Amdgpu driver).</p>
+    <p>Supported drivers: </p>
+    <ul>
+      <li>Open source Radeon driver (xf86-video-ati)</li>
+      <li>Open source Amdgpu driver or proprietary Amdgpu-pro driver (xf86-video-amdgpu)</li>
+      <li>Old proprietary driver (fglrx)</li>
+    </ul>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main page</caption>
+      <image>http://i.imgur.com/knL5abL.png</image>
+    </screenshot>
+    <screenshot type="default">
+      <caption>The graphs page</caption>
+      <image>http://i.imgur.com/wSGDQTZ.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/marazmista/radeon-profile</url>
+  <url type="bugtracker">https://github.com/marazmista/radeon-profile/issues</url>
+  <url type="help">https://www.phoronix.com/forums/forum/linux-graphics-x-org-drivers/open-source-amd-linux/37384-radeon-profile-tool-for-changing-profiles-and-monitoring-some-gpu-parameters</url>
+  <url type="translate">https://github.com/marazmista/radeon-profile/tree/master/radeon-profile/translations</url>
+  <developer_name>marazmista</developer_name>
+  <provides>
+    <binary>radeon-profile</binary>
+  </provides>
+  <releases>
+    <release date="2016-12-21" version="20161221">
+      <description>
+        <p>Created event tab</p>
+      </description>
+    </release>
+  </releases>
+</component>
