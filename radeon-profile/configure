@@ -1,0 +1,23 @@
+#!/bin/sh
+
+for IN in $* ; do
+	case $IN in
+	'--prefix='*)
+		ARG="$ARG PREFIX=${IN##--prefix=}"
+		;;
+	'--libdir='*)
+		ARG="$ARG QMAKE_LIBDIR+=${IN##--libdir=}"
+		;;
+	'CFLAGS='*)
+		ARG="$ARG QMAKE_CFLAGS+=${IN##CFLAGS=}"
+		;;
+	'CXXFLAGS'*)
+		ARG="$ARG QMAKE_CXXFLAGS+=${IN##CXXFLAGS=}"
+		;;
+	*)
+		ARG="$ARG $IN"
+		;;
+	esac
+done
+
+qmake-qt5 "$ARG" || qmake-qt4 "$ARG" || qmake "$ARG"
