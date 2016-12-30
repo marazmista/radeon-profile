@@ -1,23 +1,44 @@
 #!/bin/sh
 
-for IN in $* ; do
+if [ "$CFLAGS" ] ; then
+	ARG="$ARG QMAKE_CFLAGS+='$CFLAGS'"
+fi
+
+if [ "$CXXFLAGS" ] ; then
+	ARG="$ARG QMAKE_CXXFLAGS+='$CXXFLAGS'"
+fi
+
+if [ "$LDFLAGS" ] ; then
+	ARG="$ARG QMAKE_LFLAGS+='$LDFLAGS'"
+fi
+
+for IN in $@ ; do
 	case $IN in
 	'--prefix='*)
-		ARG="$ARG PREFIX=${IN##--prefix=}"
+		ARG="$ARG PREFIX='${IN##--prefix=}'"
 		;;
 	'--libdir='*)
-		ARG="$ARG QMAKE_LIBDIR+=${IN##--libdir=}"
+		ARG="$ARG QMAKE_LIBDIR+='${IN##--libdir=}'"
 		;;
+#	'--includedir='*)
+# For some reason this is not working...
+#		ARG="$ARG QMAKE_INCDIR+='${IN##--includedir=}'"
+#		;;
 	'CFLAGS='*)
-		ARG="$ARG QMAKE_CFLAGS+=${IN##CFLAGS=}"
+		ARG="$ARG QMAKE_CFLAGS+='${IN##CFLAGS=}'"
 		;;
-	'CXXFLAGS'*)
-		ARG="$ARG QMAKE_CXXFLAGS+=${IN##CXXFLAGS=}"
+	'CXXFLAGS='*)
+		ARG="$ARG QMAKE_CXXFLAGS+='${IN##CXXFLAGS=}'"
 		;;
-	*)
+	'LDFLAGS='*)
+		ARG="$ARG QMAKE_LFLAGS+='${IN##LDFLAGS=}'"
+		;;
+	'QMAKE_STRIP='*)
 		ARG="$ARG $IN"
 		;;
 	esac
 done
 
-qmake-qt5 "$ARG" || qmake-qt4 "$ARG" || qmake "$ARG"
+echo "qmake $ARG"
+
+eval qmake-qt5 $ARG || eval qmake-qt4 $ARG || eval qmake $ARG

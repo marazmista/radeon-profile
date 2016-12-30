@@ -3,10 +3,11 @@
 	"runtime": "org.kde.Platform",
 	"sdk": "org.kde.Sdk",
 	"command": "radeon-profile",
-	"copy-icon": true,
+	"rename-icon": "radeon-profile",
 	"rename-desktop-file": "radeon-profile.desktop",
 	"rename-appdata-file": "radeon-profile.appdata.xml",
 	"finish-args": [
+		"--device=dri",
 		"--socket=x11",
 		"--share=ipc",
 		"--filesystem=/tmp",
@@ -19,10 +20,6 @@
 			"name": "radeon-profile",
 			"subdir": "radeon-profile",
 			"no-autogen": true,
-			"post-install": [
-				"make clean",
-				"mv /app/usr/* /app/"
-			],
 			"sources": [
 				{
 					"type": "git",

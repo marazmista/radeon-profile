@@ -76,19 +76,20 @@ DISTFILES += \
 
 # http://doc.qt.io/qt-5/qmake-advanced-usage.html#installing-files
 # binary: /usr/bin/radeon-profile
-binary.path = $$PREFIX/$(DESTDIR)/usr/bin/
+binary.path = /$(DESTDIR)/$$PREFIX/bin/
 binary.files = radeon-profile
-# icon: /usr/share/icons/radeon-profile.png
-icon.path = $$PREFIX/$(DESTDIR)/usr/share/icons/
+# https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#install_icons
+# icon: /usr/share/icons/hicolor/512x512/apps/radeon-profile.png
+icon.path = /$(DESTDIR)/$$PREFIX/share/icons/hicolor/512x512/apps/
 icon.files = extra/radeon-profile.png
 # desktop: /usr/share/applications/radeon-profile.desktop
-desktop.path = $$PREFIX/$(DESTDIR)/usr/share/applications/
+desktop.path = /$(DESTDIR)/$$PREFIX/share/applications/
 desktop.files = extra/radeon-profile.desktop
 # appdata: /usr/share/appdata/radeon-profile.appdata.xml
-appdata.path = $$PREFIX/$(DESTDIR)/usr/share/appdata/
+appdata.path = /$(DESTDIR)/$$PREFIX/share/appdata/
 appdata.files = extra/radeon-profile.appdata.xml
 # translate: /usr/share/radeon-profile/strings.*.qm
-translate.path = $$PREFIX/$(DESTDIR)/usr/share/radeon-profile/
+translate.path = /$(DESTDIR)/$$PREFIX/share/radeon-profile/
 translate.commands = lrelease radeon-profile.pro || lrelease-qt5 radeon-profile.pro || lrelease-qt4 radeon-profile.pro;
 translate.commands += for tr in translations/*.qm; do
 translate.commands += echo \$$tr;
