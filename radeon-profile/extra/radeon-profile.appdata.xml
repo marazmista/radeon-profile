@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Goes into /usr/share/appdata/ -->
+<!-- https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps -->
 <component type="desktop">
   <id>radeon-profile.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-2.0+</project_license>
   <name>Radeon Profile</name>
-  <summary>App for display info about radeon cards</summary>
+  <summary>Display info about radeon cards</summary>
   <description>
-    <p>Read clocks, voltages and temperature; Manage power profiles and fan speed (on HD7000 series cards and above); Overclock your GPU (on Amdgpu driver).</p>
-    <p>Supported drivers: </p>
-    <ul>
-      <li>Open source Radeon driver (xf86-video-ati)</li>
-      <li>Open source Amdgpu driver or proprietary Amdgpu-pro driver (xf86-video-amdgpu)</li>
-      <li>Old proprietary driver (fglrx)</li>
-    </ul>
+    <p>Radeon profile is an user friendly application that allows to read clocks, voltages and temperatures, manage power profiles and fan speed (on HD7000 series cards and above) and overclock your GPU (on Amdgpu driver).</p>
+    <p>Radeon profile works with the open source radeon driver (xf86-video-ati), the Amdgpu driver (xf86-video-amdgpu or Amdgpu-Pro) and the Catalyst driver (fglrx).</p>
   </description>
   <screenshots>
     <screenshot type="default">
@@ -33,10 +29,17 @@
   <provides>
     <binary>radeon-profile</binary>
   </provides>
+  <translation type="qt">
+    <!-- https://github.com/hughsie/appstream-glib/issues/88 -->
+    strings
+  </translation>
+  <update_contact>
+    https://github.com/marazmista/radeon-profile/issues
+  </update_contact>
   <releases>
     <release date="2016-12-21" version="20161221">
       <description>
-        <p>Created event tab</p>
+	<p>Created event tab, improved fan control, updated translations.</p>
       </description>
     </release>
   </releases>
