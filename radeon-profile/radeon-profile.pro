@@ -69,11 +69,18 @@ TRANSLATIONS += translations/strings.it.ts \
     translations/strings.pl.ts \
     translations/strings.hr.ts
 
-DISTFILES += \
-    translations/strings.it.ts \
-    translations/strings.pl.ts \
-    translations/strings.hr.ts
+DISTFILES += $$TRANSLATIONS
 
+
+
+
+# AUTOMATIC MAKEFILE INSTRUCTIONS FOR make clean
+# http://doc.qt.io/qt-5/qmake-variable-reference.html#qmake-clean
+QMFILES = $$replace(TRANSLATIONS,".ts",".qm")
+QMAKE_CLEAN += $$QMFILES
+
+
+# AUTOMATIC MAKEFILE INSTRUCTIONS FOR make install
 # http://doc.qt.io/qt-5/qmake-advanced-usage.html#installing-files
 # binary: /usr/bin/radeon-profile
 binary.path = /$(DESTDIR)/$$PREFIX/bin/
@@ -89,11 +96,12 @@ desktop.files = extra/radeon-profile.desktop
 appdata.path = /$(DESTDIR)/$$PREFIX/share/appdata/
 appdata.files = extra/radeon-profile.appdata.xml
 # translate: /usr/share/radeon-profile/strings.*.qm
+# https://wiki.qt.io/Undocumented_QMake#Custom_install_config
+# https://wiki.qt.io/Automating_generation_of_qm_files
 translate.path = /$(DESTDIR)/$$PREFIX/share/radeon-profile/
-translate.commands = lrelease radeon-profile.pro || lrelease-qt5 radeon-profile.pro || lrelease-qt4 radeon-profile.pro;
-translate.commands += for tr in translations/*.qm; do
-translate.commands += echo \$$tr;
-translate.commands += install -Dm644 \$$tr $(INSTALL_ROOT)$${translate.path}\$${tr$${LITERAL_HASH}translations/};
-translate.commands += done
+translate.files = $$QMFILES
+qtPrepareTool(LRELEASE, lrelease)
+translate.extra = $$LRELEASE $$_PRO_FILE_
+translate.CONFIG += no_check_exist
 INSTALLS += binary icon desktop appdata translate
 

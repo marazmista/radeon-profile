@@ -3,12 +3,15 @@
 #include <QTranslator>
 #include <QSplashScreen>
 #include <QPixmap>
+#include <QBitmap>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-	QSplashScreen loading(QPixmap(":/icon/extra/radeon-profile.png"));
+    QPixmap pm(":/icon/extra/radeon-profile.png");
+    QSplashScreen loading(pm);
+    loading.setMask(pm.mask());
 	loading.show();
 
     QTranslator translator(&a);
