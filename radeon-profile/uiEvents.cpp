@@ -328,18 +328,8 @@ void radeon_profile::on_chProfile_clicked()
 
     QString selection = QInputDialog::getItem(this, tr("Select new power profile"), tr("Profile selection"), globalStuff::createProfileCombo(), 0, false, &ok);
 
-    if (ok) {
-        if (selection == profile_default)
-            device.setPowerProfile(globalStuff::DEFAULT);
-        else if (selection == profile_auto)
-            device.setPowerProfile(globalStuff::AUTO);
-        else if (selection == profile_high)
-            device.setPowerProfile(globalStuff::HIGH);
-        else if (selection == profile_mid)
-            device.setPowerProfile(globalStuff::MID);
-        else if (selection == profile_low)
-            device.setPowerProfile(globalStuff::LOW);
-    }
+    if (ok)
+        ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(selection));
 }
 
 void radeon_profile::on_btn_reconfigureDaemon_clicked()

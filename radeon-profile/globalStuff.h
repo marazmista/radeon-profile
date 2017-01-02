@@ -72,7 +72,7 @@ public:
     }
 
     static QStringList createProfileCombo() {
-        return QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low;
+        return QStringList() << profile_auto << profile_default << profile_low << profile_mid << profile_high;
     }
 
     enum powerProfiles {

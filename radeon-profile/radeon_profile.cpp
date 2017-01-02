@@ -95,6 +95,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     addRuntimeWidgets();
 
     showWindow();
+    qDebug() << "Initialization completed";
 }
 
 radeon_profile::~radeon_profile()

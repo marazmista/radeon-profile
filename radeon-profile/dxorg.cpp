@@ -8,6 +8,7 @@
 #include <QTime>
 #include <QCoreApplication>
 #include <QDebug>
+#include <map>
 
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
@@ -312,18 +313,22 @@ float dXorg::getTemperature() {
 }
 
 globalStuff::powerMethod dXorg::getPowerMethod() {
-    if (QFile::exists(filePaths.dpmStateFilePath))
+    if (QFile::exists(filePaths.dpmStateFilePath)){
+        qDebug() << "Found" << filePaths.dpmStateFilePath << ", using DPM";
         return globalStuff::DPM;
+    }
 
     QFile powerMethodFile(filePaths.powerMethodFilePath);
     if (powerMethodFile.open(QIODevice::ReadOnly)) {
         QString s = powerMethodFile.readLine(20);
 
-        if (s.contains("dpm",Qt::CaseInsensitive))
+        if (s.contains("dpm",Qt::CaseInsensitive)){
+            qDebug() << "Found" << filePaths.powerMethodFilePath << ", using DPM";
             return globalStuff::DPM;
-        else if (s.contains("profile",Qt::CaseInsensitive))
+        } else if (s.contains("profile",Qt::CaseInsensitive)){
+            qDebug() << "Found" << filePaths.powerMethodFilePath << ", using PROFILE";
             return globalStuff::PROFILE;
-        else
+        } else
             return globalStuff::PM_UNKNOWN;
     }
 
@@ -464,67 +469,46 @@ void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
         qWarning() << "Unable to open " << filePath << " to write " << newValue;
 }
 
+static const std::map<globalStuff::powerProfiles,QString> powerProfilesString = {
+    {globalStuff::BATTERY, dpm_battery},
+    {globalStuff::BALANCED, dpm_balanced},
+    {globalStuff::PERFORMANCE, dpm_performance},
+    {globalStuff::AUTO, profile_auto},
+    {globalStuff::DEFAULT, profile_default},
+    {globalStuff::HIGH, profile_high},
+    {globalStuff::MID, profile_mid},
+    {globalStuff::LOW, profile_low}
+};
+
 void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
-    QString newValue;
-    switch (_newPowerProfile) {
-    case globalStuff::BATTERY:
-        newValue = dpm_battery;
-        break;
-    case globalStuff::BALANCED:
-        newValue = dpm_balanced;
-        break;
-    case globalStuff::PERFORMANCE:
-        newValue = dpm_performance;
-        break;
-    case globalStuff::AUTO:
-        newValue = profile_auto;
-        break;
-    case globalStuff::DEFAULT:
-        newValue = profile_default;
-        break;
-    case globalStuff::HIGH:
-        newValue = profile_high;
-        break;
-    case globalStuff::MID:
-        newValue = profile_mid;
-        break;
-    case globalStuff::LOW:
-        newValue = profile_low;
-        break;
-    default: break;
+    if(Q_UNLIKELY(currentPowerMethod == globalStuff::PM_UNKNOWN)){
+        qCritical() << "Asked to set power profile but no power method available";
+        return;
     }
+
+    QString newValue = powerProfilesString.at(_newPowerProfile),
+            path = Q_LIKELY(currentPowerMethod==globalStuff::DPM) ? filePaths.dpmStateFilePath : filePaths.profilePath;
 
     if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
         command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
         command.append(newValue).append(SEPARATOR); // Power profile to be set
-        command.append(filePaths.dpmStateFilePath).append(SEPARATOR); // The path where the power profile should be written in
+        command.append(path).append(SEPARATOR); // The path where the power profile should be written in
 
         qDebug() << "Sending daemon power profile signal: " << command;
         dcomm->sendCommand(command);
-    } else {
-        // enum is int, so first three values are dpm, rest are profile
-        if (_newPowerProfile <= globalStuff::PERFORMANCE)
-            setNewValue(filePaths.dpmStateFilePath,newValue);
-        else
-            setNewValue(filePaths.profilePath,newValue);
-    }
+    } else
+        setNewValue(path, newValue);
 }
 
+static const std::map<globalStuff::forcePowerLevels,QString> forcePowerLevelsString = {
+    {globalStuff::F_AUTO, dpm_auto},
+    {globalStuff::F_LOW, dpm_low},
+    {globalStuff::F_HIGH, dpm_high}
+};
+
 void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
-    QString newValue;
-    switch (_newForcePowerLevel) {
-    case globalStuff::F_AUTO:
-        newValue = dpm_auto;
-        break;
-    case globalStuff::F_HIGH:
-        newValue = dpm_high;
-        break;
-    case globalStuff::F_LOW:
-        newValue = dpm_low;
-    default:
-        break;
-    }
+    QString newValue = forcePowerLevelsString.at(_newForcePowerLevel);
 
     if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
@@ -644,16 +628,17 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
 
     features.pm = currentPowerMethod;
 
+    if(daemonConnected() && (currentPowerMethod != globalStuff::PM_UNKNOWN)){
+        qDebug() << "Daemon will be used to change profile";
+        features.canChangeProfile = true;
+    }
+
     switch (currentPowerMethod) {
     case globalStuff::DPM: {
-        if (daemonConnected())
+        QFile f(filePaths.dpmStateFilePath);
+        if (f.open(QIODevice::WriteOnly)){
             features.canChangeProfile = true;
-        else {
-            QFile f(filePaths.dpmStateFilePath);
-            if (f.open(QIODevice::WriteOnly)){
-                features.canChangeProfile = true;
-                f.close();
-            }
+            f.close();
         }
         break;
     }
