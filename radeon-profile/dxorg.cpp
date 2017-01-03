@@ -26,6 +26,7 @@ daemonComm *dXorg::dcomm = new daemonComm();
 
 void dXorg::configure(const QString &gpuName) {
     setupDriverModule(gpuName);
+    qDebug() << "Using module" << dXorg::driverModuleName;
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
@@ -143,6 +144,21 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     }
 }
 
+/**
+ * @brief dXorg::isDataAvailable check if shared memory contains anything
+ * @return true if the shared memory is not empty
+ */
+bool dXorg::isDataAvailable(){
+    if(!sharedMem.lock())
+        return false;
+
+    const char *data = (const char*)sharedMem.constData();
+    bool out = data && *data;
+
+    sharedMem.unlock();
+    return out;
+}
+
 // method for gather info about clocks from deamon or from debugfs if root
 QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     QFile clocksFile(filePaths.clocksPath);
@@ -163,16 +179,19 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
         // fist call, so notihing is in sharedmem and we need to wait for data
         // because we need correctly figure out what is available
         // see: https://stackoverflow.com/a/11487434/2347196
-        if (Q_UNLIKELY(resolvingGpuFeatures)) {
+        if (Q_UNLIKELY(resolvingGpuFeatures && !isDataAvailable())) {
+            // Check regurarely if the first data reading is complete
+            // Max waiting time: 1200 msec, then give up
             QTime delayTime = QTime::currentTime().addMSecs(1200);
-            qDebug() << "Waiting for first daemon data read...";
-            while (QTime::currentTime() < delayTime)
+            qDebug() << QTime::currentTime() << "Waiting for first daemon data read...";
+            while (QTime::currentTime() < delayTime && !isDataAvailable())
                 QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            qDebug() << QTime::currentTime() << "First daemon data read completed";
         }
 
-       if (sharedMem.lock()) {
+       if (Q_LIKELY(sharedMem.lock())) {
             const char *to = (const char*)sharedMem.constData();
-            if (to != NULL) {
+            if (Q_LIKELY(to != NULL)) {
                 qDebug() << "Reading data from shared memory";
                 data = QString(QByteArray::fromRawData(to, SHARED_MEM_SIZE)).trimmed();
             } else
@@ -469,6 +488,7 @@ void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
         qWarning() << "Unable to open " << filePath << " to write " << newValue;
 }
 
+/** Translate a power profile into its actual string */
 static const std::map<globalStuff::powerProfiles,QString> powerProfilesString = {
     {globalStuff::BATTERY, dpm_battery},
     {globalStuff::BALANCED, dpm_balanced},
@@ -501,6 +521,7 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
         setNewValue(path, newValue);
 }
 
+/** Translate a forced power level into its actual string */
 static const std::map<globalStuff::forcePowerLevels,QString> forcePowerLevelsString = {
     {globalStuff::F_AUTO, dpm_auto},
     {globalStuff::F_LOW, dpm_low},
