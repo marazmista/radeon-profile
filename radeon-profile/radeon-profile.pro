@@ -69,9 +69,9 @@ TRANSLATIONS += translations/strings.it.ts \
     translations/strings.pl.ts \
     translations/strings.hr.ts
 
-DISTFILES += $$TRANSLATIONS
-
-
+DISTFILES += \
+    configure \
+    $$TRANSLATIONS
 
 
 # AUTOMATIC MAKEFILE INSTRUCTIONS FOR make clean
