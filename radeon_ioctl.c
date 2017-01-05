@@ -1,4 +1,4 @@
-#ifdef ENABLE_IOCTL
+//#ifdef ENABLE_IOCTL
 
 #include "radeon_ioctl.h"
 
@@ -123,4 +123,4 @@ struct buffer amdgpuGttUsage(int const fd){
     return getValue(fd, AMDGPU_INFO_GTT_USAGE);
 }
 
-#endif
+//#endif

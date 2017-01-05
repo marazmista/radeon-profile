@@ -1,4 +1,4 @@
-#ifdef ENABLE_IOCTL
+//#ifdef ENABLE_IOCTL
 
 #ifndef RADEON_IOCTL_H
 #define RADEON_IOCTL_H
@@ -29,4 +29,4 @@ struct buffer amdgpuGttUsage(int const fd); // fills byte
 
 #endif
 
-#endif
+//#endif
