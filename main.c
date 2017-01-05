@@ -18,7 +18,9 @@ int main(int argc, char *argv[]){
     if(argc == 2)
         strcpy(card, argv[1]);
     else {
-        printf("Which card? ");
+        if(!fork())
+            execl("/usr/bin/ls", "ls", "/dev/dri/", (char*)NULL);
+        write(1, "Which card?\n", 13);
         fgets(card, CARD_SIZE, stdin);
         TRIM(card);
     }
@@ -40,7 +42,12 @@ int main(int argc, char *argv[]){
 
     b=radeonCoreClock(fd);
     if(!b.error)
-        printf("Core clock: %u MHz \n", b.value.MegaHertz);
+        printf("Core clock: %u MHz", b.value.MegaHertz);
+
+    b=radeonMaxCoreClock(fd);
+    if(!b.error)
+        printf(" (max: %u MHz)", b.value.KiloHertz/1000);
+    putchar('\n');
 
     b=radeonMemoryClock(fd);
     if(!b.error)

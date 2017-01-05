@@ -52,6 +52,7 @@ struct buffer getValue(int fd, uint32_t command){
     case RADEON_INFO_CURRENT_GPU_SCLK:
     case RADEON_INFO_CURRENT_GPU_TEMP:
     case RADEON_INFO_GTT_USAGE:
+    case RADEON_INFO_MAX_SCLK:
     case RADEON_INFO_VRAM_USAGE:
     {
         struct drm_radeon_info buffer;
@@ -68,6 +69,7 @@ struct buffer getValue(int fd, uint32_t command){
 
     // AMDGPU
     case AMDGPU_INFO_GTT_USAGE:
+    case AMDGPU_INFO_VRAM_GTT:
     case AMDGPU_INFO_VRAM_USAGE:
     {
         struct drm_amdgpu_info buffer;
@@ -103,6 +105,10 @@ struct buffer radeonCoreClock(int const fd){
     return getValue(fd, RADEON_INFO_CURRENT_GPU_SCLK);
 }
 
+struct buffer radeonMaxCoreClock(const int fd){
+    return getValue(fd, RADEON_INFO_MAX_SCLK);
+}
+
 struct buffer radeonMemoryClock(int const fd){
     return getValue(fd, RADEON_INFO_CURRENT_GPU_MCLK);
 }
@@ -113,6 +119,10 @@ struct buffer radeonVramUsage(int const fd){
 
 struct buffer radeonGttUsage(int const fd){
     return getValue(fd, RADEON_INFO_GTT_USAGE);
+}
+
+struct buffer amdgpuVramSize(const int fd){
+    return getValue(fd, AMDGPU_INFO_VRAM_GTT); // 3 x uint64_t, only first kept because of max size
 }
 
 struct buffer amdgpuVramUsage(int const fd){

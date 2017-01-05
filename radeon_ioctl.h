@@ -12,18 +12,21 @@ struct buffer {
     int error; // Data is valid only if error == 0
     union {
         unsigned int MegaHertz; // https://lists.freedesktop.org/archives/dri-devel/2014-October/069412.html
+        unsigned int KiloHertz;
         int milliCelsius; // https://lists.freedesktop.org/archives/dri-devel/2013-June/040499.html
         unsigned long byte; // http://lxr.free-electrons.com/source/drivers/gpu/drm/radeon/radeon_kms.c#L529
     } value;
 };
 
-struct buffer radeonTemperature(int const fd); // fills milliCelsius
-struct buffer radeonCoreClock(int const fd); // fills MegaHertz
-struct buffer radeonMemoryClock(int const fd); // fills MegaHertz
-struct buffer radeonVramUsage(int const fd); // fills byte
-struct buffer radeonGttUsage(int const fd); // fills byte
-struct buffer amdgpuVramUsage(int const fd); // fills byte
-struct buffer amdgpuGttUsage(int const fd); // fills byte
+struct buffer radeonTemperature(int const fd); // milliCelsius
+struct buffer radeonCoreClock(int const fd); // MegaHertz
+struct buffer radeonMemoryClock(int const fd); // MegaHertz
+struct buffer radeonMaxCoreClock(int const fd); // KiloHertz
+struct buffer radeonVramUsage(int const fd); // byte
+struct buffer radeonGttUsage(int const fd); // byte
+struct buffer amdgpuVramSize(int const fd); // byte
+struct buffer amdgpuVramUsage(int const fd); // byte
+struct buffer amdgpuGttUsage(int const fd); // byte
 
 
 
