@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
 
     fd = openCardFD(card);
     if(fd < 0){
-        printf("Open of %s %s failed, exit\n", argv[1], argv[2]);
+        printf("Open of %s failed, exit\n", card);
         return -2;
     }
 
@@ -43,13 +43,14 @@ int main(int argc, char *argv[]){
         printf("Temperature: %3.1f °C \n", (float)b.value.milliCelsius/1000);
 
     radeonCoreClock(fd, &b);
-    if(!b.error)
+    if(!b.error){
         printf("Core clock: %u MHz", b.value.MegaHertz);
 
-    radeonMaxCoreClock(fd, &b);
-    if(!b.error)
-        printf(" (max: %u MHz)", b.value.KiloHertz/1000);
-    putchar('\n');
+        radeonMaxCoreClock(fd, &b);
+        if(!b.error)
+            printf(" (max: %u MHz)", b.value.KiloHertz/1000);
+        putchar('\n');
+    }
 
     radeonMemoryClock(fd, &b);
     if(!b.error)
@@ -70,14 +71,14 @@ int main(int argc, char *argv[]){
         printf("Used GTT: %lu KB \n", b.value.byte/1024);
 
     amdgpuVramUsage(fd, &b);
-    if(!b.error)
+    if(!b.error){
         printf("Used VRAM: %lu KB", b.value.byte/1024);
 
-    amdgpuVramSize(fd, &b);
-    if(!b.error)
-        printf(" (total: %lu KB)", b.value.byte/1024);
-    putchar('\n');
-
+        amdgpuVramSize(fd, &b);
+        if(!b.error)
+            printf(" (total: %lu KB)", b.value.byte/1024);
+        putchar('\n');
+    }
 
     closeCardFD(fd);
 }
