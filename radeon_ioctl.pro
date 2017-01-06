@@ -3,6 +3,8 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
+CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT
+
 SOURCES += \
     main.c \
     radeon_ioctl.c

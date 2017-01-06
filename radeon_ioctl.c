@@ -13,10 +13,12 @@ void radeonMaxCoreClock(int const fd, struct buffer *data){(void)fd; data->error
 void radeonVramUsage(int const fd, struct buffer *data){(void)fd; data->error=1;}
 void radeonGttUsage(int const fd, struct buffer *data){(void)fd; data->error=1;}
 void radeonRegistry(const int fd, struct buffer *data){(void)fd; data->error=1;}
+void radeonGpuUsage(int const fd, struct buffer *data, const unsigned int time, const float frequency){(void)fd;(void)time;(void)frequency; data->error=1;}
 void amdgpuVramSize(int const fd, struct buffer *data){(void)fd; data->error=1;}
 void amdgpuVramUsage(int const fd, struct buffer *data){(void)fd; data->error=1;}
 void amdgpuGttUsage(int const fd, struct buffer *data){(void)fd; data->error=1;}
 void amdgpuRegistry(const int fd, struct buffer *data){(void)fd; data->error=1;}
+void amdgpuGpuUsage(int const fd, struct buffer *data, const unsigned int time, const float frequency){(void)fd;(void)time;(void)frequency; data->error=1;}
 
 
 #else
@@ -31,11 +33,16 @@ void amdgpuRegistry(const int fd, struct buffer *data){(void)fd; data->error=1;}
 #include <fcntl.h>
 #include <inttypes.h>
 
-#include <drm/radeon_drm.h> // http://lxr.free-electrons.com/source/include/uapi/drm/radeon_drm.h#L993
-#include <drm/amdgpu_drm.h> // http://lxr.free-electrons.com/source/include/uapi/drm/amdgpu_drm.h#L441
-
 #define CLEAN(object) memset(&(object), 0, sizeof(object))
 #define PATH_SIZE 20
+
+void errorDebug(char const * const title){
+#ifdef QT_NO_DEBUG_OUTPUT
+    (void)title;
+#else
+    perror(title);
+#endif
+}
 
 int openCardFD(const char * const card){
     int fd;
@@ -45,15 +52,42 @@ int openCardFD(const char * const card){
     fd= open(path,O_RDONLY);
 
     if(fd < 0)
-        perror("open");
+        errorDebug("open");
 
     return fd;
 }
 
 void closeCardFD(const int fd){
     if(close(fd))
-        perror("close");
+        errorDebug("close");
 }
+
+void gpuUsage(int const fd, struct buffer *data, unsigned int const time, float const frequency, void(*accessRegistry)(int const fd, struct buffer *data)){
+#define REGISTRY_ADDRESS 0x8010 // http://support.amd.com/TechDocs/46142.pdf#page=246
+#define REGISTRY_MASK 1<<31
+    const unsigned int sleep = time/frequency;
+    unsigned int remaining, activeCount = 0, totalCount = 0;
+    for(remaining = time ; remaining > 0 ; remaining -= (sleep - usleep(sleep)), totalCount++){
+        // We need a struct buffer, we already have *data, we use it
+        data->value.registry = REGISTRY_ADDRESS;
+        accessRegistry(fd, data);
+
+        if(data->error)
+            return;
+
+        if(REGISTRY_MASK & data->value.registry)
+            activeCount++;
+    }
+
+    data->value.percentage = (100.0f * activeCount) / totalCount;
+
+#ifndef QT_NO_DEBUG_OUTPUT
+    printf("%u / %u (%3.2f%%) [%d mS, %3.1f Hz]\n", activeCount, totalCount, data->value.percentage, time/1000, frequency);
+#endif
+}
+
+/********************  RADEON  ********************/
+#include <drm/radeon_drm.h> // http://lxr.free-electrons.com/source/include/uapi/drm/radeon_drm.h#L993
 
 void radeonGetValue(int fd, struct buffer *data, uint32_t command){
     struct drm_radeon_info buffer;
@@ -62,34 +96,7 @@ void radeonGetValue(int fd, struct buffer *data, uint32_t command){
 
     data->error = ioctl(fd, DRM_IOCTL_RADEON_INFO, &buffer);
     if(data->error)
-        perror("ioctl radeon");
-}
-
-void amdgpuGetValue(int fd, struct buffer *data, uint32_t command){
-    struct drm_amdgpu_info buffer;
-    buffer.query = command;
-
-    switch(command){
-    case AMDGPU_INFO_VRAM_GTT: {
-        struct drm_amdgpu_info_vram_gtt info;
-        buffer.return_pointer = (uint64_t)&info;
-        buffer.return_size = sizeof(info);
-
-        data->error = ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
-        data->value.byte = info.vram_size;
-        break;
-    }
-
-    default:
-        buffer.return_pointer = (uint64_t)&(data->value);
-        buffer.return_size = sizeof(data->value);
-
-        data->error = ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
-        break;
-    }
-
-    if(data->error)
-        perror("ioctl amdgpu");
+        errorDebug("ioctl radeon");
 }
 
 void radeonTemperature(int const fd, struct buffer *data){
@@ -116,12 +123,41 @@ void radeonGttUsage(int const fd, struct buffer *data){
     radeonGetValue(fd, data, RADEON_INFO_GTT_USAGE); // http://lxr.free-electrons.com/source/drivers/gpu/drm/radeon/radeon_kms.c#L534
 }
 
-void radeonRegistry(const int fd, struct buffer *data){
+void radeonReadRegistry(const int fd, struct buffer *data){
     radeonGetValue(fd, data, RADEON_INFO_READ_REG); // http://lxr.free-electrons.com/source/drivers/gpu/drm/radeon/radeon_kms.c#L576
 }
 
+void radeonGpuUsage(int const fd, struct buffer *data, unsigned int const time, float const frequency){
+    gpuUsage(fd, data, time, frequency, radeonReadRegistry);
+}
+
+
+/********************  AMDGPU  ********************/
+#include <drm/amdgpu_drm.h> // http://lxr.free-electrons.com/source/include/uapi/drm/amdgpu_drm.h#L441
+
 void amdgpuVramSize(const int fd, struct buffer *data){
-    amdgpuGetValue(fd, data, AMDGPU_INFO_VRAM_GTT); // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L404
+    struct drm_amdgpu_info_vram_gtt info;
+    struct drm_amdgpu_info buffer;
+    buffer.query = AMDGPU_INFO_VRAM_GTT; // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L404
+    buffer.return_pointer = (uint64_t)&info;
+    buffer.return_size = sizeof(info);
+
+    data->error = ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
+    data->value.byte = info.vram_size;
+
+    if(data->error)
+        errorDebug("ioctl amdgpu");
+}
+
+void amdgpuGetValue(int fd, struct buffer *data, uint32_t command){
+    struct drm_amdgpu_info buffer;
+    buffer.query = command;
+    buffer.return_pointer = (uint64_t)&(data->value);
+    buffer.return_size = sizeof(data->value);
+
+    data->error = ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
+    if(data->error)
+        errorDebug("ioctl amdgpu");
 }
 
 void amdgpuVramUsage(int const fd, struct buffer *data){
@@ -132,8 +168,12 @@ void amdgpuGttUsage(int const fd, struct buffer *data){
     amdgpuGetValue(fd, data, AMDGPU_INFO_GTT_USAGE); // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L387
 }
 
-void amdgpuRegistry(const int fd, struct buffer *data){
+void amdgpuReadRegistry(const int fd, struct buffer *data){
     amdgpuGetValue(fd, data, AMDGPU_INFO_READ_MMR_REG); // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L416
+}
+
+void amdgpuGpuUsage(const int fd, struct buffer *data, const unsigned int time, const float frequency){
+    gpuUsage(fd, data, time, frequency, amdgpuReadRegistry);
 }
 
 #endif
