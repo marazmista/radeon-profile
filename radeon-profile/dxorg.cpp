@@ -12,7 +12,6 @@ extern "C" {
 #include <QTime>
 #include <QCoreApplication>
 #include <QDebug>
-#include <map>
 
 // define static members //
 dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
@@ -119,6 +118,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 
 #ifdef QT_DEBUG
     // Example IOCTLs
+    // IOCTLs require root access
     int fd = openCardFD(gpuName.toStdString().c_str());
     if(fd >= 0){
         int i;
@@ -517,16 +517,19 @@ void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
 }
 
 /** Translate a power profile into its actual string */
-static const std::map<globalStuff::powerProfiles,QString> powerProfilesString = {
-    {globalStuff::BATTERY, dpm_battery},
-    {globalStuff::BALANCED, dpm_balanced},
-    {globalStuff::PERFORMANCE, dpm_performance},
-    {globalStuff::AUTO, profile_auto},
-    {globalStuff::DEFAULT, profile_default},
-    {globalStuff::HIGH, profile_high},
-    {globalStuff::MID, profile_mid},
-    {globalStuff::LOW, profile_low}
-};
+QString powerProfilesToString(globalStuff::powerProfiles profile){
+    switch (profile) {
+    case globalStuff::BATTERY: return dpm_battery;
+    case globalStuff::BALANCED: return dpm_balanced;
+    case globalStuff::PERFORMANCE: return dpm_performance;
+    case globalStuff::AUTO: return profile_auto;
+    case globalStuff::DEFAULT: return profile_default;
+    case globalStuff::HIGH: return profile_high;
+    case globalStuff::MID: return profile_mid;
+    case globalStuff::LOW: return profile_low;
+    default: return "ERROR";
+    }
+}
 
 void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
     if(Q_UNLIKELY(currentPowerMethod == globalStuff::PM_UNKNOWN)){
@@ -534,7 +537,7 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
         return;
     }
 
-    QString newValue = powerProfilesString.at(_newPowerProfile),
+    QString newValue = powerProfilesToString(_newPowerProfile),
             path = Q_LIKELY(currentPowerMethod==globalStuff::DPM) ? filePaths.dpmStateFilePath : filePaths.profilePath;
 
     if (daemonConnected()) {
@@ -550,14 +553,17 @@ void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
 }
 
 /** Translate a forced power level into its actual string */
-static const std::map<globalStuff::forcePowerLevels,QString> forcePowerLevelsString = {
-    {globalStuff::F_AUTO, dpm_auto},
-    {globalStuff::F_LOW, dpm_low},
-    {globalStuff::F_HIGH, dpm_high}
-};
+QString forcePowerLevelsToString(globalStuff::forcePowerLevels level){
+    switch(level){
+    case globalStuff::F_AUTO: return dpm_auto;
+    case globalStuff::F_LOW: return dpm_low;
+    case globalStuff::F_HIGH: return dpm_high;
+    default: return "ERROR";
+    }
+}
 
 void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
-    QString newValue = forcePowerLevelsString.at(_newForcePowerLevel);
+    QString newValue = forcePowerLevelsToString(_newForcePowerLevel);
 
     if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
