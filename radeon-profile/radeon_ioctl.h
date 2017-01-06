@@ -3,37 +3,22 @@
 
 
 
-int openCardFD(char const * const card);
-void closeCardFD(int const fd);
-
-struct buffer {
-    int error; // Data is valid only if error == 0
-    union valueType {
-        // units of measurement
-        unsigned int MegaHertz;
-        unsigned int KiloHertz;
-        int milliCelsius;
-        unsigned long byte;
-        float percentage;
-        // registry reading
-        unsigned int registry;
-        unsigned char raw[8];
-    } value;
-};
-
-void radeonTemperature(int const fd, struct buffer *data); // milliCelsius
-void radeonCoreClock(int const fd, struct buffer *data); // MegaHertz
-void radeonMemoryClock(int const fd, struct buffer *data); // MegaHertz
-void radeonMaxCoreClock(int const fd, struct buffer *data); // KiloHertz
-void radeonReadRegistry(int const fd, struct buffer *data); // raw; registry must contain the registry address
-void radeonGpuUsage(int const fd, struct buffer *data, const unsigned int time, const float frequency); // percentage; blocks for $time microseconds
-void radeonVramUsage(int const fd, struct buffer *data); // byte
-void radeonGttUsage(int const fd, struct buffer *data); // byte
-void amdgpuVramSize(int const fd, struct buffer *data); // byte
-void amdgpuVramUsage(int const fd, struct buffer *data); // byte
-void amdgpuGttUsage(int const fd, struct buffer *data); // byte
-void amdgpuReadRegistry(int const fd, struct buffer *data); // raw; registry must contain the registry address
-void amdgpuGpuUsage(int const fd, struct buffer *data, const unsigned int time, const float frequency); // percentage; blocks for $time microseconds
+/***** All functions return 0 on success, !=0 on failure *****/
+int openCardFD(const char * card);
+void closeCardFD(int fd);
+int radeonTemperature(int fd, int *data); // milliCelsius
+int radeonCoreClock(int fd, unsigned *data); // MegaHertz
+int radeonMemoryClock(int fd, unsigned *data); // MegaHertz
+int radeonMaxCoreClock(int fd, unsigned *data); // KiloHertz
+int radeonReadRegistry(int fd, unsigned *data); // raw; when called, *data must contain the registry address
+int radeonGpuUsage(int fd, float *data, unsigned time, unsigned frequency); // percentage; blocks for $time microseconds
+int radeonVramUsage(int fd, unsigned long *data); // byte
+int radeonGttUsage(int fd, unsigned long *data); // byte
+int amdgpuVramSize(int fd, unsigned long *data); // byte
+int amdgpuVramUsage(int fd, unsigned long *data); // byte
+int amdgpuGttUsage(int fd, unsigned long *data); // byte
+int amdgpuReadRegistry(int fd, unsigned *data); // raw; when called, *data must contain the registry address
+int amdgpuGpuUsage(int fd, float *data, unsigned time, unsigned frequency); // percentage; blocks for $time microseconds
 
 
 
