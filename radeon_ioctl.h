@@ -1,5 +1,3 @@
-//#ifdef ENABLE_IOCTL
-
 #ifndef RADEON_IOCTL_H
 #define RADEON_IOCTL_H
 
@@ -11,25 +9,23 @@ void closeCardFD(int const fd);
 struct buffer {
     int error; // Data is valid only if error == 0
     union {
-        unsigned int MegaHertz; // https://lists.freedesktop.org/archives/dri-devel/2014-October/069412.html
+        unsigned int MegaHertz;
         unsigned int KiloHertz;
-        int milliCelsius; // https://lists.freedesktop.org/archives/dri-devel/2013-June/040499.html
-        unsigned long byte; // http://lxr.free-electrons.com/source/drivers/gpu/drm/radeon/radeon_kms.c#L529
+        int milliCelsius;
+        unsigned long byte;
     } value;
 };
 
-struct buffer radeonTemperature(int const fd); // milliCelsius
-struct buffer radeonCoreClock(int const fd); // MegaHertz
-struct buffer radeonMemoryClock(int const fd); // MegaHertz
-struct buffer radeonMaxCoreClock(int const fd); // KiloHertz
-struct buffer radeonVramUsage(int const fd); // byte
-struct buffer radeonGttUsage(int const fd); // byte
-struct buffer amdgpuVramSize(int const fd); // byte
-struct buffer amdgpuVramUsage(int const fd); // byte
-struct buffer amdgpuGttUsage(int const fd); // byte
+void radeonTemperature(int const fd, struct buffer *data); // milliCelsius
+void radeonCoreClock(int const fd, struct buffer *data); // MegaHertz
+void radeonMemoryClock(int const fd, struct buffer *data); // MegaHertz
+void radeonMaxCoreClock(int const fd, struct buffer *data); // KiloHertz
+void radeonVramUsage(int const fd, struct buffer *data); // byte
+void radeonGttUsage(int const fd, struct buffer *data); // byte
+void amdgpuVramSize(int const fd, struct buffer *data); // byte
+void amdgpuVramUsage(int const fd, struct buffer *data); // byte
+void amdgpuGttUsage(int const fd, struct buffer *data); // byte
 
 
 
 #endif
-
-//#endif

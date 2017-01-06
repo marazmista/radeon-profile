@@ -36,30 +36,48 @@ int main(int argc, char *argv[]){
         return -2;
     }
 
-    b=radeonTemperature(fd);
+
+    puts("\nRADEON");
+    radeonTemperature(fd, &b);
     if(!b.error)
         printf("Temperature: %3.1f °C \n", (float)b.value.milliCelsius/1000);
 
-    b=radeonCoreClock(fd);
+    radeonCoreClock(fd, &b);
     if(!b.error)
         printf("Core clock: %u MHz", b.value.MegaHertz);
 
-    b=radeonMaxCoreClock(fd);
+    radeonMaxCoreClock(fd, &b);
     if(!b.error)
         printf(" (max: %u MHz)", b.value.KiloHertz/1000);
     putchar('\n');
 
-    b=radeonMemoryClock(fd);
+    radeonMemoryClock(fd, &b);
     if(!b.error)
         printf("Memory clock: %u MHz \n", b.value.MegaHertz);
 
-    b=radeonGttUsage(fd);
+    radeonGttUsage(fd, &b);
     if(!b.error)
         printf("Used GTT: %lu KB \n", b.value.byte/1024);
 
-    b=radeonVramUsage(fd);
+    radeonVramUsage(fd, &b);
     if(!b.error)
         printf("Used VRAM: %lu KB \n", b.value.byte/1024);
+
+
+    puts("\nAMDGPU");
+    amdgpuGttUsage(fd, &b);
+    if(!b.error)
+        printf("Used GTT: %lu KB \n", b.value.byte/1024);
+
+    amdgpuVramUsage(fd, &b);
+    if(!b.error)
+        printf("Used VRAM: %lu KB", b.value.byte/1024);
+
+    amdgpuVramSize(fd, &b);
+    if(!b.error)
+        printf(" (total: %lu KB)", b.value.byte/1024);
+    putchar('\n');
+
 
     closeCardFD(fd);
 }

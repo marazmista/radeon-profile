@@ -15,14 +15,9 @@ QMAKE_CFLAGS += \
     -Wextra \
     -Wpedantic
 
-#QMAKE_LFLAGS += \
-#    -ldrm -lXxf86vm
-
 DISTFILES += \
     findCard.sh
 
 QMAKE_INCDIR += \
     /usr/include/libdrm
 
-DEFINES += \
-    ENABLE_IOCTL
