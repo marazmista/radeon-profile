@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
     puts("\nRADEON");
     radeonTemperature(fd, &b);
     if(!b.error)
-        printf("Temperature: %3.1f °C \n", (float)b.value.milliCelsius/1000);
+        printf("Temperature: %3.1f °C \n", b.value.milliCelsius/1000.0f);
 
     radeonCoreClock(fd, &b);
     if(!b.error){
@@ -55,6 +55,11 @@ int main(int argc, char *argv[]){
     radeonMemoryClock(fd, &b);
     if(!b.error)
         printf("Memory clock: %u MHz \n", b.value.MegaHertz);
+
+    b.value.registry = 0x8010; // http://support.amd.com/TechDocs/46142.pdf#page=246
+    radeonRegistry(fd, &b);
+    if(!b.error)
+        printf("GPU load registry: %#x\n", *(unsigned int*)b.value.raw);
 
     radeonGttUsage(fd, &b);
     if(!b.error)
@@ -79,6 +84,11 @@ int main(int argc, char *argv[]){
             printf(" (total: %lu KB)", b.value.byte/1024);
         putchar('\n');
     }
+
+    b.value.registry = 0x8010;
+    amdgpuRegistry(fd, &b);
+    if(!b.error)
+        printf("GPU load registry: %#x", *(unsigned int*)b.value.raw);
 
     closeCardFD(fd);
 }

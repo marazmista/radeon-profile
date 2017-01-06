@@ -12,9 +12,11 @@ void radeonMemoryClock(int const fd, struct buffer *data){(void)fd; data->error=
 void radeonMaxCoreClock(int const fd, struct buffer *data){(void)fd; data->error=1;}
 void radeonVramUsage(int const fd, struct buffer *data){(void)fd; data->error=1;}
 void radeonGttUsage(int const fd, struct buffer *data){(void)fd; data->error=1;}
+void radeonRegistry(const int fd, struct buffer *data){(void)fd; data->error=1;}
 void amdgpuVramSize(int const fd, struct buffer *data){(void)fd; data->error=1;}
 void amdgpuVramUsage(int const fd, struct buffer *data){(void)fd; data->error=1;}
 void amdgpuGttUsage(int const fd, struct buffer *data){(void)fd; data->error=1;}
+void amdgpuRegistry(const int fd, struct buffer *data){(void)fd; data->error=1;}
 
 
 #else
@@ -57,7 +59,6 @@ void radeonGetValue(int fd, struct buffer *data, uint32_t command){
     struct drm_radeon_info buffer;
     buffer.request = command;
     buffer.value = (uint64_t)&(data->value);
-    buffer.pad = sizeof(data->value);
 
     data->error = ioctl(fd, DRM_IOCTL_RADEON_INFO, &buffer);
     if(data->error)
@@ -115,6 +116,10 @@ void radeonGttUsage(int const fd, struct buffer *data){
     radeonGetValue(fd, data, RADEON_INFO_GTT_USAGE); // http://lxr.free-electrons.com/source/drivers/gpu/drm/radeon/radeon_kms.c#L534
 }
 
+void radeonRegistry(const int fd, struct buffer *data){
+    radeonGetValue(fd, data, RADEON_INFO_READ_REG); // http://lxr.free-electrons.com/source/drivers/gpu/drm/radeon/radeon_kms.c#L576
+}
+
 void amdgpuVramSize(const int fd, struct buffer *data){
     amdgpuGetValue(fd, data, AMDGPU_INFO_VRAM_GTT); // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L404
 }
@@ -127,5 +132,8 @@ void amdgpuGttUsage(int const fd, struct buffer *data){
     amdgpuGetValue(fd, data, AMDGPU_INFO_GTT_USAGE); // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L387
 }
 
+void amdgpuRegistry(const int fd, struct buffer *data){
+    amdgpuGetValue(fd, data, AMDGPU_INFO_READ_MMR_REG); // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L416
+}
 
 #endif
