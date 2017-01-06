@@ -48,7 +48,7 @@ int openCardFD(const char * card){
     int fd;
     char path[PATH_SIZE] = "/dev/dri/";
 
-    strncat(path, card, PATH_SIZE);
+    strncat(path, card, PATH_SIZE-strlen(path)-1);
     fd= open(path,O_RDONLY);
 
     if(fd < 0)
@@ -98,6 +98,7 @@ int gpuUsage(int fd, float *data, unsigned time, unsigned frequency, int(*access
 int radeonGetValue(int fd, void *data, uint32_t command){
     int error;
     struct drm_radeon_info buffer;
+    CLEAN(buffer);
     buffer.request = command;
     buffer.value = (uint64_t)data;
 
@@ -148,6 +149,7 @@ int amdgpuVramSize(int fd, unsigned long *data){
     int error;
     struct drm_amdgpu_info_vram_gtt info;
     struct drm_amdgpu_info buffer;
+    CLEAN(buffer);
     buffer.query = AMDGPU_INFO_VRAM_GTT; // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L404
     buffer.return_pointer = (uint64_t)&info;
     buffer.return_size = sizeof(info);
@@ -164,6 +166,7 @@ int amdgpuVramSize(int fd, unsigned long *data){
 int amdgpuGetValue(int fd, void *data, uint32_t command){
     int error;
     struct drm_amdgpu_info buffer;
+    CLEAN(buffer);
     buffer.query = command;
     buffer.return_pointer = (uint64_t)data;
     buffer.return_size = sizeof(unsigned long);

@@ -24,6 +24,7 @@ public:
                 gpuTemeperatureData.max =
                 gpuTemeperatureData.min =
                 gpuTemeperatureData.sum = 0;
+        gpuTemeperatureData.pwmSpeed = -1;
     }
 
     globalStuff::gpuClocksStruct gpuClocksData;

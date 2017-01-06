@@ -126,7 +126,8 @@ globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuf
     tmp.current = QString::number(data.current) + QString::fromUtf8("\u00B0C");
     tmp.max = QString::number(data.max) + QString::fromUtf8("\u00B0C");
     tmp.min = QString::number(data.min) + QString::fromUtf8("\u00B0C");
-    tmp.pwmSpeed = QString::number(data.pwmSpeed)+"%";
+    if(data.pwmSpeed != -1)
+        tmp.pwmSpeed = QString::number(data.pwmSpeed)+"%";
 
     return tmp;
 }

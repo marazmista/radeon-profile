@@ -233,10 +233,11 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 void radeon_profile::refreshGpuData() {
     device.refreshPowerLevel();
     device.getClocks();
-    device.getTemperature();
 
     if (device.features.pwmAvailable)
-        device.getPwmSpeed();
+        device.getPwmSpeed(); // Fill gpuTemeperatureData.pwmSpeed
+
+    device.getTemperature(); // Fill gpuTemeperatureData, translate in gpuTemeperatureDataString
 
     if (Q_LIKELY(execsRunning.count() == 0))
         return;
