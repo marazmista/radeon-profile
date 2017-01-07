@@ -35,7 +35,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     rangeX = 180;
     ticksCounter = 0;
     statsTickCounter = 0;
-	savedState = nullptr;
 
     ui->setupUi(this);
     timer = new QTimer(this);
@@ -95,7 +94,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     connectSignals();
 
     showWindow();
-    qDebug() << "Initialization completed";
 }
 
 radeon_profile::~radeon_profile()
@@ -228,11 +226,10 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
 void radeon_profile::refreshGpuData() {
     device.refreshPowerLevel();
     device.getClocks();
+    device.getTemperature();
 
     if (device.features.pwmAvailable)
-        device.getPwmSpeed(); // Fill gpuTemeperatureData.pwmSpeed
-
-    device.getTemperature(); // Fill gpuTemeperatureData, translate in gpuTemeperatureDataString
+        device.getPwmSpeed();
 
     if (Q_LIKELY(execsRunning.count() == 0))
         return;

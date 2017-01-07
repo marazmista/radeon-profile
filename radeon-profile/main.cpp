@@ -1,19 +1,10 @@
 #include "radeon_profile.h"
 #include <QApplication>
 #include <QTranslator>
-#include <QSplashScreen>
-#include <QPixmap>
-#include <QBitmap>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
-    QPixmap pm(":/icon/extra/radeon-profile.png");
-    QSplashScreen loading(pm);
-    loading.setMask(pm.mask());
-	loading.show();
-
     QTranslator translator;
     QLocale locale;
 
@@ -29,7 +20,6 @@ int main(int argc, char *argv[])
     }
 
     radeon_profile w(a.arguments());
-	loading.close();
     
     return a.exec();
 }

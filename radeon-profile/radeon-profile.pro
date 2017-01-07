@@ -17,7 +17,7 @@ QMAKE_CXXFLAGS += -std=c++0x
 #   http://doc.qt.io/qt-5/qtglobal.html#QtMsgType-enum
 #   qDebug will work only when compiled for Debug
 #   QtWarning, QtCritical and QtFatal will still work on Release
-CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT NO_IOCTL
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 SOURCES += main.cpp\
         radeon_profile.cpp \
@@ -31,7 +31,6 @@ SOURCES += main.cpp\
     daemonComm.cpp \
     execTab.cpp \
     execbin.cpp \
-    radeon_ioctl.c \
     dialog_rpevent.cpp \
     eventsTab.cpp \
     fanControlTab.cpp
@@ -44,7 +43,6 @@ HEADERS  += radeon_profile.h \
     globalStuff.h \
     daemonComm.h \
     execbin.h \
-    radeon_ioctl.h \
     dialog_rpevent.h \
     rpevent.h
 

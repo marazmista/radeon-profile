@@ -173,7 +173,7 @@ private:
     QMap<QString, unsigned int> pmStats;
     unsigned int rangeX, ticksCounter, statsTickCounter;
     QButtonGroup pwmGroup;
-	currentStateInfo *savedState;
+    currentStateInfo *savedState = nullptr;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
