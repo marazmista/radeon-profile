@@ -14,13 +14,19 @@ int main(int argc, char *argv[])
     loading.setMask(pm.mask());
 	loading.show();
 
-    QTranslator translator(&a);
-    if(translator.load(QLocale(), "strings", ".")
-            || translator.load(QLocale(), "strings", ".", QApplication::applicationDirPath())
-            || translator.load(QLocale(), "strings", ".", "/usr/share/radeon-profile"))
-        a.installTranslator(&translator);
-    else
-        qWarning() << "Failed loading translation";
+    QTranslator translator;
+    QLocale locale;
+
+    if (locale.language() != QLocale::Language::English) {
+
+        if (translator.load(locale, "strings", ".")
+                || translator.load(locale, "strings", ".", QApplication::applicationDirPath())
+                || translator.load(locale, "strings", ".", "/usr/share/radeon-profile"))
+
+            a.installTranslator(&translator);
+        else
+            qWarning() << "Translation not found.";
+    }
 
     radeon_profile w(a.arguments());
 	loading.close();
