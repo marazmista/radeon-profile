@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Goes into /usr/share/appdata/ -->
+<!-- https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps -->
+<component type="desktop">
+  <id>radeon-profile.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0+</project_license>
+  <name>Radeon Profile</name>
+  <summary>Display info about radeon cards</summary>
+  <description>
+    <p>Radeon profile is an user friendly application that allows to read clocks, voltages and temperatures, manage power profiles and fan speed (on HD7000 series cards and above) and overclock your GPU (on Amdgpu driver).</p>
+    <p>Radeon profile works with the open source radeon driver (xf86-video-ati), the Amdgpu driver (xf86-video-amdgpu or Amdgpu-Pro) and the Catalyst driver (fglrx).</p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main page</caption>
+      <image>http://i.imgur.com/knL5abL.png</image>
+    </screenshot>
+    <screenshot type="default">
+      <caption>The graphs page</caption>
+      <image>http://i.imgur.com/wSGDQTZ.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/marazmista/radeon-profile</url>
+  <url type="bugtracker">https://github.com/marazmista/radeon-profile/issues</url>
+  <url type="help">https://www.phoronix.com/forums/forum/linux-graphics-x-org-drivers/open-source-amd-linux/37384-radeon-profile-tool-for-changing-profiles-and-monitoring-some-gpu-parameters</url>
+  <url type="translate">https://github.com/marazmista/radeon-profile/tree/master/radeon-profile/translations</url>
+  <developer_name>marazmista</developer_name>
+  <provides>
+    <binary>radeon-profile</binary>
+  </provides>
+  <translation type="qt">
+    <!-- https://github.com/hughsie/appstream-glib/issues/88 -->
+    strings
+  </translation>
+  <update_contact>
+    https://github.com/marazmista/radeon-profile/issues
+  </update_contact>
+  <releases>
+    <release date="2016-12-21" version="20161221">
+      <description>
+	<p>Created event tab, improved fan control, updated translations.</p>
+      </description>
+    </release>
+  </releases>
+</component>
