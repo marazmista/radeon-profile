@@ -5,14 +5,19 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QTranslator translator;
+    QLocale locale;
 
-    QTranslator translator(&a);
-    if(translator.load(QLocale(), "strings", ".")
-            || translator.load(QLocale(), "strings", ".", QApplication::applicationDirPath())
-            || translator.load(QLocale(), "strings", ".", "/usr/share/radeon-profile"))
-        a.installTranslator(&translator);
-    else
-        qWarning() << "Failed loading translation";
+    if (locale.language() != QLocale::Language::English) {
+
+        if (translator.load(locale, "strings", ".")
+                || translator.load(locale, "strings", ".", QApplication::applicationDirPath())
+                || translator.load(locale, "strings", ".", "/usr/share/radeon-profile"))
+
+            a.installTranslator(&translator);
+        else
+            qWarning() << "Translation not found.";
+    }
 
     radeon_profile w(a.arguments());
     
