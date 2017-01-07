@@ -703,7 +703,8 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                                                                            properties[propertyIndex]);
                     if(propertyInfo == NULL) {
                         qDebug() << screenIndex << '/' << outputInfo->name << ": propertyInfo is NULL";
-                    } else if(propertyInfo->num_values > 0) { // A range or a list of alternatives is present
+                    } else {
+                        if(propertyInfo->num_values > 0) { // A range or a list of alternatives is present
                         // Proceed to print the range or the list alternatives
                         propertyValue += (propertyInfo->range) ? " (Range: " : " (Supported: ";
 
@@ -728,6 +729,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                         }
 
                         propertyValue += ')';
+                        }
 
                         // Property alternatives completed: deallocate propertyInfo
                         free(propertyInfo);
