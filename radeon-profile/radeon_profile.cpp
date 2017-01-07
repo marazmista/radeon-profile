@@ -77,9 +77,6 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     if(ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
         ui->btn_applyOverclock->click();
 
-
-    connectSignals();
-
     // timer init
     timer->setInterval(ui->spin_timerInterval->value()*1000);
 
@@ -91,7 +88,10 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     refreshUI();
 
     timer->start();
+    timerEvent();
+
     addRuntimeWidgets();
+    connectSignals();
 
     showWindow();
 }
@@ -188,7 +188,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->l_mVolt->setVisible(false);
     }
 
-    if (features.pwmAvailable && (globalStuff::globalConfig.rootMode || device.daemonConnected())) {
+    if (features.pwmAvailable && features.canChangeProfile) {
         qDebug() << "Fan control is available , configuring the fan control tab";
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
         ui->l_fanProfileUnsavedIndicator->setVisible(false);
@@ -206,7 +206,6 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
                     break;
             }
         }
-
     } else {
         qDebug() << "Fan control is not available";
         ui->mainTabs->setTabEnabled(3,false);
@@ -216,10 +215,6 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     if (Q_LIKELY(features.pm == globalStuff::DPM)) {
         ui->combo_pProfile->addItems(globalStuff::createDPMCombo());
         ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo());
-
-        ui->combo_pProfile->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
-        ui->combo_pLevel->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerLevel));
-
     } else {
         ui->combo_pLevel->setEnabled(false);
         ui->combo_pProfile->addItems(globalStuff::createProfileCombo());
