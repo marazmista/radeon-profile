@@ -1,0 +1,85 @@
+#!/bin/bash
+
+if [ "$CFLAGS" ] ; then
+	ARG="$ARG QMAKE_CFLAGS+='$CFLAGS'"
+fi
+
+if [ "$CXXFLAGS" ] ; then
+	ARG="$ARG QMAKE_CXXFLAGS+='$CXXFLAGS'"
+fi
+
+if [ "$LDFLAGS" ] ; then
+	ARG="$ARG QMAKE_LFLAGS+='$LDFLAGS'"
+fi
+
+for IN in $@ ; do
+	case $IN in
+	'--prefix='*)
+		ARG="$ARG PREFIX='${IN##--prefix=}'"
+		;;
+
+	'--libdir='*)
+		ARG="$ARG QMAKE_LIBDIR+='${IN##--libdir=}'"
+		;;
+
+	'--includedir='*)
+		DIR="${IN##--includedir=}"
+		if [ "$DIR" == "/usr/include" ] ; then
+		    echo "$0: ignoring '$IN', see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70129#c0"
+		else
+		    ARG="$ARG QMAKE_INCDIR+='$DIR'"
+		fi
+		;;
+
+	'CFLAGS='*)
+		ARG="$ARG QMAKE_CFLAGS+='${IN##CFLAGS=}'"
+		;;
+
+	'CXXFLAGS='*)
+		ARG="$ARG QMAKE_CXXFLAGS+='${IN##CXXFLAGS=}'"
+		;;
+
+	'LDFLAGS='*)
+		ARG="$ARG QMAKE_LFLAGS+='${IN##LDFLAGS=}'"
+		;;
+
+	'QMAKE_STRIP='*)
+		;&
+	*'.pro')
+		;&
+	'-W'*)
+		;&
+	'-d')
+		ARG="$ARG $IN"
+		;;
+
+	'--help')
+		;&
+	'help')
+		;&
+	'-h')
+		echo "Create the Makefile for the execution of 'make'. Usage:"
+		echo "$0 [options] [project_file.pro]"
+		echo "Possible options:"
+		echo "	Compilation/linking flags:"
+		echo "	    CFLAGS=..."
+		echo "	    CXXFLAGS=..."
+		echo "	    LDFLAGS=..."
+		echo "	    QMAKE_STRIP=..."
+		echo "	Directories:"
+		echo "	    --prefix=..."
+		echo "	    --libdir=..."
+		echo "	    --includedir=..."
+		echo "The prefix will be used by 'make install' to install files in \$INSTALL_ROOT/\$DESTDIR/\$PREFIX/"
+		exit
+		;;
+
+	*)
+		echo "$0: ignoring '$IN'"
+		;;
+	esac
+done
+
+echo "qmake $ARG"
+
+eval qmake-qt5 $ARG || eval qmake-qt4 $ARG || eval qmake $ARG

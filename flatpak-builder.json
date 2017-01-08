@@ -1,0 +1,33 @@
+{
+	"app-id": "org.rp.RadeonProfile",
+	"runtime": "org.kde.Platform",
+	"sdk": "org.kde.Sdk",
+	"command": "radeon-profile",
+	"rename-icon": "radeon-profile",
+	"rename-desktop-file": "radeon-profile.desktop",
+	"rename-appdata-file": "radeon-profile.appdata.xml",
+	"finish-args": [
+		"--device=dri",
+		"--socket=x11",
+		"--share=ipc",
+		"--filesystem=/tmp",
+		"--filesystem=/sys/kernel/debug/dri",
+		"--filesystem=/sys/class/drm",
+		"--filesystem=/sys/class/hwmon"
+	],
+	"modules": [
+		{
+			"name": "radeon-profile",
+			"subdir": "radeon-profile",
+			"no-autogen": true,
+			"sources": [
+				{
+					"type": "git",
+					"path": ".",
+					"url": "https://github.com/marazmista/radeon-profile.git",
+					"branch": "master"
+				}
+			]
+		}
+	]
+}

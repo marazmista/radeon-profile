@@ -103,6 +103,7 @@ private:
     static tempSensor testSensor();
     static void setNewValue(const QString &filePath, const QString &newValue);
     static QString findSysFsHwmonForGpu();
+    static bool isDataAvailable();
 };
 
 #endif // DXORG_H

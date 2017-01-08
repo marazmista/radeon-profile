@@ -3,6 +3,10 @@
 #include "dxorg.h"
 #include "gpu.h"
 
+extern "C" {
+#include "radeon_ioctl.h"
+}
+
 #include <QFile>
 #include <QTextStream>
 #include <QTime>
@@ -25,6 +29,7 @@ daemonComm *dXorg::dcomm = new daemonComm();
 
 void dXorg::configure(const QString &gpuName) {
     setupDriverModule(gpuName);
+    qDebug() << "Using module" << dXorg::driverModuleName;
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
@@ -110,6 +115,31 @@ bool dXorg::daemonConnected() {
 }
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
+
+#ifdef QT_DEBUG
+    // Example IOCTLs
+    // IOCTLs require root access
+    int fd = openCardFD(gpuName.toStdString().c_str());
+    if(fd >= 0){
+        int i;
+        unsigned u;
+        unsigned long ul;
+        float f;
+
+        qDebug() << "Testing IOCTLs";
+        if(!radeonCoreClock(fd, &u)) qDebug() << "Core clock:" << u << "MHz";
+        if(!radeonMaxCoreClock(fd, &u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
+        if(!radeonMemoryClock(fd, &u)) qDebug() << "Memory clock:" << u << "MHz";
+        if(!radeonTemperature(fd, &i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
+        if(!radeonVramUsage(fd,&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
+        if(!radeonGpuUsage(fd, &f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
+        if(!amdgpuVramUsage(fd,&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
+        if(!amdgpuGpuUsage(fd, &f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
+
+        closeCardFD(fd);
+    }
+#endif
+
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
 
@@ -142,6 +172,21 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     }
 }
 
+/**
+ * @brief dXorg::isDataAvailable check if shared memory contains anything
+ * @return true if the shared memory is not empty
+ */
+bool dXorg::isDataAvailable(){
+    if(!sharedMem.lock())
+        return false;
+
+    const char *data = (const char*)sharedMem.constData();
+    bool out = data && *data;
+
+    sharedMem.unlock();
+    return out;
+}
+
 // method for gather info about clocks from deamon or from debugfs if root
 QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     QFile clocksFile(filePaths.clocksPath);
@@ -162,16 +207,19 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
         // fist call, so notihing is in sharedmem and we need to wait for data
         // because we need correctly figure out what is available
         // see: https://stackoverflow.com/a/11487434/2347196
-        if (Q_UNLIKELY(resolvingGpuFeatures)) {
+        if (Q_UNLIKELY(resolvingGpuFeatures && !isDataAvailable())) {
+            // Check regurarely if the first data reading is complete
+            // Max waiting time: 1200 msec, then give up
             QTime delayTime = QTime::currentTime().addMSecs(1200);
-            qDebug() << "Waiting for first daemon data read...";
-            while (QTime::currentTime() < delayTime)
+            qDebug() << QTime::currentTime() << "Waiting for first daemon data read...";
+            while (QTime::currentTime() < delayTime && !isDataAvailable())
                 QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            qDebug() << QTime::currentTime() << "First daemon data read completed";
         }
 
-       if (sharedMem.lock()) {
+       if (Q_LIKELY(sharedMem.lock())) {
             const char *to = (const char*)sharedMem.constData();
-            if (to != NULL) {
+            if (Q_LIKELY(to != NULL)) {
                 qDebug() << "Reading data from shared memory";
                 data = QString(QByteArray::fromRawData(to, SHARED_MEM_SIZE)).trimmed();
             } else
@@ -312,18 +360,22 @@ float dXorg::getTemperature() {
 }
 
 globalStuff::powerMethod dXorg::getPowerMethod() {
-    if (QFile::exists(filePaths.dpmStateFilePath))
+    if (QFile::exists(filePaths.dpmStateFilePath)){
+        qDebug() << "Found" << filePaths.dpmStateFilePath << ", using DPM";
         return globalStuff::DPM;
+    }
 
     QFile powerMethodFile(filePaths.powerMethodFilePath);
     if (powerMethodFile.open(QIODevice::ReadOnly)) {
         QString s = powerMethodFile.readLine(20);
 
-        if (s.contains("dpm",Qt::CaseInsensitive))
+        if (s.contains("dpm",Qt::CaseInsensitive)){
+            qDebug() << "Found" << filePaths.powerMethodFilePath << ", using DPM";
             return globalStuff::DPM;
-        else if (s.contains("profile",Qt::CaseInsensitive))
+        } else if (s.contains("profile",Qt::CaseInsensitive)){
+            qDebug() << "Found" << filePaths.powerMethodFilePath << ", using PROFILE";
             return globalStuff::PROFILE;
-        else
+        } else
             return globalStuff::PM_UNKNOWN;
     }
 
@@ -464,67 +516,54 @@ void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
         qWarning() << "Unable to open " << filePath << " to write " << newValue;
 }
 
-void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
-    QString newValue;
-    switch (_newPowerProfile) {
-    case globalStuff::BATTERY:
-        newValue = dpm_battery;
-        break;
-    case globalStuff::BALANCED:
-        newValue = dpm_balanced;
-        break;
-    case globalStuff::PERFORMANCE:
-        newValue = dpm_performance;
-        break;
-    case globalStuff::AUTO:
-        newValue = profile_auto;
-        break;
-    case globalStuff::DEFAULT:
-        newValue = profile_default;
-        break;
-    case globalStuff::HIGH:
-        newValue = profile_high;
-        break;
-    case globalStuff::MID:
-        newValue = profile_mid;
-        break;
-    case globalStuff::LOW:
-        newValue = profile_low;
-        break;
-    default: break;
+/** Translate a power profile into its actual string */
+QString powerProfilesToString(globalStuff::powerProfiles profile){
+    switch (profile) {
+    case globalStuff::BATTERY: return dpm_battery;
+    case globalStuff::BALANCED: return dpm_balanced;
+    case globalStuff::PERFORMANCE: return dpm_performance;
+    case globalStuff::AUTO: return profile_auto;
+    case globalStuff::DEFAULT: return profile_default;
+    case globalStuff::HIGH: return profile_high;
+    case globalStuff::MID: return profile_mid;
+    case globalStuff::LOW: return profile_low;
+    default: return "ERROR";
     }
+}
+
+void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
+    if(Q_UNLIKELY(currentPowerMethod == globalStuff::PM_UNKNOWN)){
+        qCritical() << "Asked to set power profile but no power method available";
+        return;
+    }
+
+    QString newValue = powerProfilesToString(_newPowerProfile),
+            path = Q_LIKELY(currentPowerMethod==globalStuff::DPM) ? filePaths.dpmStateFilePath : filePaths.profilePath;
 
     if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
         command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
         command.append(newValue).append(SEPARATOR); // Power profile to be set
-        command.append(filePaths.dpmStateFilePath).append(SEPARATOR); // The path where the power profile should be written in
+        command.append(path).append(SEPARATOR); // The path where the power profile should be written in
 
         qDebug() << "Sending daemon power profile signal: " << command;
         dcomm->sendCommand(command);
-    } else {
-        // enum is int, so first three values are dpm, rest are profile
-        if (_newPowerProfile <= globalStuff::PERFORMANCE)
-            setNewValue(filePaths.dpmStateFilePath,newValue);
-        else
-            setNewValue(filePaths.profilePath,newValue);
+    } else
+        setNewValue(path, newValue);
+}
+
+/** Translate a forced power level into its actual string */
+QString forcePowerLevelsToString(globalStuff::forcePowerLevels level){
+    switch(level){
+    case globalStuff::F_AUTO: return dpm_auto;
+    case globalStuff::F_LOW: return dpm_low;
+    case globalStuff::F_HIGH: return dpm_high;
+    default: return "ERROR";
     }
 }
 
 void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
-    QString newValue;
-    switch (_newForcePowerLevel) {
-    case globalStuff::F_AUTO:
-        newValue = dpm_auto;
-        break;
-    case globalStuff::F_HIGH:
-        newValue = dpm_high;
-        break;
-    case globalStuff::F_LOW:
-        newValue = dpm_low;
-    default:
-        break;
-    }
+    QString newValue = forcePowerLevelsToString(_newForcePowerLevel);
 
     if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
@@ -644,16 +683,17 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
 
     features.pm = currentPowerMethod;
 
+    if(daemonConnected() && (currentPowerMethod != globalStuff::PM_UNKNOWN)){
+        qDebug() << "Daemon will be used to change profile";
+        features.canChangeProfile = true;
+    }
+
     switch (currentPowerMethod) {
     case globalStuff::DPM: {
-        if (daemonConnected())
+        QFile f(filePaths.dpmStateFilePath);
+        if (f.open(QIODevice::WriteOnly)){
             features.canChangeProfile = true;
-        else {
-            QFile f(filePaths.dpmStateFilePath);
-            if (f.open(QIODevice::WriteOnly)){
-                features.canChangeProfile = true;
-                f.close();
-            }
+            f.close();
         }
         break;
     }

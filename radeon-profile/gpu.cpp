@@ -51,7 +51,7 @@ bool gpu::daemonConnected() {
 // and call some things that need to be done before read data
 QStringList gpu::initialize() {
 
-    QStringList gpuList;
+    qDebug() << "Searching available driver";
 
     gpuList = gpu::initialize(gpu::XORG);
     if (gpuList.length() > 0)
@@ -67,25 +67,24 @@ QStringList gpu::initialize() {
 
 QStringList gpu::initialize(gpu::driver driver) {
     currentDriver = driver;
-    QStringList gpuList;
 
     switch (currentDriver) {
         case gpu::XORG:
             gpuList = dXorg::detectCards();
             if(currentGpuIndex < gpuList.size()){
-                dXorg::configure(gpuList[currentGpuIndex]);
-                features = dXorg::figureOutDriverFeatures();
+                qDebug() << "Using XORG driver";
+                changeGpu(currentGpuIndex);
             }
             break;
         case gpu::FGLRX:
-            dFglrx::configure(currentGpuIndex);
-            features = dFglrx::figureOutDriverFeatures();
+            gpuList = dFglrx::detectCards();
+            if(currentGpuIndex < gpuList.size()){
+                qDebug() << "Using FGLRX driver";
+                changeGpu(currentGpuIndex);
+            }
             break;
         case gpu::DRIVER_UNKNOWN:
-            globalStuff::driverFeatures f;
-            f.pm = globalStuff::PM_UNKNOWN;
-            f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
-            features = f;
+            features = globalStuff::driverFeatures(); // Nothing available
             gpuList << QObject::tr("Unknown");
             break;
     }
@@ -127,12 +126,19 @@ globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuf
     tmp.current = QString::number(data.current) + QString::fromUtf8("\u00B0C");
     tmp.max = QString::number(data.max) + QString::fromUtf8("\u00B0C");
     tmp.min = QString::number(data.min) + QString::fromUtf8("\u00B0C");
-    tmp.pwmSpeed = QString::number(data.pwmSpeed)+"%";
+    if(data.pwmSpeed != -1)
+        tmp.pwmSpeed = QString::number(data.pwmSpeed)+"%";
 
     return tmp;
 }
 
 void gpu::changeGpu(char index) {
+    if((index < 0) || (index >= gpuList.size())) {
+        qCritical() << "Asked to choose GPU n." << (int)index << "but only" << gpuList.size() << "GPUs are available";
+        return;
+    }
+
+    qDebug() << "Switching to GPU n." << (int)index << "(" << gpuList[index] << ")";
     currentGpuIndex = index;
 
     switch (currentDriver) {
@@ -697,7 +703,8 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                                                                            properties[propertyIndex]);
                     if(propertyInfo == NULL) {
                         qDebug() << screenIndex << '/' << outputInfo->name << ": propertyInfo is NULL";
-                    } else if(propertyInfo->num_values > 0) { // A range or a list of alternatives is present
+                    } else {
+                        if(propertyInfo->num_values > 0) { // A range or a list of alternatives is present
                         // Proceed to print the range or the list alternatives
                         propertyValue += (propertyInfo->range) ? " (Range: " : " (Supported: ";
 
@@ -722,6 +729,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                         }
 
                         propertyValue += ')';
+                        }
 
                         // Property alternatives completed: deallocate propertyInfo
                         free(propertyInfo);

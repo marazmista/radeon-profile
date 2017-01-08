@@ -6,131 +6,131 @@
     <message>
         <location filename="../dialog_rpevent.ui" line="20"/>
         <source>Event definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Creazione evento</translation>
     </message>
     <message>
         <location filename="../dialog_rpevent.ui" line="35"/>
         <source>Save</source>
-        <translation type="unfinished">Salva</translation>
+        <translation>Salva</translation>
     </message>
     <message>
         <location filename="../dialog_rpevent.ui" line="48"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annulla</translation>
+        <translation>Annulla</translation>
+    </message>
+    <message>
+        <location filename="../dialog_rpevent.ui" line="283"/>
+        <source>Event trigger</source>
+        <translation>Innesco dell&apos;evento</translation>
+    </message>
+    <message>
+        <location filename="../dialog_rpevent.ui" line="249"/>
+        <source>Event name</source>
+        <translation>Nome dell&apos;evento</translation>
+    </message>
+    <message>
+        <location filename="../dialog_rpevent.ui" line="270"/>
+        <source>Temperature</source>
+        <translation>Temperatura</translation>
+    </message>
+    <message>
+        <location filename="../dialog_rpevent.ui" line="275"/>
+        <source>Binary</source>
+        <translation>Eseguibile</translation>
     </message>
     <message>
         <location filename="../dialog_rpevent.ui" line="61"/>
-        <source>Event trigger</source>
-        <translation type="unfinished"></translation>
+        <source>Modify:</source>
+        <translation>Modifica:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="74"/>
-        <source>Event name</source>
-        <translation type="unfinished"></translation>
+        <location filename="../dialog_rpevent.ui" line="76"/>
+        <source>Set power level:</source>
+        <translation>Cambia livello di potenza:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="98"/>
-        <source>Temperature</source>
-        <translation type="unfinished">Temperatura</translation>
+        <location filename="../dialog_rpevent.ui" line="84"/>
+        <location filename="../dialog_rpevent.ui" line="93"/>
+        <location filename="../dialog_rpevent.ui" line="109"/>
+        <source>No change</source>
+        <translation>Nessun cambiamento</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="103"/>
-        <source>Binary</source>
-        <translation type="unfinished">Comando</translation>
+        <location filename="../dialog_rpevent.ui" line="101"/>
+        <source>Set fan:</source>
+        <translation>Imposta ventola:</translation>
     </message>
     <message>
         <location filename="../dialog_rpevent.ui" line="117"/>
-        <source>Modify:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../dialog_rpevent.ui" line="132"/>
-        <source>Set power level:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../dialog_rpevent.ui" line="140"/>
-        <location filename="../dialog_rpevent.ui" line="149"/>
-        <location filename="../dialog_rpevent.ui" line="165"/>
-        <source>No change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../dialog_rpevent.ui" line="157"/>
-        <source>Set fan:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../dialog_rpevent.ui" line="173"/>
         <source>Set DPM to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia DPM:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="189"/>
+        <location filename="../dialog_rpevent.ui" line="133"/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="233"/>
+        <location filename="../dialog_rpevent.ui" line="177"/>
         <source>Activate above this temperature:</source>
-        <translation type="unfinished"></translation>
+        <translation>Attiva sopra questa temperatura:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="261"/>
+        <location filename="../dialog_rpevent.ui" line="205"/>
         <source>Binary (executing this binary will trigger event):</source>
-        <translation type="unfinished"></translation>
+        <translation>Eseguibile (l&apos;esecuzione innescherà l&apos;evento):</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="284"/>
+        <location filename="../dialog_rpevent.ui" line="228"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="302"/>
+        <location filename="../dialog_rpevent.ui" line="259"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Abilitato</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="31"/>
+        <location filename="../dialog_rpevent.cpp" line="33"/>
         <source>Set Profile to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Imposta profilo:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="37"/>
+        <location filename="../dialog_rpevent.cpp" line="39"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="38"/>
+        <location filename="../dialog_rpevent.cpp" line="40"/>
         <source>Fixed speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocità fissa</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="74"/>
+        <location filename="../dialog_rpevent.cpp" line="76"/>
         <source>Selected trigger type is Binary, so the binary field cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hai selezionato l&apos;innesco da eseguibile, devi selezionare l&apos;eseguibile.</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="135"/>
+        <location filename="../dialog_rpevent.cpp" line="137"/>
         <source>Select binary</source>
-        <translation type="unfinished">Seleziona un eseguibile</translation>
+        <translation>Seleziona un eseguibile</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../gpu.cpp" line="458"/>
-        <location filename="../gpu.cpp" line="527"/>
+        <location filename="../gpu.cpp" line="464"/>
+        <location filename="../gpu.cpp" line="533"/>
         <source>Resolution</source>
         <translation>Risoluzione</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="466"/>
+        <location filename="../gpu.cpp" line="472"/>
         <source>Minimum resolution</source>
         <translation>Risoluzione minima</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="469"/>
+        <location filename="../gpu.cpp" line="475"/>
         <source>Maximum resolution</source>
         <translation>Risoluzione massima</translation>
     </message>
@@ -167,7 +167,7 @@
         <translation type="vanished">Temperatura della GPU</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="763"/>
+        <location filename="../gpu.cpp" line="765"/>
         <source>No info</source>
         <translation>Nessuna info</translation>
     </message>
@@ -236,93 +236,93 @@
         <translation type="vanished">Eseguire &quot;</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="89"/>
+        <location filename="../gpu.cpp" line="88"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="472"/>
+        <location filename="../gpu.cpp" line="478"/>
         <source>Virtual size</source>
         <translation>Dimensione virtuale</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="482"/>
+        <location filename="../gpu.cpp" line="488"/>
         <source>Outputs</source>
         <translation>Connessioni</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="516"/>
-        <location filename="../gpu.cpp" line="518"/>
+        <location filename="../gpu.cpp" line="522"/>
+        <location filename="../gpu.cpp" line="524"/>
         <source>Active</source>
         <translation>Attivo</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="594"/>
+        <location filename="../gpu.cpp" line="598"/>
         <source> Hz vertical, </source>
         <translation> Hz verticale, </translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="597"/>
+        <location filename="../gpu.cpp" line="601"/>
         <source> KHz horizontal, </source>
         <translation> KHz orizzontale, </translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="600"/>
+        <location filename="../gpu.cpp" line="604"/>
         <source> MHz dot clock</source>
         <translation> MHz dot clock</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="518"/>
+        <location filename="../gpu.cpp" line="524"/>
         <source>Yes</source>
         <translation>Si</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="516"/>
+        <location filename="../gpu.cpp" line="522"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="533"/>
+        <location filename="../gpu.cpp" line="539"/>
         <source>Refresh rate</source>
         <translation>Frequenza di aggiornamento</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="539"/>
+        <location filename="../gpu.cpp" line="545"/>
         <source>Offset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="551"/>
+        <location filename="../gpu.cpp" line="557"/>
         <source>Brightness (software)</source>
         <translation>Luminosità (software)</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="566"/>
+        <location filename="../gpu.cpp" line="572"/>
         <source>Size</source>
         <translation>Dimensione</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="569"/>
+        <location filename="../gpu.cpp" line="575"/>
         <source>Supported modes</source>
         <translation>Modalità supportate</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="618"/>
+        <location filename="../gpu.cpp" line="622"/>
         <source>Properties</source>
         <translation>Proprietà</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="686"/>
+        <location filename="../gpu.cpp" line="688"/>
         <source>Serial number</source>
         <translation>Numero di serie</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="685"/>
+        <location filename="../gpu.cpp" line="687"/>
         <source>Not available</source>
         <translation>Non disponibile</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="677"/>
+        <location filename="../gpu.cpp" line="679"/>
         <source>Connected with </source>
         <translation>Connesso con </translation>
     </message>
@@ -335,7 +335,7 @@
         <translation type="vanished">Velocità della ventola</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="503"/>
+        <location filename="../gpu.cpp" line="509"/>
         <source>Disconnected</source>
         <translation>Disconnesso</translation>
     </message>
@@ -484,7 +484,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation type="vanished">Salva</translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="472"/>
+        <location filename="../gpu.cpp" line="478"/>
         <source>%n mm</source>
         <translation>
             <numerusform></numerusform>
@@ -492,7 +492,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="566"/>
+        <location filename="../gpu.cpp" line="572"/>
         <source>%n mm </source>
         <translation>
             <numerusform></numerusform>
@@ -500,7 +500,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="566"/>
+        <location filename="../gpu.cpp" line="572"/>
         <source>(%n inches)</source>
         <translation>
             <numerusform>(%n pollici)</numerusform>
@@ -508,8 +508,8 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="472"/>
-        <location filename="../gpu.cpp" line="566"/>
+        <location filename="../gpu.cpp" line="478"/>
+        <location filename="../gpu.cpp" line="572"/>
         <source>%n mm x </source>
         <translation>
             <numerusform></numerusform>
@@ -517,7 +517,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="747"/>
+        <location filename="../gpu.cpp" line="749"/>
         <source>%n connected, </source>
         <translation>
             <numerusform>%n connesso, </numerusform>
@@ -525,7 +525,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="747"/>
+        <location filename="../gpu.cpp" line="749"/>
         <source>%n active</source>
         <translation>
             <numerusform>%n attivo</numerusform>
@@ -533,7 +533,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="452"/>
+        <location filename="../gpu.cpp" line="458"/>
         <source>Virtual screen n°%n</source>
         <translatorcomment>Per un qualche motivo non viene tradotto correttamente a runtime, investigare</translatorcomment>
         <translation>
@@ -585,13 +585,13 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="309"/>
-        <location filename="../radeon_profile.cpp" line="284"/>
+        <location filename="../radeon_profile.cpp" line="283"/>
         <source>GPU temperature</source>
         <translation>Temperatura della GPU</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="340"/>
-        <location filename="../radeon_profile.cpp" line="269"/>
+        <location filename="../radeon_profile.cpp" line="268"/>
         <location filename="../uiElements.cpp" line="44"/>
         <source>GPU clock</source>
         <translation>Clock della GPU</translation>
@@ -624,14 +624,14 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation>Velocità della ventola</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="279"/>
+        <location filename="../radeon_profile.cpp" line="278"/>
         <location filename="../uiElements.cpp" line="52"/>
         <source>I/O voltage (vddci)</source>
         <translation>Voltaggio dell&apos;I/O</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="93"/>
-        <location filename="../uiEvents.cpp" line="201"/>
+        <location filename="../uiEvents.cpp" line="197"/>
         <source>Quit</source>
         <translation>Esci</translation>
     </message>
@@ -694,7 +694,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="244"/>
-        <location filename="../radeon_profile.cpp" line="271"/>
+        <location filename="../radeon_profile.cpp" line="270"/>
         <location filename="../uiElements.cpp" line="45"/>
         <source>Memory clock</source>
         <translation>Clock della memoria</translation>
@@ -824,7 +824,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message>
         <location filename="../radeon_profile.ui" line="157"/>
         <location filename="../radeon_profile.ui" line="853"/>
-        <location filename="../radeon_profile.cpp" line="267"/>
+        <location filename="../radeon_profile.cpp" line="266"/>
         <source>Power level</source>
         <translation>Livello di potenza</translation>
     </message>
@@ -968,8 +968,8 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1774"/>
-        <location filename="../fanControlTab.cpp" line="190"/>
-        <location filename="../fanControlTab.cpp" line="243"/>
+        <location filename="../fanControlTab.cpp" line="193"/>
+        <location filename="../fanControlTab.cpp" line="246"/>
         <location filename="../uiElements.cpp" line="38"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
@@ -1073,37 +1073,37 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     <message>
         <location filename="../radeon_profile.ui" line="1703"/>
         <source>Unsaved</source>
-        <translation type="unfinished"></translation>
+        <translation>Non salvato</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1794"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Eventi</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1814"/>
         <source>Enable event tracking</source>
-        <translation type="unfinished"></translation>
+        <translation>Abilita tracciamento degli eventi</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1834"/>
         <source>Current active event:</source>
-        <translation type="unfinished"></translation>
+        <translation>Evento attivo:</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1854"/>
         <source>Revoke current event</source>
-        <translation type="unfinished"></translation>
+        <translation>Revoca l&apos;evento attuale</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1882"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Abilitato</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1887"/>
         <source>Event name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome dell&apos;evento</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1904"/>
@@ -1436,11 +1436,11 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <location filename="../execTab.cpp" line="64"/>
         <location filename="../execTab.cpp" line="74"/>
         <location filename="../execTab.cpp" line="289"/>
-        <location filename="../fanControlTab.cpp" line="195"/>
-        <location filename="../fanControlTab.cpp" line="211"/>
-        <location filename="../fanControlTab.cpp" line="232"/>
-        <location filename="../fanControlTab.cpp" line="237"/>
-        <location filename="../uiEvents.cpp" line="390"/>
+        <location filename="../fanControlTab.cpp" line="198"/>
+        <location filename="../fanControlTab.cpp" line="214"/>
+        <location filename="../fanControlTab.cpp" line="235"/>
+        <location filename="../fanControlTab.cpp" line="240"/>
+        <location filename="../uiEvents.cpp" line="376"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
@@ -1471,7 +1471,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="../execTab.cpp" line="146"/>
-        <location filename="../fanControlTab.cpp" line="71"/>
+        <location filename="../fanControlTab.cpp" line="74"/>
         <source>Question</source>
         <translation>Domanda</translation>
     </message>
@@ -1502,7 +1502,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation>Eseguire &quot;</translation>
     </message>
     <message numerus="yes">
-        <location filename="../radeon_profile.cpp" line="124"/>
+        <location filename="../radeon_profile.cpp" line="126"/>
         <source>version %n</source>
         <translation>
             <numerusform>versione %n</numerusform>
@@ -1510,75 +1510,80 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         </translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="138"/>
+        <location filename="../radeon_profile.cpp" line="140"/>
         <source>Back to profiles</source>
         <translation>Ritorna ai profili</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="273"/>
+        <location filename="../radeon_profile.cpp" line="272"/>
         <location filename="../uiElements.cpp" line="46"/>
         <source>UVD core clock (cclk)</source>
         <translation>Clock del UVD (cclk)</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="275"/>
+        <location filename="../radeon_profile.cpp" line="274"/>
         <location filename="../uiElements.cpp" line="47"/>
         <source>UVD decoder clock (dclk)</source>
         <translation>Clock del decoder UVD (dclk)</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="277"/>
+        <location filename="../radeon_profile.cpp" line="276"/>
         <location filename="../uiElements.cpp" line="51"/>
         <source>GPU voltage (vddc)</source>
         <translation>Voltaggio GPU (vddc)</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="282"/>
+        <location filename="../radeon_profile.cpp" line="281"/>
         <source>Can&apos;t read data</source>
         <translation>Impossibile leggere i dati</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="282"/>
+        <location filename="../radeon_profile.cpp" line="281"/>
         <source>You need debugfs mounted and either root rights or the daemon running</source>
         <translation>È necessario che debugfs sia montato e che il demone sia attivo (o che il programma venga eseguito come root)</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="201"/>
+        <location filename="../radeon_profile.cpp" line="460"/>
+        <source>Current profile: </source>
+        <translation>Profilo attuale:</translation>
+    </message>
+    <message>
+        <location filename="../uiEvents.cpp" line="197"/>
         <source> is still running, exit anyway?</source>
         <translation> è ancora in esecuzione, uscire comunque?</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="253"/>
+        <location filename="../uiEvents.cpp" line="249"/>
         <source>GPU data is disabled</source>
         <translation>Dati della GPU disabilitati</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="329"/>
+        <location filename="../uiEvents.cpp" line="325"/>
         <source>Select new power profile</source>
         <translation>Seleziona un nuovo profilo di potenza</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="329"/>
+        <location filename="../uiEvents.cpp" line="325"/>
         <source>Profile selection</source>
         <translation>Selezione del profilo</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="353"/>
+        <location filename="../uiEvents.cpp" line="339"/>
         <source>Process is still running. Close tab?</source>
         <translation>Il processo è ancora attivo. Chiudere comunque?</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="142"/>
+        <location filename="../fanControlTab.cpp" line="145"/>
         <source>Cannot activate unsaved profile. Do you want to save it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Devo salvare il profilo prima di attivarlo. Vuoi salvarlo?</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="185"/>
+        <location filename="../fanControlTab.cpp" line="188"/>
         <source>Fan control information</source>
         <translation>Informazioni sul controllo della ventola</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="185"/>
+        <location filename="../fanControlTab.cpp" line="188"/>
         <source>Don&apos;t overheat your card! Be careful! Don&apos;t use this if you don&apos;t know what you&apos;re doing! 
 
 Hovewer, looks like card won&apos;t apply too low values due its internal protection. 
@@ -1591,23 +1596,23 @@ Il sistema di protezione della scheda grafica non accetta valori troppo bassi.
 Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola su Auto. Se l&apos;applicazione va in crash, l&apos;ultimo valore usato rimarrà attivo. Sei stato avvertito!</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="195"/>
+        <location filename="../fanControlTab.cpp" line="198"/>
         <source>This step already exists. Double click on it, to change its value</source>
         <translation>Questa temperatura esiste già. Doppio click per modificarla</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="197"/>
-        <location filename="../fanControlTab.cpp" line="252"/>
+        <location filename="../fanControlTab.cpp" line="200"/>
+        <location filename="../fanControlTab.cpp" line="255"/>
         <source>Speed [%]</source>
         <translation>Velocità [%]</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="232"/>
+        <location filename="../fanControlTab.cpp" line="235"/>
         <source>You can&apos;t edit the last item</source>
         <translation>Non puoi modificare l&apos;ultimo elemento</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="237"/>
+        <location filename="../fanControlTab.cpp" line="240"/>
         <source>You can&apos;t edit temperature of the first item</source>
         <translation>Non puoi modificare la temperatura del primo elemento</translation>
     </message>
@@ -1616,12 +1621,12 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation type="vanished">Velocità [%] (10-100)</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="398"/>
+        <location filename="../uiEvents.cpp" line="384"/>
         <source>Export destination directory</source>
         <translation>Cartella di destinazione</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="71"/>
+        <location filename="../fanControlTab.cpp" line="74"/>
         <source>This option may cause overheat of your card and it is your responsibility if this happens. Do you want to enable it?</source>
         <translation>Questa opzione può causare un sirriscaldamento della scheda video, ti assumi la responsabilità se questo succede. Vuoi abilitarla? </translation>
     </message>
@@ -1630,7 +1635,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation type="vanished">Velocità [%] (20-100)</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="211"/>
+        <location filename="../fanControlTab.cpp" line="214"/>
         <source>You can&apos;t delete the first and the last item</source>
         <translation>Non puoi cancellare il primo e l&apos;ultimo elemento</translation>
     </message>
@@ -1639,58 +1644,62 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
         <translation type="vanished">Non puoi modificare il primo e l&apos;ultimo elemento</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="390"/>
+        <location filename="../uiEvents.cpp" line="376"/>
         <source>An error occurred, overclock failed</source>
         <translation>Si è verificato un errore, overclock fallito</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="87"/>
+        <location filename="../fanControlTab.cpp" line="90"/>
         <source>Cannot remove default profile.</source>
         <translation>Non puoi rimuovere il profilo di default.</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="91"/>
+        <location filename="../fanControlTab.cpp" line="94"/>
         <source>Remove profile: </source>
-        <translation type="unfinished"></translation>
+        <translation>Rimuovi profilo:</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="118"/>
+        <location filename="../fanControlTab.cpp" line="121"/>
         <source>Fan profile name:</source>
         <translation>Nome del profilo:</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="121"/>
+        <location filename="../fanControlTab.cpp" line="124"/>
         <source>Profile name musn&apos;t contain &apos;|&apos; character.</source>
         <translation>Il nome del profilo non può contenere il carattere &apos;|&apos;.</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="126"/>
+        <location filename="../fanControlTab.cpp" line="129"/>
         <source>Cannot add another profile with the same name that already exists.</source>
         <translation>Esiste già un profilo con questo nome.</translation>
     </message>
     <message>
-        <location filename="../eventsTab.cpp" line="154"/>
+        <location filename="../eventsTab.cpp" line="156"/>
         <source>Events info</source>
-        <translation type="unfinished"></translation>
+        <translation>Info sugli eventi</translation>
     </message>
     <message>
-        <location filename="../eventsTab.cpp" line="155"/>
+        <location filename="../eventsTab.cpp" line="157"/>
         <source>Here you can define events. Each event has a defined condition, and when this condition is fulfilled, event is activated. 
 
 After activation, defined power profile, power level and fan profile are applied. When one of events is activated, tracking is suspended.
 
 When active event condition is no longer true, event is revoked and power profile, power level and fan profile are restored to state before event was activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Qui puoi definire gli eventi. Ogni evento ha una condizione definita, quando questa si verifica l&apos;evento viene innescato. 
+
+Una volta innescato, l&apos;evento applica profilo di potenza, livello di potenza e profilo della ventola in base ai valori inseriti alla creazione dell&apos;evento; il tracciamento viene sospeso.
+
+Una volta scomparsa la condizione dell&apos;evento, l&apos;evento viene revocato e profilo di potenza, livello di potenza e profilo della ventola vengono riportati ai valori precedenti all&apos;attivazione dell&apos;evento.</translation>
     </message>
     <message>
-        <location filename="../eventsTab.cpp" line="194"/>
+        <location filename="../eventsTab.cpp" line="196"/>
         <source>Cannot remove event that is currently active.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile rimuovere un evento attivo.</translation>
     </message>
     <message>
-        <location filename="../eventsTab.cpp" line="198"/>
+        <location filename="../eventsTab.cpp" line="200"/>
         <source>Do you want to remove event: </source>
-        <translation type="unfinished"></translation>
+        <translation>Vuoi rimuovere levento: </translation>
     </message>
 </context>
 </TS>
