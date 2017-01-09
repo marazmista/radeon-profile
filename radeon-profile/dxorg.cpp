@@ -3,6 +3,10 @@
 #include "dxorg.h"
 #include "gpu.h"
 
+extern "C" {
+#include "radeon_ioctl.h"
+}
+
 #include <QFile>
 #include <QTextStream>
 #include <QTime>
@@ -25,6 +29,7 @@ daemonComm *dXorg::dcomm = new daemonComm();
 
 void dXorg::configure(const QString &gpuName) {
     setupDriverModule(gpuName);
+    qDebug() << "Using module" << dXorg::driverModuleName;
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
@@ -110,6 +115,31 @@ bool dXorg::daemonConnected() {
 }
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
+
+#ifdef QT_DEBUG
+    // Example IOCTLs
+    // IOCTLs require root access
+    int fd = openCardFD(gpuName.toStdString().c_str());
+    if(fd >= 0){
+        int i;
+        unsigned u;
+        unsigned long ul;
+        float f;
+
+        qDebug() << "Testing IOCTLs";
+        if(!radeonCoreClock(fd, &u)) qDebug() << "Core clock:" << u << "MHz";
+        if(!radeonMaxCoreClock(fd, &u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
+        if(!radeonMemoryClock(fd, &u)) qDebug() << "Memory clock:" << u << "MHz";
+        if(!radeonTemperature(fd, &i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
+        if(!radeonVramUsage(fd,&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
+        if(!radeonGpuUsage(fd, &f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
+        if(!amdgpuVramUsage(fd,&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
+        if(!amdgpuGpuUsage(fd, &f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
+
+        closeCardFD(fd);
+    }
+#endif
+
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
 

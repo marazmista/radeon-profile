@@ -35,6 +35,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     rangeX = 180;
     ticksCounter = 0;
     statsTickCounter = 0;
+	savedState = nullptr;
 
     ui->setupUi(this);
     timer = new QTimer(this);
@@ -94,6 +95,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
     connectSignals();
 
     showWindow();
+    qDebug() << "Initialization completed";
 }
 
 radeon_profile::~radeon_profile()
