@@ -77,7 +77,6 @@ public:
 
     /**
      * @brief getCoreClock Get GPU current clock (sclk)
-     * @param fd File descriptor to use
      * @param data On success is filled with the value, in MHz
      * @return Success
      */
@@ -85,7 +84,6 @@ public:
 
     /**
      * @brief getMaxCoreClock Get GPU maximum clock
-     * @param fd File descriptor to use
      * @param data On success is filled with the value, in KHz
      * @return Success
      */
@@ -104,7 +102,6 @@ public:
 
     /**
      * @brief getMemoryClock Get VRAM memory current clock (mclk)
-     * @param fd File descriptor to use
      * @param data On success is filled with the value, in MHz
      * @return Success
      */
@@ -112,7 +109,6 @@ public:
 
     /**
      * @brief getVramUsage Get VRAM memory current usage
-     * @param fd File descriptor to use
      * @param data On success is filled with the value, in bytes
      * @return Success
      */
@@ -120,7 +116,6 @@ public:
 
     /**
      * @brief getVramSize Get VRAM memory size
-     * @param fd File descriptor to use
      * @param data On success is filled with the value, in bytes
      * @return Success
      */
