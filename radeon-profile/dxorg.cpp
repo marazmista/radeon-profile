@@ -3,9 +3,7 @@
 #include "dxorg.h"
 #include "gpu.h"
 
-extern "C" {
 #include "radeon_ioctl.h"
-}
 
 #include <QFile>
 #include <QTextStream>
@@ -119,24 +117,22 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 #ifdef QT_DEBUG
     // Example IOCTLs
     // IOCTLs require root access
-    int fd = openCardFD(gpuName.toStdString().c_str());
-    if(fd >= 0){
+    ioctlHandler ioctls(gpuName, dXorg::driverModuleName);
+    if(ioctls.isValid()){
         int i;
         unsigned u;
         unsigned long ul;
         float f;
 
         qDebug() << "Testing IOCTLs";
-        if(!radeonCoreClock(fd, &u)) qDebug() << "Core clock:" << u << "MHz";
-        if(!radeonMaxCoreClock(fd, &u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
-        if(!radeonMemoryClock(fd, &u)) qDebug() << "Memory clock:" << u << "MHz";
-        if(!radeonTemperature(fd, &i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
-        if(!radeonVramUsage(fd,&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
-        if(!radeonGpuUsage(fd, &f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
-        if(!amdgpuVramUsage(fd,&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
-        if(!amdgpuGpuUsage(fd, &f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
+        if(ioctls.getCoreClock(&u)) qDebug() << "Core clock:" << u << "MHz";
+        if(ioctls.getMaxCoreClock(&u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
+        if(ioctls.getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
+        if(ioctls.getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
+        if(ioctls.getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
+        if(ioctls.getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024 << "KB";
+        if(ioctls.getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
 
-        closeCardFD(fd);
     }
 #endif
 

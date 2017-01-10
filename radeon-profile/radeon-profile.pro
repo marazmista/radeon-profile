@@ -31,7 +31,7 @@ SOURCES += main.cpp\
     daemonComm.cpp \
     execTab.cpp \
     execbin.cpp \
-    radeon_ioctl.c \
+    radeon_ioctl.cpp \
     dialog_rpevent.cpp \
     eventsTab.cpp \
     fanControlTab.cpp
