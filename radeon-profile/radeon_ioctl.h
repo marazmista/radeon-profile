@@ -5,26 +5,34 @@
 #include <QString>
 
 /**
- * @brief The ioctlHandler class
+ * @brief The ioctlHandler class is an interface to the kernel IOCTL system that allows to retrieve informations from the driver
  */
 class ioctlHandler
 {
 private:
+    /**
+     * @brief fd File descriptor for the card device, used by all IOCTLs
+     */
     int fd;
-    struct ioctlCodes {
-        uint32_t request,
-            temperature,
-            coreClock,
-            maxCoreClock,
-            memoryClock,
-            vramUsage,
-            vramSize,
-            registry;
-    } codes;
+
+    /**
+     * @brief The ioctlCodes struct contains all query codes needed to execute the ioctls
+     */
+    struct ioctlCodes{
+        unsigned request, /**< Identifies the driver to query (radeon/amdgpu) */
+            temperature, /**< Temperature ioctl request */
+            coreClock, /**< SCLK ioctl request */
+            maxCoreClock, /**< Max SCLK ioctl request */
+            memoryClock, /**< MCLK ioctl request */
+            vramUsage, /**< VRAM usage ioctl request */
+            vramSize, /**< VRAM size ioctl request */
+            registry; /**< Registry read ioctl request */
+    } codes; /**< Contains available query codes */
+
 
     /**
      * @brief getValue Execute an ioctl call to the driver
-     * @param data Buffer memory area to store input/output data
+     * @param data Points to the memory area to store input/output data
      * @param dataSize Size of the memory area
      * @param command Driver request identifier
      * @return Success
@@ -41,13 +49,16 @@ private:
 
 public:
     /**
-     * @brief ioctlHandler initializes the ioctl handler
-     * @warning the class MUST be initializedor it won't work; you can check if it worked out with isValid()
+     * @brief Opens the communication with the device and initializes the ioctl handler.
+     * @note You can check if it worked out with isValid()
      * @param card Name of the card to be opened (e.g. card0).
-     * @warning You can find the list of available cards by running 'ls /dev/dri/'
+     * @note You can find the list of available cards by running 'ls /dev/dri/'
      */
     ioctlHandler(QString card, QString driver);
 
+    /**
+     * @brief Closes the communication with the device.
+     */
     ~ioctlHandler();
 
     /**
@@ -56,14 +67,12 @@ public:
      */
     bool isValid();
 
-
     /**
      * @brief getTemperature Get GPU temperature
      * @param data On success is filled with the value, in °mC (milliCelsius)
      * @return Success
      */
     bool getTemperature(int *data);
-
 
     /**
      * @brief getCoreClock Get GPU current clock (sclk)
@@ -73,7 +82,6 @@ public:
      */
     bool getCoreClock(unsigned *data);
 
-
     /**
      * @brief getMaxCoreClock Get GPU maximum clock
      * @param fd File descriptor to use
@@ -81,7 +89,6 @@ public:
      * @return Success
      */
     bool getMaxCoreClock(unsigned *data);
-
 
     /**
      * @brief getGpuUsage Get how busy the GPU is
@@ -94,7 +101,6 @@ public:
      */
     bool getGpuUsage(float *data, unsigned time, unsigned frequency);
 
-
     /**
      * @brief getMemoryClock Get VRAM memory current clock (mclk)
      * @param fd File descriptor to use
@@ -103,7 +109,6 @@ public:
      */
     bool getMemoryClock(unsigned *data);
 
-
     /**
      * @brief getVramUsage Get VRAM memory current usage
      * @param fd File descriptor to use
@@ -111,7 +116,6 @@ public:
      * @return Success
      */
     bool getVramUsage(unsigned long *data);
-
 
     /**
      * @brief getVramSize Get VRAM memory size

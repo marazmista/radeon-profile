@@ -1,0 +1,8 @@
+# Doxygen documentation configuration
+# Run doxygen in radeon-profile/ to generate documentation
+# Then open radeon-profile/html/index.html to see it
+PROJECT_NAME           = "Radeon profile"
+EXCLUDE                = qcustomplot.h qcustomplot.cpp
+GENERATE_LATEX         = NO
+GENERATE_HTML          = YES
+EXTRACT_PRIVATE        = YES # Document also private members
