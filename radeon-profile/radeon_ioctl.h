@@ -53,6 +53,7 @@ public:
      * @note You can check if it worked out with isValid()
      * @param card Name of the card to be opened (e.g. card0).
      * @note You can find the list of available cards by running 'ls /dev/dri/'
+     * @param driver Name of the driver ("radeon"/"amdgpu")
      */
     ioctlHandler(QString card, QString driver);
 
