@@ -40,9 +40,9 @@ ioctlHandler::ioctlHandler(QString card, QString driver){
         return;
 
     // Open file descriptor to card device
-    const char * path = ("/dev/dri/" + card).toStdString().c_str();
+    QString path = "/dev/dri/" + card;
     qDebug() << "Opening" << path << "for IOCTLs with driver" << driver;
-    fd = open(path, O_RDONLY);
+    fd = open(path.toStdString().c_str(), O_RDONLY);
     if(fd < 0){
         DESCRIBE_ERROR("fd open");
         return;
@@ -52,29 +52,25 @@ ioctlHandler::ioctlHandler(QString card, QString driver){
     if(driver=="radeon"){
         // http://lxr.free-electrons.com/source/include/uapi/drm/radeon_drm.h#L993
         // http://lxr.free-electrons.com/source/drivers/gpu/drm/radeon/radeon_kms.c#L203
-        codes = {
-            request: DRM_IOCTL_RADEON_INFO,
-            temperature: RADEON_INFO_CURRENT_GPU_TEMP,
-            coreClock: RADEON_INFO_CURRENT_GPU_SCLK,
-            maxCoreClock: RADEON_INFO_MAX_SCLK,
-            memoryClock: RADEON_INFO_CURRENT_GPU_MCLK,
-            vramUsage: RADEON_INFO_VRAM_USAGE,
-            vramSize: UNAVAILABLE,
-            registry:RADEON_INFO_READ_REG
-        };
+        codes.request = DRM_IOCTL_RADEON_INFO;
+        codes.temperature = RADEON_INFO_CURRENT_GPU_TEMP;
+        codes.coreClock = RADEON_INFO_CURRENT_GPU_SCLK;
+        codes.maxCoreClock = RADEON_INFO_MAX_SCLK;
+        codes.memoryClock = RADEON_INFO_CURRENT_GPU_MCLK;
+        codes.vramUsage = RADEON_INFO_VRAM_USAGE;
+        codes.vramSize = UNAVAILABLE;
+        codes.registry = RADEON_INFO_READ_REG;
     } else if (driver == "amdgpu") {
         // http://lxr.free-electrons.com/source/include/uapi/drm/amdgpu_drm.h#L441
         // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L212
-        codes = {
-            request: DRM_IOCTL_AMDGPU_INFO,
-            temperature: UNAVAILABLE,
-            coreClock: UNAVAILABLE,
-            maxCoreClock: UNAVAILABLE,
-            memoryClock: UNAVAILABLE,
-            vramUsage: AMDGPU_INFO_VRAM_USAGE,
-            vramSize: AMDGPU_INFO_VRAM_GTT,
-            registry: AMDGPU_INFO_READ_MMR_REG
-        };
+        codes.request = DRM_IOCTL_AMDGPU_INFO;
+        codes.temperature = UNAVAILABLE;
+        codes.coreClock = UNAVAILABLE;
+        codes.maxCoreClock = UNAVAILABLE;
+        codes.memoryClock = UNAVAILABLE;
+        codes.vramUsage = AMDGPU_INFO_VRAM_USAGE;
+        codes.vramSize = AMDGPU_INFO_VRAM_GTT;
+        codes.registry = AMDGPU_INFO_READ_MMR_REG;
     } else {
         codes = {
             UNAVAILABLE,
