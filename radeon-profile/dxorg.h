@@ -24,8 +24,13 @@ public:
     ~dXorg() {
         delete dcomm;
 
-        // Before being deleted, the class deletes the sharedMem
-        sharedMem.deleteLater();
+        if(sharedMem.isAttached()){
+            // In case the closing signal interrupts a sharedMem lock+read+unlock phase, sharedmem is unlocked
+            sharedMem.unlock();
+            // Before being deleted, the class deletes the sharedMem
+            sharedMem.detach();
+            sharedMem.deleteLater();
+        }
     }
 
     static globalStuff::gpuClocksStruct getClocks(const QString &data);
