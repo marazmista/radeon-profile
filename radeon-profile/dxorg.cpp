@@ -114,9 +114,7 @@ bool dXorg::daemonConnected() {
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 
-#ifdef QT_DEBUG
-    // Example IOCTLs
-    // IOCTLs require root access
+    /* Example IOCTLs
     ioctlHandler ioctls(gpuName, dXorg::driverModuleName);
     if(ioctls.isValid()){
         int i;
@@ -134,7 +132,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
         if(ioctls.getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
 
     }
-#endif
+    */
 
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
