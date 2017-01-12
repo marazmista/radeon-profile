@@ -21,6 +21,7 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){r
 #include <QDebug>
 
 #include <cstring>
+#include <cstdio>
 #include <cerrno>
 
 extern "C" {
@@ -34,18 +35,46 @@ extern "C" {
 #define DESCRIBE_ERROR(title) qWarning() << (title) << ':' << strerror(errno)
 #define CLEAN(object) memset(&(object), 0, sizeof(object))
 #define UNAVAILABLE 0
+#define PATH_SIZE 20
 
-ioctlHandler::ioctlHandler(QString card, QString driver){
-    if(card.isEmpty() || driver.isEmpty())
+ioctlHandler::ioctlHandler(unsigned card, QString driver){
+    if(driver.isEmpty())
         return;
 
-    // Open file descriptor to card device
-    QString path = "/dev/dri/" + card;
+    /* Open file descriptor to card device
+     * Information ioctls can be accessed in two ways:
+     * The kernel generates for the card with index N the files /dev/dri/card<N> and /dev/dri/renderD<128+N>
+     * Opening /dev/dri/card<N> requires either root access or being DRM Master
+     * Opening /dev/dri/renderD<128+N> does not require these permissions, but legacy kernels do not support it
+     * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#DRM-Master_and_DRM-Auth
+     * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#Render_nodes
+     * https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=15
+     */
+     // Try /dev/dri/renderD<128+N>
+    char path[PATH_SIZE];
+    snprintf(path, PATH_SIZE, "/dev/dri/renderD%u", 128+card);
     qDebug() << "Opening" << path << "for IOCTLs with driver" << driver;
-    fd = open(path.toStdString().c_str(), O_RDONLY);
+    fd = open(path, O_RDONLY);
     if(fd < 0){
         DESCRIBE_ERROR("fd open");
-        return;
+
+        // /dev/dri/renderD<128+N> not available, try /dev/dri/card<N>
+        snprintf(path, PATH_SIZE, "/dev/dri/card%u", card);
+        qDebug() << "Opening" << path << "for IOCTLs with driver" << driver;
+        fd = open(path, O_RDONLY);
+        if(fd < 0){
+            DESCRIBE_ERROR("fd open");
+            // /dev/dri/card<N> not available, initialization failed
+            return;
+        }
+
+        /* Try drm authorization to card device, to allow non-root ioctls
+         * Works only if DRM master
+         * Won't work in radeon-profile since as graphical app the DRM master will be the display server
+         * But it might work in radeon-profile-daemon */
+        drm_auth_t auth;
+        if(ioctl(fd, DRM_IOCTL_GET_MAGIC, &auth) || ioctl(fd, DRM_IOCTL_AUTH_MAGIC, &auth))
+            DESCRIBE_ERROR("auth_magic");
     }
 
     // Initialize ioctl codes
@@ -83,15 +112,6 @@ ioctlHandler::ioctlHandler(QString card, QString driver){
             UNAVAILABLE
         };
     }
-
-    // Try drm authorization to card device, to allow non-root ioctls
-    // https://en.wikipedia.org/wiki/Direct_Rendering_Manager#DRM-Master_and_DRM-Auth
-    // https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=15
-    // Works only if DRM master, never true since this is a graphical application and the DRM master will be the display server
-    // It might work in radeon-profile-daemon
-    drm_auth_t auth;
-    if(ioctl(fd, DRM_IOCTL_GET_MAGIC, &auth) || ioctl(fd, DRM_IOCTL_AUTH_MAGIC, &auth))
-        DESCRIBE_ERROR("auth_magic");
 }
 
 

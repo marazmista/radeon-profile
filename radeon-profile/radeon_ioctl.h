@@ -6,7 +6,6 @@
 
 /**
  * @brief The ioctlHandler class is an interface to the kernel IOCTL system that allows to retrieve informations from the driver.
- * @warning The process using this class must either have root access or be DRM Master.
  */
 class ioctlHandler
 {
@@ -52,11 +51,11 @@ public:
     /**
      * @brief Open the communication with the device and initialize the ioctl handler.
      * @note You can check if it worked out with isValid().
-     * @param card Name of the card to be opened (for example 'card0').
+     * @param card Index of the card to be opened (for example 'card0' --> 0).
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
      * @param driver Name of the driver ("radeon"/"amdgpu").
      */
-    ioctlHandler(QString card, QString driver);
+    ioctlHandler(unsigned card, QString driver);
 
     /**
      * @brief Close the communication with the device.

@@ -115,7 +115,8 @@ bool dXorg::daemonConnected() {
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 
     /* Example IOCTLs
-    ioctlHandler ioctls(gpuName, dXorg::driverModuleName);
+    unsigned index = gpuName[4].toLatin1() - '0';
+    ioctlHandler ioctls(index, dXorg::driverModuleName);
     if(ioctls.isValid()){
         int i;
         unsigned u;
