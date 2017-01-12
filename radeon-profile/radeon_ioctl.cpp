@@ -31,11 +31,15 @@ extern "C" {
 #include <drm/amdgpu_drm.h> // http://lxr.free-electrons.com/source/include/uapi/drm/amdgpu_drm.h#L441
 }
 
-#define DESCRIBE_ERROR(title) qDebug() << (title) << ':' << strerror(errno)
+#define DESCRIBE_ERROR(title) qWarning() << (title) << ':' << strerror(errno)
 #define CLEAN(object) memset(&(object), 0, sizeof(object))
 #define UNAVAILABLE 0
 
 ioctlHandler::ioctlHandler(QString card, QString driver){
+    if(card.isEmpty() || driver.isEmpty())
+        return;
+
+    // Open file descriptor to card device
     const char * path = ("/dev/dri/" + card).toStdString().c_str();
     qDebug() << "Opening" << path << "for IOCTLs with driver" << driver;
     fd = open(path, O_RDONLY);
@@ -44,6 +48,7 @@ ioctlHandler::ioctlHandler(QString card, QString driver){
         return;
     }
 
+    // Initialize ioctl codes
     if(driver=="radeon"){
         // http://lxr.free-electrons.com/source/include/uapi/drm/radeon_drm.h#L993
         // http://lxr.free-electrons.com/source/drivers/gpu/drm/radeon/radeon_kms.c#L203
@@ -82,11 +87,35 @@ ioctlHandler::ioctlHandler(QString card, QString driver){
             UNAVAILABLE
         };
     }
+
+    // Try drm authorization to card device, to allow non-root ioctls
+    // https://en.wikipedia.org/wiki/Direct_Rendering_Manager#DRM-Master_and_DRM-Auth
+    // https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=15
+    // Works only if DRM master, never true since this is a graphical application and the DRM master will be the display server
+    // It might work in radeon-profile-daemon
+    drm_auth_t auth;
+    if(ioctl(fd, DRM_IOCTL_GET_MAGIC, &auth) || ioctl(fd, DRM_IOCTL_AUTH_MAGIC, &auth))
+        DESCRIBE_ERROR("auth_magic");
 }
 
 
 bool ioctlHandler::isValid(){
-    return (fd >= 0) && ((codes.request==DRM_IOCTL_RADEON_INFO) || ((codes.request==DRM_IOCTL_AMDGPU_INFO)));
+    if(fd < 0){
+        qDebug() << "Ioctl: file descriptor not available";
+        return false;
+    }
+
+    if((codes.request != DRM_IOCTL_RADEON_INFO) && (codes.request != DRM_IOCTL_AMDGPU_INFO)){
+        qDebug() << "Ioctl: request code not available";
+        return false;
+    }
+
+    if(ioctl(fd, codes.request) && (errno == EACCES)){
+        qDebug() << "Ioctl: drm authentication failed and no root access";
+        return false;
+    }
+
+    return true;
 }
 
 
