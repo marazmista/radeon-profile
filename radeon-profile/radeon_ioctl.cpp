@@ -188,32 +188,32 @@ bool ioctlHandler::getValue(void *data, unsigned dataSize, unsigned command){
 
 
 bool ioctlHandler::getTemperature(int *data){
-    return (codes.temperature != UNAVAILABLE) && getValue(data, sizeof(data), codes.temperature);
+    return (codes.temperature != UNAVAILABLE) && getValue(data, sizeof(*data), codes.temperature);
 }
 
 
 bool ioctlHandler::getCoreClock(unsigned *data){
-    return (codes.coreClock != UNAVAILABLE) && getValue(data, sizeof(data), codes.coreClock);
+    return (codes.coreClock != UNAVAILABLE) && getValue(data, sizeof(*data), codes.coreClock);
 }
 
 
 bool ioctlHandler::getMaxCoreClock(unsigned *data){
-    return (codes.maxCoreClock != UNAVAILABLE) && getValue(data, sizeof(data), codes.maxCoreClock);
+    return (codes.maxCoreClock != UNAVAILABLE) && getValue(data, sizeof(*data), codes.maxCoreClock);
 }
 
 
 bool ioctlHandler::getMemoryClock(unsigned *data){
-    return (codes.memoryClock != UNAVAILABLE) && getValue(data, sizeof(data), codes.memoryClock);
+    return (codes.memoryClock != UNAVAILABLE) && getValue(data, sizeof(*data), codes.memoryClock);
 }
 
 
 bool ioctlHandler::getVramUsage(unsigned long *data){
-    return (codes.vramUsage != UNAVAILABLE) && getValue(data, sizeof(data), codes.vramUsage);
+    return (codes.vramUsage != UNAVAILABLE) && getValue(data, sizeof(*data), codes.vramUsage);
 }
 
 
 bool ioctlHandler::readRegistry(unsigned *data){
-    return (codes.registry != UNAVAILABLE) && getValue(data, sizeof(data), codes.registry);
+    return (codes.registry != UNAVAILABLE) && getValue(data, sizeof(*data), codes.registry);
 }
 
 
