@@ -3,7 +3,7 @@
 
 #ifdef NO_IOCTL
 
-ioctlHandler::ioctlHandler(QString card, QString driver){Q_UNUSED(card);Q_UNUSED(driver);}
+ioctlHandler::ioctlHandler(unsigned card, QString driver){Q_UNUSED(card);Q_UNUSED(driver);}
 ioctlHandler::~ioctlHandler(){}
 bool ioctlHandler::isValid(){return false;}
 bool ioctlHandler::getTemperature(int *data){return false; Q_UNUSED(data);}
