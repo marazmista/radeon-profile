@@ -16,6 +16,15 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){r
 
 #else
 
+#ifdef __has_include
+#  if !__has_include("drm/radeon_drm.h")
+#    error radeon_drm.h is not available! Install it or compile with the flag -DNO_IOCTL
+#  endif
+#  if !__has_include("drm/amdgpu_drm.h")
+#    error amdgpu_drm.h is not available! Install it or compile with the flag -DNO_IOCTL
+#  endif
+#endif
+
 #include <QFile>
 #include <QString>
 #include <QDebug>
