@@ -44,8 +44,10 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
     /* Open file descriptor to card device
      * Information ioctls can be accessed in two ways:
      * The kernel generates for the card with index N the files /dev/dri/card<N> and /dev/dri/renderD<128+N>
-     * Opening /dev/dri/card<N> requires either root access or being DRM Master
-     * Opening /dev/dri/renderD<128+N> does not require these permissions, but legacy kernels do not support it
+     * Both can be opened without root access
+     * Executing ioctls on /dev/dri/card<N> requires either root access or being DRM Master
+     * /dev/dri/renderD<128+N> does not require these permissions, but legacy kernels do not support it
+     * For more details:
      * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#DRM-Master_and_DRM-Auth
      * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#Render_nodes
      * https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=15
@@ -68,13 +70,13 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
             return;
         }
 
-        /* Try drm authorization to card device, to allow non-root ioctls
-         * Works only if DRM master
+        /* Try drm authorization to card device, to allow non-root ioctls if the process is DRM master
          * Won't work in radeon-profile since as graphical app the DRM master will be the display server
-         * But it might work in radeon-profile-daemon */
+         * But it might work in radeon-profile-daemon
         drm_auth_t auth;
         if(ioctl(fd, DRM_IOCTL_GET_MAGIC, &auth) || ioctl(fd, DRM_IOCTL_AUTH_MAGIC, &auth))
             DESCRIBE_ERROR("auth_magic");
+        */
     }
 
     // Initialize ioctl codes
@@ -142,23 +144,28 @@ ioctlHandler::~ioctlHandler(){
 
 
 bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){
-#define REGISTRY_ADDRESS 0x8010 // http://support.amd.com/TechDocs/46142.pdf#page=246
+    /* Sample the GPU status register N times and check how many of these samples have the GPU busy
+     * Register documentation:
+     * http://support.amd.com/TechDocs/46142.pdf#page=246   (address 0x8010, 31st bit)
+     */
+#define REGISTRY_ADDRESS 0x8010
 #define REGISTRY_MASK 1<<31
 #define ONE_SECOND 1000000
     const unsigned int sleep = ONE_SECOND/frequency;
     unsigned int remaining, activeCount = 0, totalCount = 0, buffer;
-    for(remaining = time; (remaining > 0) && (remaining <= time); remaining -= (sleep - usleep(sleep)), totalCount++){
+    for(remaining = time; (remaining > 0) && (remaining <= time); // Cycle until the time has finished
+            remaining -= (sleep - usleep(sleep)), totalCount++){ // On each cycle sleep and subtract the slept time from the remaining
         buffer = REGISTRY_ADDRESS;
         bool success = readRegistry(&buffer);
 
-        if(!success)
+        if(Q_UNLIKELY(!success)) // Read failed
             return false;
 
-        if(REGISTRY_MASK & buffer)
+        if(REGISTRY_MASK & buffer) // Check if the activity bit is 1
             activeCount++;
     }
 
-    if(totalCount == 0)
+    if(Q_UNLIKELY(totalCount == 0))
         return false;
 
     *data = (100.0f * activeCount) / totalCount;
@@ -196,7 +203,7 @@ bool ioctlHandler::getValue(void *data, unsigned dataSize, unsigned command){
         return false;
     }
 
-    if(!success)
+    if(Q_UNLIKELY(!success))
         DESCRIBE_ERROR("ioctl");
 
     return success;
