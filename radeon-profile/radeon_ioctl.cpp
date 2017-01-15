@@ -16,12 +16,16 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){r
 
 #else
 
-#ifdef __has_include
-#  if !__has_include("drm/radeon_drm.h")
-#    error radeon_drm.h is not available! Install it or compile with the flag -DNO_IOCTL
+// NO_IOCTL is not defined, drm headers must be available for compilation
+
+#ifdef __has_include // If the compiler supports the __has_include macro (clang or gcc>=5.0)
+#  if !__has_include(<drm/radeon_drm.h>)
+#    error radeon_drm.h is not available! Install kernel headers or compile with the flag -DNO_IOCTL
 #  endif
-#  if !__has_include("drm/amdgpu_drm.h")
-#    error amdgpu_drm.h is not available! Install it or compile with the flag -DNO_IOCTL
+#  ifndef NO_AMDGPU_IOCTL
+#    if !__has_include(<drm/amdgpu_drm.h>) // Available only in Linux 4.2 and above
+#      error amdgpu_drm.h is not available! Install kernel headers or compile with the flag -DNO_AMDGPU_IOCTL
+#    endif
 #  endif
 #endif
 
@@ -29,17 +33,19 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){r
 #include <QString>
 #include <QDebug>
 
-#include <cstring>
-#include <cstdio>
-#include <cerrno>
+#include <cstring> // memset(), strerror()
+#include <cstdio> // snprintf()
+#include <cerrno> // errno
+#include <unistd.h> // close(), usleep()
+#include <fcntl.h> // open()
+#include <sys/ioctl.h> // ioctl()
 
-extern "C" {
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <drm/radeon_drm.h> // http://lxr.free-electrons.com/source/include/uapi/drm/radeon_drm.h#L993
-#include <drm/amdgpu_drm.h> // http://lxr.free-electrons.com/source/include/uapi/drm/amdgpu_drm.h#L441
-}
+#include <drm/radeon_drm.h> // radeon ioctl codes and structs
+#ifndef NO_AMDGPU_IOCTL
+#  include <drm/amdgpu_drm.h> // amdgpu ioctl codes and structs
+#endif
+
+// Macros
 
 #define DESCRIBE_ERROR(title) qWarning() << (title) << ':' << strerror(errno)
 #define CLEAN(object) memset(&(object), 0, sizeof(object))
@@ -100,9 +106,11 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
         codes.vramUsage = RADEON_INFO_VRAM_USAGE;
         codes.vramSize = UNAVAILABLE;
         codes.registry = RADEON_INFO_READ_REG;
-    } else if (driver == "amdgpu") {
-        // http://lxr.free-electrons.com/source/include/uapi/drm/amdgpu_drm.h#L441
-        // http://lxr.free-electrons.com/source/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#L212
+    }
+#ifdef __AMDGPU_DRM_H__
+    else if (driver == "amdgpu") {
+        // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/amdgpu_drm.h#n471
+        // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#n212
         codes.request = DRM_IOCTL_AMDGPU_INFO;
         codes.temperature = UNAVAILABLE;
         codes.coreClock = UNAVAILABLE;
@@ -111,7 +119,9 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
         codes.vramUsage = AMDGPU_INFO_VRAM_USAGE;
         codes.vramSize = AMDGPU_INFO_VRAM_GTT;
         codes.registry = AMDGPU_INFO_READ_MMR_REG;
-    } else {
+    }
+#endif
+       else {
         codes = {
             UNAVAILABLE,
             UNAVAILABLE,
@@ -132,7 +142,7 @@ bool ioctlHandler::isValid(){
         return false;
     }
 
-    if((codes.request != DRM_IOCTL_RADEON_INFO) && (codes.request != DRM_IOCTL_AMDGPU_INFO)){
+    if(codes.request == UNAVAILABLE){
         qDebug() << "Ioctl: request code not available";
         return false;
     }
@@ -197,6 +207,7 @@ bool ioctlHandler::getValue(void *data, unsigned dataSize, unsigned command){
         break;
     }
 
+#ifdef __AMDGPU_DRM_H__
     case DRM_IOCTL_AMDGPU_INFO:{ // Amdgpu driver
         struct drm_amdgpu_info buffer;
         CLEAN(buffer);
@@ -206,6 +217,9 @@ bool ioctlHandler::getValue(void *data, unsigned dataSize, unsigned command){
         success = !ioctl(fd, codes.request, &buffer);
         break;
     }
+#else
+        Q_UNUSED(dataSize)
+#endif
 
     default: // Unknown driver or not initialized
         qWarning("ioctlHandler not initialized correctly");
@@ -250,17 +264,24 @@ bool ioctlHandler::readRegistry(unsigned *data){
 
 
 bool ioctlHandler::getVramSize(unsigned long *data){
-    bool success = false;
-
-    if(codes.vramSize == AMDGPU_INFO_VRAM_GTT){
+    switch(codes.vramSize){
+#ifdef __AMDGPU_DRM_H__
+    case AMDGPU_INFO_VRAM_GTT:{
         struct drm_amdgpu_info_vram_gtt info;
         CLEAN(info);
         bool success = getValue(&info, sizeof(info), codes.vramSize);
         if(success)
             *data = info.vram_size;
+        return success;
     }
+#endif
 
-    return success;
+    case UNAVAILABLE:
+        return false;
+
+    default:
+        return getValue(data, sizeof(*data), codes.vramSize);
+    }
 }
 
 
