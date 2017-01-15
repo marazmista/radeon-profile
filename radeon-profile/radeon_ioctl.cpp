@@ -1,7 +1,7 @@
 #include "radeon_ioctl.h"
 
 
-#ifdef NO_IOCTL
+#ifdef NO_IOCTL // Do not compile ioctl functions (useful if kernel headers can't be installed)
 
 ioctlHandler::ioctlHandler(unsigned card, QString driver){Q_UNUSED(card);Q_UNUSED(driver);}
 ioctlHandler::~ioctlHandler(){}
@@ -12,7 +12,12 @@ bool ioctlHandler::getMemoryClock(unsigned *data){return false; Q_UNUSED(data);}
 bool ioctlHandler::getMaxCoreClock(unsigned *data){return false; Q_UNUSED(data);}
 bool ioctlHandler::getVramUsage(unsigned long *data){return false; Q_UNUSED(data);}
 bool ioctlHandler::getVramSize(unsigned long *data){return false; Q_UNUSED(data);}
-bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){return false; Q_UNUSED(data);Q_UNUSED(time);Q_UNUSED(frequency);}
+bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){
+    return false;
+    Q_UNUSED(data);
+    Q_UNUSED(time);
+    Q_UNUSED(frequency);
+}
 
 #else
 
@@ -29,7 +34,8 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){r
 #  endif
 #endif
 
-#include <QFile>
+// Includes
+
 #include <QString>
 #include <QDebug>
 
@@ -51,6 +57,8 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){r
 #define CLEAN(object) memset(&(object), 0, sizeof(object))
 #define UNAVAILABLE 0
 #define PATH_SIZE 20
+
+// Class functions
 
 ioctlHandler::ioctlHandler(unsigned card, QString driver){
     if(driver.isEmpty())
@@ -96,8 +104,8 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
 
     // Initialize ioctl codes
     if(driver=="radeon"){
-        // http://lxr.free-electrons.com/source/include/uapi/drm/radeon_drm.h#L993
-        // http://lxr.free-electrons.com/source/drivers/gpu/drm/radeon/radeon_kms.c#L203
+        // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/radeon_drm.h#n993
+        // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/radeon_kms.c#n203
         codes.request = DRM_IOCTL_RADEON_INFO;
         codes.temperature = RADEON_INFO_CURRENT_GPU_TEMP;
         codes.coreClock = RADEON_INFO_CURRENT_GPU_SCLK;
@@ -113,9 +121,16 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#n212
         codes.request = DRM_IOCTL_AMDGPU_INFO;
         codes.temperature = UNAVAILABLE;
+
+#  ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Available only in Linux 4.10 and above
+        codes.coreClock = AMDGPU_INFO_VCE_CLOCK_TABLE;
+        codes.memoryClock = AMDGPU_INFO_VCE_CLOCK_TABLE;
+#  else
         codes.coreClock = UNAVAILABLE;
-        codes.maxCoreClock = UNAVAILABLE;
         codes.memoryClock = UNAVAILABLE;
+#  endif
+
+        codes.maxCoreClock = UNAVAILABLE;
         codes.vramUsage = AMDGPU_INFO_VRAM_USAGE;
         codes.vramSize = AMDGPU_INFO_VRAM_GTT;
         codes.registry = AMDGPU_INFO_READ_MMR_REG;
@@ -239,7 +254,23 @@ bool ioctlHandler::getTemperature(int *data){
 
 
 bool ioctlHandler::getCoreClock(unsigned *data){
-    return (codes.coreClock != UNAVAILABLE) && getValue(data, sizeof(*data), codes.coreClock);
+    switch(codes.coreClock){
+#ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Implicit: ifdef __AMDGPU_DRM_H__
+    case AMDGPU_INFO_VCE_CLOCK_TABLE:{
+        drm_amdgpu_info_vce_clock_table table;
+        bool success = getValue(&table, sizeof(table), codes.coreClock);
+        if(success && table.num_valid_entries > 0)
+            *data = table.entries[0].sclk;
+        return success;
+    }
+#endif
+
+    case UNAVAILABLE:
+        return false;
+
+    default:
+        return getValue(data, sizeof(*data), codes.coreClock);
+    }
 }
 
 
@@ -249,7 +280,23 @@ bool ioctlHandler::getMaxCoreClock(unsigned *data){
 
 
 bool ioctlHandler::getMemoryClock(unsigned *data){
-    return (codes.memoryClock != UNAVAILABLE) && getValue(data, sizeof(*data), codes.memoryClock);
+    switch(codes.memoryClock){
+#ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Implicit: ifdef __AMDGPU_DRM_H__
+    case AMDGPU_INFO_VCE_CLOCK_TABLE:{
+        drm_amdgpu_info_vce_clock_table table;
+        bool success = getValue(&table, sizeof(table), codes.memoryClock);
+        if(success && table.num_valid_entries > 0)
+            *data = table.entries[0].mclk;
+        return success;
+    }
+#endif
+
+    case UNAVAILABLE:
+        return false;
+
+    default:
+        return getValue(data, sizeof(*data), codes.memoryClock);
+    }
 }
 
 
