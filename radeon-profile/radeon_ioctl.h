@@ -19,6 +19,7 @@ private:
      * @brief The ioctlCodes struct contains all query codes needed to execute the ioctls.
      */
     struct ioctlCodes{
+#define UNAVAILABLE 0
         unsigned request, /**< Identifies the driver to query (radeon/amdgpu). */
             temperature, /**< Temperature ioctl request. */
             coreClock, /**< SCLK ioctl request. */
@@ -27,6 +28,18 @@ private:
             vramUsage, /**< VRAM usage ioctl request. */
             vramSize, /**< VRAM total size ioctl request. */
             registry; /**< Registry read ioctl request .*/
+
+        /** @brief Create an empty struct (all codes initialized to UNAVAILABLE). */
+        ioctlCodes(){
+            request = UNAVAILABLE;
+            temperature = UNAVAILABLE;
+            coreClock = UNAVAILABLE;
+            maxCoreClock = UNAVAILABLE;
+            memoryClock = UNAVAILABLE;
+            vramUsage = UNAVAILABLE;
+            vramSize = UNAVAILABLE;
+            registry = UNAVAILABLE;
+        }
     } codes; /**< Contains available query codes. */
 
 

@@ -1,44 +1,18 @@
-#include "radeon_ioctl.h"
-
-
-#ifdef NO_IOCTL // Do not compile ioctl functions (useful if kernel headers can't be installed)
-
-ioctlHandler::ioctlHandler(unsigned card, QString driver){Q_UNUSED(card);Q_UNUSED(driver);}
-ioctlHandler::~ioctlHandler(){}
-bool ioctlHandler::isValid(){return false;}
-bool ioctlHandler::getTemperature(int *data){return false; Q_UNUSED(data);}
-bool ioctlHandler::getCoreClock(unsigned *data){return false; Q_UNUSED(data);}
-bool ioctlHandler::getMemoryClock(unsigned *data){return false; Q_UNUSED(data);}
-bool ioctlHandler::getMaxCoreClock(unsigned *data){return false; Q_UNUSED(data);}
-bool ioctlHandler::getVramUsage(unsigned long *data){return false; Q_UNUSED(data);}
-bool ioctlHandler::getVramSize(unsigned long *data){return false; Q_UNUSED(data);}
-bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){
-    return false;
-    Q_UNUSED(data);
-    Q_UNUSED(time);
-    Q_UNUSED(frequency);
-}
-
-#else
-
-// NO_IOCTL is not defined, drm headers must be available for compilation
-
 #ifdef __has_include // If the compiler supports the __has_include macro (clang or gcc>=5.0)
-#  if !__has_include(<drm/radeon_drm.h>)
-#    error radeon_drm.h is not available! Install kernel headers or compile with the flag -DNO_IOCTL
+#  if !__has_include(<libdrm/radeon_drm.h>)
+#    error radeon_drm.h is not available! Install libdrm headers or compile with the flag -DNO_IOCTL
 #  endif
 #  ifndef NO_AMDGPU_IOCTL
-#    if !__has_include(<drm/amdgpu_drm.h>) // Available only in Linux 4.2 and above
-#      error amdgpu_drm.h is not available! Install kernel headers or compile with the flag -DNO_AMDGPU_IOCTL
+#    if !__has_include(<libdrm/amdgpu_drm.h>) // Amdgpu is available only in Linux 4.2 and above
+#      error amdgpu_drm.h is not available! Install libdrm headers or compile with the flag -DNO_AMDGPU_IOCTL
 #    endif
 #  endif
 #endif
 
-// Includes
 
+#include "radeon_ioctl.h"
 #include <QString>
 #include <QDebug>
-
 #include <cstring> // memset(), strerror()
 #include <cstdio> // snprintf()
 #include <cerrno> // errno
@@ -46,21 +20,26 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){
 #include <fcntl.h> // open()
 #include <sys/ioctl.h> // ioctl()
 
-#include <drm/radeon_drm.h> // radeon ioctl codes and structs
-#ifndef NO_AMDGPU_IOCTL
-#  include <drm/amdgpu_drm.h> // amdgpu ioctl codes and structs
+#ifndef NO_IOCTL // Useful if libdrm headers can't be installed
+#  include <libdrm/radeon_drm.h> // radeon ioctl codes and structs
+#  ifndef NO_AMDGPU_IOCTL
+#    include <libdrm/amdgpu_drm.h> // amdgpu ioctl codes and structs
+#  endif
 #endif
 
-// Macros
 
 #define DESCRIBE_ERROR(title) qWarning() << (title) << ':' << strerror(errno)
 #define CLEAN(object) memset(&(object), 0, sizeof(object))
-#define UNAVAILABLE 0
 #define PATH_SIZE 20
 
-// Class functions
 
 ioctlHandler::ioctlHandler(unsigned card, QString driver){
+#ifdef NO_IOCTL
+    fd = -1;
+    codes = ioctlCodes();
+    return;
+#endif
+
     if(driver.isEmpty())
         return;
 
@@ -103,6 +82,7 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
     }
 
     // Initialize ioctl codes
+#ifdef __RADEON_DRM_H__
     if(driver=="radeon"){
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/radeon_drm.h#n993
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/radeon_kms.c#n203
@@ -114,40 +94,28 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
         codes.vramUsage = RADEON_INFO_VRAM_USAGE;
         codes.vramSize = UNAVAILABLE;
         codes.registry = RADEON_INFO_READ_REG;
-    }
+    } else
+#endif // __RADEON_DRM_H__
 #ifdef __AMDGPU_DRM_H__
-    else if (driver == "amdgpu") {
+    if (driver == "amdgpu") {
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/amdgpu_drm.h#n471
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#n212
         codes.request = DRM_IOCTL_AMDGPU_INFO;
         codes.temperature = UNAVAILABLE;
-
 #  ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Available only in Linux 4.10 and above
         codes.coreClock = AMDGPU_INFO_VCE_CLOCK_TABLE;
         codes.memoryClock = AMDGPU_INFO_VCE_CLOCK_TABLE;
 #  else
         codes.coreClock = UNAVAILABLE;
         codes.memoryClock = UNAVAILABLE;
-#  endif
-
+#  endif // AMDGPU_INFO_VCE_CLOCK_TABLE
         codes.maxCoreClock = UNAVAILABLE;
         codes.vramUsage = AMDGPU_INFO_VRAM_USAGE;
         codes.vramSize = AMDGPU_INFO_VRAM_GTT;
         codes.registry = AMDGPU_INFO_READ_MMR_REG;
-    }
-#endif
-       else {
-        codes = {
-            UNAVAILABLE,
-            UNAVAILABLE,
-            UNAVAILABLE,
-            UNAVAILABLE,
-            UNAVAILABLE,
-            UNAVAILABLE,
-            UNAVAILABLE,
-            UNAVAILABLE
-        };
-    }
+    } else
+#endif // __AMDGPU_DRM_H__
+    codes = ioctlCodes();
 }
 
 
@@ -172,7 +140,7 @@ bool ioctlHandler::isValid(){
 
 
 ioctlHandler::~ioctlHandler(){
-    if(close(fd))
+    if((fd >= 0) && close(fd))
         DESCRIBE_ERROR("fd close");
 }
 
@@ -210,17 +178,19 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency){
 
 
 bool ioctlHandler::getValue(void *data, unsigned dataSize, unsigned command){
-    bool success = false;
-
     switch(codes.request){
+#ifdef __RADEON_DRM_H__
     case DRM_IOCTL_RADEON_INFO:{ // Radeon driver
         struct drm_radeon_info buffer;
         CLEAN(buffer);
         buffer.request = command;
         buffer.value = (uint64_t)data;
-        success = !ioctl(fd, codes.request, &buffer);
-        break;
+        bool success = !ioctl(fd, codes.request, &buffer);
+        if(Q_UNLIKELY(!success))
+            DESCRIBE_ERROR("ioctl");
+        return success;
     }
+#endif // __RADEON_DRM_H__
 
 #ifdef __AMDGPU_DRM_H__
     case DRM_IOCTL_AMDGPU_INFO:{ // Amdgpu driver
@@ -229,22 +199,21 @@ bool ioctlHandler::getValue(void *data, unsigned dataSize, unsigned command){
         buffer.query = command;
         buffer.return_pointer = (uint64_t)data;
         buffer.return_size = dataSize;
-        success = !ioctl(fd, codes.request, &buffer);
-        break;
+        bool success = !ioctl(fd, codes.request, &buffer);
+        if(Q_UNLIKELY(!success))
+            DESCRIBE_ERROR("ioctl");
+        return success;
     }
 #else
-        Q_UNUSED(dataSize)
-#endif
+    Q_UNUSED(data)
+    Q_UNUSED(command)
+    Q_UNUSED(dataSize)
+#endif // __AMDGPU_DRM_H__
 
     default: // Unknown driver or not initialized
         qWarning("ioctlHandler not initialized correctly");
         return false;
     }
-
-    if(Q_UNLIKELY(!success))
-        DESCRIBE_ERROR("ioctl");
-
-    return success;
 }
 
 
@@ -255,7 +224,7 @@ bool ioctlHandler::getTemperature(int *data){
 
 bool ioctlHandler::getCoreClock(unsigned *data){
     switch(codes.coreClock){
-#ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Implicit: ifdef __AMDGPU_DRM_H__
+#ifdef AMDGPU_INFO_VCE_CLOCK_TABLE
     case AMDGPU_INFO_VCE_CLOCK_TABLE:{
         drm_amdgpu_info_vce_clock_table table;
         bool success = getValue(&table, sizeof(table), codes.coreClock);
@@ -263,7 +232,7 @@ bool ioctlHandler::getCoreClock(unsigned *data){
             *data = table.entries[0].sclk;
         return success;
     }
-#endif
+#endif // AMDGPU_INFO_VCE_CLOCK_TABLE
 
     case UNAVAILABLE:
         return false;
@@ -281,7 +250,7 @@ bool ioctlHandler::getMaxCoreClock(unsigned *data){
 
 bool ioctlHandler::getMemoryClock(unsigned *data){
     switch(codes.memoryClock){
-#ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Implicit: ifdef __AMDGPU_DRM_H__
+#ifdef AMDGPU_INFO_VCE_CLOCK_TABLE
     case AMDGPU_INFO_VCE_CLOCK_TABLE:{
         drm_amdgpu_info_vce_clock_table table;
         bool success = getValue(&table, sizeof(table), codes.memoryClock);
@@ -289,7 +258,7 @@ bool ioctlHandler::getMemoryClock(unsigned *data){
             *data = table.entries[0].mclk;
         return success;
     }
-#endif
+#endif // AMDGPU_INFO_VCE_CLOCK_TABLE
 
     case UNAVAILABLE:
         return false;
@@ -331,5 +300,3 @@ bool ioctlHandler::getVramSize(unsigned long *data){
     }
 }
 
-
-#endif
