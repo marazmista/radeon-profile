@@ -1,13 +1,18 @@
-#ifdef __has_include // If the compiler supports the __has_include macro (clang or gcc>=5.0)
-#  if !__has_include(<libdrm/radeon_drm.h>)
-#    error radeon_drm.h is not available! Install libdrm headers or compile with the flag -DNO_IOCTL
-#  endif
-#  ifndef NO_AMDGPU_IOCTL
-#    if !__has_include(<libdrm/amdgpu_drm.h>) // Amdgpu is available only in Linux 4.2 and above
-#      error amdgpu_drm.h is not available! Install libdrm headers or compile with the flag -DNO_AMDGPU_IOCTL
-#    endif
-#  endif // NO_AMDGPU_IOCTL
-#endif // __has_include
+// Define NO _IOCTL if libdrm headers can't be installed (all ioctl functions will return failure)
+// Define NO_AMDGPU_IOCTL if libdrm headers  are installed but amdgpu is not available (Linux < 4.2)
+
+#ifndef NO_IOCTL // Check if libdrm headers are available only if NO_IOCTL is not defined ...
+#  ifdef __has_include // ... and the compiler supports the __has_include macro (clang or gcc>=5.0)
+#    if !__has_include(<libdrm/radeon_drm.h>)
+#      error radeon_drm.h is not available! Install libdrm headers or compile with the flag -DNO_IOCTL
+#    endif // radeon_drm.h
+#    ifndef NO_AMDGPU_IOCTL // Search the amdgpu drm header only if NO_AMDGPU_IOCTL is not defined
+#      if !__has_include(<libdrm/amdgpu_drm.h>)
+#        error amdgpu_drm.h is not available! Install libdrm headers or compile with the flag -DNO_AMDGPU_IOCTL
+#      endif // amdgpu_drm.h
+#    endif // NO_AMDGPU_IOCTL
+#  endif // __has_include
+#endif // NO_IOCTL
 
 
 #include "radeon_ioctl.h"
@@ -20,7 +25,7 @@
 #include <fcntl.h> // open()
 #include <sys/ioctl.h> // ioctl()
 
-#ifndef NO_IOCTL // Useful if libdrm headers can't be installed
+#ifndef NO_IOCTL // Include libdrm headers only if NO_IOCTL is not defined
 #  include <libdrm/radeon_drm.h> // radeon ioctl codes and structs
 #  ifndef NO_AMDGPU_IOCTL
 #    include <libdrm/amdgpu_drm.h> // amdgpu ioctl codes and structs
