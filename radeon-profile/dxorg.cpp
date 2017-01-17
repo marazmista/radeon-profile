@@ -116,7 +116,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 
     /* Example IOCTLs
     unsigned index = gpuName[4].toLatin1() - '0';
-    ioctlHandler ioctls(index, dXorg::driverModuleName);
+    ioctlHandler ioctls(index);
     if(ioctls.isValid()){
         int i;
         unsigned u;

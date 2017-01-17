@@ -33,15 +33,15 @@
 #define PATH_SIZE 20
 
 
-ioctlHandler::ioctlHandler(unsigned card, QString driver){
-#ifdef NO_IOCTL
-    fd = -1;
+ioctlHandler::ioctlHandler(unsigned card){
     codes = ioctlCodes();
-    return;
-#endif
 
-    if(driver.isEmpty())
-        return;
+#ifdef NO_IOCTL
+    qWarning() << "radeon profile was compiled with NO_IOCTL, ioctls won't work";
+    fd = -1;
+    return;
+#endif // NO_IOCTL
+
 
     /* Open file descriptor to card device
      * Information ioctls can be accessed in two ways:
@@ -57,14 +57,14 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
      // Try /dev/dri/renderD<128+N>
     char path[PATH_SIZE];
     snprintf(path, PATH_SIZE, "/dev/dri/renderD%u", 128+card);
-    qDebug() << "Opening" << path << "for IOCTLs with driver" << driver;
+    qDebug() << "Opening" << path << "for ioctls";
     fd = open(path, O_RDONLY);
     if(fd < 0){
         DESCRIBE_ERROR("fd open");
 
         // /dev/dri/renderD<128+N> not available, try /dev/dri/card<N>
         snprintf(path, PATH_SIZE, "/dev/dri/card%u", card);
-        qDebug() << "Opening" << path << "for IOCTLs with driver" << driver;
+        qDebug() << "Opening" << path << "for ioctls";
         fd = open(path, O_RDONLY);
         if(fd < 0){
             DESCRIBE_ERROR("fd open");
@@ -82,6 +82,9 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
     }
 
     // Initialize ioctl codes
+    QString driver = getDriverName();
+    qDebug() << "Initializing codes for driver " << driver;
+
 #ifdef __RADEON_DRM_H__
     if(driver=="radeon"){
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/radeon_drm.h#n993
@@ -92,30 +95,46 @@ ioctlHandler::ioctlHandler(unsigned card, QString driver){
         codes.maxCoreClock = RADEON_INFO_MAX_SCLK;
         codes.memoryClock = RADEON_INFO_CURRENT_GPU_MCLK;
         codes.vramUsage = RADEON_INFO_VRAM_USAGE;
-        codes.vramSize = UNAVAILABLE;
         codes.registry = RADEON_INFO_READ_REG;
-    } else
+    }
 #endif // __RADEON_DRM_H__
+
 #ifdef __AMDGPU_DRM_H__
     if (driver == "amdgpu") {
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/amdgpu_drm.h#n471
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#n212
         codes.request = DRM_IOCTL_AMDGPU_INFO;
-        codes.temperature = UNAVAILABLE;
 #  ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Available only in Linux 4.10 and above
         codes.coreClock = AMDGPU_INFO_VCE_CLOCK_TABLE;
         codes.memoryClock = AMDGPU_INFO_VCE_CLOCK_TABLE;
-#  else
-        codes.coreClock = UNAVAILABLE;
-        codes.memoryClock = UNAVAILABLE;
 #  endif // AMDGPU_INFO_VCE_CLOCK_TABLE
-        codes.maxCoreClock = UNAVAILABLE;
         codes.vramUsage = AMDGPU_INFO_VRAM_USAGE;
         codes.vramSize = AMDGPU_INFO_VRAM_GTT;
         codes.registry = AMDGPU_INFO_READ_MMR_REG;
-    } else
+    }
 #endif // __AMDGPU_DRM_H__
-    codes = ioctlCodes();
+}
+
+
+QString ioctlHandler::getDriverName(){
+    if(fd < 0)
+        return "";
+
+#define NAME_SIZE 10
+    char driver[NAME_SIZE] = "";
+
+#ifdef _DRM_H_
+    drm_version_t v;
+    CLEAN(v);
+    v.name = driver;
+    v.name_len = NAME_SIZE;
+    if(ioctl(fd, DRM_IOCTL_VERSION, &v)){
+        DESCRIBE_ERROR("ioctl version");
+        return "";
+    }
+#endif // _DRM_H_
+
+    return QString(driver);
 }
 
 

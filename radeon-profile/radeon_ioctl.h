@@ -66,9 +66,8 @@ public:
      * @note You can check if it worked out with isValid().
      * @param card Index of the card to be opened (for example 'card0' --> 0).
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
-     * @param driver Name of the driver ("radeon"/"amdgpu").
      */
-    ioctlHandler(unsigned card, QString driver);
+    ioctlHandler(unsigned card);
 
     /**
      * @brief Close the communication with the device.
@@ -133,6 +132,12 @@ public:
      * @return Success.
      */
     bool getVramSize(unsigned long *data);
+
+    /**
+     * @brief Get the name of driver
+     * @return Driver name on success, empty on failure
+     */
+    QString getDriverName();
 
 };
 
