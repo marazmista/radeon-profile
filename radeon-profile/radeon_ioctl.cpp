@@ -127,6 +127,7 @@ ioctlHandler::ioctlHandler(unsigned card){
         codes.coreClock = AMDGPU_INFO_VCE_CLOCK_TABLE;
         codes.memoryClock = AMDGPU_INFO_VCE_CLOCK_TABLE;
 #  endif // AMDGPU_INFO_VCE_CLOCK_TABLE
+        codes.maxCoreClock = AMDGPU_INFO_DEV_INFO;
         codes.vramUsage = AMDGPU_INFO_VRAM_USAGE;
         codes.vramSize = AMDGPU_INFO_VRAM_GTT;
         codes.registry = AMDGPU_INFO_READ_MMR_REG;
@@ -264,7 +265,8 @@ bool ioctlHandler::getCoreClock(unsigned *data){
     switch(codes.coreClock){
 #ifdef AMDGPU_INFO_VCE_CLOCK_TABLE
     case AMDGPU_INFO_VCE_CLOCK_TABLE:{
-        drm_amdgpu_info_vce_clock_table table;
+        struct drm_amdgpu_info_vce_clock_table table;
+        CLEAN(table);
         bool success = getValue(&table, sizeof(table), codes.coreClock);
         if(success && table.num_valid_entries > 0)
             *data = table.entries[0].sclk;
@@ -282,7 +284,24 @@ bool ioctlHandler::getCoreClock(unsigned *data){
 
 
 bool ioctlHandler::getMaxCoreClock(unsigned *data){
-    return (codes.maxCoreClock != UNAVAILABLE) && getValue(data, sizeof(*data), codes.maxCoreClock);
+    switch (codes.maxCoreClock) {
+#ifdef __AMDGPU_DRM_H__
+    case AMDGPU_INFO_DEV_INFO:{
+        struct drm_amdgpu_info_device info;
+        CLEAN(info);
+        bool success = getValue(&info, sizeof(info), codes.maxCoreClock);
+        if(success)
+            *data = info.max_engine_clock;
+        return success;
+    }
+#endif // __AMDGPU_DRM_H__
+
+    case UNAVAILABLE:
+        return false;
+
+    default:
+        return getValue(data, sizeof(*data), codes.maxCoreClock);
+    }
 }
 
 
@@ -290,7 +309,8 @@ bool ioctlHandler::getMemoryClock(unsigned *data){
     switch(codes.memoryClock){
 #ifdef AMDGPU_INFO_VCE_CLOCK_TABLE
     case AMDGPU_INFO_VCE_CLOCK_TABLE:{
-        drm_amdgpu_info_vce_clock_table table;
+        struct drm_amdgpu_info_vce_clock_table table;
+        CLEAN(table);
         bool success = getValue(&table, sizeof(table), codes.memoryClock);
         if(success && table.num_valid_entries > 0)
             *data = table.entries[0].mclk;
