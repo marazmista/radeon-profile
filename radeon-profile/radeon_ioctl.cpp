@@ -6,8 +6,8 @@
 #    if !__has_include(<libdrm/amdgpu_drm.h>) // Amdgpu is available only in Linux 4.2 and above
 #      error amdgpu_drm.h is not available! Install libdrm headers or compile with the flag -DNO_AMDGPU_IOCTL
 #    endif
-#  endif
-#endif
+#  endif // NO_AMDGPU_IOCTL
+#endif // __has_include
 
 
 #include "radeon_ioctl.h"
@@ -30,7 +30,18 @@
 
 #define DESCRIBE_ERROR(title) qWarning() << (title) << ':' << strerror(errno)
 #define CLEAN(object) memset(&(object), 0, sizeof(object))
-#define PATH_SIZE 20
+
+
+ioctlHandler::ioctlCodes::ioctlCodes(){
+    request = UNAVAILABLE;
+    temperature = UNAVAILABLE;
+    coreClock = UNAVAILABLE;
+    maxCoreClock = UNAVAILABLE;
+    memoryClock = UNAVAILABLE;
+    vramUsage = UNAVAILABLE;
+    vramSize = UNAVAILABLE;
+    registry = UNAVAILABLE;
+}
 
 
 ioctlHandler::ioctlHandler(unsigned card){
@@ -55,6 +66,7 @@ ioctlHandler::ioctlHandler(unsigned card){
      * https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=15
      */
      // Try /dev/dri/renderD<128+N>
+#define PATH_SIZE 20
     char path[PATH_SIZE];
     snprintf(path, PATH_SIZE, "/dev/dri/renderD%u", 128+card);
     qDebug() << "Opening" << path << "for ioctls";
@@ -83,10 +95,11 @@ ioctlHandler::ioctlHandler(unsigned card){
 
     // Initialize ioctl codes
     QString driver = getDriverName();
-    qDebug() << "Initializing codes for driver " << driver;
+    qDebug() << "Initializing ioctl codes for driver " << driver;
 
 #ifdef __RADEON_DRM_H__
     if(driver=="radeon"){
+        // https://cgit.freedesktop.org/mesa/drm/tree/include/drm/radeon_drm.h#n993
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/radeon_drm.h#n993
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/radeon_kms.c#n203
         codes.request = DRM_IOCTL_RADEON_INFO;
@@ -101,6 +114,7 @@ ioctlHandler::ioctlHandler(unsigned card){
 
 #ifdef __AMDGPU_DRM_H__
     if (driver == "amdgpu") {
+        // https://cgit.freedesktop.org/mesa/drm/tree/include/drm/amdgpu_drm.h#n437
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/amdgpu_drm.h#n471
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#n212
         codes.request = DRM_IOCTL_AMDGPU_INFO;

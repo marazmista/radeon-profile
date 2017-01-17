@@ -30,16 +30,7 @@ private:
             registry; /**< Registry read ioctl request .*/
 
         /** @brief Create an empty struct (all codes initialized to UNAVAILABLE). */
-        ioctlCodes(){
-            request = UNAVAILABLE;
-            temperature = UNAVAILABLE;
-            coreClock = UNAVAILABLE;
-            maxCoreClock = UNAVAILABLE;
-            memoryClock = UNAVAILABLE;
-            vramUsage = UNAVAILABLE;
-            vramSize = UNAVAILABLE;
-            registry = UNAVAILABLE;
-        }
+        ioctlCodes();
     } codes; /**< Contains available query codes. */
 
 
