@@ -64,7 +64,7 @@ ioctlHandler::ioctlHandler(unsigned card){
      * The kernel generates for the card with index N the files /dev/dri/card<N> and /dev/dri/renderD<128+N>
      * Both can be opened without root access
      * Executing ioctls on /dev/dri/card<N> requires either root access or being DRM Master
-     * /dev/dri/renderD<128+N> does not require these permissions, but legacy kernels do not support it
+     * /dev/dri/renderD<128+N> does not require these permissions, but legacy kernels (Linux < 3.15) do not support it
      * For more details:
      * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#DRM-Master_and_DRM-Auth
      * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#Render_nodes
@@ -108,12 +108,14 @@ ioctlHandler::ioctlHandler(unsigned card){
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/radeon_drm.h#n993
         // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/radeon_kms.c#n203
         codes.request = DRM_IOCTL_RADEON_INFO;
+#ifdef RADEON_INFO_CURRENT_GPU_TEMP // Available only in Linux 4.1 and above
         codes.temperature = RADEON_INFO_CURRENT_GPU_TEMP;
         codes.coreClock = RADEON_INFO_CURRENT_GPU_SCLK;
-        codes.maxCoreClock = RADEON_INFO_MAX_SCLK;
         codes.memoryClock = RADEON_INFO_CURRENT_GPU_MCLK;
-        codes.vramUsage = RADEON_INFO_VRAM_USAGE;
         codes.registry = RADEON_INFO_READ_REG;
+#endif // RADEON_INFO_CURRENT_GPU_TEMP
+        codes.maxCoreClock = RADEON_INFO_MAX_SCLK;
+        codes.vramUsage = RADEON_INFO_VRAM_USAGE;
     }
 #endif // __RADEON_DRM_H__
 
