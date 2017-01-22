@@ -48,6 +48,18 @@ ioctlHandler::ioctlCodes::ioctlCodes(){
     registry = UNAVAILABLE;
 }
 
+int ioctlHandler::openPath(const char *prefix, unsigned index){
+#define PATH_SIZE 20
+    char path[PATH_SIZE];
+    snprintf(path, PATH_SIZE, "%s%u", prefix, index);
+    qDebug() << "Opening" << path << "for ioctls";
+
+    int res = open(path, O_RDONLY);
+    if(res < 0) // Open failed
+        DESCRIBE_ERROR(path);
+
+    return res;
+}
 
 ioctlHandler::ioctlHandler(unsigned card){
     codes = ioctlCodes();
@@ -70,32 +82,11 @@ ioctlHandler::ioctlHandler(unsigned card){
      * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#Render_nodes
      * https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=15
      */
-     // Try /dev/dri/renderD<128+N>
-#define PATH_SIZE 20
-    char path[PATH_SIZE];
-    snprintf(path, PATH_SIZE, "/dev/dri/renderD%u", 128+card);
-    qDebug() << "Opening" << path << "for ioctls";
-    fd = open(path, O_RDONLY);
-    if(fd < 0){
-        DESCRIBE_ERROR("fd open");
-
-        // /dev/dri/renderD<128+N> not available, try /dev/dri/card<N>
-        snprintf(path, PATH_SIZE, "/dev/dri/card%u", card);
-        qDebug() << "Opening" << path << "for ioctls";
-        fd = open(path, O_RDONLY);
-        if(fd < 0){
-            DESCRIBE_ERROR("fd open");
-            // /dev/dri/card<N> not available, initialization failed
-            return;
-        }
-
-        /* Try drm authorization to card device, to allow non-root ioctls if the process is DRM master
-         * Won't work in radeon-profile since as graphical app the DRM master will be the display server
-         * But it might work in radeon-profile-daemon
-        drm_auth_t auth;
-        if(ioctl(fd, DRM_IOCTL_GET_MAGIC, &auth) || ioctl(fd, DRM_IOCTL_AUTH_MAGIC, &auth))
-            DESCRIBE_ERROR("auth_magic");
-        */
+    fd = openPath("/dev/dri/renderD", 128+card); // Try /dev/dri/renderD<128+N>
+    if(fd < 0){ // /dev/dri/renderD<128+N> not available
+        fd = openPath("/dev/dri/card", card); // Try /dev/dri/card<N>
+        if(fd < 0) // /dev/dri/card<N> not available
+            return; // Initialization failed
     }
 
     // Initialize ioctl codes
@@ -172,7 +163,7 @@ bool ioctlHandler::isValid(){
     }
 
     if(ioctl(fd, codes.request) && (errno == EACCES)){
-        qDebug() << "Ioctl: drm authentication failed and no root access";
+        qDebug() << "Ioctl: drm render node not available and no root access";
         return false;
     }
 

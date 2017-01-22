@@ -50,6 +50,14 @@ private:
      */
     bool readRegistry(unsigned *data);
 
+    /**
+     * @brief Open a file descriptor to a file in the path $prefix$index
+     * @param prefix Text prefix of the file to open (for example '/dev/dri/card' or '/dev/dri/renderD')
+     * @param index Index to append to the prefix
+     * @return The file descriptor
+     */
+    int openPath(const char *prefix, unsigned index);
+
 
 public:
     /**
