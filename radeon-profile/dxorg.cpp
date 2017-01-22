@@ -3,7 +3,7 @@
 #include "dxorg.h"
 #include "gpu.h"
 
-#include "radeon_ioctl.h"
+#include "ioctlHandler.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -116,22 +116,30 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 
     /* Example IOCTLs
     unsigned index = gpuName[4].toLatin1() - '0';
-    ioctlHandler ioctls(index);
-    if(ioctls.isValid()){
+    ioctlHandler *ioctls;
+    if(dXorg::driverModuleName == "radeon")
+        ioctls = new radeonIoctlHandler(index);
+    else if(dXorg::driverModuleName == "amdgpu")
+        ioctls = new amdgpuIoctlHandler(index);
+    else
+        ioctls = NULL;
+
+    if(ioctls!=NULL && ioctls->isValid()){
         int i;
         unsigned u;
         unsigned long ul;
         float f;
 
         qDebug() << "Testing IOCTLs";
-        if(ioctls.getCoreClock(&u)) qDebug() << "Core clock:" << u << "MHz";
-        if(ioctls.getMaxCoreClock(&u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
-        if(ioctls.getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
-        if(ioctls.getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
-        if(ioctls.getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
-        if(ioctls.getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024 << "KB";
-        if(ioctls.getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
-
+        qDebug() << "Driver: " << ioctls->getDriverName();
+        if(ioctls->getCoreClock(&u)) qDebug() << "Core clock:" << u << "MHz";
+        if(ioctls->getMaxCoreClock(&u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
+        if(ioctls->getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
+        if(ioctls->getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
+        if(ioctls->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
+        if(ioctls->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024 << "KB";
+        if(ioctls->getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
+        delete ioctls;
     }
     */
 
