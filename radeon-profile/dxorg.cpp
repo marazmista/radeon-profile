@@ -3,7 +3,7 @@
 #include "dxorg.h"
 #include "gpu.h"
 
-#include "ioctlHandler.h"
+#include "ioctlHandler.hpp"
 
 #include <QFile>
 #include <QTextStream>

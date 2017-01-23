@@ -1,9 +1,11 @@
-#include "ioctlHandler.h"
+#include "ioctlHandler.hpp"
 
 #ifndef NO_IOCTL // Include libdrm headers only if NO_IOCTL is not defined
 #  include <libdrm/radeon_drm.h> // radeon ioctl codes and structs
 #endif
 
+
+radeonIoctlHandler::radeonIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIndex){}
 
 bool radeonIoctlHandler::getValue(void *data, unsigned dataSize, unsigned command) const {
     // https://cgit.freedesktop.org/mesa/drm/tree/include/drm/radeon_drm.h#n993

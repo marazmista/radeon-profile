@@ -10,8 +10,6 @@
 #define DESCRIBE_ERROR(title) qWarning() << (title) << ':' << strerror(errno)
 #define CLEAN(object) memset(&(object), 0, sizeof(object))
 
-// Define NO _IOCTL if libdrm headers can't be installed (all ioctl functions will fail)
-// Define NO_AMDGPU_IOCTL if libdrm headers  are installed but amdgpu is not available (Linux < 4.2)
 
 /**
  * @brief The ioctlHandler class is an interface to the kernel IOCTL system that allows to retrieve informations from the driver.
@@ -134,7 +132,8 @@ public:
 
 
 /**
- * @brief The radeonIoctlHandler class implements ioctlHandler for the radeon driver
+ * @brief The radeonIoctlHandler class implements ioctlHandler for the radeon driver.
+ * @note Define NO _IOCTL if libdrm headers can't be installed (all ioctl functions will fail).
  */
 class radeonIoctlHandler : public ioctlHandler {
 protected:
@@ -145,10 +144,10 @@ public:
     /**
      * @brief Open the communication with the device and initialize the ioctl handler.
      * @note You can check if it worked out with isValid().
-     * @param card Index of the card to be opened (for example 'card0' --> 0).
+     * @param cardIndex Index of the card to be opened (for example 'card0' --> 0).
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
      */
-    radeonIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIndex){}
+    radeonIoctlHandler(unsigned cardIndex);
     bool isValid() const override;
     bool getCoreClock(unsigned *data) const override;
     bool getMaxCoreClock(unsigned *data) const override;
@@ -161,7 +160,9 @@ public:
 
 
 /**
- * @brief The amdgpuIoctlHandler class implements ioctlHandler for the amdgpu driver
+ * @brief The amdgpuIoctlHandler class implements ioctlHandler for the amdgpu driver.
+ * @note Define NO _IOCTL if libdrm headers can't be installed (all ioctl functions will fail).
+ * @note Define NO_AMDGPU_IOCTL if only libdrm amdgpu headers are not available (amdgpu ioctl functions will fail).
  */
 class amdgpuIoctlHandler : public ioctlHandler {
 protected:
@@ -172,10 +173,10 @@ public:
     /**
      * @brief Open the communication with the device and initialize the ioctl handler.
      * @note You can check if it worked out with isValid().
-     * @param card Index of the card to be opened (for example 'card0' --> 0).
+     * @param cardIndex Index of the card to be opened (for example 'card0' --> 0).
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
      */
-    amdgpuIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIndex){}
+    amdgpuIoctlHandler(unsigned cardIndex);
     bool isValid() const override;
     bool getCoreClock(unsigned *data) const override;
     bool getMaxCoreClock(unsigned *data) const override;

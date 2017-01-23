@@ -1,4 +1,4 @@
-#include "ioctlHandler.h"
+#include "ioctlHandler.hpp"
 
 #ifndef NO_IOCTL // Include libdrm headers only if NO_IOCTL is not defined
 #  ifndef NO_AMDGPU_IOCTL // Include libdrm amdgpu headers only if NO_AMDGPU_IOCTL is not declared
@@ -6,6 +6,8 @@
 #  endif
 #endif
 
+
+amdgpuIoctlHandler::amdgpuIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIndex){}
 
 bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned command) const {
     // https://cgit.freedesktop.org/mesa/drm/tree/include/drm/amdgpu_drm.h#n437

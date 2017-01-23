@@ -54,7 +54,7 @@ HEADERS  += radeon_profile.h \
     execbin.h \
     dialog_rpevent.h \
     rpevent.h \
-    ioctlHandler.h
+    ioctlHandler.hpp
 
 FORMS    += radeon_profile.ui \
     dialog_rpevent.ui
