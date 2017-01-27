@@ -102,6 +102,14 @@ public:
     virtual bool getMemoryClock(unsigned *data) const = 0;
 
     /**
+     * @brief Get both core and memory clock
+     * @param core On success is filled with the core clock, in MHz.
+     * @param memory On success is filled with the memory clock, in MHz.
+     * @return Success.
+     */
+    virtual bool getClocks(unsigned *core, unsigned *memory) const = 0;
+
+    /**
      * @brief Get VRAM memory current usage.
      * @param data On success is filled with the value, in bytes.
      * @return Success.
@@ -146,6 +154,7 @@ public:
     bool getCoreClock(unsigned *data) const override;
     bool getMaxCoreClock(unsigned *data) const override;
     bool getMemoryClock(unsigned *data) const override;
+    bool getClocks(unsigned *core, unsigned *memory) const override;
     bool getTemperature(int *data) const override;
     bool getVramSize(unsigned long *data) const override;
     bool getVramUsage(unsigned long *data) const override;
@@ -175,6 +184,7 @@ public:
     bool getCoreClock(unsigned *data) const override;
     bool getMaxCoreClock(unsigned *data) const override;
     bool getMemoryClock(unsigned *data) const override;
+    bool getClocks(unsigned *core, unsigned *memory) const override;
     bool getTemperature(int *data) const override;
     bool getVramSize(unsigned long *data) const override;
     bool getVramUsage(unsigned long *data) const override;

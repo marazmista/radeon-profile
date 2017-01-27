@@ -95,6 +95,11 @@ bool radeonIoctlHandler::getMemoryClock(unsigned *data) const {
 }
 
 
+bool radeonIoctlHandler::getClocks(unsigned *core, unsigned *memory) const {
+    return ((core == NULL) || getCoreClock(core)) && ((memory == NULL) || getMemoryClock(memory));
+}
+
+
 bool radeonIoctlHandler::getVramUsage(unsigned long *data) const {
 #ifdef RADEON_INFO_VRAM_USAGE
     return getValue(data, sizeof(*data), RADEON_INFO_VRAM_USAGE);
