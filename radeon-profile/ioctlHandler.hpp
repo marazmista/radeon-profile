@@ -3,12 +3,6 @@
 
 
 #include <QString>
-#include <QDebug>
-#include <sys/ioctl.h> // ioctl()
-#include <cstring> // memset(), strerror()
-#include <cerrno> // errno
-#define DESCRIBE_ERROR(title) qWarning() << (title) << ':' << strerror(errno)
-#define CLEAN(object) memset(&(object), 0, sizeof(object))
 
 
 /**

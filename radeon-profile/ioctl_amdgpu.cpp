@@ -1,5 +1,10 @@
 #include "ioctlHandler.hpp"
 
+#include <QDebug>
+#include <sys/ioctl.h> // ioctl()
+#include <cstring> // memset()
+#include <cstdio> // perror()
+
 #ifndef NO_IOCTL // Include libdrm headers only if NO_IOCTL is not defined
 #  ifndef NO_AMDGPU_IOCTL // Include libdrm amdgpu headers only if NO_AMDGPU_IOCTL is not declared
 #    include <libdrm/amdgpu_drm.h> // amdgpu ioctl codes and structs
@@ -16,13 +21,13 @@ bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
 
 #ifdef DRM_IOCTL_AMDGPU_INFO
     struct drm_amdgpu_info buffer;
-    CLEAN(buffer);
+    memset(&buffer, 0, sizeof(buffer));
     buffer.query = command;
     buffer.return_pointer = (uint64_t)data;
     buffer.return_size = dataSize;
     bool success = !ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
     if(Q_UNLIKELY(!success))
-        DESCRIBE_ERROR("ioctl");
+        perror("DRM_IOCTL_AMDGPU_INFO");
     return success;
 #else
     Q_UNUSED(data);
@@ -61,7 +66,7 @@ bool amdgpuIoctlHandler::getTemperature(int *data) const {
 bool amdgpuIoctlHandler::getCoreClock(unsigned *data) const {
 #ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Linux >= 4.10
     struct drm_amdgpu_info_vce_clock_table table;
-    CLEAN(table);
+    memset(&table, 0, sizeof(table));
     bool success = getValue(&table, sizeof(table), AMDGPU_INFO_VCE_CLOCK_TABLE);
     if(success && table.num_valid_entries > 0)
         *data = table.entries[0].sclk;
@@ -76,7 +81,7 @@ bool amdgpuIoctlHandler::getCoreClock(unsigned *data) const {
 bool amdgpuIoctlHandler::getMaxCoreClock(unsigned *data) const {
 #ifdef AMDGPU_INFO_DEV_INFO
     struct drm_amdgpu_info_device info;
-    CLEAN(info);
+    memset(&info, 0, sizeof(info));
     bool success = getValue(&info, sizeof(info), AMDGPU_INFO_DEV_INFO);
     if(success)
         *data = info.max_engine_clock;
@@ -91,7 +96,7 @@ bool amdgpuIoctlHandler::getMaxCoreClock(unsigned *data) const {
 bool amdgpuIoctlHandler::getMemoryClock(unsigned *data) const {
 #ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Linux >= 4.10
     struct drm_amdgpu_info_vce_clock_table table;
-    CLEAN(table);
+    memset(&table, 0, sizeof(table));
     bool success = getValue(&table, sizeof(table), AMDGPU_INFO_VCE_CLOCK_TABLE);
     if(success && table.num_valid_entries > 0)
         *data = table.entries[0].mclk;
@@ -116,7 +121,7 @@ bool amdgpuIoctlHandler::getVramUsage(unsigned long *data) const {
 bool amdgpuIoctlHandler::getVramSize(unsigned long *data) const {
 #ifdef AMDGPU_INFO_VRAM_GTT
     struct drm_amdgpu_info_vram_gtt info;
-    CLEAN(info);
+    memset(&info, 0, sizeof(info));
     bool success = getValue(&info, sizeof(info), AMDGPU_INFO_VRAM_GTT);
     if(success)
         *data = info.vram_size;

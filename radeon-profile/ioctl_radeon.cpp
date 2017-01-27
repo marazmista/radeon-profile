@@ -1,5 +1,10 @@
 #include "ioctlHandler.hpp"
 
+#include <QDebug>
+#include <sys/ioctl.h> // ioctl()
+#include <cstring> // memset()
+#include <cstdio> // perror()
+
 #ifndef NO_IOCTL // Include libdrm headers only if NO_IOCTL is not defined
 #  include <libdrm/radeon_drm.h> // radeon ioctl codes and structs
 #endif
@@ -14,12 +19,12 @@ bool radeonIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
 
 #ifdef DRM_IOCTL_RADEON_INFO
     struct drm_radeon_info buffer;
-    CLEAN(buffer);
+    memset(&buffer, 0, sizeof(buffer));
     buffer.request = command;
     buffer.value = (uint64_t)data;
     bool success = !ioctl(fd, DRM_IOCTL_RADEON_INFO, &buffer);
     if(Q_UNLIKELY(!success))
-        DESCRIBE_ERROR("ioctl");
+        perror("ioctl");
     return success;
 #else
     return false;

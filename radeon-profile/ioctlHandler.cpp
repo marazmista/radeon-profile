@@ -1,5 +1,8 @@
 #include "ioctlHandler.hpp"
 
+#include <QDebug>
+#include <sys/ioctl.h> // ioctl()
+#include <cstring> // memset()
 #include <cstdio> // snprintf()
 #include <unistd.h> // close(), usleep()
 #include <fcntl.h> // open()
@@ -19,7 +22,7 @@ int ioctlHandler::openPath(const char *prefix, unsigned index) const {
 
     int res = open(path, O_RDONLY);
     if(res < 0) // Open failed
-        DESCRIBE_ERROR(path);
+        perror(path);
     else
         qDebug() << "Opened" << path << ", fd number:" << res;
 
@@ -58,11 +61,11 @@ QString ioctlHandler::getDriverName() const {
 
 #ifdef DRM_IOCTL_VERSION
     drm_version_t v;
-    CLEAN(v);
+    memset(&v, 0, sizeof(v));
     v.name = driver;
     v.name_len = NAME_SIZE;
     if(ioctl(fd, DRM_IOCTL_VERSION, &v)){
-        DESCRIBE_ERROR("ioctl version");
+        perror("DRM_IOCTL_VERSION");
         return "";
     }
 #endif
@@ -74,7 +77,7 @@ QString ioctlHandler::getDriverName() const {
 ioctlHandler::~ioctlHandler(){
     qDebug() << "Closing ioctl fd, number:" << fd;
     if((fd >= 0) && close(fd))
-        DESCRIBE_ERROR("fd close");
+        perror("fd close");
 }
 
 
