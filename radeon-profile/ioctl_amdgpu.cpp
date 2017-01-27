@@ -67,8 +67,8 @@ bool amdgpuIoctlHandler::getCoreClock(unsigned *data) const {
 #ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Linux >= 4.10
     struct drm_amdgpu_info_vce_clock_table table;
     memset(&table, 0, sizeof(table));
-    bool success = getValue(&table, sizeof(table), AMDGPU_INFO_VCE_CLOCK_TABLE);
-    if(success && table.num_valid_entries > 0)
+    bool success = getValue(&table, sizeof(table), AMDGPU_INFO_VCE_CLOCK_TABLE) && (table.num_valid_entries > 0);
+    if(success)
         *data = table.entries[0].sclk;
     return success;
 #else
@@ -97,8 +97,8 @@ bool amdgpuIoctlHandler::getMemoryClock(unsigned *data) const {
 #ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Linux >= 4.10
     struct drm_amdgpu_info_vce_clock_table table;
     memset(&table, 0, sizeof(table));
-    bool success = getValue(&table, sizeof(table), AMDGPU_INFO_VCE_CLOCK_TABLE);
-    if(success && table.num_valid_entries > 0)
+    bool success = getValue(&table, sizeof(table), AMDGPU_INFO_VCE_CLOCK_TABLE) && (table.num_valid_entries > 0);
+    if(success)
         *data = table.entries[0].mclk;
     return success;
 #else
