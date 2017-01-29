@@ -1,7 +1,7 @@
 # Doxygen documentation configuration
-# Run doxygen in radeon-profile/ to generate documentation
-# Then open radeon-profile/html/index.html to see it in the browser
-# Add radeon-profile/html/doc.qch to QtCreator (Tools > Options > Help > Documentation > Add) to see it in documentation
+# Run doxygen in this folder to generate documentation
+# Then open html/index.html to see it in the browser
+# Add html/doc.qch to QtCreator (Tools > Options > Help > Documentation > Add) to see it in documentation
 
 PROJECT_NAME           = "Radeon profile"
 INPUT                  = . ..

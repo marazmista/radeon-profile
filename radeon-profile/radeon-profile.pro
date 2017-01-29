@@ -35,14 +35,14 @@ SOURCES += main.cpp\
     dfglrx.cpp \
     settings.cpp \
     daemonComm.cpp \
+    ioctlHandler.cpp \
+    ioctl_radeon.cpp \
+    ioctl_amdgpu.cpp \
     execTab.cpp \
     execbin.cpp \
     dialog_rpevent.cpp \
     eventsTab.cpp \
-    fanControlTab.cpp \
-    ioctlHandler.cpp \
-    ioctl_radeon.cpp \
-    ioctl_amdgpu.cpp
+    fanControlTab.cpp
 
 HEADERS  += radeon_profile.h \
     qcustomplot.h \
@@ -51,10 +51,10 @@ HEADERS  += radeon_profile.h \
     dfglrx.h \
     globalStuff.h \
     daemonComm.h \
+    ioctlHandler.hpp \
     execbin.h \
     dialog_rpevent.h \
-    rpevent.h \
-    ioctlHandler.hpp
+    rpevent.h
 
 FORMS    += radeon_profile.ui \
     dialog_rpevent.ui

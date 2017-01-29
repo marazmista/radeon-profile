@@ -21,7 +21,7 @@ bool radeonIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
     struct drm_radeon_info buffer;
     memset(&buffer, 0, sizeof(buffer));
     buffer.request = command;
-    buffer.value = (uint64_t)data;
+    buffer.value = reinterpret_cast<uint64_t>(data);
     bool success = !ioctl(fd, DRM_IOCTL_RADEON_INFO, &buffer);
     if(Q_UNLIKELY(!success))
         perror("ioctl");

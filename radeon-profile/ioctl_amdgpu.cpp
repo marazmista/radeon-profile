@@ -23,7 +23,7 @@ bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
     struct drm_amdgpu_info buffer;
     memset(&buffer, 0, sizeof(buffer));
     buffer.query = command;
-    buffer.return_pointer = (uint64_t)data;
+    buffer.return_pointer = reinterpret_cast<uint64_t>(data);
     buffer.return_size = dataSize;
     bool success = !ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
     if(Q_UNLIKELY(!success))
