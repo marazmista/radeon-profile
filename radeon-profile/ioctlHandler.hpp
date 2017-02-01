@@ -139,8 +139,8 @@ public:
  */
 class radeonIoctlHandler : public ioctlHandler {
 protected:
-    bool getValue(void *data, unsigned dataSize, unsigned command) const override;
-    bool readRegistry(unsigned *data) const override;
+    bool getValue(void *data, unsigned dataSize, unsigned command) const;
+    bool readRegistry(unsigned *data) const;
 
 public:
     /**
@@ -150,14 +150,14 @@ public:
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
      */
     radeonIoctlHandler(unsigned cardIndex);
-    bool isValid() const override;
-    bool getCoreClock(unsigned *data) const override;
-    bool getMaxCoreClock(unsigned *data) const override;
-    bool getMemoryClock(unsigned *data) const override;
-    bool getClocks(unsigned *core, unsigned *memory) const override;
-    bool getTemperature(int *data) const override;
-    bool getVramSize(unsigned long *data) const override;
-    bool getVramUsage(unsigned long *data) const override;
+    bool isValid() const;
+    bool getCoreClock(unsigned *data) const;
+    bool getMaxCoreClock(unsigned *data) const;
+    bool getMemoryClock(unsigned *data) const;
+    bool getClocks(unsigned *core, unsigned *memory) const;
+    bool getTemperature(int *data) const;
+    bool getVramSize(unsigned long *data) const;
+    bool getVramUsage(unsigned long *data) const;
 };
 
 
@@ -169,8 +169,8 @@ public:
  */
 class amdgpuIoctlHandler : public ioctlHandler {
 protected:
-    bool getValue(void *data, unsigned dataSize, unsigned command) const override;
-    bool readRegistry(unsigned *data) const override;
+    bool getValue(void *data, unsigned dataSize, unsigned command) const;
+    bool readRegistry(unsigned *data) const;
 
 public:
     /**
@@ -180,14 +180,14 @@ public:
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
      */
     amdgpuIoctlHandler(unsigned cardIndex);
-    bool isValid() const override;
-    bool getCoreClock(unsigned *data) const override;
-    bool getMaxCoreClock(unsigned *data) const override;
-    bool getMemoryClock(unsigned *data) const override;
-    bool getClocks(unsigned *core, unsigned *memory) const override;
-    bool getTemperature(int *data) const override;
-    bool getVramSize(unsigned long *data) const override;
-    bool getVramUsage(unsigned long *data) const override;
+    bool isValid() const;
+    bool getCoreClock(unsigned *data) const;
+    bool getMaxCoreClock(unsigned *data) const;
+    bool getMemoryClock(unsigned *data) const;
+    bool getClocks(unsigned *core, unsigned *memory) const;
+    bool getTemperature(int *data) const;
+    bool getVramSize(unsigned long *data) const;
+    bool getVramUsage(unsigned long *data) const;
 };
 
 #endif
