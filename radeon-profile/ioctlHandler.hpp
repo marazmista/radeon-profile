@@ -117,6 +117,13 @@ public:
     virtual bool getVramUsage(unsigned long *data) const = 0;
 
     /**
+     * @brief Get the percentage of VRAM memory currently used.
+     * @param data On success is filled with the value, as percentage.
+     * @return Success.
+     */
+    bool getVramUsagePercentage(float *data) const;
+
+    /**
      * @brief Get VRAM memory total size.
      * @param data On success is filled with the value, in bytes.
      * @return Success.

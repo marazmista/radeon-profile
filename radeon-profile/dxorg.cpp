@@ -137,6 +137,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
         if(ioctls->getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
         if(ioctls->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024/1024 << "MB";
         if(ioctls->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024/1024 << "MB";
+        if(ioctls->getVramUsagePercentage(&f)) qDebug() << "VRAM usage percentage:" << f << "%";
         if(ioctls->getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
         delete ioctls;
     }

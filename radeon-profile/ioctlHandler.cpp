@@ -104,9 +104,6 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency) c
             activeCount++;
     }
 
-    if(Q_UNLIKELY(totalCount == 0))
-        return false;
-
     *data = (100.0f * activeCount) / totalCount;
 
     // qDebug() << activeCount << "active moments out of" << totalCount << "(" << *data << "%) in" << time/1000 << "mS (Sampling at" << frequency << "Hz)";
@@ -114,4 +111,11 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency) c
 }
 
 
+bool ioctlHandler::getVramUsagePercentage(float *data) const {
+    unsigned long usage, total;
+    bool success = getVramUsage(&usage) && getVramSize(&total);
+    if(Q_LIKELY(success))
+        *data = (100.0f * usage) / total;
+    return success;
+}
 
