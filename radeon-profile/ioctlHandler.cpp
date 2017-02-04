@@ -84,16 +84,17 @@ ioctlHandler::~ioctlHandler(){
 bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency) const {
     /* Sample the GPU status register N times and check how many of these samples have the GPU busy
      * Register documentation:
-     * http://support.amd.com/TechDocs/46142.pdf#page=246   (address 0x8010, 31st bit)
+     * http://support.amd.com/TechDocs/46142.pdf#page=246   (address 0x8010, 32nd bit)
+     * https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/cikd.h#n1035
      */
 #define REGISTRY_ADDRESS 0x8010
 #define REGISTRY_MASK 1<<31
 #define ONE_SECOND 1000000
     const unsigned int sleep = ONE_SECOND/frequency;
-    unsigned int remaining, activeCount = 0, totalCount = 0, buffer;
+    unsigned int remaining, activeCount = 0, totalCount = 0;
     for(remaining = time; (remaining > 0) && (remaining <= time); // Cycle until the time has finished
         remaining -= (sleep - usleep(sleep)), totalCount++){ // On each cycle sleep and subtract the slept time from the remaining
-        buffer = REGISTRY_ADDRESS;
+        unsigned buffer = REGISTRY_ADDRESS;
         bool success = readRegistry(&buffer);
 
         if(Q_UNLIKELY(!success)) // Read failed

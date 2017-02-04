@@ -22,9 +22,9 @@ bool radeonIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
     memset(&buffer, 0, sizeof(buffer));
     buffer.request = command;
     buffer.value = reinterpret_cast<uint64_t>(data);
-    bool success = !ioctl(fd, DRM_IOCTL_RADEON_INFO, &buffer);
+    const bool success = !ioctl(fd, DRM_IOCTL_RADEON_INFO, &buffer);
     if(Q_UNLIKELY(!success))
-        perror("ioctl");
+        perror("DRM_IOCTL_RADEON_INFO");
     return success;
 #else
     return false;
@@ -111,8 +111,19 @@ bool radeonIoctlHandler::getVramUsage(unsigned long *data) const {
 
 
 bool radeonIoctlHandler::getVramSize(unsigned long *data) const {
+#ifdef DRM_IOCTL_RADEON_GEM_INFO
+    struct drm_radeon_gem_info buffer;
+    memset(&buffer, 0, sizeof(buffer));
+    const bool success = !ioctl(fd, DRM_IOCTL_RADEON_GEM_INFO, &buffer);
+    if(Q_LIKELY(success))
+        *data = buffer.vram_size;
+    else
+        perror("DRM_IOCTL_RADEON_GEM_INFO");
+    return success;
+#else
     return false;
     Q_UNUSED(data);
+#endif
 }
 
 

@@ -123,10 +123,10 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
         ioctls = NULL;
 
     if(ioctls!=NULL && ioctls->isValid()){
-        int i;
-        unsigned u, v;
-        unsigned long ul;
-        float f;
+        int i=0;
+        unsigned u=0, v=0;
+        unsigned long ul=0;
+        float f=0;
 
         qDebug() << "Testing IOCTLs";
         qDebug() << "Driver: " << ioctls->getDriverName();
@@ -135,8 +135,8 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
         if(ioctls->getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
         if(ioctls->getClocks(&u, &v)) qDebug() << "Core & Memory clocks:" << u << "&" << v << "MHz";
         if(ioctls->getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
-        if(ioctls->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024 << "KB";
-        if(ioctls->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024 << "KB";
+        if(ioctls->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024/1024 << "MB";
+        if(ioctls->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024/1024 << "MB";
         if(ioctls->getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
         delete ioctls;
     }
