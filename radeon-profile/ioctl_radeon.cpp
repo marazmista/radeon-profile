@@ -85,6 +85,18 @@ bool radeonIoctlHandler::getMaxCoreClock(unsigned *data) const {
 }
 
 
+bool radeonIoctlHandler::getMaxMemoryClock(unsigned *data) const {
+    qDebug() << "radeonIoctlHandler::getMaxMemoryClock() is not available";
+    return false;
+    Q_UNUSED(data);
+}
+
+
+bool radeonIoctlHandler::getMaxClocks(unsigned *core, unsigned *memory) const {
+    return ((memory == NULL) || getMaxMemoryClock(memory)) && ((core == NULL) || getMaxCoreClock(core));
+}
+
+
 bool radeonIoctlHandler::getMemoryClock(unsigned *data) const {
 #ifdef RADEON_INFO_CURRENT_GPU_MCLK // Linux >= 4.1
     return getValue(data, sizeof(*data), RADEON_INFO_CURRENT_GPU_MCLK);

@@ -83,6 +83,22 @@ public:
     virtual bool getMaxCoreClock(unsigned *data) const = 0;
 
     /**
+     * @brief Get memory maximum clock.
+     * @param data On success is filled with the value, in KHz.
+     * @return Success.
+     */
+    virtual bool getMaxMemoryClock(unsigned *data) const = 0;
+
+    /**
+     * @brief Get both core and memory maximum clocks.
+     * @param core On success is filled with the max core clock, in KHz.
+     * @param memory On success is filled with the max memory clock, in KHz.
+     * @note If one parameter is NULL it will not be filled.
+     * @return Success.
+     */
+    virtual bool getMaxClocks(unsigned *core, unsigned *memory) const = 0;
+
+    /**
      * @brief Get how busy the GPU is.
      * Sample the GPU status register N times and check how many of these samples have the GPU busy
      * @param data On success is filled with the value, as percentage of time (o%=idle, 100%=full).
@@ -105,6 +121,7 @@ public:
      * @brief Get both core and memory clock
      * @param core On success is filled with the core clock, in MHz.
      * @param memory On success is filled with the memory clock, in MHz.
+     * @note If one parameter is NULL it will not be filled.
      * @return Success.
      */
     virtual bool getClocks(unsigned *core, unsigned *memory) const = 0;
@@ -160,6 +177,8 @@ public:
     bool isValid() const;
     bool getCoreClock(unsigned *data) const;
     bool getMaxCoreClock(unsigned *data) const;
+    bool getMaxMemoryClock(unsigned *data) const;
+    bool getMaxClocks(unsigned *core, unsigned *memory) const;
     bool getMemoryClock(unsigned *data) const;
     bool getClocks(unsigned *core, unsigned *memory) const;
     bool getTemperature(int *data) const;
@@ -190,6 +209,8 @@ public:
     bool isValid() const;
     bool getCoreClock(unsigned *data) const;
     bool getMaxCoreClock(unsigned *data) const;
+    bool getMaxMemoryClock(unsigned *data) const;
+    bool getMaxClocks(unsigned *core, unsigned *memory) const;
     bool getMemoryClock(unsigned *data) const;
     bool getClocks(unsigned *core, unsigned *memory) const;
     bool getTemperature(int *data) const;

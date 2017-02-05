@@ -124,7 +124,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 
     if(ioctls!=NULL && ioctls->isValid()){
         int i=0;
-        unsigned u=0, v=0;
+        unsigned u=0;
         unsigned long ul=0;
         float f=0;
 
@@ -133,7 +133,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
         if(ioctls->getCoreClock(&u)) qDebug() << "Core clock:" << u << "MHz";
         if(ioctls->getMaxCoreClock(&u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
         if(ioctls->getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
-        if(ioctls->getClocks(&u, &v)) qDebug() << "Core & Memory clocks:" << u << "&" << v << "MHz";
+        if(ioctls->getMaxMemoryClock(&u)) qDebug() << "Max memory clock:" << u/1000 << "MHz";
         if(ioctls->getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
         if(ioctls->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024/1024 << "MB";
         if(ioctls->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024/1024 << "MB";

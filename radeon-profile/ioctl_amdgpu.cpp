@@ -58,6 +58,7 @@ bool amdgpuIoctlHandler::isValid() const {
 
 
 bool amdgpuIoctlHandler::getTemperature(int *data) const {
+    qDebug() << "amdgpuIoctlHandler::getTemperature() is not available";
     return false;
     Q_UNUSED(data);
 }
@@ -69,16 +70,31 @@ bool amdgpuIoctlHandler::getCoreClock(unsigned *data) const {
 
 
 bool amdgpuIoctlHandler::getMaxCoreClock(unsigned *data) const {
+    return getMaxClocks(data, NULL);
+}
+
+
+bool amdgpuIoctlHandler::getMaxMemoryClock(unsigned *data) const {
+    return getMaxClocks(NULL, data);
+}
+
+
+bool amdgpuIoctlHandler::getMaxClocks(unsigned *core, unsigned *memory) const {
 #ifdef AMDGPU_INFO_DEV_INFO
     struct drm_amdgpu_info_device info;
     memset(&info, 0, sizeof(info));
     bool success = getValue(&info, sizeof(info), AMDGPU_INFO_DEV_INFO);
-    if(success)
-        *data = info.max_engine_clock;
+    if(success){
+        if(core != NULL)
+            *core = info.max_engine_clock;
+        if(memory != NULL)
+            *memory = info.max_memory_clock;
+    }
     return success;
 #else
     return false;
-    Q_UNUSED(data);
+    Q_UNUSED(core);
+    Q_UNUSED(memory);
 #endif
 }
 
