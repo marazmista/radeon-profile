@@ -38,25 +38,6 @@ bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
 }
 
 
-bool amdgpuIoctlHandler::isValid() const {
-    if(fd < 0){
-        qDebug() << "Ioctl: file descriptor not available";
-        return false;
-    }
-
-#ifdef DRM_IOCTL_AMDGPU_INFO
-    if(ioctl(fd, DRM_IOCTL_AMDGPU_INFO) && (errno == EACCES)){
-        qDebug() << "Ioctl: drm render node not available and no root access";
-        return false;
-    }
-#else
-    return false;
-#endif
-
-    return true;
-}
-
-
 bool amdgpuIoctlHandler::getTemperature(int *data) const {
     qDebug() << "amdgpuIoctlHandler::getTemperature() is not available";
     return false;

@@ -59,7 +59,7 @@ public:
      * @brief Check if the ioctlHandler has been initialized correctly.
      * @return Validity.
      */
-    virtual bool isValid() const = 0;
+    bool isValid() const;
 
     /**
      * @brief Get GPU temperature.
@@ -174,7 +174,6 @@ public:
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
      */
     radeonIoctlHandler(unsigned cardIndex);
-    bool isValid() const;
     bool getCoreClock(unsigned *data) const;
     bool getMaxCoreClock(unsigned *data) const;
     bool getMaxMemoryClock(unsigned *data) const;
@@ -206,7 +205,6 @@ public:
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
      */
     amdgpuIoctlHandler(unsigned cardIndex);
-    bool isValid() const;
     bool getCoreClock(unsigned *data) const;
     bool getMaxCoreClock(unsigned *data) const;
     bool getMaxMemoryClock(unsigned *data) const;

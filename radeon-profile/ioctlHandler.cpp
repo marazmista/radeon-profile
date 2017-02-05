@@ -53,6 +53,22 @@ ioctlHandler::ioctlHandler(unsigned card){
 }
 
 
+bool ioctlHandler::isValid() const {
+    int temp;
+
+    if(fd < 0) {
+        qDebug() << "ioctlHandler: file descriptor not valid";
+        return false;
+    } else if(!getValue(&temp, sizeof(temp), 0) && (errno == EACCES)){
+        qDebug() << "ioctlHandler: drm render node not available and no root access";
+        return false;
+    } else {
+        qDebug() << "ioctlHandler: everything ok";
+        return true;
+    }
+}
+
+
 QString ioctlHandler::getDriverName() const {
     if(fd < 0)
         return "";
@@ -112,7 +128,7 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency) c
 
 
 bool ioctlHandler::getVramUsagePercentage(float *data) const {
-    unsigned long usage, total;
+    unsigned long usage=0, total=0;
     bool success = getVramUsage(&usage) && getVramSize(&total);
     if(Q_LIKELY(success))
         *data = (100.0f * usage) / total;

@@ -36,25 +36,6 @@ bool radeonIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
 }
 
 
-bool radeonIoctlHandler::isValid() const {
-    if(fd < 0){
-        qDebug() << "Ioctl: file descriptor not available";
-        return false;
-    }
-
-#ifdef DRM_IOCTL_RADEON_INFO
-    if(ioctl(fd, DRM_IOCTL_RADEON_INFO) && (errno == EACCES)){
-        qDebug() << "Ioctl: drm render node not available and no root access";
-        return false;
-    }
-#else
-    return false;
-#endif
-
-    return true;
-}
-
-
 bool radeonIoctlHandler::getTemperature(int *data) const {
 #ifdef RADEON_INFO_CURRENT_GPU_TEMP // Linux >= 4.1
     return getValue(data, sizeof(*data), RADEON_INFO_CURRENT_GPU_TEMP);
