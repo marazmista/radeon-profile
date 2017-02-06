@@ -44,7 +44,7 @@ ioctlHandler::ioctlHandler(unsigned card){
      * For more details:
      * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#DRM-Master_and_DRM-Auth
      * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#Render_nodes
-     * https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=15
+     * https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=14
      */
     fd = openPath("/dev/dri/renderD", 128+card); // Try /dev/dri/renderD<128+N>
     if(fd < 0) // /dev/dri/renderD<128+N> not available
@@ -101,15 +101,15 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency) c
     /* Sample the GPU status register N times and check how many of these samples have the GPU busy
      * Register documentation:
      * http://support.amd.com/TechDocs/46142.pdf#page=246   (address 0x8010, 32nd bit)
+     * http://lxr.free-electrons.com/ident?i=GRBM_STATUS
      * https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/cikd.h#n1035
      */
 #define REGISTRY_ADDRESS 0x8010
 #define REGISTRY_MASK 1<<31
 #define ONE_SECOND 1000000
     const unsigned int sleep = ONE_SECOND/frequency;
-    unsigned int remaining, activeCount = 0, totalCount = 0;
-    for(remaining = time; (remaining > 0) && (remaining <= time); // Cycle until the time has finished
-        remaining -= (sleep - usleep(sleep)), totalCount++){ // On each cycle sleep and subtract the slept time from the remaining
+    unsigned int slept, activeCount = 0, totalCount = 0;
+    for(slept = 0; slept < time; usleep(sleep), slept+=sleep, totalCount++){
         unsigned buffer = REGISTRY_ADDRESS;
         bool success = readRegistry(&buffer);
 
