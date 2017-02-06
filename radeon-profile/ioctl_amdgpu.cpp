@@ -2,7 +2,6 @@
 
 #include <QDebug>
 #include <sys/ioctl.h> // ioctl()
-#include <cstring> // memset()
 #include <cstdio> // perror()
 
 #ifndef NO_IOCTL // Include libdrm headers only if NO_IOCTL is not defined
@@ -20,8 +19,7 @@ bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
     // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#n212
 
 #ifdef DRM_IOCTL_AMDGPU_INFO
-    struct drm_amdgpu_info buffer;
-    memset(&buffer, 0, sizeof(buffer));
+    struct drm_amdgpu_info buffer = {};
     buffer.query = command;
     buffer.return_pointer = reinterpret_cast<uint64_t>(data);
     buffer.return_size = dataSize;
@@ -62,8 +60,7 @@ bool amdgpuIoctlHandler::getMaxMemoryClock(unsigned *data) const {
 
 bool amdgpuIoctlHandler::getMaxClocks(unsigned *core, unsigned *memory) const {
 #ifdef AMDGPU_INFO_DEV_INFO
-    struct drm_amdgpu_info_device info;
-    memset(&info, 0, sizeof(info));
+    struct drm_amdgpu_info_device info = {};
     bool success = getValue(&info, sizeof(info), AMDGPU_INFO_DEV_INFO);
     if(success){
         if(core != NULL)
@@ -87,8 +84,7 @@ bool amdgpuIoctlHandler::getMemoryClock(unsigned *data) const {
 
 bool amdgpuIoctlHandler::getClocks(unsigned *core, unsigned *memory) const {
 #ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Linux >= 4.10
-    struct drm_amdgpu_info_vce_clock_table table;
-    memset(&table, 0, sizeof(table));
+    struct drm_amdgpu_info_vce_clock_table table = {};
     bool success = getValue(&table, sizeof(table), AMDGPU_INFO_VCE_CLOCK_TABLE) && (table.num_valid_entries > 0);
     if(success){
         if(core != NULL)
@@ -117,8 +113,7 @@ bool amdgpuIoctlHandler::getVramUsage(unsigned long *data) const {
 
 bool amdgpuIoctlHandler::getVramSize(unsigned long *data) const {
 #ifdef AMDGPU_INFO_VRAM_GTT
-    struct drm_amdgpu_info_vram_gtt info;
-    memset(&info, 0, sizeof(info));
+    struct drm_amdgpu_info_vram_gtt info = {};
     bool success = getValue(&info, sizeof(info), AMDGPU_INFO_VRAM_GTT);
     if(success)
         *data = info.vram_size;

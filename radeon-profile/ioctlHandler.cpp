@@ -2,7 +2,7 @@
 
 #include <QDebug>
 #include <sys/ioctl.h> // ioctl()
-#include <cstring> // memset()
+#include <cerrno>
 #include <cstdio> // snprintf()
 #include <unistd.h> // close(), usleep()
 #include <fcntl.h> // open()
@@ -76,8 +76,7 @@ QString ioctlHandler::getDriverName() const {
     char driver[NAME_SIZE] = "";
 
 #ifdef DRM_IOCTL_VERSION
-    drm_version_t v;
-    memset(&v, 0, sizeof(v));
+    drm_version_t v = {};
     v.name = driver;
     v.name_len = NAME_SIZE;
     if(ioctl(fd, DRM_IOCTL_VERSION, &v)){

@@ -2,7 +2,6 @@
 
 #include <QDebug>
 #include <sys/ioctl.h> // ioctl()
-#include <cstring> // memset()
 #include <cstdio> // perror()
 
 #ifndef NO_IOCTL // Include libdrm headers only if NO_IOCTL is not defined
@@ -18,8 +17,7 @@ bool radeonIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
     // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/radeon_kms.c#n203
 
 #ifdef DRM_IOCTL_RADEON_INFO
-    struct drm_radeon_info buffer;
-    memset(&buffer, 0, sizeof(buffer));
+    struct drm_radeon_info buffer = {};
     buffer.request = command;
     buffer.value = reinterpret_cast<uint64_t>(data);
     const bool success = !ioctl(fd, DRM_IOCTL_RADEON_INFO, &buffer);
@@ -105,8 +103,7 @@ bool radeonIoctlHandler::getVramUsage(unsigned long *data) const {
 
 bool radeonIoctlHandler::getVramSize(unsigned long *data) const {
 #ifdef DRM_IOCTL_RADEON_GEM_INFO
-    struct drm_radeon_gem_info buffer;
-    memset(&buffer, 0, sizeof(buffer));
+    struct drm_radeon_gem_info buffer = {};
     const bool success = !ioctl(fd, DRM_IOCTL_RADEON_GEM_INFO, &buffer);
     if(Q_LIKELY(success))
         *data = buffer.vram_size;
