@@ -201,6 +201,10 @@ private:
     void refreshUI();
     void connectSignals();
     void setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile);
+
+    /**
+     * @brief If the temperature has changed adjust the fan speed
+     */
     void adjustFanSpeed();
     fanProfileSteps stepsListToMap();
     void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);

@@ -353,6 +353,16 @@ void radeon_profile::timerEvent() {
         checkEvents();
 }
 
+/**
+ * If the fan profile contains a direct match for the current temperature, it is used.<br>
+ * Otherwise find the closest matches and use linear interpolation:<br>
+ * \f$speed(temp) = \frac{hSpeed - lSpeed}{hTemperature - lTemperature} * (temp - lTemperature)  + lSpeed\f$<br>
+ * Where:<br>
+ * \f$(hTemperature, hSpeed)\f$ is the higher closest match;<br>
+ * \f$(lTemperature, lSpeed)\f$ is the lower closest match;<br>
+ * \f$temp\f$ is the current temperature;<br>
+ * \f$speed\f$ is the speed to apply.
+ */
 void radeon_profile::adjustFanSpeed() {
     if (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore) {
         if (currentFanProfile.contains(device.gpuTemeperatureData.current)) {  // Exact match
