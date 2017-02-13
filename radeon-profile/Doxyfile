@@ -1,7 +1,7 @@
 # Doxygen documentation configuration
 # Run doxygen in this folder to generate documentation
-# Then open html/index.html to see it in the browser
-# Add html/doc.qch to QtCreator (Tools > Options > Help > Documentation > Add) to see it in documentation
+# To see it in the browser open html/index.html
+# To see it in QtCreator Help add html/doc.qch to docs (Tools > Options > Help > Documentation > Add)
 
 PROJECT_NAME           = "Radeon profile"
 INPUT                  = . ..
@@ -11,6 +11,7 @@ USE_MDFILE_AS_MAINPAGE = ../README.md
 GENERATE_LATEX         = NO
 GENERATE_HTML          = YES
 GENERATE_QHP           = YES # Qt Creator Documentation
+QHP_NAMESPACE          = radeon-profile
 QHG_LOCATION           = /usr/bin/qhelpgenerator
 QCH_FILE               = doc.qch
 
