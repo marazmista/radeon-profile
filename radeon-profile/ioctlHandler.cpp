@@ -29,23 +29,22 @@ int ioctlHandler::openPath(const char *prefix, unsigned index) const {
     return res;
 }
 
+/**
+ * Open file descriptor to card device.<br>
+ * The kernel generates for the card with index N the files /dev/dri/card<N> and /dev/dri/renderD<128+N>.<br>
+ * Executing ioctls on /dev/dri/card<N> requires either root access or being DRM Master.<br>
+ * /dev/dri/renderD<128+N> does not require these permissions, but legacy kernels (Linux < 3.15) do not support it.<br>
+ * This constructor tries to open both (render has the precedence).
+ * @see https://en.wikipedia.org/wiki/Direct_Rendering_Manager#DRM-Master_and_DRM-Auth
+ * @see https://en.wikipedia.org/wiki/Direct_Rendering_Manager#Render_nodes
+ * @see https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=14
+ */
 ioctlHandler::ioctlHandler(unsigned card){
 #ifdef NO_IOCTL
     qWarning() << "radeon profile was compiled with NO_IOCTL, ioctls won't work";
     fd = -1;
     Q_UNUSED(card);
 #else
-    /* Open file descriptor to card device
-     * Information ioctls can be accessed in two ways:
-     * The kernel generates for the card with index N the files /dev/dri/card<N> and /dev/dri/renderD<128+N>
-     * Both can be opened without root access
-     * Executing ioctls on /dev/dri/card<N> requires either root access or being DRM Master
-     * /dev/dri/renderD<128+N> does not require these permissions, but legacy kernels (Linux < 3.15) do not support it
-     * For more details:
-     * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#DRM-Master_and_DRM-Auth
-     * https://en.wikipedia.org/wiki/Direct_Rendering_Manager#Render_nodes
-     * https://www.x.org/wiki/Events/XDC2013/XDC2013DavidHerrmannDRMSecurity/slides.pdf#page=14
-     */
     fd = openPath("/dev/dri/renderD", 128+card); // Try /dev/dri/renderD<128+N>
     if(fd < 0) // /dev/dri/renderD<128+N> not available
         fd = openPath("/dev/dri/card", card); // Try /dev/dri/card<N>
@@ -97,26 +96,15 @@ ioctlHandler::~ioctlHandler(){
 
 
 bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency) const {
-    /* Sample the GPU status register N times and check how many of these samples have the GPU busy
-     * Register documentation:
-     * http://support.amd.com/TechDocs/46142.pdf#page=246   (address 0x8010, 32nd bit)
-     * http://lxr.free-electrons.com/ident?i=GRBM_STATUS
-     * https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/cikd.h#n1035
-     */
-#define REGISTRY_ADDRESS 0x8010
-#define REGISTRY_MASK 1<<31
 #define ONE_SECOND 1000000
     const unsigned int sleep = ONE_SECOND/frequency;
     unsigned int slept, activeCount = 0, totalCount = 0;
     for(slept = 0; slept < time; usleep(sleep), slept+=sleep, totalCount++){
-        unsigned buffer = REGISTRY_ADDRESS;
-        bool success = readRegistry(&buffer);
-
-        if(Q_UNLIKELY(!success)) // Read failed
-            return false;
-
-        if(REGISTRY_MASK & buffer) // Check if the activity bit is 1
-            activeCount++;
+        bool active;
+        if(!isCardActive(&active))
+            return false; // Read failed, exit
+        else if (active)
+            activeCount++; // Read succeeded and the card is active, increase the counter
     }
 
     *data = (100.0f * activeCount) / totalCount;

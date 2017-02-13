@@ -33,6 +33,13 @@ protected:
     virtual bool readRegistry(unsigned *data) const = 0;
 
     /**
+     * @brief Check if the card is currently elaborating.
+     * @param data On success is filled with the value (true=active, false=idle).
+     * @return Success.
+     */
+    virtual bool isCardActive(bool *data) const = 0;
+
+    /**
      * @brief Open a file descriptor to a file in the path $prefix$index
      * @param prefix Text prefix of the file to open (for example '/dev/dri/card' or '/dev/dri/renderD')
      * @param index Index to append to the prefix
@@ -165,6 +172,7 @@ class radeonIoctlHandler : public ioctlHandler {
 protected:
     bool getValue(void *data, unsigned dataSize, unsigned command) const;
     bool readRegistry(unsigned *data) const;
+    bool isCardActive(bool *data) const;
 
 public:
     /**
@@ -196,6 +204,7 @@ class amdgpuIoctlHandler : public ioctlHandler {
 protected:
     bool getValue(void *data, unsigned dataSize, unsigned command) const;
     bool readRegistry(unsigned *data) const;
+    bool isCardActive(bool *data) const;
 
 public:
     /**

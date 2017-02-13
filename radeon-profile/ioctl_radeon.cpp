@@ -11,11 +11,11 @@
 
 radeonIoctlHandler::radeonIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIndex){}
 
+/**
+ * @see https://cgit.freedesktop.org/mesa/drm/tree/include/drm/radeon_drm.h#n993
+ * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/radeon_drm.h#n993
+ */
 bool radeonIoctlHandler::getValue(void *data, unsigned dataSize, unsigned command) const {
-    // https://cgit.freedesktop.org/mesa/drm/tree/include/drm/radeon_drm.h#n993
-    // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/radeon_drm.h#n993
-    // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/radeon_kms.c#n203
-
 #ifdef DRM_IOCTL_RADEON_INFO
     struct drm_radeon_info buffer = {};
     buffer.request = command;
@@ -125,3 +125,22 @@ bool radeonIoctlHandler::readRegistry(unsigned *data) const {
     Q_UNUSED(data);
 #endif
 }
+
+/**
+ * Register address 0x8010, 32nd bit
+ * @see http://support.amd.com/TechDocs/46142.pdf#page=246
+ * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/sid.h#n942
+ * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/r600d.h#n291
+ * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/evergreend.h#n842
+ * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/rv770d.h#n403
+ * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/nid.h#n238
+ * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/radeon/cikd.h#n1036
+ */
+bool radeonIoctlHandler::isCardActive(bool *data) const {
+    unsigned reg = 0x8010;
+    bool success = readRegistry(&reg);
+    if(success)
+        *data = reg & (1 << 31); // Check if the activity bit is 1
+    return success;
+}
+

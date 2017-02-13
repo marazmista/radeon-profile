@@ -13,11 +13,11 @@
 
 amdgpuIoctlHandler::amdgpuIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIndex){}
 
+/**
+ * @see https://cgit.freedesktop.org/mesa/drm/tree/include/drm/amdgpu_drm.h#n437
+ * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/amdgpu_drm.h#n471
+ */
 bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned command) const {
-    // https://cgit.freedesktop.org/mesa/drm/tree/include/drm/amdgpu_drm.h#n437
-    // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/amdgpu_drm.h#n471
-    // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/amd/amdgpu/amdgpu_kms.c#n212
-
 #ifdef DRM_IOCTL_AMDGPU_INFO
     struct drm_amdgpu_info buffer = {};
     buffer.query = command;
@@ -132,4 +132,16 @@ bool amdgpuIoctlHandler::readRegistry(unsigned *data) const {
     return false;
     Q_UNUSED(data);
 #endif
+}
+
+/**
+ * Register address 0x2004, 32nd bit
+ * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/amd/include/asic_reg/si/sid.h#n941
+ */
+bool amdgpuIoctlHandler::isCardActive(bool *data) const {
+    unsigned reg = 0x2004;
+    bool success = readRegistry(&reg);
+    if(success)
+        *data = reg & (1 << 31);
+    return success;
 }
