@@ -33,7 +33,7 @@ For full functionality:
 * Graph widget: http://www.qcustomplot.com/
 * Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 
-# Bulid
+# Build
 Qt4: `qmake-qt4 && make` in source directory.
 
 Qt5: `qmake && make` in source directory.
