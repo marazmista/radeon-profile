@@ -151,7 +151,7 @@ public:
 
     struct gpuTemperatureStruct{
         float current, currentBefore, max, min, sum;
-        int pwmSpeed;
+        int pwmSpeed = 0;
     };
 
     struct gpuTemperatureStructString {
