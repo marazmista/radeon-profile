@@ -1,0 +1,18 @@
+# Doxygen documentation configuration
+# Run doxygen in this folder to generate documentation
+# To see it in the browser open html/index.html
+# To see it in QtCreator Help add html/doc.qch to docs (Tools > Options > Help > Documentation > Add)
+
+PROJECT_NAME           = "Radeon profile"
+INPUT                  = . ..
+EXCLUDE                = qcustomplot.h qcustomplot.cpp
+USE_MDFILE_AS_MAINPAGE = ../README.md
+
+GENERATE_LATEX         = NO
+GENERATE_HTML          = YES
+GENERATE_QHP           = YES # Qt Creator Documentation
+QHP_NAMESPACE          = radeon-profile
+QHG_LOCATION           = /usr/bin/qhelpgenerator
+QCH_FILE               = doc.qch
+
+EXTRACT_PRIVATE        = YES # Document also private members

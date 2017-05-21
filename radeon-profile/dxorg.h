@@ -7,6 +7,7 @@
 
 #include "globalStuff.h"
 #include "daemonComm.h"
+#include "ioctlHandler.hpp"
 
 #include <QString>
 #include <QList>
@@ -24,6 +25,11 @@ public:
     ~dXorg() {
         delete dcomm;
 
+        if(sharedMem.isAttached()){
+            // In case the closing signal interrupts a sharedMem lock+read+unlock phase, sharedmem is unlocked
+            sharedMem.unlock();
+            sharedMem.detach();
+        }
         // Before being deleted, the class deletes the sharedMem
         sharedMem.deleteLater();
     }

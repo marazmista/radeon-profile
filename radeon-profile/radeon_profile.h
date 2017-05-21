@@ -173,7 +173,7 @@ private:
     QMap<QString, unsigned int> pmStats;
     unsigned int rangeX, ticksCounter, statsTickCounter;
     QButtonGroup pwmGroup;
-    currentStateInfo *savedState = nullptr;
+	currentStateInfo *savedState;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
@@ -201,6 +201,10 @@ private:
     void refreshUI();
     void connectSignals();
     void setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile);
+
+    /**
+     * @brief If the temperature has changed adjust the fan speed
+     */
     void adjustFanSpeed();
     fanProfileSteps stepsListToMap();
     void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);

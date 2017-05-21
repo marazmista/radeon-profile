@@ -25,6 +25,7 @@ daemonComm *dXorg::dcomm = new daemonComm();
 
 void dXorg::configure(const QString &gpuName) {
     setupDriverModule(gpuName);
+    qDebug() << "Using module" << dXorg::driverModuleName;
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
@@ -110,6 +111,38 @@ bool dXorg::daemonConnected() {
 }
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
+
+#ifdef QT_DEBUG // Test IOCTLs
+    unsigned index = gpuName[4].toLatin1() - '0';
+    ioctlHandler *ioctls;
+    if(dXorg::driverModuleName == "radeon")
+        ioctls = new radeonIoctlHandler(index);
+    else if(dXorg::driverModuleName == "amdgpu")
+        ioctls = new amdgpuIoctlHandler(index);
+    else
+        ioctls = NULL;
+
+    if(ioctls!=NULL && ioctls->isValid()){
+        int i=0;
+        unsigned u=0;
+        unsigned long ul=0;
+        float f=0;
+
+        qDebug() << "Testing IOCTLs";
+        qDebug() << "Driver: " << ioctls->getDriverName();
+        if(ioctls->getCoreClock(&u)) qDebug() << "Core clock:" << u << "MHz";
+        if(ioctls->getMaxCoreClock(&u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
+        if(ioctls->getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
+        if(ioctls->getMaxMemoryClock(&u)) qDebug() << "Max memory clock:" << u/1000 << "MHz";
+        if(ioctls->getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
+        if(ioctls->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024/1024 << "MB";
+        if(ioctls->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024/1024 << "MB";
+        if(ioctls->getVramUsagePercentage(&f)) qDebug() << "VRAM usage percentage:" << f << "%";
+        if(ioctls->getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
+        delete ioctls;
+    }
+#endif
+
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
 

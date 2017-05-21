@@ -16,6 +16,7 @@ Can be forced by `--driver fglrx` parameter.
 Crucial:
 * Qt4 or Qt5  (see build below)
 * libxrandr
+* libdrm
 * radeon card
 
 For full functionality:
