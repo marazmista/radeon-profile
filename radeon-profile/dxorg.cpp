@@ -114,6 +114,7 @@ bool dXorg::daemonConnected() {
 
 void dXorg::loadIoctls(const QString &gpuName){
     if(ioctls == NULL){ // Do nothing if ioctls is already loaded
+        qDebug() << "Loading ioctls";
          // Card index: "card0" => 0, "card1" => 1, ...
         unsigned index = gpuName[4].toLatin1() - '0';
         ioctlHandler * handler = NULL;
@@ -126,7 +127,7 @@ void dXorg::loadIoctls(const QString &gpuName){
 
         // If the handler is not valid, delete it
         if(handler != NULL && ! handler->isValid()){
-            qDebug("Invalid ioctl handler, deleting it");
+            qDebug() << "Invalid ioctl handler, deleting it";
             delete handler;
             handler = NULL;
         }
@@ -134,7 +135,7 @@ void dXorg::loadIoctls(const QString &gpuName){
         ioctls = handler;
     }
 
-#ifdef QT_DEBUG // Test IOCTLs
+    /*
     if(ioctls!=NULL){
         int i=0;
         unsigned u=0;
@@ -152,9 +153,8 @@ void dXorg::loadIoctls(const QString &gpuName){
         if(ioctls->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024/1024 << "MB";
         if(ioctls->getVramUsagePercentage(&f)) qDebug() << "VRAM usage percentage:" << f << "%";
         if(ioctls->getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
-        delete ioctls;
     }
-#endif
+    */
 }
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
@@ -239,6 +239,14 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 
 globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
     globalStuff::gpuClocksStruct tData(-1); // empty struct
+
+    if(ioctls != NULL){
+        unsigned core, mem;
+        if(ioctls->getClocks(&core, &mem)){
+            tData.coreClk = static_cast<int>(core);
+            tData.memClk = static_cast<int>(mem);
+        }
+    }
 
     // if nothing is there returns empty (-1) struct
     if (data.isEmpty()){
@@ -330,6 +338,12 @@ globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
 
 float dXorg::getTemperature() {
     QString temp;
+
+    if(ioctls != NULL){
+        int temp;
+        if(ioctls->getTemperature(&temp))
+            return temp/1000.0f;
+    }
 
     switch (currentTempSensor) {
     case SYSFS_HWMON:
