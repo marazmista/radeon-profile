@@ -9,25 +9,23 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-// define static members //
-dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
-globalStuff::powerMethod dXorg::currentPowerMethod;
-int dXorg::sensorsGPUtempIndex;
-short dXorg::rxMatchIndex;
-short dXorg::clocksValueDivider;
-QString dXorg::driverModuleName;
-QChar dXorg::gpuSysIndex;
-QSharedMemory dXorg::sharedMem;
-dXorg::driverFilePaths dXorg::filePaths;
-dXorg::rxPatternsStruct dXorg::rxPatterns;
-daemonComm *dXorg::dcomm = new daemonComm();
-// end //
+dXorg::dXorg(const QString &gpuName) {
+   configure(gpuName);
+}
 
 void dXorg::configure(const QString &gpuName) {
     setupDriverModule(gpuName);
-    qDebug() << "Using module" << dXorg::driverModuleName;
+    qDebug() << "Using module" << driverModuleName;
+
+    if(driverModuleName == "radeon")
+        ioctlHnd = new radeonIoctlHandler( gpuName[4].toLatin1() - '0');
+    else if(driverModuleName == "amdgpu")
+        ioctlHnd = new amdgpuIoctlHandler( gpuName[4].toLatin1() - '0');
+    else
+        ioctlHnd = NULL;
+
     figureOutGpuDataFilePaths(gpuName);
-    currentTempSensor = testSensor();
+    currentTempSensor = getTemperatureSensor();
     currentPowerMethod = getPowerMethod();
 
     if (globalStuff::globalConfig.rootMode)
@@ -53,6 +51,7 @@ void dXorg::configure(const QString &gpuName) {
         // If QSharedMemory::create() returns true, it has already automatically attached
     }
 
+    dcomm = new daemonComm();
     dcomm->connectToDaemon();
     if (daemonConnected()) {
         qDebug() << "Daemon is connected, configuring it";
@@ -76,13 +75,13 @@ void dXorg::setupDriverModule(const QString &gpuName) {
         f.close();
 
         if (line == "DRIVER=radeon") {
-            dXorg::driverModuleName = "radeon";
+            driverModuleName = "radeon";
             return;
         }
 
 
         if (line == "DRIVER=amdgpu") {
-            dXorg::driverModuleName = "amdgpu";
+            driverModuleName = "amdgpu";
             return;
         }
     }
@@ -111,35 +110,24 @@ bool dXorg::daemonConnected() {
 }
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
-
 #ifdef QT_DEBUG // Test IOCTLs
-    unsigned index = gpuName[4].toLatin1() - '0';
-    ioctlHandler *ioctls;
-    if(dXorg::driverModuleName == "radeon")
-        ioctls = new radeonIoctlHandler(index);
-    else if(dXorg::driverModuleName == "amdgpu")
-        ioctls = new amdgpuIoctlHandler(index);
-    else
-        ioctls = NULL;
-
-    if(ioctls!=NULL && ioctls->isValid()){
+    if(ioctlHnd!=NULL && ioctlHnd->isValid()){
         int i=0;
         unsigned u=0;
         unsigned long ul=0;
         float f=0;
 
         qDebug() << "Testing IOCTLs";
-        qDebug() << "Driver: " << ioctls->getDriverName();
-        if(ioctls->getCoreClock(&u)) qDebug() << "Core clock:" << u << "MHz";
-        if(ioctls->getMaxCoreClock(&u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
-        if(ioctls->getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
-        if(ioctls->getMaxMemoryClock(&u)) qDebug() << "Max memory clock:" << u/1000 << "MHz";
-        if(ioctls->getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
-        if(ioctls->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024/1024 << "MB";
-        if(ioctls->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024/1024 << "MB";
-        if(ioctls->getVramUsagePercentage(&f)) qDebug() << "VRAM usage percentage:" << f << "%";
-        if(ioctls->getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
-        delete ioctls;
+        qDebug() << "Driver: " << ioctlHnd->getDriverName();
+        if(ioctlHnd->getCoreClock(&u)) qDebug() << "Core clock:" << u << "MHz";
+        if(ioctlHnd->getMaxCoreClock(&u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
+        if(ioctlHnd->getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
+        if(ioctlHnd->getMaxMemoryClock(&u)) qDebug() << "Max memory clock:" << u/1000 << "MHz";
+        if(ioctlHnd->getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
+        if(ioctlHnd->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024/1024 << "MB";
+        if(ioctlHnd->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024/1024 << "MB";
+        if(ioctlHnd->getVramUsagePercentage(&f)) qDebug() << "VRAM usage percentage:" << f << "%";
+        if(ioctlHnd->getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
     }
 #endif
 
@@ -150,8 +138,8 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     filePaths.profilePath = devicePath + file_powerProfile;
     filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
     filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
-    filePaths.moduleParamsPath = devicePath + "driver/module/holders/"+dXorg::driverModuleName+"/parameters/";
-    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+dXorg::driverModuleName+"_pm_info"; // this path contains only index
+    filePaths.moduleParamsPath = devicePath + "driver/module/holders/"+driverModuleName+"/parameters/";
+    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+driverModuleName+"_pm_info"; // this path contains only index
     filePaths.overDrivePath = devicePath + file_overclockLevel;
 
 
@@ -222,8 +210,10 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     return data;
 }
 
-globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
+globalStuff::gpuClocksStruct dXorg::getClocks() {
     globalStuff::gpuClocksStruct tData(-1); // empty struct
+
+    QString data = dXorg::getClocksRawData();
 
     // if nothing is there returns empty (-1) struct
     if (data.isEmpty()){
@@ -363,7 +353,7 @@ globalStuff::powerMethod dXorg::getPowerMethod() {
     return globalStuff::PM_UNKNOWN;
 }
 
-dXorg::tempSensor dXorg::testSensor() {
+dXorg::tempSensor dXorg::getTemperatureSensor() {
     QFile hwmon(filePaths.sysfsHwmonTempPath);
 
     // first method, try read temp from sysfs in card dir (path from figureOutGPUDataPaths())
@@ -439,20 +429,7 @@ QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
     return data;
 }
 
-QStringList dXorg::detectCards() {
-    QStringList data;
-    QStringList out = globalStuff::grabSystemInfo("ls /sys/class/drm/").filter("card");
-    for (char i = 0; i < out.count(); i++) {
-        QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
-        if (f.open(QIODevice::ReadOnly)) {
-            QString line = f.readLine(50).trimmed();
 
-            if (line == "DRIVER=radeon" || line == "DRIVER=amdgpu")
-                data.append(f.fileName().split('/')[4]);
-        }
-    }
-    return data;
-}
 
 QString dXorg::getCurrentPowerProfile() {
     switch (currentPowerMethod) {
@@ -584,7 +561,7 @@ void dXorg::setPwmValue(unsigned int value) {
         setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
 }
 
-void dXorg::setPwmManuaControl(bool manual) {
+void dXorg::setPwmManualControl(bool manual) {
     char mode = manual ? pwm_manual : pwm_auto;
 
     if (daemonConnected()) {
@@ -662,7 +639,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
 
     QString data = getClocksRawData(true);
     setupRegex(data);
-    globalStuff::gpuClocksStruct test = dXorg::getClocks(data);
+    globalStuff::gpuClocksStruct test = getClocks();
 
     // still, sometimes there is miscomunication between daemon,
     // but vales are there, so look again in the file which daemon has
@@ -744,7 +721,7 @@ globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
     return fallbackFeatures;
 }
 
-bool dXorg::overClock(const int percentage){
+bool dXorg::overclock(const int percentage){
     if((percentage > 20) || (percentage < 0))
         qWarning() << "Error overclocking: invalid percentage passed: " << percentage;
     else if (daemonConnected()){ // Signal the daemon to set the overclock value
@@ -766,6 +743,6 @@ bool dXorg::overClock(const int percentage){
     return false;
 }
 
-void dXorg::resetOverClock(){
-    overClock(0);
+void dXorg::resetOverclock() {
+    overclock(0);
 }

@@ -19,7 +19,8 @@ int main(int argc, char *argv[])
             qWarning() << "Translation not found.";
     }
 
-    radeon_profile w(a.arguments());
-    
+    radeon_profile w;
+    w.show();
+
     return a.exec();
 }

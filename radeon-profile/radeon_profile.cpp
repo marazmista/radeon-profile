@@ -28,7 +28,7 @@
 
 unsigned int radeon_profile::minFanStepsSpeed = 10;
 
-radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
+radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
 {
@@ -63,14 +63,7 @@ radeon_profile::radeon_profile(QStringList a,QWidget *parent) :
 
     loadConfig();
 
-    //figure out parameters
-    QString params = a.join(" ");
-    if (params.contains("--driver xorg"))
-        ui->combo_gpus->addItems(device.initialize(gpu::XORG));
-    else if (params.contains("--driver fglrx"))
-        ui->combo_gpus->addItems(device.initialize(gpu::FGLRX));
-    else
-        ui->combo_gpus->addItems(device.initialize());
+    ui->combo_gpus->addItems(device.initialize());
 
     ui->configGroups->setTabEnabled(2,device.daemonConnected());
     setupUiEnabledFeatures(device.features);

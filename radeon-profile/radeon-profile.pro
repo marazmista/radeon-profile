@@ -19,7 +19,7 @@ QMAKE_CXXFLAGS += -std=c++0x
 #   QtWarning, QtCritical and QtFatal will still work on Release
 CONFIG(release, debug|release){
     message('Building for release')
-    DEFINES += QT_NO_DEBUG_OUTPUT NO_IOCTL
+    DEFINES += QT_NO_DEBUG_OUTPUT
 } else {
     message('Building for debug')
     QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic
@@ -32,7 +32,6 @@ SOURCES += main.cpp\
     uiEvents.cpp \
     gpu.cpp \
     dxorg.cpp \
-    dfglrx.cpp \
     settings.cpp \
     daemonComm.cpp \
     ioctlHandler.cpp \
@@ -48,7 +47,6 @@ HEADERS  += radeon_profile.h \
     qcustomplot.h \
     gpu.h \
     dxorg.h \
-    dfglrx.h \
     globalStuff.h \
     daemonComm.h \
     ioctlHandler.hpp \

@@ -8,15 +8,14 @@
 #define GPU_H
 
 #include "globalStuff.h"
-#include "dfglrx.h"
 #include "dxorg.h"
 
 class gpu
 {
 public:
-    enum driver {
-        XORG, FGLRX, DRIVER_UNKNOWN
-    };
+//    enum driverType {
+//        XORG, FGLRX, DRIVER_UNKNOWN
+//    };
 
     explicit gpu() {
         currentGpuIndex = 0;
@@ -26,10 +25,15 @@ public:
                 gpuTemeperatureData.sum = 0;
     }
 
+    ~gpu() {
+        delete driverHandler;
+    }
+
     globalStuff::gpuClocksStruct gpuClocksData;
     globalStuff::gpuClocksStructString gpuClocksDataString;
     globalStuff::gpuTemperatureStruct gpuTemeperatureData;
     globalStuff::gpuTemperatureStructString gpuTemeperatureDataString;
+
     QStringList gpuList;
     char currentGpuIndex;
     globalStuff::driverFeatures features;
@@ -38,8 +42,8 @@ public:
     QList<QTreeWidgetItem *> getCardConnectors() const;
     QStringList getGLXInfo(QString gpuName) const;
     QList<QTreeWidgetItem *> getModuleInfo() const;
-    QString getCurrentPowerLevel() const;
-    QString getCurrentPowerProfile() const;
+    QString getCurrentPowerLevel();
+    QString getCurrentPowerProfile();
     void refreshPowerLevel();
     globalStuff::gpuClocksStructString convertClocks(const globalStuff::gpuClocksStruct &data);
     globalStuff::gpuTemperatureStructString convertTemperature(const globalStuff::gpuTemperatureStruct &data);
@@ -49,12 +53,12 @@ public:
     void getPwmSpeed();
 
     void changeGpu(char index);
-    void setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const;
-    void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const;
-    void setPwmManualControl(bool manual) const;
-    void setPwmValue(unsigned int value) const;
+    void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
+    void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel);
+    void setPwmManualControl(bool manual);
+    void setPwmValue(unsigned int value);
 
-    QStringList initialize(gpu::driver);
+    QStringList detectCards();
     QStringList initialize();
     void reconfigureDaemon();
     bool daemonConnected();
@@ -63,7 +67,7 @@ public:
     void resetOverclock();
 
 private:
-    driver currentDriver;
+    dXorg *driverHandler;
 
 };
 

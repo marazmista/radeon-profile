@@ -15,14 +15,16 @@
 #include <QSharedMemory>
 #include <QThread>
 
-#define SHARED_MEM_SIZE 128 // When changin this, consider changing SHARED_MEM_SIZE in radeon-profile-daemon/rpdthread.h
+
+#define SHARED_MEM_SIZE 128
 
 class dXorg
 {
 public:
     dXorg() { }
+    dXorg(const QString &gpuName);
 
-    ~dXorg() {
+    void cleanup() {
         delete dcomm;
 
         if(sharedMem.isAttached()){
@@ -32,40 +34,34 @@ public:
         }
         // Before being deleted, the class deletes the sharedMem
         sharedMem.deleteLater();
+
+        delete ioctlHnd;
     }
 
-    static globalStuff::gpuClocksStruct getClocks(const QString &data);
-    static QString getClocksRawData(bool forFeatures = false);
-    static float getTemperature();
-    static QStringList getGLXInfo(QProcessEnvironment env);
-    static QList<QTreeWidgetItem *> getModuleInfo();
-    static QString getCurrentPowerLevel();
-    static QString getCurrentPowerProfile();
-    static int getPwmSpeed();
+    globalStuff::gpuClocksStruct getClocks();
+    QString getClocksRawData(bool forFeatures = false);
+    float getTemperature();
+    QStringList getGLXInfo(QProcessEnvironment env);
+    QList<QTreeWidgetItem *> getModuleInfo();
+    QString getCurrentPowerLevel();
+    QString getCurrentPowerProfile();
+    int getPwmSpeed();
 
-    static void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
-    static void setForcePowerLevel(globalStuff::forcePowerLevels);
-    static void setPwmManuaControl(bool manual);
-    static void setPwmValue(unsigned int value);
+    void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
+    void setForcePowerLevel(globalStuff::forcePowerLevels);
+    void setPwmManualControl(bool manual);
+    void setPwmValue(unsigned int value);
 
-    static QStringList detectCards();
-    static void figureOutGpuDataFilePaths(const QString &gpuName);
-    static void configure(const QString &gpuName);
-    static globalStuff::driverFeatures figureOutDriverFeatures();
-    static void reconfigureDaemon();
-    static bool daemonConnected();
-    static globalStuff::gpuClocksStruct getFeaturesFallback();
-    static void setupDriverModule(const QString &gpuName);
-    static void setupRegex(const QString &data);
-
-    /**
-     * @brief overClock Overclocks the GPU
-     * @param percent Overclock percentage [0-20]
-     * @return Success
-     */
-    static bool overClock(int percentage);
-
-    static void resetOverClock();
+    void figureOutGpuDataFilePaths(const QString &gpuName);
+    void configure(const QString &gpuName);
+    globalStuff::driverFeatures figureOutDriverFeatures();
+    void reconfigureDaemon();
+    bool daemonConnected();
+    globalStuff::gpuClocksStruct getFeaturesFallback();
+    void setupDriverModule(const QString &gpuName);
+    void setupRegex(const QString &data);
+    bool overclock(int percentage);
+    void resetOverclock();
 
 private:
     enum tempSensor {
@@ -76,16 +72,17 @@ private:
         TS_UNKNOWN
     };
 
-    static QChar gpuSysIndex;
-    static QSharedMemory sharedMem;
-    static QString driverModuleName;
-    static daemonComm *dcomm;
+    QChar gpuSysIndex;
+    QSharedMemory sharedMem;
+    QString driverModuleName;
+    daemonComm *dcomm;
+    ioctlHandler *ioctlHnd;
 
-    static struct rxPatternsStruct {
+    struct rxPatternsStruct {
         QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
     } rxPatterns;
 
-    static struct driverFilePaths {
+    struct driverFilePaths {
         QString powerMethodFilePath,
             profilePath,
             dpmStateFilePath,
@@ -99,16 +96,16 @@ private:
             overDrivePath;
     } filePaths;
 
-    static int sensorsGPUtempIndex;
-    static short rxMatchIndex, clocksValueDivider;
-    static dXorg::tempSensor currentTempSensor;
-    static globalStuff::powerMethod currentPowerMethod;
+    int sensorsGPUtempIndex;
+    short rxMatchIndex, clocksValueDivider;
+    dXorg::tempSensor currentTempSensor;
+    globalStuff::powerMethod currentPowerMethod;
 
-    static QString findSysfsHwmonForGPU();
-    static globalStuff::powerMethod getPowerMethod();
-    static tempSensor testSensor();
-    static void setNewValue(const QString &filePath, const QString &newValue);
-    static QString findSysFsHwmonForGpu();
+    QString findSysfsHwmonForGPU();
+    globalStuff::powerMethod getPowerMethod();
+    tempSensor getTemperatureSensor();
+    void setNewValue(const QString &filePath, const QString &newValue);
+    QString findSysFsHwmonForGpu();
 };
 
 #endif // DXORG_H

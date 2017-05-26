@@ -40,54 +40,33 @@ static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
 };
 
 void gpu::reconfigureDaemon() {
-    dXorg::reconfigureDaemon();
+    driverHandler->reconfigureDaemon();
 }
 
 bool gpu::daemonConnected() {
-    return dXorg::daemonConnected();
+   return driverHandler->daemonConnected();
 }
 
-// method for resolve which driver gpu instance will use
-// and call some things that need to be done before read data
+QStringList gpu::detectCards() {
+    QStringList data;
+    QStringList out = globalStuff::grabSystemInfo("ls /sys/class/drm/").filter("card");
+    for (char i = 0; i < out.count(); i++) {
+        QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
+        if (f.open(QIODevice::ReadOnly)) {
+            QString line = f.readLine(50).trimmed();
+
+            if (line == "DRIVER=radeon" || line == "DRIVER=amdgpu")
+                data.append(f.fileName().split('/')[4]);
+        }
+    }
+    return data;
+}
+
 QStringList gpu::initialize() {
-
-    QStringList gpuList;
-
-    gpuList = gpu::initialize(gpu::XORG);
-    if (gpuList.length() > 0)
-        return gpuList;
-
-    gpuList = gpu::initialize(gpu::FGLRX);
-    if (gpuList.length() > 0)
-        return gpuList;
-
-    gpuList = gpu::initialize(gpu::DRIVER_UNKNOWN);
-    return gpuList;
-}
-
-QStringList gpu::initialize(gpu::driver driver) {
-    currentDriver = driver;
-    QStringList gpuList;
-
-    switch (currentDriver) {
-        case gpu::XORG:
-            gpuList = dXorg::detectCards();
-            if(currentGpuIndex < gpuList.size()){
-                dXorg::configure(gpuList[currentGpuIndex]);
-                features = dXorg::figureOutDriverFeatures();
-            }
-            break;
-        case gpu::FGLRX:
-            dFglrx::configure(currentGpuIndex);
-            features = dFglrx::figureOutDriverFeatures();
-            break;
-        case gpu::DRIVER_UNKNOWN:
-            globalStuff::driverFeatures f;
-            f.pm = globalStuff::PM_UNKNOWN;
-            f.canChangeProfile = f.temperatureAvailable = f.coreVoltAvailable = f.coreClockAvailable = false;
-            features = f;
-            gpuList << QObject::tr("Unknown");
-            break;
+    QStringList gpuList = detectCards();
+    if (currentGpuIndex < gpuList.size()) {
+        driverHandler = new dXorg(gpuList[currentGpuIndex]);
+        features = driverHandler->figureOutDriverFeatures();
     }
 
     return gpuList;
@@ -134,55 +113,20 @@ globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuf
 
 void gpu::changeGpu(char index) {
     currentGpuIndex = index;
+    driverHandler->configure(gpuList[currentGpuIndex]);
+    features = driverHandler->figureOutDriverFeatures();
 
-    switch (currentDriver) {
-    case XORG: {
-        dXorg::configure(gpuList[currentGpuIndex]);
-        features = dXorg::figureOutDriverFeatures();
-        break;
-    }
-    case FGLRX: {
-        dFglrx::configure(currentGpuIndex);
-        features = dFglrx::figureOutDriverFeatures();
-        break;
-    }
-    case DRIVER_UNKNOWN:
-        break;
-    }
 }
 
 void gpu::getClocks() {
-    switch (currentDriver) {
-    case XORG: {
-        gpuClocksData = dXorg::getClocks(dXorg::getClocksRawData());
-        break;
-    }
-    case FGLRX:
-        gpuClocksData = dFglrx::getClocks();
-        break;
-    case DRIVER_UNKNOWN: {
-        globalStuff::gpuClocksStruct clk(-1);
-        gpuClocksData = clk;
-        break;
-    }
-    }
+    gpuClocksData = driverHandler->getClocks();
     gpuClocksDataString = convertClocks(gpuClocksData);
 }
 
 void gpu::getTemperature() {
 
     gpuTemeperatureData.currentBefore = gpuTemeperatureData.current;
-
-    switch (currentDriver) {
-    case XORG:
-        gpuTemeperatureData.current = dXorg::getTemperature();
-        break;
-    case FGLRX:
-        gpuTemeperatureData.current = dFglrx::getTemperature();
-        break;
-    case DRIVER_UNKNOWN:
-        return;
-    }
+    gpuTemeperatureData.current = driverHandler->getTemperature();
 
     // update rest of structure with temperature data //
     gpuTemeperatureData.sum += gpuTemeperatureData.current;
@@ -746,19 +690,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 }
 
 QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
-    QList<QTreeWidgetItem *> list;
-
-    switch (currentDriver) {
-    case XORG:
-        list = dXorg::getModuleInfo();
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN: {
-        list.append(new QTreeWidgetItem(QStringList() << QObject::tr("No info")));
-    }
-    }
-
-    return list;
+    return driverHandler->getModuleInfo();
 }
 
 QStringList gpu::getGLXInfo(QString gpuName) const {
@@ -776,39 +708,20 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
     if (!driver.isEmpty())  // because of segfault when no xdriinfo
         data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
-    switch (currentDriver) {
-    case XORG:
-        data << dXorg::getGLXInfo(env);
-        break;
-    case FGLRX:
-        data << dFglrx::getGLXInfo();
-        break;
-    case DRIVER_UNKNOWN:
-        break;
-    }
+
+    data << driverHandler->getGLXInfo(env);
+
     return data;
 }
 
-QString gpu::getCurrentPowerLevel() const {
-    switch (currentDriver) {
-    case XORG:
-        return dXorg::getCurrentPowerLevel().trimmed();
-        break;
-    default:
-        return "";
-        break;
-    }
+QString gpu::getCurrentPowerLevel() {
+    return driverHandler->getCurrentPowerLevel().trimmed();
+
 }
 
-QString gpu::getCurrentPowerProfile() const {
-    switch (currentDriver) {
-    case XORG:
-        return dXorg::getCurrentPowerProfile().trimmed();
-        break;
-    default:
-        return "";
-        break;
-    }
+QString gpu::getCurrentPowerProfile()  {
+    return driverHandler->getCurrentPowerProfile().trimmed();
+
 }
 
 void gpu::refreshPowerLevel() {
@@ -816,70 +729,39 @@ void gpu::refreshPowerLevel() {
     currentPowerProfile = getCurrentPowerProfile();
 }
 
-void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) const {
-    switch (currentDriver) {
-    case XORG:
-        dXorg::setPowerProfile(_newPowerProfile);
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
+    driverHandler->setPowerProfile(_newPowerProfile);
 }
 
-void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) const {
-    switch (currentDriver) {
-    case XORG:
-        dXorg::setForcePowerLevel(_newForcePowerLevel);
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
+    driverHandler->setForcePowerLevel(_newForcePowerLevel);
+
 }
 
-void gpu::setPwmValue(unsigned int value) const {
-    switch (currentDriver) {
-    case XORG:
-        dXorg::setPwmValue(features.pwmMaxSpeed * value / 100);
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+void gpu::setPwmValue(unsigned int value) {
+    driverHandler->setPwmValue(features.pwmMaxSpeed * value / 100);
+
 }
 
-void gpu::setPwmManualControl(bool manual) const {
-    switch (currentDriver) {
-    case XORG:
-        dXorg::setPwmManuaControl(manual);
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+void gpu::setPwmManualControl(bool manual) {
+    driverHandler->setPwmManualControl(manual);
+
 }
 
 void gpu::getPwmSpeed() {
-    switch (currentDriver) {
-    case XORG:
-            gpuTemeperatureData.pwmSpeed = ((float)dXorg::getPwmSpeed() / features.pwmMaxSpeed ) * 100;
-        break;
-    case FGLRX:
-    case DRIVER_UNKNOWN:
-        break;
-    }
+    gpuTemeperatureData.pwmSpeed = ((float)driverHandler->getPwmSpeed() / features.pwmMaxSpeed ) * 100;
+
 }
 
 bool gpu::overclock(const int value){
-    if(features.overClockAvailable && (currentDriver == XORG))
-        return dXorg::overClock(value);
+    if (features.overClockAvailable)
+        return driverHandler->overclock(value);
 
     qWarning() << "Error overclocking: overclocking is not supported";
     return false;
 }
 
 void gpu::resetOverclock(){
-    if(features.overClockAvailable && (currentDriver == XORG))
-        dXorg::resetOverClock();
+    if (features.overClockAvailable)
+        driverHandler->resetOverclock();
 }
