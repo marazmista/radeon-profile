@@ -21,11 +21,13 @@ QSharedMemory dXorg::sharedMem;
 dXorg::driverFilePaths dXorg::filePaths;
 dXorg::rxPatternsStruct dXorg::rxPatterns;
 daemonComm *dXorg::dcomm = new daemonComm();
+ioctlHandler *dXorg::ioctls = NULL;
 // end //
 
 void dXorg::configure(const QString &gpuName) {
     setupDriverModule(gpuName);
     qDebug() << "Using module" << dXorg::driverModuleName;
+    loadIoctls(gpuName);
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
@@ -110,19 +112,30 @@ bool dXorg::daemonConnected() {
     return dcomm->connected();
 }
 
-void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
+void dXorg::loadIoctls(const QString &gpuName){
+    if(ioctls == NULL){ // Do nothing if ioctls is already loaded
+         // Card index: "card0" => 0, "card1" => 1, ...
+        unsigned index = gpuName[4].toLatin1() - '0';
+        ioctlHandler * handler = NULL;
+
+        // Create the appropriate handler
+        if(dXorg::driverModuleName == "radeon")
+            handler = new radeonIoctlHandler(index);
+        else if(dXorg::driverModuleName == "amdgpu")
+            handler = new amdgpuIoctlHandler(index);
+
+        // If the handler is not valid, delete it
+        if(handler != NULL && ! handler->isValid()){
+            qDebug("Invalid ioctl handler, deleting it");
+            delete handler;
+            handler = NULL;
+        }
+
+        ioctls = handler;
+    }
 
 #ifdef QT_DEBUG // Test IOCTLs
-    unsigned index = gpuName[4].toLatin1() - '0';
-    ioctlHandler *ioctls;
-    if(dXorg::driverModuleName == "radeon")
-        ioctls = new radeonIoctlHandler(index);
-    else if(dXorg::driverModuleName == "amdgpu")
-        ioctls = new amdgpuIoctlHandler(index);
-    else
-        ioctls = NULL;
-
-    if(ioctls!=NULL && ioctls->isValid()){
+    if(ioctls!=NULL){
         int i=0;
         unsigned u=0;
         unsigned long ul=0;
@@ -142,7 +155,9 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
         delete ioctls;
     }
 #endif
+}
 
+void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
 
