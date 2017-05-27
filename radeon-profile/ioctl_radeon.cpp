@@ -1,4 +1,4 @@
-#include "ioctlHandler.hpp"
+#include "ioctlHandler.h"
 
 #include <QDebug>
 #include <sys/ioctl.h> // ioctl()
@@ -44,7 +44,7 @@ bool radeonIoctlHandler::getTemperature(int *data) const {
 }
 
 
-bool radeonIoctlHandler::getCoreClock(unsigned *data) const {
+bool radeonIoctlHandler::getCoreClock(int *data) const {
 #ifdef RADEON_INFO_CURRENT_GPU_SCLK // Linux >= 4.1
     return getValue(data, sizeof(*data), RADEON_INFO_CURRENT_GPU_SCLK);
 #else
@@ -54,7 +54,7 @@ bool radeonIoctlHandler::getCoreClock(unsigned *data) const {
 }
 
 
-bool radeonIoctlHandler::getMaxCoreClock(unsigned *data) const {
+bool radeonIoctlHandler::getMaxCoreClock(int *data) const {
 #ifdef RADEON_INFO_MAX_SCLK
     return getValue(data, sizeof(*data), RADEON_INFO_MAX_SCLK);
 #else
@@ -64,19 +64,19 @@ bool radeonIoctlHandler::getMaxCoreClock(unsigned *data) const {
 }
 
 
-bool radeonIoctlHandler::getMaxMemoryClock(unsigned *data) const {
+bool radeonIoctlHandler::getMaxMemoryClock(int *data) const {
     qDebug() << "radeonIoctlHandler::getMaxMemoryClock() is not available";
     return false;
     Q_UNUSED(data);
 }
 
 
-bool radeonIoctlHandler::getMaxClocks(unsigned *core, unsigned *memory) const {
+bool radeonIoctlHandler::getMaxClocks(int *core, int *memory) const {
     return ((memory == NULL) || getMaxMemoryClock(memory)) && ((core == NULL) || getMaxCoreClock(core));
 }
 
 
-bool radeonIoctlHandler::getMemoryClock(unsigned *data) const {
+bool radeonIoctlHandler::getMemoryClock(int *data) const {
 #ifdef RADEON_INFO_CURRENT_GPU_MCLK // Linux >= 4.1
     return getValue(data, sizeof(*data), RADEON_INFO_CURRENT_GPU_MCLK);
 #else
@@ -86,12 +86,12 @@ bool radeonIoctlHandler::getMemoryClock(unsigned *data) const {
 }
 
 
-bool radeonIoctlHandler::getClocks(unsigned *core, unsigned *memory) const {
+bool radeonIoctlHandler::getClocks(int *core, int *memory) const {
     return ((core == NULL) || getCoreClock(core)) && ((memory == NULL) || getMemoryClock(memory));
 }
 
 
-bool radeonIoctlHandler::getVramUsage(unsigned long *data) const {
+bool radeonIoctlHandler::getVramUsage(float *data) const {
 #ifdef RADEON_INFO_VRAM_USAGE
     return getValue(data, sizeof(*data), RADEON_INFO_VRAM_USAGE);
 #else
@@ -101,7 +101,7 @@ bool radeonIoctlHandler::getVramUsage(unsigned long *data) const {
 }
 
 
-bool radeonIoctlHandler::getVramSize(unsigned long *data) const {
+bool radeonIoctlHandler::getVramSize(float *data) const {
 #ifdef DRM_IOCTL_RADEON_GEM_INFO
     struct drm_radeon_gem_info buffer = {};
     const bool success = !ioctl(fd, DRM_IOCTL_RADEON_GEM_INFO, &buffer);

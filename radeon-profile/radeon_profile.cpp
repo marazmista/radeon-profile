@@ -239,54 +239,54 @@ void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, c
 // -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
 // did not alter it, it stays and in result will be not displayed
 void radeon_profile::refreshUI() {
-    ui->l_cClk->setText(device.gpuClocksDataString.coreClk);
-    ui->l_mClk->setText(device.gpuClocksDataString.memClk);
-    ui->l_mVolt->setText(device.gpuClocksDataString.memVolt);
-    ui->l_cVolt->setText(device.gpuClocksDataString.coreVolt);
+    ui->l_cClk->setText(device.gpuClocksData.str.coreClk);
+    ui->l_mClk->setText(device.gpuClocksData.str.memClk);
+    ui->l_mVolt->setText(device.gpuClocksData.str.memVolt);
+    ui->l_cVolt->setText(device.gpuClocksData.str.coreVolt);
 
     // Header - Temperature
-    ui->l_temp->setText(device.gpuTemeperatureDataString.current);
+    ui->l_temp->setText(device.gpuTemeperatureData.str.current);
 
     // Header - Fan speed
-    ui->l_fanSpeed->setText(device.gpuTemeperatureDataString.pwmSpeed);
+    ui->l_fanSpeed->setText(device.gpuPwmData.str.pwmSpeed);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
         ui->list_currentGPUData->clear();
 
         if (device.gpuClocksData.powerLevel != -1)
-            addChild(ui->list_currentGPUData, tr("Power level"), device.gpuClocksDataString.powerLevel);
+            addChild(ui->list_currentGPUData, tr("Power level"), device.gpuClocksData.str.powerLevel);
         if (device.gpuClocksData.coreClk != -1)
-            addChild(ui->list_currentGPUData, tr("GPU clock"), device.gpuClocksDataString.coreClk);
+            addChild(ui->list_currentGPUData, tr("GPU clock"), device.gpuClocksData.str.coreClk);
         if (device.gpuClocksData.memClk != -1)
-            addChild(ui->list_currentGPUData, tr("Memory clock"), device.gpuClocksDataString.memClk);
+            addChild(ui->list_currentGPUData, tr("Memory clock"), device.gpuClocksData.str.memClk);
         if (device.gpuClocksData.uvdCClk != -1)
-            addChild(ui->list_currentGPUData, tr("UVD core clock (cclk)"), device.gpuClocksDataString.uvdCClk);
+            addChild(ui->list_currentGPUData, tr("UVD core clock (cclk)"), device.gpuClocksData.str.uvdCClk);
         if (device.gpuClocksData.uvdDClk != -1)
-            addChild(ui->list_currentGPUData, tr("UVD decoder clock (dclk)"), device.gpuClocksDataString.uvdDClk);
+            addChild(ui->list_currentGPUData, tr("UVD decoder clock (dclk)"), device.gpuClocksData.str.uvdDClk);
         if (device.gpuClocksData.coreVolt != -1)
-            addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuClocksDataString.coreVolt);
+            addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuClocksData.str.coreVolt);
         if (device.gpuClocksData.memVolt != -1)
-            addChild(ui->list_currentGPUData, tr("I/O voltage (vddci)"), device.gpuClocksDataString.memVolt);
+            addChild(ui->list_currentGPUData, tr("I/O voltage (vddci)"), device.gpuClocksData.str.memVolt);
 
         if (ui->list_currentGPUData->topLevelItemCount() == 0)
             addChild(ui->list_currentGPUData, tr("Can't read data"), tr("You need debugfs mounted and either root rights or the daemon running"));
 
-        addChild(ui->list_currentGPUData, tr("GPU temperature"), device.gpuTemeperatureDataString.current);
+        addChild(ui->list_currentGPUData, tr("GPU temperature"), device.gpuTemeperatureData.str.current);
     }
 }
 
 void radeon_profile::updateExecLogs() {
     for (int i = 0; i < execsRunning.count(); i++) {
         if (execsRunning.at(i)->getExecState() == QProcess::Running && execsRunning.at(i)->logEnabled) {
-            QString logData = QDateTime::currentDateTime().toString(logDateFormat) +";" + device.gpuClocksDataString.powerLevel + ";" +
-                    device.gpuClocksDataString.coreClk + ";"+
-                    device.gpuClocksDataString.memClk + ";"+
-                    device.gpuClocksDataString.uvdCClk + ";"+
-                    device.gpuClocksDataString.uvdDClk + ";"+
-                    device.gpuClocksDataString.coreVolt + ";"+
-                    device.gpuClocksDataString.memVolt + ";"+
-                    device.gpuTemeperatureDataString.current;
+            QString logData = QDateTime::currentDateTime().toString(logDateFormat) +";" + device.gpuClocksData.str.powerLevel + ";" +
+                    device.gpuClocksData.str.coreClk + ";"+
+                    device.gpuClocksData.str.memClk + ";"+
+                    device.gpuClocksData.str.uvdCClk + ";"+
+                    device.gpuClocksData.str.uvdDClk + ";"+
+                    device.gpuClocksData.str.coreVolt + ";"+
+                    device.gpuClocksData.str.memVolt + ";"+
+                    device.gpuTemeperatureData.str.current;
             execsRunning.at(i)->appendToLog(logData);
         }
     }
@@ -426,8 +426,8 @@ void radeon_profile::refreshGraphs() {
         ui->plotTemp->yAxis->setRange(device.gpuTemeperatureData.min - 5, device.gpuTemeperatureData.max + 5);
 
     ui->plotTemp->graph(0)->addData(ticksCounter,device.gpuTemeperatureData.current);
-    ui->l_minMaxTemp->setText("Max: " + device.gpuTemeperatureDataString.max  + " | Min: " +
-                              device.gpuTemeperatureDataString.min + " | Avg: " + QString().setNum(device.gpuTemeperatureData.sum/ticksCounter,'f',1) + QString::fromUtf8("\u00B0C"));
+    ui->l_minMaxTemp->setText("Max: " + device.gpuTemeperatureData.str.max  + " | Min: " +
+                              device.gpuTemeperatureData.str.min + " | Avg: " + QString().setNum(device.gpuTemeperatureData.sum/ticksCounter,'f',1) + QString::fromUtf8("\u00B0C"));
 }
 
 void radeon_profile::doTheStats() {
@@ -435,12 +435,12 @@ void radeon_profile::doTheStats() {
     statsTickCounter++;
 
     // figure out pm level based on data provided
-    QString pmLevelName = (device.gpuClocksData.powerLevel == -1) ? "" : "Power level:" + device.gpuClocksDataString.powerLevel, volt;
-    volt = (device.gpuClocksData.coreVolt == -1) ? "" : "(" + device.gpuClocksDataString.coreVolt+")";
-    pmLevelName = (device.gpuClocksData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +device.gpuClocksDataString.coreClk + volt;
+    QString pmLevelName = (device.gpuClocksData.powerLevel == -1) ? "" : "Power level:" + device.gpuClocksData.str.powerLevel, volt;
+    volt = (device.gpuClocksData.coreVolt == -1) ? "" : "(" + device.gpuClocksData.str.coreVolt+")";
+    pmLevelName = (device.gpuClocksData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +device.gpuClocksData.str.coreClk + volt;
 
-    volt = (device.gpuClocksData.memVolt == -1) ? "" : "(" + device.gpuClocksDataString.memVolt + ")";
-    pmLevelName = (device.gpuClocksData.memClk == -1) ? pmLevelName : pmLevelName + " Mem:" + device.gpuClocksDataString.memClk +  volt;
+    volt = (device.gpuClocksData.memVolt == -1) ? "" : "(" + device.gpuClocksData.str.memVolt + ")";
+    pmLevelName = (device.gpuClocksData.memClk == -1) ? pmLevelName : pmLevelName + " Mem:" + device.gpuClocksData.str.memClk +  volt;
 
     if (pmStats.contains(pmLevelName)) // This power level already exists, increment its count
         pmStats[pmLevelName]++;

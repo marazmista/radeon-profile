@@ -93,33 +93,6 @@ public:
         PM_UNKNOWN = 2
     };
 
-    struct gpuClocksStruct {
-        int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
-        char powerLevel;
-
-        gpuClocksStruct() { }
-
-        gpuClocksStruct(int _coreClk, int _memClk, int _coreVolt, int _memVolt, int _uvdCClk, int _uvdDclk, char _pwrLevel ) {
-            coreClk = _coreClk;
-            memClk = _memClk;
-            coreVolt = _coreVolt;
-            memVolt = _memVolt;
-            uvdCClk = _uvdCClk;
-            uvdDClk = _uvdDclk;
-            powerLevel = _pwrLevel;
-        }
-
-        // initialize empty struct, so when we pass -1, only values that != -1 will show
-        gpuClocksStruct(int allValues) {
-            coreClk = memClk =  coreVolt =   memVolt = uvdCClk =  uvdDClk = powerLevel = allValues;
-        }
-    };
-
-    struct gpuClocksStructString {
-      QString powerLevel, coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
-    };
-
-
     // structure which holds what can be display on ui and on its base
     // we enable ui elements
     struct driverFeatures {
@@ -132,7 +105,6 @@ public:
             pwmAvailable,
             overClockAvailable;
         globalStuff::powerMethod pm;
-        int pwmMaxSpeed;
 
         driverFeatures() {
             canChangeProfile =
@@ -144,22 +116,89 @@ public:
                     pwmAvailable =
                     overClockAvailable = false;
             pm = PM_UNKNOWN;
-            pwmMaxSpeed = 0;
         }
 
     };
 
-    struct gpuTemperatureStruct{
-        float current, currentBefore, max, min, sum;
-        int pwmSpeed = 0;
+    struct gpuClocksStructString {
+      QString powerLevel, coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
+    };
+
+    struct gpuClocksStruct {
+        int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
+        char powerLevel;
+        gpuClocksStructString str;
+
+        gpuClocksStruct() { }
+
+        // initialize empty struct, so when we pass -1, only values that != -1 will show
+        gpuClocksStruct(int allValues) {
+            coreClk = memClk =  coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = allValues;
+        }
+
+        void convertToString() {
+            str.coreClk = (coreClk != -1) ? QString::number(coreClk)+"MHz" : "";
+            str.memClk = (memClk != -1) ? QString::number(memClk)+"MHz" : "";
+            str.memVolt = (memVolt != -1) ? QString::number(memVolt)+"mV" : "";
+            str.coreVolt = (coreVolt != -1) ? QString::number(coreVolt)+"mV" : "";
+            str.uvdCClk = (uvdCClk != -1) ? QString::number(uvdCClk)+"MHz" : "";
+            str.uvdDClk =  (uvdDClk != -1) ?  QString::number(uvdDClk)+"MHz" : "";
+
+
+            if (powerLevel != -1)
+                str.powerLevel =  QString::number(powerLevel);
+        }
     };
 
     struct gpuTemperatureStructString {
-        QString current, max, min, pwmSpeed;
+        QString current, max, min;
+    };
+
+    struct gpuTemperatureStruct {
+        float current, currentBefore, max, min, sum;
+        gpuTemperatureStructString str;
+
+        void convertToString() {
+            str.current = QString::number(current) + QString::fromUtf8("\u00B0C");
+            str.max = QString::number(max) + QString::fromUtf8("\u00B0C");
+            str.min = QString::number(min) + QString::fromUtf8("\u00B0C");
+        }
+    };
+
+    struct gpuPwmStructString {
+        QString pwmSpeed;
+    };
+
+    struct gpuPwmStruct {
+        int pwmSpeed = 0;
+        gpuPwmStructString str;
+
+        void convertToString() {
+            str.pwmSpeed = QString::number(pwmSpeed) + "%";
+        }
+    };
+
+    struct gpuUsageStructString {
+        QString gpuLoad, gpuVramLoadPercent, gpuVramLoad;
+    };
+
+    struct gpuUsageStruct {
+        float gpuLoad, gpuVramLoadPercent, gpuVramLoad;
+        gpuUsageStructString str;
+
+        void convertToString() {
+             str.gpuLoad = (gpuLoad != -1) ? QString::number(gpuLoad) + "%" : "";
+             str.gpuVramLoadPercent = (gpuVramLoadPercent != -1) ? QString::number(gpuVramLoadPercent) + "%" : "";
+             str.gpuVramLoad = (gpuVramLoad != -1) ? QString::number(gpuVramLoad/1024/1024) + "MB" : "";
+        }
+    };
+
+    struct gpuConstParams {
+         int pwmMaxSpeed, maxCoreClock, maxMemClock, vRamSize;
     };
 
     // settings from config used across the source
-    static struct globalCfgStruct{
+    static struct globalCfgStruct {
         float interval;
         bool daemonAutoRefresh, rootMode;
         int graphOffset;

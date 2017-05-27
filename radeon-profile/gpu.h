@@ -30,13 +30,15 @@ public:
     }
 
     globalStuff::gpuClocksStruct gpuClocksData;
-    globalStuff::gpuClocksStructString gpuClocksDataString;
     globalStuff::gpuTemperatureStruct gpuTemeperatureData;
-    globalStuff::gpuTemperatureStructString gpuTemeperatureDataString;
+    globalStuff::gpuUsageStruct gpuUsageData;
+    globalStuff::gpuConstParams gpuParams;
+    globalStuff::gpuPwmStruct gpuPwmData;
+
+    globalStuff::driverFeatures features;
 
     QStringList gpuList;
     char currentGpuIndex;
-    globalStuff::driverFeatures features;
     QString currentPowerProfile, currentPowerLevel;
 
     QList<QTreeWidgetItem *> getCardConnectors() const;
@@ -45,12 +47,12 @@ public:
     QString getCurrentPowerLevel();
     QString getCurrentPowerProfile();
     void refreshPowerLevel();
-    globalStuff::gpuClocksStructString convertClocks(const globalStuff::gpuClocksStruct &data);
-    globalStuff::gpuTemperatureStructString convertTemperature(const globalStuff::gpuTemperatureStruct &data);
 
     void getClocks();
     void getTemperature();
     void getPwmSpeed();
+    void getGpuUsage();
+    void getConstParams();
 
     void changeGpu(char index);
     void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
@@ -65,7 +67,6 @@ public:
 
     bool overclock(int value);
     void resetOverclock();
-
 private:
     dXorg *driverHandler;
 

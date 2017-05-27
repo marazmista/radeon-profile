@@ -1,4 +1,4 @@
-#include "ioctlHandler.hpp"
+#include "ioctlHandler.h"
 
 #include <QDebug>
 #include <sys/ioctl.h> // ioctl()
@@ -43,22 +43,22 @@ bool amdgpuIoctlHandler::getTemperature(int *data) const {
 }
 
 
-bool amdgpuIoctlHandler::getCoreClock(unsigned *data) const {
+bool amdgpuIoctlHandler::getCoreClock(int *data) const {
     return getClocks(data, NULL);
 }
 
 
-bool amdgpuIoctlHandler::getMaxCoreClock(unsigned *data) const {
+bool amdgpuIoctlHandler::getMaxCoreClock(int *data) const {
     return getMaxClocks(data, NULL);
 }
 
 
-bool amdgpuIoctlHandler::getMaxMemoryClock(unsigned *data) const {
+bool amdgpuIoctlHandler::getMaxMemoryClock(int *data) const {
     return getMaxClocks(NULL, data);
 }
 
 
-bool amdgpuIoctlHandler::getMaxClocks(unsigned *core, unsigned *memory) const {
+bool amdgpuIoctlHandler::getMaxClocks(int *core, int *memory) const {
 #ifdef AMDGPU_INFO_DEV_INFO
     struct drm_amdgpu_info_device info = {};
     bool success = getValue(&info, sizeof(info), AMDGPU_INFO_DEV_INFO);
@@ -77,12 +77,12 @@ bool amdgpuIoctlHandler::getMaxClocks(unsigned *core, unsigned *memory) const {
 }
 
 
-bool amdgpuIoctlHandler::getMemoryClock(unsigned *data) const {
+bool amdgpuIoctlHandler::getMemoryClock(int *data) const {
     return getClocks(NULL, data);
 }
 
 
-bool amdgpuIoctlHandler::getClocks(unsigned *core, unsigned *memory) const {
+bool amdgpuIoctlHandler::getClocks(int *core, int *memory) const {
 #ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Linux >= 4.10
     struct drm_amdgpu_info_vce_clock_table table = {};
     bool success = getValue(&table, sizeof(table), AMDGPU_INFO_VCE_CLOCK_TABLE) && (table.num_valid_entries > 0);
@@ -101,7 +101,7 @@ bool amdgpuIoctlHandler::getClocks(unsigned *core, unsigned *memory) const {
 }
 
 
-bool amdgpuIoctlHandler::getVramUsage(unsigned long *data) const {
+bool amdgpuIoctlHandler::getVramUsage(float *data) const {
 #ifdef AMDGPU_INFO_VRAM_USAGE
     return getValue(data, sizeof(*data), AMDGPU_INFO_VRAM_USAGE);
 #else
@@ -111,7 +111,7 @@ bool amdgpuIoctlHandler::getVramUsage(unsigned long *data) const {
 }
 
 
-bool amdgpuIoctlHandler::getVramSize(unsigned long *data) const {
+bool amdgpuIoctlHandler::getVramSize(float *data) const {
 #ifdef AMDGPU_INFO_VRAM_GTT
     struct drm_amdgpu_info_vram_gtt info = {};
     bool success = getValue(&info, sizeof(info), AMDGPU_INFO_VRAM_GTT);

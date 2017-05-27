@@ -1,4 +1,4 @@
-#include "ioctlHandler.hpp"
+#include "ioctlHandler.h"
 
 #include <QDebug>
 #include <sys/ioctl.h> // ioctl()
@@ -95,7 +95,7 @@ ioctlHandler::~ioctlHandler(){
 }
 
 
-bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency) const {
+bool ioctlHandler::getGpuUsage(float *data, int time, int frequency) const {
 #define ONE_SECOND 1000000
     const unsigned int sleep = ONE_SECOND/frequency;
     unsigned int slept, activeCount = 0, totalCount = 0;
@@ -115,7 +115,7 @@ bool ioctlHandler::getGpuUsage(float *data, unsigned time, unsigned frequency) c
 
 
 bool ioctlHandler::getVramUsagePercentage(float *data) const {
-    unsigned long usage=0, total=0;
+    float usage=0, total=0;
     bool success = getVramUsage(&usage) && getVramSize(&total);
     if(Q_LIKELY(success))
         *data = (100.0f * usage) / total;

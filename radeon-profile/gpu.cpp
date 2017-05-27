@@ -67,60 +67,22 @@ QStringList gpu::initialize() {
     if (currentGpuIndex < gpuList.size()) {
         driverHandler = new dXorg(gpuList[currentGpuIndex]);
         features = driverHandler->figureOutDriverFeatures();
+        gpuParams = driverHandler->getGpuConstParams();
     }
 
     return gpuList;
-}
-
-
-globalStuff::gpuClocksStructString gpu::convertClocks(const globalStuff::gpuClocksStruct &data) {
-    globalStuff::gpuClocksStructString tmp;
-
-    if (data.coreClk != -1)
-        tmp.coreClk =  QString().setNum(data.coreClk)+"MHz";
-
-    if (data.memClk != -1)
-        tmp.memClk =  QString().setNum(data.memClk)+"MHz";
-
-    if (data.memVolt != -1)
-        tmp.memVolt =  QString().setNum(data.memVolt)+"mV";
-
-    if (data.coreVolt != -1)
-        tmp.coreVolt =  QString().setNum(data.coreVolt)+"mV";
-
-    if (data.powerLevel != -1)
-        tmp.powerLevel =  QString().setNum(data.powerLevel);
-
-    if (data.uvdCClk != -1)
-        tmp.uvdCClk =  QString().setNum(data.uvdCClk)+"MHz";
-
-    if (data.uvdDClk != -1)
-        tmp.uvdDClk =  QString().setNum(data.uvdDClk)+"MHz";
-
-    return tmp;
-}
-
-globalStuff::gpuTemperatureStructString gpu::convertTemperature(const globalStuff::gpuTemperatureStruct &data) {
-    globalStuff::gpuTemperatureStructString tmp;
-
-    tmp.current = QString::number(data.current) + QString::fromUtf8("\u00B0C");
-    tmp.max = QString::number(data.max) + QString::fromUtf8("\u00B0C");
-    tmp.min = QString::number(data.min) + QString::fromUtf8("\u00B0C");
-    tmp.pwmSpeed = QString::number(data.pwmSpeed)+"%";
-
-    return tmp;
 }
 
 void gpu::changeGpu(char index) {
     currentGpuIndex = index;
     driverHandler->configure(gpuList[currentGpuIndex]);
     features = driverHandler->figureOutDriverFeatures();
-
+    gpuParams = driverHandler->getGpuConstParams();
 }
 
 void gpu::getClocks() {
     gpuClocksData = driverHandler->getClocks();
-    gpuClocksDataString = convertClocks(gpuClocksData);
+    gpuClocksData.convertToString();
 }
 
 void gpu::getTemperature() {
@@ -136,7 +98,87 @@ void gpu::getTemperature() {
     gpuTemeperatureData.max = (gpuTemeperatureData.max < gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.max;
     gpuTemeperatureData.min = (gpuTemeperatureData.min > gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.min;
 
-    gpuTemeperatureDataString = convertTemperature(gpuTemeperatureData);
+    gpuTemeperatureData.convertToString();
+}
+
+void gpu::getGpuUsage() {
+    gpuUsageData = driverHandler->getGpuUsage();
+    gpuUsageData.convertToString();
+}
+
+QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
+    return driverHandler->getModuleInfo();
+}
+
+QStringList gpu::getGLXInfo(QString gpuName) const {
+    QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter(QRegExp(".+VGA.+|.+3D.+"));
+    gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
+
+    // loop for multi gpu
+    for (int i = 0; i < gpus.count(); i++)
+        data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
+
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    if (!gpuName.isEmpty())
+        env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
+    QStringList driver = globalStuff::grabSystemInfo("xdriinfo",env).filter("Screen 0:",Qt::CaseInsensitive);
+    if (!driver.isEmpty())  // because of segfault when no xdriinfo
+        data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
+
+
+    data << driverHandler->getGLXInfo(env);
+
+    return data;
+}
+
+QString gpu::getCurrentPowerLevel() {
+    return driverHandler->getCurrentPowerLevel().trimmed();
+
+}
+
+QString gpu::getCurrentPowerProfile()  {
+    return driverHandler->getCurrentPowerProfile().trimmed();
+
+}
+
+void gpu::refreshPowerLevel() {
+    currentPowerLevel = getCurrentPowerLevel();
+    currentPowerProfile = getCurrentPowerProfile();
+}
+
+void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
+    driverHandler->setPowerProfile(_newPowerProfile);
+}
+
+void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
+    driverHandler->setForcePowerLevel(_newForcePowerLevel);
+
+}
+
+void gpu::setPwmValue(unsigned int value) {
+    driverHandler->setPwmValue(gpuParams.pwmMaxSpeed * value / 100);
+}
+
+void gpu::setPwmManualControl(bool manual) {
+    driverHandler->setPwmManualControl(manual);
+}
+
+void gpu::getPwmSpeed() {
+    gpuPwmData.pwmSpeed = ((float)driverHandler->getPwmSpeed() / gpuParams.pwmMaxSpeed ) * 100;
+    gpuPwmData.convertToString();
+}
+
+bool gpu::overclock(const int value){
+    if (features.overClockAvailable)
+        return driverHandler->overclock(value);
+
+    qWarning() << "Error overclocking: overclocking is not supported";
+    return false;
+}
+
+void gpu::resetOverclock(){
+    if (features.overClockAvailable)
+        driverHandler->resetOverclock();
 }
 
 // Function that returns the human readable output of a property value
@@ -689,79 +731,3 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
     return cardConnectorsList;
 }
 
-QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
-    return driverHandler->getModuleInfo();
-}
-
-QStringList gpu::getGLXInfo(QString gpuName) const {
-    QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter(QRegExp(".+VGA.+|.+3D.+"));
-    gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
-
-    // loop for multi gpu
-    for (int i = 0; i < gpus.count(); i++)
-        data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
-
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    if (!gpuName.isEmpty())
-        env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
-    QStringList driver = globalStuff::grabSystemInfo("xdriinfo",env).filter("Screen 0:",Qt::CaseInsensitive);
-    if (!driver.isEmpty())  // because of segfault when no xdriinfo
-        data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
-
-
-    data << driverHandler->getGLXInfo(env);
-
-    return data;
-}
-
-QString gpu::getCurrentPowerLevel() {
-    return driverHandler->getCurrentPowerLevel().trimmed();
-
-}
-
-QString gpu::getCurrentPowerProfile()  {
-    return driverHandler->getCurrentPowerProfile().trimmed();
-
-}
-
-void gpu::refreshPowerLevel() {
-    currentPowerLevel = getCurrentPowerLevel();
-    currentPowerProfile = getCurrentPowerProfile();
-}
-
-void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
-    driverHandler->setPowerProfile(_newPowerProfile);
-}
-
-void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
-    driverHandler->setForcePowerLevel(_newForcePowerLevel);
-
-}
-
-void gpu::setPwmValue(unsigned int value) {
-    driverHandler->setPwmValue(features.pwmMaxSpeed * value / 100);
-
-}
-
-void gpu::setPwmManualControl(bool manual) {
-    driverHandler->setPwmManualControl(manual);
-
-}
-
-void gpu::getPwmSpeed() {
-    gpuTemeperatureData.pwmSpeed = ((float)driverHandler->getPwmSpeed() / features.pwmMaxSpeed ) * 100;
-
-}
-
-bool gpu::overclock(const int value){
-    if (features.overClockAvailable)
-        return driverHandler->overclock(value);
-
-    qWarning() << "Error overclocking: overclocking is not supported";
-    return false;
-}
-
-void gpu::resetOverclock(){
-    if (features.overClockAvailable)
-        driverHandler->resetOverclock();
-}

@@ -80,21 +80,21 @@ public:
      * @param data On success is filled with the value, in MHz.
      * @return Success.
      */
-    virtual bool getCoreClock(unsigned *data) const = 0;
+    virtual bool getCoreClock(int *data) const = 0;
 
     /**
      * @brief Get GPU maximum clock.
      * @param data On success is filled with the value, in KHz.
      * @return Success.
      */
-    virtual bool getMaxCoreClock(unsigned *data) const = 0;
+    virtual bool getMaxCoreClock(int *data) const = 0;
 
     /**
      * @brief Get memory maximum clock.
      * @param data On success is filled with the value, in KHz.
      * @return Success.
      */
-    virtual bool getMaxMemoryClock(unsigned *data) const = 0;
+    virtual bool getMaxMemoryClock(int *data) const = 0;
 
     /**
      * @brief Get both core and memory maximum clocks.
@@ -103,7 +103,7 @@ public:
      * @note If one parameter is NULL it will not be filled.
      * @return Success.
      */
-    virtual bool getMaxClocks(unsigned *core, unsigned *memory) const = 0;
+    virtual bool getMaxClocks(int *core, int *memory) const = 0;
 
     /**
      * @brief Get how busy the GPU is.
@@ -115,14 +115,14 @@ public:
      * @note A frequency > 100 Hz is suggested (A low sampling frequency reduces precision).
      * @return Success.
      */
-    bool getGpuUsage(float *data, unsigned time, unsigned frequency) const;
+    bool getGpuUsage(float *data, int time, int frequency) const;
 
     /**
      * @brief Get VRAM memory current clock (mclk).
      * @param data On success is filled with the value, in MHz.
      * @return Success.
      */
-    virtual bool getMemoryClock(unsigned *data) const = 0;
+    virtual bool getMemoryClock(int *data) const = 0;
 
     /**
      * @brief Get both core and memory clock
@@ -131,14 +131,14 @@ public:
      * @note If one parameter is NULL it will not be filled.
      * @return Success.
      */
-    virtual bool getClocks(unsigned *core, unsigned *memory) const = 0;
+    virtual bool getClocks(int *core, int *memory) const = 0;
 
     /**
      * @brief Get VRAM memory current usage.
      * @param data On success is filled with the value, in bytes.
      * @return Success.
      */
-    virtual bool getVramUsage(unsigned long *data) const = 0;
+    virtual bool getVramUsage(float *data) const = 0;
 
     /**
      * @brief Get the percentage of VRAM memory currently used.
@@ -152,7 +152,7 @@ public:
      * @param data On success is filled with the value, in bytes.
      * @return Success.
      */
-    virtual bool getVramSize(unsigned long *data) const = 0;
+    virtual bool getVramSize(float *data) const = 0;
 
     /**
      * @brief Get the name of driver
@@ -182,15 +182,15 @@ public:
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
      */
     radeonIoctlHandler(unsigned cardIndex);
-    bool getCoreClock(unsigned *data) const;
-    bool getMaxCoreClock(unsigned *data) const;
-    bool getMaxMemoryClock(unsigned *data) const;
-    bool getMaxClocks(unsigned *core, unsigned *memory) const;
-    bool getMemoryClock(unsigned *data) const;
-    bool getClocks(unsigned *core, unsigned *memory) const;
+    bool getCoreClock(int *data) const;
+    bool getMaxCoreClock(int *data) const;
+    bool getMaxMemoryClock(int *data) const;
+    bool getMaxClocks(int *core, int *memory) const;
+    bool getMemoryClock(int *data) const;
+    bool getClocks(int *core, int *memory) const;
     bool getTemperature(int *data) const;
-    bool getVramSize(unsigned long *data) const;
-    bool getVramUsage(unsigned long *data) const;
+    bool getVramSize(float *data) const;
+    bool getVramUsage(float *data) const;
 };
 
 
@@ -214,15 +214,15 @@ public:
      * @note You can find the list of available cards by running 'ls /dev/dri/ | grep card'.
      */
     amdgpuIoctlHandler(unsigned cardIndex);
-    bool getCoreClock(unsigned *data) const;
-    bool getMaxCoreClock(unsigned *data) const;
-    bool getMaxMemoryClock(unsigned *data) const;
-    bool getMaxClocks(unsigned *core, unsigned *memory) const;
-    bool getMemoryClock(unsigned *data) const;
-    bool getClocks(unsigned *core, unsigned *memory) const;
+    bool getCoreClock(int *data) const;
+    bool getMaxCoreClock(int *data) const;
+    bool getMaxMemoryClock(int *data) const;
+    bool getMaxClocks(int *core, int *memory) const;
+    bool getMemoryClock(int *data) const;
+    bool getClocks(int *core, int *memory) const;
     bool getTemperature(int *data) const;
-    bool getVramSize(unsigned long *data) const;
-    bool getVramUsage(unsigned long *data) const;
+    bool getVramSize(float *data) const;
+    bool getVramUsage(float *data) const;
 };
 
 #endif

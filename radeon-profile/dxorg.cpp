@@ -17,12 +17,12 @@ void dXorg::configure(const QString &gpuName) {
     setupDriverModule(gpuName);
     qDebug() << "Using module" << driverModuleName;
 
-    if(driverModuleName == "radeon")
-        ioctlHnd = new radeonIoctlHandler( gpuName[4].toLatin1() - '0');
-    else if(driverModuleName == "amdgpu")
-        ioctlHnd = new amdgpuIoctlHandler( gpuName[4].toLatin1() - '0');
+    if (driverModuleName == "radeon")
+        ioctlHnd = new radeonIoctlHandler(gpuName[4].toLatin1() - '0');
+    else if (driverModuleName == "amdgpu")
+        ioctlHnd = new amdgpuIoctlHandler(gpuName[4].toLatin1() - '0');
     else
-        ioctlHnd = NULL;
+        ioctlHnd = nullptr;
 
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = getTemperatureSensor();
@@ -111,10 +111,10 @@ bool dXorg::daemonConnected() {
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 #ifdef QT_DEBUG // Test IOCTLs
-    if(ioctlHnd!=NULL && ioctlHnd->isValid()){
+    if(ioctlHnd!=nullptr && ioctlHnd->isValid()){
         int i=0;
-        unsigned u=0;
-        unsigned long ul=0;
+        int u=0;
+        float ul=0;
         float f=0;
 
         qDebug() << "Testing IOCTLs";
@@ -334,6 +334,22 @@ float dXorg::getTemperature() {
     return temp.toFloat();
 }
 
+globalStuff::gpuUsageStruct dXorg::getGpuUsage() {
+    globalStuff::gpuUsageStruct data;
+
+    if (!ioctlHnd->getGpuUsage(&data.gpuLoad, 500000, 150))
+        data.gpuLoad = -1;
+
+    if (!ioctlHnd->getVramUsagePercentage(&data.gpuVramLoadPercent))
+        data.gpuVramLoadPercent = -1;
+
+    if (!ioctlHnd->getVramUsage(&data.gpuVramLoad))
+        data.gpuVramLoad = -1;
+
+    return data;
+}
+
+
 globalStuff::powerMethod dXorg::getPowerMethod() {
     if (QFile::exists(filePaths.dpmStateFilePath))
         return globalStuff::DPM;
@@ -428,8 +444,6 @@ QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
     }
     return data;
 }
-
-
 
 QString dXorg::getCurrentPowerProfile() {
     switch (currentPowerMethod) {
@@ -685,11 +699,7 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
         if (QString(f.readLine(2))[0] != pwm_disabled) {
             features.pwmAvailable = true;
 
-            QFile fPwmMax(filePaths.pwmMaxSpeedPath);
-            if (fPwmMax.open(QIODevice::ReadOnly)) {
-                features.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
-                fPwmMax.close();
-            }
+
         }
         f.close();
     }
@@ -697,6 +707,26 @@ globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
     features.overClockAvailable = QFile::exists(filePaths.overDrivePath);
 
     return features;
+}
+
+globalStuff::gpuConstParams dXorg::getGpuConstParams() {
+    globalStuff::gpuConstParams params;
+
+    QFile fPwmMax(filePaths.pwmMaxSpeedPath);
+    if (fPwmMax.open(QIODevice::ReadOnly)) {
+        params.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
+        fPwmMax.close();
+    }
+
+    if (ioctlHnd != nullptr && ioctlHnd->isValid()) {
+        if (!ioctlHnd->getMaxCoreClock(&params.maxCoreClock))
+            params.maxCoreClock = -1;
+
+        if (!ioctlHnd->getMaxMemoryClock(&params.maxMemClock))
+            params.maxMemClock = -1;
+    }
+
+    return params;
 }
 
 globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
@@ -721,10 +751,10 @@ globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
     return fallbackFeatures;
 }
 
-bool dXorg::overclock(const int percentage){
-    if((percentage > 20) || (percentage < 0))
+bool dXorg::overclock(const int percentage) {
+    if ((percentage > 20) || (percentage < 0))
         qWarning() << "Error overclocking: invalid percentage passed: " << percentage;
-    else if (daemonConnected()){ // Signal the daemon to set the overclock value
+    else if (daemonConnected()) { // Signal the daemon to set the overclock value
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
         command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
         command.append(QString::number(percentage)).append(SEPARATOR); // The overclock level

@@ -7,7 +7,7 @@
 
 #include "globalStuff.h"
 #include "daemonComm.h"
-#include "ioctlHandler.hpp"
+#include "ioctlHandler.h"
 
 #include <QString>
 #include <QList>
@@ -26,6 +26,7 @@ public:
 
     void cleanup() {
         delete dcomm;
+        delete ioctlHnd;
 
         if(sharedMem.isAttached()){
             // In case the closing signal interrupts a sharedMem lock+read+unlock phase, sharedmem is unlocked
@@ -34,13 +35,12 @@ public:
         }
         // Before being deleted, the class deletes the sharedMem
         sharedMem.deleteLater();
-
-        delete ioctlHnd;
     }
 
     globalStuff::gpuClocksStruct getClocks();
     QString getClocksRawData(bool forFeatures = false);
     float getTemperature();
+    globalStuff::gpuUsageStruct getGpuUsage();
     QStringList getGLXInfo(QProcessEnvironment env);
     QList<QTreeWidgetItem *> getModuleInfo();
     QString getCurrentPowerLevel();
@@ -55,6 +55,7 @@ public:
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure(const QString &gpuName);
     globalStuff::driverFeatures figureOutDriverFeatures();
+    globalStuff::gpuConstParams getGpuConstParams();
     void reconfigureDaemon();
     bool daemonConnected();
     globalStuff::gpuClocksStruct getFeaturesFallback();
