@@ -7,6 +7,7 @@
 
 #include "globalStuff.h"
 #include "daemonComm.h"
+#include "ioctlHandler.hpp"
 
 #include <QString>
 #include <QList>
@@ -24,6 +25,14 @@ public:
     ~dXorg() {
         delete dcomm;
 
+        if(ioctls != NULL)
+            delete ioctls;
+
+        if(sharedMem.isAttached()){
+            // In case the closing signal interrupts a sharedMem lock+read+unlock phase, sharedmem is unlocked
+            sharedMem.unlock();
+            sharedMem.detach();
+        }
         // Before being deleted, the class deletes the sharedMem
         sharedMem.deleteLater();
     }
@@ -43,6 +52,7 @@ public:
     static void setPwmValue(unsigned int value);
 
     static QStringList detectCards();
+    static void loadIoctls(const QString &gpuName);
     static void figureOutGpuDataFilePaths(const QString &gpuName);
     static void configure(const QString &gpuName);
     static globalStuff::driverFeatures figureOutDriverFeatures();
@@ -74,6 +84,7 @@ private:
     static QSharedMemory sharedMem;
     static QString driverModuleName;
     static daemonComm *dcomm;
+    static ioctlHandler *ioctls;
 
     static struct rxPatternsStruct {
         QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;

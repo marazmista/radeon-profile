@@ -21,10 +21,13 @@ QSharedMemory dXorg::sharedMem;
 dXorg::driverFilePaths dXorg::filePaths;
 dXorg::rxPatternsStruct dXorg::rxPatterns;
 daemonComm *dXorg::dcomm = new daemonComm();
+ioctlHandler *dXorg::ioctls = NULL;
 // end //
 
 void dXorg::configure(const QString &gpuName) {
     setupDriverModule(gpuName);
+    qDebug() << "Using module" << dXorg::driverModuleName;
+    loadIoctls(gpuName);
     figureOutGpuDataFilePaths(gpuName);
     currentTempSensor = testSensor();
     currentPowerMethod = getPowerMethod();
@@ -109,6 +112,51 @@ bool dXorg::daemonConnected() {
     return dcomm->connected();
 }
 
+void dXorg::loadIoctls(const QString &gpuName){
+    if(ioctls == NULL){ // Do nothing if ioctls is already loaded
+        qDebug() << "Loading ioctls";
+         // Card index: "card0" => 0, "card1" => 1, ...
+        unsigned index = gpuName[4].toLatin1() - '0';
+        ioctlHandler * handler = NULL;
+
+        // Create the appropriate handler
+        if(dXorg::driverModuleName == "radeon")
+            handler = new radeonIoctlHandler(index);
+        else if(dXorg::driverModuleName == "amdgpu")
+            handler = new amdgpuIoctlHandler(index);
+
+        // If the handler is not valid, delete it
+        if(handler != NULL && ! handler->isValid()){
+            qDebug() << "Invalid ioctl handler, deleting it";
+            delete handler;
+            handler = NULL;
+        }
+
+        ioctls = handler;
+    }
+
+    /*
+    if(ioctls!=NULL){
+        int i=0;
+        unsigned u=0;
+        unsigned long ul=0;
+        float f=0;
+
+        qDebug() << "Testing IOCTLs";
+        qDebug() << "Driver: " << ioctls->getDriverName();
+        if(ioctls->getCoreClock(&u)) qDebug() << "Core clock:" << u << "MHz";
+        if(ioctls->getMaxCoreClock(&u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
+        if(ioctls->getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
+        if(ioctls->getMaxMemoryClock(&u)) qDebug() << "Max memory clock:" << u/1000 << "MHz";
+        if(ioctls->getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
+        if(ioctls->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024/1024 << "MB";
+        if(ioctls->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024/1024 << "MB";
+        if(ioctls->getVramUsagePercentage(&f)) qDebug() << "VRAM usage percentage:" << f << "%";
+        if(ioctls->getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
+    }
+    */
+}
+
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     gpuSysIndex = gpuName.at(gpuName.length()-1);
     QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
@@ -191,6 +239,14 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 
 globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
     globalStuff::gpuClocksStruct tData(-1); // empty struct
+
+    if(ioctls != NULL){
+        unsigned core, mem;
+        if(ioctls->getClocks(&core, &mem)){
+            tData.coreClk = static_cast<int>(core);
+            tData.memClk = static_cast<int>(mem);
+        }
+    }
 
     // if nothing is there returns empty (-1) struct
     if (data.isEmpty()){
@@ -282,6 +338,12 @@ globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
 
 float dXorg::getTemperature() {
     QString temp;
+
+    if(ioctls != NULL){
+        int temp;
+        if(ioctls->getTemperature(&temp))
+            return temp/1000.0f;
+    }
 
     switch (currentTempSensor) {
     case SYSFS_HWMON:
