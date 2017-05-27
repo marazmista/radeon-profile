@@ -37,9 +37,20 @@ bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
 
 
 bool amdgpuIoctlHandler::getTemperature(int *data) const {
-    qDebug() << "amdgpuIoctlHandler::getTemperature() is not available";
+#ifdef AMDGPU_INFO_SENSOR // Linux >= 4.12
+    struct drm_amdgpu_info buffer = {};
+    buffer.query = AMDGPU_INFO_SENSOR;
+    buffer.return_pointer = reinterpret_cast<uint64_t>(data);
+    buffer.return_size = sizeof(*data);
+    buffer.sensor_info.type = AMDGPU_INFO_SENSOR_GPU_TEMP;
+    bool success = !ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
+    if(Q_UNLIKELY(!success))
+        perror("DRM_IOCTL_AMDGPU_INFO AMDGPU_INFO_SENSOR");
+    return success;
+#else
     return false;
     Q_UNUSED(data);
+#endif
 }
 
 
