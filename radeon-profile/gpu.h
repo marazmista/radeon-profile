@@ -9,20 +9,21 @@
 
 #include "globalStuff.h"
 #include "dxorg.h"
+#include <QtConcurrent/QtConcurrent>
 
-class gpu
+class gpu : public QObject
 {
-public:
-//    enum driverType {
-//        XORG, FGLRX, DRIVER_UNKNOWN
-//    };
 
-    explicit gpu() {
+    Q_OBJECT
+public:
+    explicit gpu(QObject *parent = 0 ) : QObject(parent) {
         currentGpuIndex = 0;
         gpuTemeperatureData.current =
                 gpuTemeperatureData.max =
                 gpuTemeperatureData.min =
                 gpuTemeperatureData.sum = 0;
+
+        connect(&fw, SIGNAL(finished()),this,SLOT(handleIoctlResult()));
     }
 
     ~gpu() {
@@ -67,8 +68,16 @@ public:
 
     bool overclock(int value);
     void resetOverclock();
+private slots:
+    void handleIoctlResult() {
+        gpuUsageData = fw.result();
+        gpuUsageData.convertToString();
+    }
+
 private:
     dXorg *driverHandler;
+    QFutureWatcher<globalStuff::gpuUsageStruct> fw;
+
 
 };
 

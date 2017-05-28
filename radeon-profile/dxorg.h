@@ -78,7 +78,6 @@ private:
     QString driverModuleName;
     daemonComm *dcomm;
     ioctlHandler *ioctlHnd;
-
     struct rxPatternsStruct {
         QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
     } rxPatterns;

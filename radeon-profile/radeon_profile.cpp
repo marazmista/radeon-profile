@@ -222,6 +222,7 @@ void radeon_profile::refreshGpuData() {
     device.refreshPowerLevel();
     device.getClocks();
     device.getTemperature();
+    device.getGpuUsage();
 
     if (device.features.pwmAvailable)
         device.getPwmSpeed();
@@ -249,6 +250,8 @@ void radeon_profile::refreshUI() {
 
     // Header - Fan speed
     ui->l_fanSpeed->setText(device.gpuPwmData.str.pwmSpeed);
+
+    ui->l_gpuUsage->setText(device.gpuUsageData.str.gpuLoad);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {

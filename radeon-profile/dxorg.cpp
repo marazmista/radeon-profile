@@ -349,7 +349,6 @@ globalStuff::gpuUsageStruct dXorg::getGpuUsage() {
     return data;
 }
 
-
 globalStuff::powerMethod dXorg::getPowerMethod() {
     if (QFile::exists(filePaths.dpmStateFilePath))
         return globalStuff::DPM;

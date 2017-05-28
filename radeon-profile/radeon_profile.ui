@@ -173,21 +173,18 @@
         <property name="verticalSpacing">
          <number>2</number>
         </property>
-        <item row="0" column="3" rowspan="2">
-         <widget class="QPushButton" name="l_fanSpeed">
-          <property name="font">
-           <font>
-            <family>Monospace</family>
-            <pointsize>20</pointsize>
-           </font>
+        <item row="0" column="5" rowspan="2">
+         <spacer name="horizontalSpacer_71">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <property name="text">
-           <string>999%</string>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
           </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-         </widget>
+         </spacer>
         </item>
         <item row="1" column="1">
          <widget class="QLabel" name="l_mVolt">
@@ -214,37 +211,6 @@
           </property>
           <property name="text">
            <string>9999mV</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="l_mClk">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>70</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Monospace</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="toolTip">
-           <string>Memory clock</string>
-          </property>
-          <property name="text">
-           <string>9999MHz</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -316,6 +282,37 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="l_mClk">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>70</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Monospace</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Memory clock</string>
+          </property>
+          <property name="text">
+           <string>9999MHz</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="l_cClk">
           <property name="minimumSize">
@@ -347,18 +344,52 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="4" rowspan="2">
-         <spacer name="horizontalSpacer_71">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item row="0" column="3" rowspan="2">
+         <widget class="QPushButton" name="l_fanSpeed">
+          <property name="font">
+           <font>
+            <family>Monospace</family>
+            <pointsize>20</pointsize>
+           </font>
           </property>
-          <property name="sizeHint" stdset="0">
+          <property name="text">
+           <string>999%</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4" rowspan="2">
+         <widget class="QLabel" name="l_gpuUsage">
+          <property name="minimumSize">
            <size>
             <width>40</width>
-            <height>20</height>
+            <height>40</height>
            </size>
           </property>
-         </spacer>
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Monospace</family>
+            <pointsize>20</pointsize>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>GPU temperature</string>
+          </property>
+          <property name="text">
+           <string>99.9°C</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

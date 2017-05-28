@@ -6,6 +6,7 @@
 #include <cmath>
 #include <QFile>
 #include <QDebug>
+#include <QtConcurrent/QtConcurrent>
 
 extern "C" {
 #include <X11/extensions/Xrandr.h>
@@ -86,7 +87,6 @@ void gpu::getClocks() {
 }
 
 void gpu::getTemperature() {
-
     gpuTemeperatureData.currentBefore = gpuTemeperatureData.current;
     gpuTemeperatureData.current = driverHandler->getTemperature();
 
@@ -102,8 +102,7 @@ void gpu::getTemperature() {
 }
 
 void gpu::getGpuUsage() {
-    gpuUsageData = driverHandler->getGpuUsage();
-    gpuUsageData.convertToString();
+    fw.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGpuUsage));
 }
 
 QList<QTreeWidgetItem *> gpu::getModuleInfo() const {

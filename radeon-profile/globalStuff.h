@@ -187,7 +187,7 @@ public:
         gpuUsageStructString str;
 
         void convertToString() {
-             str.gpuLoad = (gpuLoad != -1) ? QString::number(gpuLoad) + "%" : "";
+             str.gpuLoad = (gpuLoad != -1) ? QString::number(gpuLoad,'f',2) + "%" : "";
              str.gpuVramLoadPercent = (gpuVramLoadPercent != -1) ? QString::number(gpuVramLoadPercent) + "%" : "";
              str.gpuVramLoad = (gpuVramLoad != -1) ? QString::number(gpuVramLoad/1024/1024) + "MB" : "";
         }

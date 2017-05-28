@@ -163,7 +163,6 @@ private:
         short fanIndex;
         QString fanProfileName;
     };
-
     gpu device;
     static const QString settingsPath;
     QList<execBin*> execsRunning;
