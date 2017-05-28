@@ -10,7 +10,7 @@
 void radeon_profile::on_btn_addEvent_clicked()
 {
     Dialog_RPEvent *d = new Dialog_RPEvent(this);
-    d->setFeatures(device.features, fanProfiles.keys());
+    d->setFeatures(device.getDriverFeatures(), fanProfiles.keys());
 
     if (d->exec() == QDialog::Accepted) {
         RPEvent rpe = d->getCreatedEvent();
@@ -54,7 +54,7 @@ void radeon_profile::checkEvents() {
 }
 
 void radeon_profile::activateEvent(const RPEvent &rpe) {
-    if (!device.features.canChangeProfile)
+    if (!device.getDriverFeatures().canChangeProfile)
         return;
 
     qDebug() << "Activating event: " + rpe.name;
@@ -63,7 +63,7 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
     savedState->profile = static_cast<globalStuff::powerProfiles>(ui->combo_pProfile->currentIndex());
     savedState->powerLevel = static_cast<globalStuff::forcePowerLevels>(ui->combo_pLevel->currentIndex());
 
-    if (device.features.pwmAvailable) {
+    if (device.getDriverFeatures().pwmAvailable) {
         switch (ui->fanModesTabs->currentIndex()) {
             case 0:
             case 1:
@@ -86,7 +86,7 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
     if (rpe.powerLevelChange > -1)
         device.setForcePowerLevel(static_cast<globalStuff::forcePowerLevels>(rpe.powerLevelChange));
 
-    if (rpe.fanComboIndex > 0 && device.features.pwmAvailable) {
+    if (rpe.fanComboIndex > 0 && device.getDriverFeatures().pwmAvailable) {
         switch (rpe.fanComboIndex) {
             case 1:
                 ui->btn_pwmAuto->click();
@@ -112,7 +112,7 @@ void radeon_profile::revokeEvent() {
     device.setPowerProfile(static_cast<globalStuff::powerProfiles>(savedState->profile));
     device.setForcePowerLevel(static_cast<globalStuff::forcePowerLevels>(savedState->powerLevel));
 
-    if (device.features.pwmAvailable) {
+    if (device.getDriverFeatures().pwmAvailable) {
         switch (savedState->fanIndex) {
             case 0:
                 ui->btn_pwmAuto->click();
@@ -166,7 +166,7 @@ void radeon_profile::on_btn_modifyEvent_clicked()
         return;
 
     Dialog_RPEvent *d = new Dialog_RPEvent(this);
-    d->setFeatures(device.features, fanProfiles.keys());
+    d->setFeatures(device.getDriverFeatures(), fanProfiles.keys());
     d->setEditedEvent(events.value(ui->list_events->currentItem()->text(1)));
 
     if (d->exec() == QDialog::Accepted) {

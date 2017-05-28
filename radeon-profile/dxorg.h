@@ -25,7 +25,7 @@ public:
     dXorg(const QString &gpuName);
 
     void cleanup() {
-        delete dcomm;
+//        delete dcomm;
         delete ioctlHnd;
 
         if(sharedMem.isAttached()){
@@ -37,15 +37,18 @@ public:
         sharedMem.deleteLater();
     }
 
+    globalStuff::gpuClocksStruct getClocksFromPmFile();
+    globalStuff::gpuClocksStruct getClocksFromIoctl();
     globalStuff::gpuClocksStruct getClocks();
-    QString getClocksRawData(bool forFeatures = false);
+
     float getTemperature();
     globalStuff::gpuUsageStruct getGpuUsage();
+    int getPwmSpeed();
+
     QStringList getGLXInfo(QProcessEnvironment env);
     QList<QTreeWidgetItem *> getModuleInfo();
     QString getCurrentPowerLevel();
     QString getCurrentPowerProfile();
-    int getPwmSpeed();
 
     void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
     void setForcePowerLevel(globalStuff::forcePowerLevels);
@@ -54,7 +57,6 @@ public:
 
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure(const QString &gpuName);
-    globalStuff::driverFeatures figureOutDriverFeatures();
     globalStuff::gpuConstParams getGpuConstParams();
     void reconfigureDaemon();
     bool daemonConnected();
@@ -63,21 +65,17 @@ public:
     void setupRegex(const QString &data);
     bool overclock(int percentage);
     void resetOverclock();
+    globalStuff::driverFeatures features;
 
 private:
-    enum tempSensor {
-        SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
-        CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
-        PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
-        MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
-        TS_UNKNOWN
-    };
-
     QChar gpuSysIndex;
     QSharedMemory sharedMem;
-    QString driverModuleName;
-    daemonComm *dcomm;
+    int sensorsGPUtempIndex;
+    short rxMatchIndex, clocksValueDivider;
+
+    daemonComm dcomm;
     ioctlHandler *ioctlHnd;
+
     struct rxPatternsStruct {
         QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
     } rxPatterns;
@@ -96,16 +94,14 @@ private:
             overDrivePath;
     } filePaths;
 
-    int sensorsGPUtempIndex;
-    short rxMatchIndex, clocksValueDivider;
-    dXorg::tempSensor currentTempSensor;
-    globalStuff::powerMethod currentPowerMethod;
-
+    QString getClocksRawData(bool forFeatures = false);
     QString findSysfsHwmonForGPU();
     globalStuff::powerMethod getPowerMethod();
-    tempSensor getTemperatureSensor();
+    globalStuff::tempSensor getTemperatureSensor();
     void setNewValue(const QString &filePath, const QString &newValue);
     QString findSysFsHwmonForGpu();
+    bool getIoctlAvailability();
+    void figureOutDriverFeatures();
 };
 
 #endif // DXORG_H

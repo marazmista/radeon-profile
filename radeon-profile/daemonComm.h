@@ -14,6 +14,7 @@
 #define DAEMON_SIGNAL_SET_VALUE '2'
 #define DAEMON_SIGNAL_TIMER_ON '4'
 #define DAEMON_SIGNAL_TIMER_OFF '5'
+#define DAEMON_DISABLE_SHAREDMEM '6'
 
 class daemonComm : public QObject
 {

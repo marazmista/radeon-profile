@@ -23,7 +23,7 @@ public:
                 gpuTemeperatureData.min =
                 gpuTemeperatureData.sum = 0;
 
-        connect(&fw, SIGNAL(finished()),this,SLOT(handleIoctlResult()));
+        connect(&futureGpuUsage, SIGNAL(finished()),this,SLOT(handleGpuUsageResult()));
     }
 
     ~gpu() {
@@ -35,8 +35,6 @@ public:
     globalStuff::gpuUsageStruct gpuUsageData;
     globalStuff::gpuConstParams gpuParams;
     globalStuff::gpuPwmStruct gpuPwmData;
-
-    globalStuff::driverFeatures features;
 
     QStringList gpuList;
     char currentGpuIndex;
@@ -65,20 +63,19 @@ public:
     QStringList initialize();
     void reconfigureDaemon();
     bool daemonConnected();
-
     bool overclock(int value);
     void resetOverclock();
+    const globalStuff::driverFeatures& getDriverFeatures();
+
 private slots:
-    void handleIoctlResult() {
-        gpuUsageData = fw.result();
+    void handleGpuUsageResult() {
+        gpuUsageData = futureGpuUsage.result();
         gpuUsageData.convertToString();
     }
 
 private:
     dXorg *driverHandler;
-    QFutureWatcher<globalStuff::gpuUsageStruct> fw;
-
-
+    QFutureWatcher<globalStuff::gpuUsageStruct> futureGpuUsage;
 };
 
 #endif // GPU_H

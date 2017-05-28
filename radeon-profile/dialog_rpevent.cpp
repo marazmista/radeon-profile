@@ -20,7 +20,7 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
 }
 
 void Dialog_RPEvent::setFeatures(const globalStuff::driverFeatures &features, const QList<QString> &profiles) {
-    switch (features.pm) {
+    switch (features.currentPowerMethod) {
         case globalStuff::powerMethod::DPM:
             ui->combo_dpmChange->addItems(globalStuff::createDPMCombo());
             ui->combo_powerLevelChange->addItems(globalStuff::createPowerLevelCombo());

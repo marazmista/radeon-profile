@@ -67,7 +67,6 @@ QStringList gpu::initialize() {
     QStringList gpuList = detectCards();
     if (currentGpuIndex < gpuList.size()) {
         driverHandler = new dXorg(gpuList[currentGpuIndex]);
-        features = driverHandler->figureOutDriverFeatures();
         gpuParams = driverHandler->getGpuConstParams();
     }
 
@@ -77,7 +76,6 @@ QStringList gpu::initialize() {
 void gpu::changeGpu(char index) {
     currentGpuIndex = index;
     driverHandler->configure(gpuList[currentGpuIndex]);
-    features = driverHandler->figureOutDriverFeatures();
     gpuParams = driverHandler->getGpuConstParams();
 }
 
@@ -102,7 +100,9 @@ void gpu::getTemperature() {
 }
 
 void gpu::getGpuUsage() {
-    fw.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGpuUsage));
+
+    // getting gpu usage seems to be heavy and cause ui lag, so it is done in another thread
+    futureGpuUsage.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGpuUsage));
 }
 
 QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
@@ -167,8 +167,12 @@ void gpu::getPwmSpeed() {
     gpuPwmData.convertToString();
 }
 
+const globalStuff::driverFeatures& gpu::getDriverFeatures() {
+    return driverHandler->features;
+}
+
 bool gpu::overclock(const int value){
-    if (features.overClockAvailable)
+    if (getDriverFeatures().overclockAvailable)
         return driverHandler->overclock(value);
 
     qWarning() << "Error overclocking: overclocking is not supported";
@@ -176,7 +180,7 @@ bool gpu::overclock(const int value){
 }
 
 void gpu::resetOverclock(){
-    if (features.overClockAvailable)
+    if (getDriverFeatures().overclockAvailable)
         driverHandler->resetOverclock();
 }
 

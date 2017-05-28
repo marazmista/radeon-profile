@@ -86,7 +86,7 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 }
 
 void radeon_profile::changeProfileFromCombo() {
-    device.setPowerProfile(static_cast<globalStuff::powerProfiles>((device.features.pm == globalStuff::DPM) ?
+    device.setPowerProfile(static_cast<globalStuff::powerProfiles>((device.getDriverFeatures().currentPowerMethod == globalStuff::DPM) ?
                                                                        ui->combo_pProfile->currentIndex() :
                                                                        ui->combo_pProfile->currentIndex() + 3)); // frist three in enum is dpm so we need to increase
 }
@@ -166,7 +166,7 @@ void radeon_profile::changeEvent(QEvent *event)
 void radeon_profile::gpuChanged()
 {
     device.changeGpu(ui->combo_gpus->currentIndex());
-    setupUiEnabledFeatures(device.features);
+    setupUiEnabledFeatures(device.getDriverFeatures());
     timerEvent();
     refreshBtnClicked();
 }
@@ -205,7 +205,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
 
     saveConfig();
 
-    if (device.features.pwmAvailable)
+    if (device.getDriverFeatures().pwmAvailable)
         device.setPwmManualControl(false);
 
     QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm

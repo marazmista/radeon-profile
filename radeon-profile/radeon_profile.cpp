@@ -66,7 +66,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     ui->combo_gpus->addItems(device.initialize());
 
     ui->configGroups->setTabEnabled(2,device.daemonConnected());
-    setupUiEnabledFeatures(device.features);
+    setupUiEnabledFeatures(device.getDriverFeatures());
 
     if(ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
         ui->btn_applyOverclock->click();
@@ -143,13 +143,13 @@ void radeon_profile::addRuntimeWidgets() {
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
 void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &features) {
-    if (features.canChangeProfile && features.pm < globalStuff::PM_UNKNOWN) {
-        ui->tabs_pm->setTabEnabled(0,features.pm == globalStuff::PROFILE);
+    if (features.canChangeProfile && features.currentPowerMethod < globalStuff::PM_UNKNOWN) {
+        ui->tabs_pm->setTabEnabled(0,features.currentPowerMethod == globalStuff::PROFILE);
 
-        ui->tabs_pm->setTabEnabled(1,features.pm == globalStuff::DPM);
-        changeProfile->setEnabled(features.pm == globalStuff::PROFILE);
-        dpmMenu->setEnabled(features.pm == globalStuff::DPM);
-        ui->combo_pLevel->setEnabled(features.pm == globalStuff::DPM);
+        ui->tabs_pm->setTabEnabled(1,features.currentPowerMethod == globalStuff::DPM);
+        changeProfile->setEnabled(features.currentPowerMethod == globalStuff::PROFILE);
+        dpmMenu->setEnabled(features.currentPowerMethod == globalStuff::DPM);
+        ui->combo_pLevel->setEnabled(features.currentPowerMethod == globalStuff::DPM);
     } else {
         ui->tabs_pm->setEnabled(false);
         changeProfile->setEnabled(false);
@@ -207,7 +207,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->l_fanSpeed->setVisible(false);
     }
 
-    if (Q_LIKELY(features.pm == globalStuff::DPM)) {
+    if (Q_LIKELY(features.currentPowerMethod == globalStuff::DPM)) {
         ui->combo_pProfile->addItems(globalStuff::createDPMCombo());
         ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo());
     } else {
@@ -215,7 +215,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->combo_pProfile->addItems(globalStuff::createProfileCombo());
     }
 
-     ui->mainTabs->setTabEnabled(2,features.overClockAvailable);
+     ui->mainTabs->setTabEnabled(2,features.overclockAvailable);
 }
 
 void radeon_profile::refreshGpuData() {
@@ -224,7 +224,7 @@ void radeon_profile::refreshGpuData() {
     device.getTemperature();
     device.getGpuUsage();
 
-    if (device.features.pwmAvailable)
+    if (device.getDriverFeatures().pwmAvailable)
         device.getPwmSpeed();
 
     if (Q_LIKELY(execsRunning.count() == 0))
@@ -300,7 +300,7 @@ void radeon_profile::timerEvent() {
     if (!refreshWhenHidden->isChecked() && this->isHidden()) {
 
         // even if in tray, keep the fan control active (if enabled)
-        if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked()) {
+        if (device.getDriverFeatures().pwmAvailable && ui->btn_pwmProfile->isChecked()) {
             device.getTemperature();
             adjustFanSpeed();
         }
@@ -311,10 +311,10 @@ void radeon_profile::timerEvent() {
         refreshGpuData();
 
         ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerProfile));
-        if (device.features.pm == globalStuff::DPM)
+        if (device.getDriverFeatures().currentPowerMethod == globalStuff::DPM)
             ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
 
-        if (device.features.pwmAvailable && ui->btn_pwmProfile->isChecked())
+        if (device.getDriverFeatures().pwmAvailable && ui->btn_pwmProfile->isChecked())
             adjustFanSpeed();
 
 

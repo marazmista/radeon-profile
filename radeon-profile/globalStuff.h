@@ -83,6 +83,14 @@ public:
         F_AUTO, F_LOW, F_HIGH
     };
 
+    enum driverModule {
+        RADEON, AMDGPU, MODULE_UNKNOWN
+    };
+
+    enum clocksDataSource {
+        IOCTL, PM_FILE, SOURCE_UNKNOWN
+    };
+
 //    enum pwmControl {
 //        PWM_DISABLED, PWM_MANUAL, PWM_AUTO
 //    };
@@ -91,6 +99,14 @@ public:
         DPM = 0,  // kernel >= 3.11
         PROFILE = 1,  // kernel <3.11 or dpm disabled
         PM_UNKNOWN = 2
+    };
+
+    enum tempSensor {
+        SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
+        CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
+        PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
+        MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
+        TS_UNKNOWN
     };
 
     // structure which holds what can be display on ui and on its base
@@ -103,8 +119,12 @@ public:
             memVoltAvailable,
             temperatureAvailable,
             pwmAvailable,
-            overClockAvailable;
-        globalStuff::powerMethod pm;
+            overclockAvailable;
+        globalStuff::powerMethod currentPowerMethod;
+        globalStuff::clocksDataSource clocksSource;
+        globalStuff::tempSensor currentTemperatureSensor;
+        globalStuff::driverModule driverModule;
+        QString driverModuleString;
 
         driverFeatures() {
             canChangeProfile =
@@ -114,10 +134,12 @@ public:
                     memVoltAvailable =
                     temperatureAvailable =
                     pwmAvailable =
-                    overClockAvailable = false;
-            pm = PM_UNKNOWN;
+                    overclockAvailable = false;
+            currentPowerMethod = PM_UNKNOWN;
+            currentTemperatureSensor = TS_UNKNOWN;
+            driverModule = MODULE_UNKNOWN;
+            driverModuleString = "";
         }
-
     };
 
     struct gpuClocksStructString {
@@ -129,11 +151,8 @@ public:
         char powerLevel;
         gpuClocksStructString str;
 
-        gpuClocksStruct() { }
-
-        // initialize empty struct, so when we pass -1, only values that != -1 will show
-        gpuClocksStruct(int allValues) {
-            coreClk = memClk =  coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = allValues;
+        gpuClocksStruct() {
+            coreClk = memClk =  coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = -1;
         }
 
         void convertToString() {
@@ -186,6 +205,10 @@ public:
         float gpuLoad, gpuVramLoadPercent, gpuVramLoad;
         gpuUsageStructString str;
 
+        gpuUsageStruct() {
+            gpuLoad = gpuVramLoad = gpuVramLoadPercent = -1;
+        }
+
         void convertToString() {
              str.gpuLoad = (gpuLoad != -1) ? QString::number(gpuLoad,'f',2) + "%" : "";
              str.gpuVramLoadPercent = (gpuVramLoadPercent != -1) ? QString::number(gpuVramLoadPercent) + "%" : "";
@@ -194,7 +217,7 @@ public:
     };
 
     struct gpuConstParams {
-         int pwmMaxSpeed, maxCoreClock, maxMemClock, vRamSize;
+         int pwmMaxSpeed, maxCoreClock = -1, maxMemClock = -1, vRamSize = -1;
     };
 
     // settings from config used across the source
