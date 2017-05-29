@@ -36,9 +36,9 @@ public:
     globalStuff::gpuConstParams gpuParams;
     globalStuff::gpuPwmStruct gpuPwmData;
 
-    QStringList gpuList;
     char currentGpuIndex;
     QString currentPowerProfile, currentPowerLevel;
+    QList<globalStuff::gpuSysInfo> gpuList;
 
     QList<QTreeWidgetItem *> getCardConnectors() const;
     QStringList getGLXInfo(QString gpuName) const;
@@ -53,14 +53,14 @@ public:
     void getGpuUsage();
     void getConstParams();
 
-    void changeGpu(char index);
+    void changeGpu(int index);
     void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
     void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel);
     void setPwmManualControl(bool manual);
     void setPwmValue(unsigned int value);
 
-    QStringList detectCards();
-    QStringList initialize();
+    void detectCards();
+    bool initialize();
     void reconfigureDaemon();
     bool daemonConnected();
     bool overclock(int value);

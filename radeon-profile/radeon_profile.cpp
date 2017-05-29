@@ -32,13 +32,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
 {
-    rangeX = 180;
-    ticksCounter = 0;
-    statsTickCounter = 0;
-	savedState = nullptr;
-
     ui->setupUi(this);
-    timer = new QTimer(this);
 
     // checks if running as root
     if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
@@ -48,6 +42,21 @@ radeon_profile::radeon_profile(QWidget *parent) :
         globalStuff::globalConfig.rootMode = false;
         ui->label_rootWarrning->setVisible(false);
     }
+
+    if (!device.initialize()) {
+        QMessageBox::critical(this,tr("Error"), tr("No Radeon cards have been found in the system."));
+
+        for (int i = 0; i < ui->mainTabs->count() - 1; ++i)
+            ui->mainTabs->setTabEnabled(i, false);
+
+        return;
+    }
+
+    rangeX = 180;
+    ticksCounter = 0;
+    statsTickCounter = 0;
+	savedState = nullptr;
+    timer = new QTimer(this);
 
     // setup ui elemensts
     ui->mainTabs->setCurrentIndex(0);
@@ -61,14 +70,14 @@ radeon_profile::radeon_profile(QWidget *parent) :
     setupContextMenus();
     setupTrayIcon();
 
+    for (int i = 0; i < device.gpuList.count(); ++i)
+        ui->combo_gpus->addItem(device.gpuList.at(i).sysName);
+
     loadConfig();
 
-    ui->combo_gpus->addItems(device.initialize());
-
-    ui->configGroups->setTabEnabled(2,device.daemonConnected());
     setupUiEnabledFeatures(device.getDriverFeatures());
 
-    if(ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
+    if (ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
         ui->btn_applyOverclock->click();
 
     // timer init
@@ -88,7 +97,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     connectSignals();
 
     showWindow();
-    qDebug() << "Initialization completed";
 }
 
 radeon_profile::~radeon_profile()
@@ -215,7 +223,8 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->combo_pProfile->addItems(globalStuff::createProfileCombo());
     }
 
-     ui->mainTabs->setTabEnabled(2,features.overclockAvailable);
+    ui->configGroups->setTabEnabled(2,device.daemonConnected() && device.getDriverFeatures().clocksSource == globalStuff::PM_FILE);
+    ui->mainTabs->setTabEnabled(2,features.overclockAvailable);
 }
 
 void radeon_profile::refreshGpuData() {

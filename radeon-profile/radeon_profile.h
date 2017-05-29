@@ -70,7 +70,7 @@ public:
     QSystemTrayIcon *trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
     QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu, *fanProfilesMenu;
-    QTimer *timer;
+    QTimer *timer = nullptr;
     static unsigned int minFanStepsSpeed;
 
     typedef QMap<int, unsigned int> fanProfileSteps;

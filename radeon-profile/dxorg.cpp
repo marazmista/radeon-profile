@@ -9,27 +9,23 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-dXorg::dXorg(const QString &gpuName) {
-
-   configure(gpuName);
+dXorg::dXorg(const globalStuff::gpuSysInfo &si) {
+    features.sysInfo = si;
+    configure();
 }
 
-void dXorg::configure(const QString &gpuName) {
-    setupDriverModule(gpuName);
-    qDebug() << "Using module" << features.driverModuleString;
-
-    if (features.driverModule == globalStuff::RADEON)
-        ioctlHnd = new radeonIoctlHandler(gpuName[4].toLatin1() - '0');
-    else if (features.driverModule == globalStuff::AMDGPU)
-        ioctlHnd = new amdgpuIoctlHandler(gpuName[4].toLatin1() - '0');
+void dXorg::configure() {
+    if (features.sysInfo.module == globalStuff::RADEON)
+        ioctlHnd = new radeonIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
+    else if (features.sysInfo.module == globalStuff::AMDGPU)
+        ioctlHnd = new amdgpuIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
     else
         ioctlHnd = nullptr;
 
-//    dcomm = new daemonComm();
     if (!globalStuff::globalConfig.rootMode)
         dcomm.connectToDaemon();
 
-    figureOutGpuDataFilePaths(gpuName);
+    figureOutGpuDataFilePaths(features.sysInfo.sysName);
     figureOutDriverFeatures();
 
     if (!features.clocksSource == globalStuff::IOCTL) {
@@ -72,27 +68,6 @@ void dXorg::configure(const QString &gpuName) {
         qCritical() << "Daemon is not connected, therefore it can't be configured";
 }
 
-void dXorg::setupDriverModule(const QString &gpuName) {
-    QFile f("/sys/class/drm/"+gpuName+"/device/uevent");
-    if (f.open(QIODevice::ReadOnly)) {
-        QString line = f.readLine(50).trimmed();
-        f.close();
-
-        if (line == "DRIVER=radeon") {
-            features.driverModuleString = "radeon";
-            features.driverModule = globalStuff::RADEON;
-            return;
-        }
-
-
-        if (line == "DRIVER=amdgpu") {
-            features.driverModuleString = "amdgpu";
-            features.driverModule = globalStuff::AMDGPU;
-            return;
-        }
-    }
-}
-
 void dXorg::reconfigureDaemon() { // Set up the timer
     if (daemonConnected()) {
         qDebug() << "Configuring daemon timer";
@@ -116,36 +91,14 @@ bool dXorg::daemonConnected() {
 }
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
-//#ifdef QT_DEBUG // Test IOCTLs
-//    if(ioctlHnd!=nullptr && ioctlHnd->isValid()){
-//        int i=0;
-//        int u=0;
-//        float ul=0;
-//        float f=0;
-
-//        qDebug() << "Testing IOCTLs";
-//        qDebug() << "Driver: " << ioctlHnd->getDriverName();
-//        if(ioctlHnd->getCoreClock(&u)) qDebug() << "Core clock:" << u << "MHz";
-//        if(ioctlHnd->getMaxCoreClock(&u)) qDebug() << "Max core clock:" << u/1000 << "MHz";
-//        if(ioctlHnd->getMemoryClock(&u)) qDebug() << "Memory clock:" << u << "MHz";
-//        if(ioctlHnd->getMaxMemoryClock(&u)) qDebug() << "Max memory clock:" << u/1000 << "MHz";
-//        if(ioctlHnd->getTemperature(&i)) qDebug() << "Temperature:" << i/1000.0f << "°C";
-//        if(ioctlHnd->getVramUsage(&ul)) qDebug() << "VRAM usage:" << ul/1024/1024 << "MB";
-//        if(ioctlHnd->getVramSize(&ul)) qDebug() << "VRAM size:" << ul/1024/1024 << "MB";
-//        if(ioctlHnd->getVramUsagePercentage(&f)) qDebug() << "VRAM usage percentage:" << f << "%";
-//        if(ioctlHnd->getGpuUsage(&f, 500000, 150)) qDebug() << "GPU usage:" << f << "%";
-//    }
-//#endif
-
-    gpuSysIndex = gpuName.at(gpuName.length()-1);
-    QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
+    QString devicePath = "/sys/class/drm/" + gpuName + "/device/";
 
     filePaths.powerMethodFilePath = devicePath + file_PowerMethod;
     filePaths.profilePath = devicePath + file_powerProfile;
     filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
     filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
-    filePaths.moduleParamsPath = devicePath + "driver/module/holders/"+features.driverModuleString+"/parameters/";
-    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+features.driverModuleString+"_pm_info"; // this path contains only index
+    filePaths.moduleParamsPath = devicePath + "driver/module/holders/" + features.sysInfo.driverModuleString + "/parameters/";
+    filePaths.clocksPath = "/sys/kernel/debug/dri/" + gpuName.right(1) + "/"+features.sysInfo.driverModuleString + "_pm_info"; // this path contains only index
     filePaths.overDrivePath = devicePath + file_overclockLevel;
 
 
@@ -406,8 +359,8 @@ globalStuff::tempSensor dXorg::getTemperatureSensor() {
 
         // if above fails, use lm_sensors
         QStringList out = globalStuff::grabSystemInfo("sensors");
-        if (out.indexOf(QRegExp(features.driverModuleString+"-pci.+")) != -1) {
-            sensorsGPUtempIndex = out.indexOf(QRegExp(features.driverModuleString+"-pci.+"));  // in order to not search for it again in timer loop
+        if (out.indexOf(QRegExp(features.sysInfo.driverModuleString+"-pci.+")) != -1) {
+            sensorsGPUtempIndex = out.indexOf(QRegExp(features.sysInfo.driverModuleString+"-pci.+"));  // in order to not search for it again in timer loop
             return globalStuff::PCI_SENSOR;
         }
         else if (out.indexOf(QRegExp("VGA_TEMP.+")) != -1) {
@@ -441,7 +394,7 @@ QStringList dXorg::getGLXInfo(QProcessEnvironment env) {
 
 QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
     QList<QTreeWidgetItem *> data;
-    QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p "+features.driverModuleString);
+    QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p "+features.sysInfo.driverModuleString);
     modInfo.sort();
 
     for (int i =0; i < modInfo.count(); i++) {
@@ -628,7 +581,7 @@ int dXorg::getPwmSpeed() {
 void dXorg::setupRegex(const QString &data) {
     QRegExp rx;
 
-    switch (features.driverModule) {
+    switch (features.sysInfo.module) {
         case globalStuff::RADEON:
             rx.setPattern("sclk:\\s\\d+");
             rx.indexIn(data);
@@ -772,7 +725,7 @@ globalStuff::gpuConstParams dXorg::getGpuConstParams() {
 
 globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
     globalStuff::gpuClocksStruct fallbackfeatures;
-    QFile f("/tmp/"+features.driverModuleString+"_pm_info");
+    QFile f("/tmp/"+features.sysInfo.driverModuleString+"_pm_info");
     if (f.open(QIODevice::ReadOnly)) {
         QString s = QString(f.readAll());
 

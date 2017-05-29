@@ -192,21 +192,24 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     }
 
     //Check if a process is still running
-    for(execBin * process : execsRunning) {
-        if(process->getExecState() == QProcess::Running
-                && ! askConfirmation(tr("Quit"), process->name + tr(" is still running, exit anyway?"))) {
+    for (execBin * process : execsRunning) {
+        if (process->getExecState() == QProcess::Running
+                && !askConfirmation(tr("Quit"), process->name + tr(" is still running, exit anyway?"))) {
             e->ignore();
             return;
         }
     }
 
-    timer->stop();
-    delete timer;
+    // means app was initialized ok
+    if (timer != nullptr) {
+        timer->stop();
+        delete timer;
 
-    saveConfig();
+        saveConfig();
 
-    if (device.getDriverFeatures().pwmAvailable)
-        device.setPwmManualControl(false);
+        if (device.getDriverFeatures().pwmAvailable)
+            device.setPwmManualControl(false);
+    }
 
     QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
     QApplication::quit();

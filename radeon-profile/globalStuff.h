@@ -109,6 +109,11 @@ public:
         TS_UNKNOWN
     };
 
+    struct gpuSysInfo {
+        QString sysName, driverModuleString;
+        globalStuff::driverModule module;
+    };
+
     // structure which holds what can be display on ui and on its base
     // we enable ui elements
     struct driverFeatures {
@@ -123,8 +128,7 @@ public:
         globalStuff::powerMethod currentPowerMethod;
         globalStuff::clocksDataSource clocksSource;
         globalStuff::tempSensor currentTemperatureSensor;
-        globalStuff::driverModule driverModule;
-        QString driverModuleString;
+        globalStuff::gpuSysInfo sysInfo;
 
         driverFeatures() {
             canChangeProfile =
@@ -137,8 +141,6 @@ public:
                     overclockAvailable = false;
             currentPowerMethod = PM_UNKNOWN;
             currentTemperatureSensor = TS_UNKNOWN;
-            driverModule = MODULE_UNKNOWN;
-            driverModuleString = "";
         }
     };
 

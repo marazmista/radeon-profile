@@ -22,7 +22,7 @@ class dXorg
 {
 public:
     dXorg() { }
-    dXorg(const QString &gpuName);
+    dXorg(const globalStuff::gpuSysInfo &si);
 
     void cleanup() {
 //        delete dcomm;
@@ -56,12 +56,11 @@ public:
     void setPwmValue(unsigned int value);
 
     void figureOutGpuDataFilePaths(const QString &gpuName);
-    void configure(const QString &gpuName);
+    void configure();
     globalStuff::gpuConstParams getGpuConstParams();
     void reconfigureDaemon();
     bool daemonConnected();
     globalStuff::gpuClocksStruct getFeaturesFallback();
-    void setupDriverModule(const QString &gpuName);
     void setupRegex(const QString &data);
     bool overclock(int percentage);
     void resetOverclock();

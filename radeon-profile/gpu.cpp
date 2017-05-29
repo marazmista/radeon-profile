@@ -48,34 +48,57 @@ bool gpu::daemonConnected() {
    return driverHandler->daemonConnected();
 }
 
-QStringList gpu::detectCards() {
-    QStringList data;
-    QStringList out = globalStuff::grabSystemInfo("ls /sys/class/drm/").filter("card");
+void gpu::detectCards() {
+    QStringList out = globalStuff::grabSystemInfo("ls /sys/class/drm/").filter(QRegExp("card\\d$"));
+
     for (char i = 0; i < out.count(); i++) {
         QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
+
         if (f.open(QIODevice::ReadOnly)) {
             QString line = f.readLine(50).trimmed();
 
-            if (line == "DRIVER=radeon" || line == "DRIVER=amdgpu")
-                data.append(f.fileName().split('/')[4]);
+            if (line == "DRIVER=radeon") {
+                globalStuff::gpuSysInfo gsi;
+                gsi.driverModuleString = "radeon";
+                gsi.module = globalStuff::RADEON;
+                gsi.sysName = out[i];
+
+                gpuList.append(gsi);
+
+                continue;
+            }
+
+            if (line == "DRIVER=amdgpu") {
+                globalStuff::gpuSysInfo gsi;
+                gsi.driverModuleString = "amdgpu";
+                gsi.module = globalStuff::AMDGPU;
+                gsi.sysName = out[i];
+
+                gpuList.append(gsi);
+
+                continue;
+            }
         }
     }
-    return data;
 }
 
-QStringList gpu::initialize() {
-    QStringList gpuList = detectCards();
-    if (currentGpuIndex < gpuList.size()) {
-        driverHandler = new dXorg(gpuList[currentGpuIndex]);
-        gpuParams = driverHandler->getGpuConstParams();
-    }
+bool gpu::initialize() {
+    detectCards();
 
-    return gpuList;
+    if (gpuList.size() == 0)
+        return false;
+
+    driverHandler = new dXorg(gpuList.at(0));
+    gpuParams = driverHandler->getGpuConstParams();
+
+    return true;
 }
 
-void gpu::changeGpu(char index) {
-    currentGpuIndex = index;
-    driverHandler->configure(gpuList[currentGpuIndex]);
+void gpu::changeGpu(int index) {
+    delete driverHandler;
+
+    driverHandler = new dXorg(gpuList.at(index));
+    driverHandler->configure();
     gpuParams = driverHandler->getGpuConstParams();
 }
 
