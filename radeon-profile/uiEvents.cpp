@@ -409,3 +409,8 @@ void radeon_profile::on_btn_export_clicked(){
             ui->plotVolts->savePng(folder + "/voltages.png");
     }
 }
+
+void radeon_profile::on_btn_saveAll_clicked()
+{
+    saveConfig();
+}

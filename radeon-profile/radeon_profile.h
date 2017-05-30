@@ -156,6 +156,8 @@ private slots:
     void on_btn_revokeEvent_clicked();
     void on_list_events_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
+    void on_btn_saveAll_clicked();
+
 private:
     struct currentStateInfo {
         globalStuff::powerProfiles profile;

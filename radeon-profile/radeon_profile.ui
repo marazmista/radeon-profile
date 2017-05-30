@@ -1467,7 +1467,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="page"/>
           <widget class="QWidget" name="page_fixed">
@@ -3753,6 +3753,25 @@
             </property>
            </widget>
           </widget>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="btn_saveAll">
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Save configuration, fan profiles, exec profiles, and defined events. All that goes to XML config file basically.</string>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Save all</string>
+          </property>
          </widget>
         </item>
        </layout>
