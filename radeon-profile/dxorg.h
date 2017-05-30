@@ -13,19 +13,88 @@
 #include <QList>
 #include <QTreeWidgetItem>
 #include <QSharedMemory>
-#include <QThread>
 
 
 #define SHARED_MEM_SIZE 128
 
 class dXorg
 {
+    struct rxPatternsStruct {
+        QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
+    };
+
+    struct deviceSysFsStruct {
+        QString
+        power_method,
+        power_profile,
+        power_dpm_state,
+        power_dpm_force_performance_level,
+        pp_sclk_od,
+        pp_mclk_od;
+
+        deviceSysFsStruct() { }
+
+        deviceSysFsStruct(const QString &devicePath) {
+            power_method = devicePath + "/power_method";
+            power_profile = devicePath + "/power_profile";
+            power_dpm_state = devicePath + "/power_dpm_state";
+            power_dpm_force_performance_level = devicePath + "/power_dpm_force_performance_level";
+            pp_sclk_od = devicePath + "/pp_sclk_od";
+            pp_mclk_od = devicePath + "/pp_mclk_od";
+
+            if (!QFile::exists(power_method))
+                power_method = "";
+
+            if (!QFile::exists(power_profile))
+                power_profile = "";
+
+            if (!QFile::exists(power_dpm_state))
+                power_dpm_state = "";
+
+            if (!QFile::exists(power_dpm_force_performance_level))
+                power_dpm_force_performance_level = "";
+
+            if (!QFile::exists(pp_sclk_od))
+                pp_sclk_od = "";
+
+            if (!QFile::exists(pp_mclk_od))
+                pp_mclk_od = "";
+        }
+    };
+
+    struct deviceFilePathsStruct {
+        QString debugfs_pm_info, moduleParams;
+        deviceSysFsStruct sysFs;
+    };
+
+    struct hwmonAttributesStruct {
+        QString temp1, pwm1, pwm1_enable, pwm1_max, fan1_input;
+
+        hwmonAttributesStruct() { }
+
+        hwmonAttributesStruct(const QString &hwmonPath) {
+            temp1 = hwmonPath + "/temp1_input";
+            pwm1 = hwmonPath + "/pwm1";
+            pwm1_enable = hwmonPath + "/pwm1_enable";
+            pwm1_max = hwmonPath + "/pwm1_max";
+            fan1_input = hwmonPath + "/fan1_input";
+
+            if (!QFile::exists(temp1))
+                temp1 = "";
+
+            if (!QFile::exists(pwm1_enable))
+                pwm1 = pwm1_enable = pwm1_max = "";
+
+            if (!QFile::exists(fan1_input))
+                fan1_input = "";
+        }
+    };
+
 public:
     dXorg() { }
     dXorg(const globalStuff::gpuSysInfo &si);
 
     void cleanup() {
-//        delete dcomm;
         delete ioctlHnd;
 
         if(sharedMem.isAttached()){
@@ -71,27 +140,13 @@ private:
     QSharedMemory sharedMem;
     int sensorsGPUtempIndex;
     short rxMatchIndex, clocksValueDivider;
+    deviceFilePathsStruct deviceFiles;
+    rxPatternsStruct rxPatterns;
+    hwmonAttributesStruct hwmonAttributes;
 
     daemonComm dcomm;
     ioctlHandler *ioctlHnd;
 
-    struct rxPatternsStruct {
-        QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
-    } rxPatterns;
-
-    struct driverFilePaths {
-        QString powerMethodFilePath,
-            profilePath,
-            dpmStateFilePath,
-            clocksPath,
-            forcePowerLevelFilePath,
-            sysfsHwmonTempPath,
-            moduleParamsPath,
-            pwmEnablePath,
-            pwmSpeedPath,
-            pwmMaxSpeedPath,
-            overDrivePath;
-    } filePaths;
 
     QString getClocksRawData(bool forFeatures = false);
     QString findSysfsHwmonForGPU();

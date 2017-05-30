@@ -195,7 +195,7 @@ const globalStuff::driverFeatures& gpu::getDriverFeatures() {
 }
 
 bool gpu::overclock(const int value){
-    if (getDriverFeatures().overclockAvailable)
+    if (getDriverFeatures().ocCoreAvailable)
         return driverHandler->overclock(value);
 
     qWarning() << "Error overclocking: overclocking is not supported";
@@ -203,7 +203,7 @@ bool gpu::overclock(const int value){
 }
 
 void gpu::resetOverclock(){
-    if (getDriverFeatures().overclockAvailable)
+    if (getDriverFeatures().ocCoreAvailable)
         driverHandler->resetOverclock();
 }
 

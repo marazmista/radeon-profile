@@ -168,9 +168,9 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->cb_eventsTracking->setChecked(false);
     }
 
-    ui->cb_showFreqGraph->setEnabled(features.coreClockAvailable);
-    ui->tabs_systemInfo->setTabEnabled(3,features.coreClockAvailable);
-    ui->cb_showVoltsGraph->setEnabled(features.coreVoltAvailable);
+    ui->cb_showFreqGraph->setEnabled(features.clkCoreAvailable);
+    ui->tabs_systemInfo->setTabEnabled(3,features.clkCoreAvailable);
+    ui->cb_showVoltsGraph->setEnabled(features.voltCoreAvailable);
 
     if (!features.temperatureAvailable) {
         ui->cb_showTempsGraph->setEnabled(false);
@@ -178,15 +178,15 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->l_temp->setVisible(false);
     }
 
-    if (!features.coreClockAvailable && !features.temperatureAvailable && !features.coreVoltAvailable)
+    if (!features.clkCoreAvailable && !features.temperatureAvailable && !features.voltCoreAvailable)
         ui->mainTabs->setTabEnabled(1,false);
 
-    if (!features.coreClockAvailable && !features.memClockAvailable) {
+    if (!features.clkCoreAvailable && !features.clkMemAvailable) {
         ui->l_cClk->setVisible(false);
         ui->l_mClk->setVisible(false);
     }
 
-    if (!features.coreVoltAvailable && !features.memVoltAvailable) {
+    if (!features.voltCoreAvailable && !features.voltMemAvailable) {
         ui->l_cVolt->setVisible(false);
         ui->l_mVolt->setVisible(false);
     }
@@ -224,7 +224,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
     }
 
     ui->configGroups->setTabEnabled(2,device.daemonConnected() && device.getDriverFeatures().clocksSource == globalStuff::PM_FILE);
-    ui->mainTabs->setTabEnabled(2,features.overclockAvailable);
+    ui->mainTabs->setTabEnabled(2,features.ocCoreAvailable);
 }
 
 void radeon_profile::refreshGpuData() {

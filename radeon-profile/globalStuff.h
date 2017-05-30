@@ -26,15 +26,7 @@
 #define pwm_manual '1'
 #define pwm_auto '2'
 
-#define file_PowerMethod "power_method"
-#define file_powerProfile "power_profile"
-#define file_powerDpmState "power_dpm_state"
-#define file_powerDpmForcePerformanceLevel "power_dpm_force_performance_level"
-#define file_overclockLevel "pp_sclk_od"
-
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
-
-
 
 class globalStuff {
 public:
@@ -117,28 +109,29 @@ public:
     // structure which holds what can be display on ui and on its base
     // we enable ui elements
     struct driverFeatures {
-        bool canChangeProfile,
-            coreClockAvailable,
-            memClockAvailable,
-            coreVoltAvailable,
-            memVoltAvailable,
-            temperatureAvailable,
-            pwmAvailable,
-            overclockAvailable;
+        bool
+        canChangeProfile = false,
+
+        clkCoreAvailable = false,
+        clkMemAvailable = false,
+        voltCoreAvailable = false,
+        voltMemAvailable = false,
+
+        temperatureAvailable = false,
+
+        pwmAvailable = false,
+        fanRpmInfoAvailable = false,
+
+        ocCoreAvailable = false,
+        ocMemAvailable = false;
+
+
         globalStuff::powerMethod currentPowerMethod;
         globalStuff::clocksDataSource clocksSource;
         globalStuff::tempSensor currentTemperatureSensor;
         globalStuff::gpuSysInfo sysInfo;
 
         driverFeatures() {
-            canChangeProfile =
-                    coreClockAvailable =
-                    memClockAvailable =
-                    coreVoltAvailable =
-                    memVoltAvailable =
-                    temperatureAvailable =
-                    pwmAvailable =
-                    overclockAvailable = false;
             currentPowerMethod = PM_UNKNOWN;
             currentTemperatureSensor = TS_UNKNOWN;
         }
@@ -187,15 +180,16 @@ public:
     };
 
     struct gpuPwmStructString {
-        QString pwmSpeed;
+        QString pwmSpeed, pwmSpeedRpm;
     };
 
     struct gpuPwmStruct {
-        int pwmSpeed = 0;
+        int pwmSpeed = 0, pwmSpeedRpm;
         gpuPwmStructString str;
 
         void convertToString() {
             str.pwmSpeed = QString::number(pwmSpeed) + "%";
+            str.pwmSpeedRpm = QString::number(pwmSpeedRpm) + "RPM";
         }
     };
 
@@ -212,7 +206,7 @@ public:
         }
 
         void convertToString() {
-             str.gpuLoad = (gpuLoad != -1) ? QString::number(gpuLoad,'f',2) + "%" : "";
+             str.gpuLoad = (gpuLoad != -1) ? QString::number(gpuLoad,'f',1) + "%" : "";
              str.gpuVramLoadPercent = (gpuVramLoadPercent != -1) ? QString::number(gpuVramLoadPercent) + "%" : "";
              str.gpuVramLoad = (gpuVramLoad != -1) ? QString::number(gpuVramLoad/1024/1024) + "MB" : "";
         }
