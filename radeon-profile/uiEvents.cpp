@@ -165,10 +165,12 @@ void radeon_profile::changeEvent(QEvent *event)
 
 void radeon_profile::gpuChanged()
 {
+    timer->stop();
     device.changeGpu(ui->combo_gpus->currentIndex());
     setupUiEnabledFeatures(device.getDriverFeatures());
     timerEvent();
     refreshBtnClicked();
+    timer->start();
 }
 
 void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
