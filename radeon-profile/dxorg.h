@@ -92,7 +92,7 @@ class dXorg
 
 public:
     dXorg() { }
-    dXorg(const globalStuff::gpuSysInfo &si);
+    dXorg(const GpuSysInfo &si);
 
     void cleanup() {
         delete ioctlHnd;
@@ -106,34 +106,34 @@ public:
         sharedMem.deleteLater();
     }
 
-    globalStuff::gpuClocksStruct getClocksFromPmFile();
-    globalStuff::gpuClocksStruct getClocksFromIoctl();
-    globalStuff::gpuClocksStruct getClocks();
+    GpuClocksStruct getClocksFromPmFile();
+    GpuClocksStruct getClocksFromIoctl();
+    GpuClocksStruct getClocks();
 
     float getTemperature();
-    globalStuff::gpuUsageStruct getGpuUsage();
-    int getPwmSpeed();
+    GpuUsageStruct getGpuUsage();
+    GpuPwmStruct getPwmSpeed();
 
     QStringList getGLXInfo(QProcessEnvironment env);
     QList<QTreeWidgetItem *> getModuleInfo();
     QString getCurrentPowerLevel();
     QString getCurrentPowerProfile();
 
-    void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
-    void setForcePowerLevel(globalStuff::forcePowerLevels);
+    void setPowerProfile(PowerProfiles _newPowerProfile);
+    void setForcePowerLevel(ForcePowerLevels);
     void setPwmManualControl(bool manual);
     void setPwmValue(unsigned int value);
 
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure();
-    globalStuff::gpuConstParams getGpuConstParams();
+    GpuConstParams getGpuConstParams();
     void reconfigureDaemon();
     bool daemonConnected();
-    globalStuff::gpuClocksStruct getFeaturesFallback();
+    GpuClocksStruct getFeaturesFallback();
     void setupRegex(const QString &data);
     bool overclock(int percentage);
     void resetOverclock();
-    globalStuff::driverFeatures features;
+    DriverFeatures features;
 
 private:
     QChar gpuSysIndex;
@@ -150,8 +150,8 @@ private:
 
     QString getClocksRawData(bool forFeatures = false);
     QString findSysfsHwmonForGPU();
-    globalStuff::powerMethod getPowerMethod();
-    globalStuff::tempSensor getTemperatureSensor();
+    PowerMethod getPowerMethod();
+    TemperatureSensor getTemperatureSensor();
     void setNewValue(const QString &filePath, const QString &newValue);
     QString findSysFsHwmonForGpu();
     bool getIoctlAvailability();

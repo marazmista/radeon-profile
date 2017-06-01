@@ -19,13 +19,13 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
     ui->spin_fixedFanSpeed->setMinimum(radeon_profile::minFanStepsSpeed);
 }
 
-void Dialog_RPEvent::setFeatures(const globalStuff::driverFeatures &features, const QList<QString> &profiles) {
+void Dialog_RPEvent::setFeatures(const QMap<ValueID, RPValue> &gpuData, const DriverFeatures &features, const QList<QString> &profiles) {
     switch (features.currentPowerMethod) {
-        case globalStuff::powerMethod::DPM:
+        case PowerMethod::DPM:
             ui->combo_dpmChange->addItems(globalStuff::createDPMCombo());
             ui->combo_powerLevelChange->addItems(globalStuff::createPowerLevelCombo());
             break;
-        case globalStuff::powerMethod::PROFILE:
+        case PowerMethod::PROFILE:
             ui->combo_dpmChange->addItems(globalStuff::createProfileCombo());
             ui->combo_powerLevelChange->setVisible(false);
             ui->l_powerLevel->setVisible(false);
@@ -42,7 +42,7 @@ void Dialog_RPEvent::setFeatures(const globalStuff::driverFeatures &features, co
     for (QString p : profiles)
         ui->combo_fanChange->addItem(p);
 
-    if (!features.pwmAvailable) {
+    if (!gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
         ui->combo_fanChange->setVisible(false);
         ui->l_fan->setVisible(false);
     }
@@ -85,8 +85,8 @@ void Dialog_RPEvent::on_btn_save_clicked()
     createdEvent.activationBinary = ui->edt_binary->text();
     createdEvent.activationTemperature = ui->spin_tempActivate->value();
 
-    createdEvent.dpmProfileChange = createdEvent.getEnumFromCombo<globalStuff::powerProfiles>(ui->combo_dpmChange->currentIndex());
-    createdEvent.powerLevelChange = createdEvent.getEnumFromCombo<globalStuff::forcePowerLevels>(ui->combo_powerLevelChange->currentIndex());
+    createdEvent.dpmProfileChange = createdEvent.getEnumFromCombo<PowerProfiles>(ui->combo_dpmChange->currentIndex());
+    createdEvent.powerLevelChange = createdEvent.getEnumFromCombo<ForcePowerLevels>(ui->combo_powerLevelChange->currentIndex());
 
     createdEvent.fixedFanSpeedChange  = ui->spin_fixedFanSpeed->value();
     createdEvent.fanComboIndex = ui->combo_fanChange->currentIndex();

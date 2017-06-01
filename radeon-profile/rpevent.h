@@ -18,8 +18,8 @@ public:
 
     bool enabled;
     QString name, activationBinary, fanProfileNameChange;
-    globalStuff::powerProfiles dpmProfileChange;
-    globalStuff::forcePowerLevels powerLevelChange;
+    PowerProfiles dpmProfileChange;
+    ForcePowerLevels powerLevelChange;
     unsigned short fixedFanSpeedChange, activationTemperature, fanComboIndex;
     rpeventType type;
 

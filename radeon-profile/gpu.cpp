@@ -58,9 +58,9 @@ void gpu::detectCards() {
             QString line = f.readLine(50).trimmed();
 
             if (line == "DRIVER=radeon") {
-                globalStuff::gpuSysInfo gsi;
+                GpuSysInfo gsi;
                 gsi.driverModuleString = "radeon";
-                gsi.module = globalStuff::RADEON;
+                gsi.module = DriverModule::RADEON;
                 gsi.sysName = out[i];
 
                 gpuList.append(gsi);
@@ -69,9 +69,9 @@ void gpu::detectCards() {
             }
 
             if (line == "DRIVER=amdgpu") {
-                globalStuff::gpuSysInfo gsi;
+                GpuSysInfo gsi;
                 gsi.driverModuleString = "amdgpu";
-                gsi.module = globalStuff::AMDGPU;
+                gsi.module = DriverModule::RADEON;
                 gsi.sysName = out[i];
 
                 gpuList.append(gsi);
@@ -103,23 +103,41 @@ void gpu::changeGpu(int index) {
 }
 
 void gpu::getClocks() {
-    gpuClocksData = driverHandler->getClocks();
-    gpuClocksData.convertToString();
+    GpuClocksStruct tmp = driverHandler->getClocks();
+
+    if (tmp.coreClk != -1)
+        gpuData.insert(ValueID::CLK_CORE, RPValue(ValueUnit::MEGAHERTZ, tmp.coreClk));
+
+    if (tmp.coreVolt != -1)
+        gpuData.insert(ValueID::VOLT_CORE, RPValue(ValueUnit::MILIVOLT, tmp.coreVolt));
+
+    if (tmp.memClk != -1)
+        gpuData.insert(ValueID::CLK_MEM, RPValue(ValueUnit::MEGAHERTZ, tmp.memClk));
+
+    if (tmp.memVolt != -1)
+        gpuData.insert(ValueID::VOLT_MEM, RPValue(ValueUnit::MILIVOLT, tmp.memVolt));
+
+    if (tmp.uvdCClk != -1)
+        gpuData.insert(ValueID::CLK_UVD, RPValue(ValueUnit::MEGAHERTZ, tmp.uvdCClk));
+
+    if (tmp.uvdDClk != -1)
+        gpuData.insert(ValueID::DCLK_UVD, RPValue(ValueUnit::MEGAHERTZ, tmp.uvdDClk));
+
+    if (tmp.powerLevel != -1)
+        gpuData.insert(ValueID::POWER_LEVEL, RPValue(ValueUnit::NONE, tmp.powerLevel));
+
 }
 
 void gpu::getTemperature() {
-    gpuTemeperatureData.currentBefore = gpuTemeperatureData.current;
-    gpuTemeperatureData.current = driverHandler->getTemperature();
+    gpuData.insert(ValueID::TEMPERATURE_BEFORE_CURRENT, gpuData.value(ValueID::TEMPERATURE_CURRENT, RPValue()));
+    gpuData.insert(ValueID::TEMPERATURE_CURRENT, RPValue(ValueUnit::CELSIUS, driverHandler->getTemperature()));
 
-    // update rest of structure with temperature data //
-    gpuTemeperatureData.sum += gpuTemeperatureData.current;
-    if (gpuTemeperatureData.min == 0)
-        gpuTemeperatureData.min  = gpuTemeperatureData.current;
 
-    gpuTemeperatureData.max = (gpuTemeperatureData.max < gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.max;
-    gpuTemeperatureData.min = (gpuTemeperatureData.min > gpuTemeperatureData.current) ? gpuTemeperatureData.current : gpuTemeperatureData.min;
+    if (!gpuData.contains(ValueID::TEMPERATURE_MIN) ||  gpuData.value(ValueID::TEMPERATURE_MIN, RPValue()).value > gpuData.value(ValueID::TEMPERATURE_CURRENT).value)
+        gpuData.insert(ValueID::TEMPERATURE_MIN, gpuData.value(ValueID::TEMPERATURE_CURRENT));
 
-    gpuTemeperatureData.convertToString();
+    if (!gpuData.contains(ValueID::TEMPERATURE_MAX) || gpuData.value(ValueID::TEMPERATURE_MAX, RPValue()).value < gpuData.value(ValueID::TEMPERATURE_CURRENT).value)
+        gpuData.insert(ValueID::TEMPERATURE_MAX, gpuData.value(ValueID::TEMPERATURE_CURRENT));
 }
 
 void gpu::getGpuUsage() {
@@ -168,11 +186,11 @@ void gpu::refreshPowerLevel() {
     currentPowerProfile = getCurrentPowerProfile();
 }
 
-void gpu::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
+void gpu::setPowerProfile(PowerProfiles _newPowerProfile) {
     driverHandler->setPowerProfile(_newPowerProfile);
 }
 
-void gpu::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
+void gpu::setForcePowerLevel(ForcePowerLevels _newForcePowerLevel) {
     driverHandler->setForcePowerLevel(_newForcePowerLevel);
 
 }
@@ -186,11 +204,13 @@ void gpu::setPwmManualControl(bool manual) {
 }
 
 void gpu::getPwmSpeed() {
-    gpuPwmData.pwmSpeed = ((float)driverHandler->getPwmSpeed() / gpuParams.pwmMaxSpeed ) * 100;
-    gpuPwmData.convertToString();
+    GpuPwmStruct tmp = driverHandler->getPwmSpeed();
+
+    gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, ((float)tmp.pwmSpeed / gpuParams.pwmMaxSpeed ) * 100));
+    gpuData.insert(ValueID::FAN_SPEED_RPM, RPValue(ValueUnit::RPM, tmp.pwmSpeedRpm));
 }
 
-const globalStuff::driverFeatures& gpu::getDriverFeatures() {
+const DriverFeatures& gpu::getDriverFeatures() {
     return driverHandler->features;
 }
 

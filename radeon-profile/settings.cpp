@@ -301,8 +301,8 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     rpe.type = static_cast<rpeventType>(xml.attributes().value("tiggerType").toString().toInt());
     rpe.activationBinary = xml.attributes().value("activationBinary").toString();
     rpe.activationTemperature = xml.attributes().value("activationTemperature").toString().toInt();
-    rpe.dpmProfileChange = static_cast<globalStuff::powerProfiles>(xml.attributes().value("dpmProfileChange").toString().toInt());
-    rpe.powerLevelChange = static_cast<globalStuff::forcePowerLevels>(xml.attributes().value("powerLevelChange").toString().toInt());
+    rpe.dpmProfileChange = static_cast<PowerProfiles>(xml.attributes().value("dpmProfileChange").toString().toInt());
+    rpe.powerLevelChange = static_cast<ForcePowerLevels>(xml.attributes().value("powerLevelChange").toString().toInt());
     rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toString().toInt();
     rpe.fanProfileNameChange = xml.attributes().value("fanProfileNameChange").toString();
     rpe.fanComboIndex = xml.attributes().value("fanComboIndex").toString().toInt();

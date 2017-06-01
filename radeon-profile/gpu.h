@@ -18,11 +18,6 @@ class gpu : public QObject
 public:
     explicit gpu(QObject *parent = 0 ) : QObject(parent) {
         currentGpuIndex = 0;
-        gpuTemeperatureData.current =
-                gpuTemeperatureData.max =
-                gpuTemeperatureData.min =
-                gpuTemeperatureData.sum = 0;
-
         connect(&futureGpuUsage, SIGNAL(finished()),this,SLOT(handleGpuUsageResult()));
     }
 
@@ -30,15 +25,13 @@ public:
         delete driverHandler;
     }
 
-    globalStuff::gpuClocksStruct gpuClocksData;
-    globalStuff::gpuTemperatureStruct gpuTemeperatureData;
-    globalStuff::gpuUsageStruct gpuUsageData;
-    globalStuff::gpuConstParams gpuParams;
-    globalStuff::gpuPwmStruct gpuPwmData;
+    // main map that has all info available by ValueID
+    QMap<ValueID, RPValue> gpuData;
+    QList<GpuSysInfo> gpuList;
+    GpuConstParams gpuParams;
 
     char currentGpuIndex;
     QString currentPowerProfile, currentPowerLevel;
-    QList<globalStuff::gpuSysInfo> gpuList;
 
     QList<QTreeWidgetItem *> getCardConnectors() const;
     QStringList getGLXInfo(QString gpuName) const;
@@ -54,8 +47,8 @@ public:
     void getConstParams();
 
     void changeGpu(int index);
-    void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
-    void setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel);
+    void setPowerProfile(PowerProfiles _newPowerProfile);
+    void setForcePowerLevel(ForcePowerLevels _newForcePowerLevel);
     void setPwmManualControl(bool manual);
     void setPwmValue(unsigned int value);
 
@@ -65,17 +58,26 @@ public:
     bool daemonConnected();
     bool overclock(int value);
     void resetOverclock();
-    const globalStuff::driverFeatures& getDriverFeatures();
+    const DriverFeatures& getDriverFeatures();
 
 private slots:
     void handleGpuUsageResult() {
-        gpuUsageData = futureGpuUsage.result();
-        gpuUsageData.convertToString();
+         GpuUsageStruct tmp = futureGpuUsage.result();
+
+         if (tmp.gpuLoad != -1)
+             gpuData.insert(ValueID::GPU_LOAD_PERCENT, RPValue(ValueUnit::PERCENT, tmp.gpuLoad));
+
+        if (tmp.gpuVramLoad != -1)
+            gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::MEGABYTE, tmp.gpuVramLoad));
+
+        if (tmp.gpuVramLoadPercent != -1) {
+            gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmp.gpuVramLoadPercent));
+        }
     }
 
 private:
     dXorg *driverHandler;
-    QFutureWatcher<globalStuff::gpuUsageStruct> futureGpuUsage;
+    QFutureWatcher<GpuUsageStruct> futureGpuUsage;
 };
 
 #endif // GPU_H

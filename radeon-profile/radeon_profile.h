@@ -18,6 +18,7 @@
 #include <QListWidgetItem>
 #include <QButtonGroup>
 #include <QXmlStreamWriter>
+#include <QtConcurrent/QtConcurrent>
 
 #define startClocksScaleL 50
 #define startClocksScaleH 150
@@ -74,9 +75,9 @@ public:
     static unsigned int minFanStepsSpeed;
 
     typedef QMap<int, unsigned int> fanProfileSteps;
-
 private slots:
     void timerEvent();
+    void initFutureHandler();
     void on_btn_dpmBattery_clicked();
     void on_btn_dpmBalanced_clicked();
     void on_btn_dpmPerformance_clicked();
@@ -160,8 +161,8 @@ private slots:
 
 private:
     struct currentStateInfo {
-        globalStuff::powerProfiles profile;
-        globalStuff::forcePowerLevels powerLevel;
+        PowerProfiles profile;
+        ForcePowerLevels powerLevel;
         short fanIndex;
         QString fanProfileName;
     };
@@ -175,6 +176,7 @@ private:
     unsigned int rangeX, ticksCounter, statsTickCounter;
     QButtonGroup pwmGroup;
 	currentStateInfo *savedState;
+    QFutureWatcher<void> initFuture;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
@@ -191,7 +193,7 @@ private:
     void setupContextMenus();
     void refreshGpuData();
     void refreshGraphs();
-    void setupUiEnabledFeatures(const globalStuff::driverFeatures &features);
+    void setupUiEnabledFeatures(const DriverFeatures &features, const QMap<ValueID, RPValue> &data);
     void loadVariables();
     void updateExecLogs();
     void addRuntimeWidgets();

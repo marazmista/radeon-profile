@@ -56,7 +56,10 @@ radeon_profile::radeon_profile(QWidget *parent) :
     ticksCounter = 0;
     statsTickCounter = 0;
 	savedState = nullptr;
+
+    // timer init
     timer = new QTimer(this);
+    timer->setInterval(ui->spin_timerInterval->value()*1000);
 
     // setup ui elemensts
     ui->mainTabs->setCurrentIndex(0);
@@ -75,20 +78,17 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     loadConfig();
 
-    setupUiEnabledFeatures(device.getDriverFeatures());
+    // start is heavy, delegated to another thread to show ui smoothly
+    connect(&initFuture, SIGNAL(finished()), this,  SLOT(initFutureHandler()));
+    initFuture.setFuture(QtConcurrent::run(this, &radeon_profile::refreshGpuData));
 
     if (ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
         ui->btn_applyOverclock->click();
 
-    // timer init
-    timer->setInterval(ui->spin_timerInterval->value()*1000);
-
     // fill tables with data at the start //
-    refreshGpuData();
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
     fillConnectors();
     fillModInfo();
-    refreshUI();
 
     timer->start();
     timerEvent();
@@ -102,6 +102,11 @@ radeon_profile::radeon_profile(QWidget *parent) :
 radeon_profile::~radeon_profile()
 {
     delete ui;
+}
+
+void radeon_profile::initFutureHandler() {
+    setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
+    refreshUI();
 }
 
 void radeon_profile::connectSignals()
@@ -150,14 +155,14 @@ void radeon_profile::addRuntimeWidgets() {
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
-void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &features) {
-    if (features.canChangeProfile && features.currentPowerMethod < globalStuff::PM_UNKNOWN) {
-        ui->tabs_pm->setTabEnabled(0,features.currentPowerMethod == globalStuff::PROFILE);
+void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const QMap<ValueID, RPValue> &data) {
+    if (features.canChangeProfile && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
+        ui->tabs_pm->setTabEnabled(0,features.currentPowerMethod == PowerMethod::PROFILE);
 
-        ui->tabs_pm->setTabEnabled(1,features.currentPowerMethod == globalStuff::DPM);
-        changeProfile->setEnabled(features.currentPowerMethod == globalStuff::PROFILE);
-        dpmMenu->setEnabled(features.currentPowerMethod == globalStuff::DPM);
-        ui->combo_pLevel->setEnabled(features.currentPowerMethod == globalStuff::DPM);
+        ui->tabs_pm->setTabEnabled(1,features.currentPowerMethod == PowerMethod::DPM);
+        changeProfile->setEnabled(features.currentPowerMethod == PowerMethod::PROFILE);
+        dpmMenu->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
+        ui->combo_pLevel->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
     } else {
         ui->tabs_pm->setEnabled(false);
         changeProfile->setEnabled(false);
@@ -168,30 +173,30 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->cb_eventsTracking->setChecked(false);
     }
 
-    ui->cb_showFreqGraph->setEnabled(features.clkCoreAvailable);
-    ui->tabs_systemInfo->setTabEnabled(3,features.clkCoreAvailable);
-    ui->cb_showVoltsGraph->setEnabled(features.voltCoreAvailable);
+    ui->cb_showFreqGraph->setEnabled(data.contains(ValueID::CLK_CORE));
+    ui->tabs_systemInfo->setTabEnabled(3,data.contains(ValueID::CLK_CORE));
+    ui->cb_showVoltsGraph->setEnabled(data.contains(ValueID::VOLT_CORE));
 
-    if (!features.temperatureAvailable) {
+    if (!device.gpuData.contains(ValueID::TEMPERATURE_CURRENT)) {
         ui->cb_showTempsGraph->setEnabled(false);
         ui->plotTemp->setVisible(false);
         ui->l_temp->setVisible(false);
     }
 
-    if (!features.clkCoreAvailable && !features.temperatureAvailable && !features.voltCoreAvailable)
+    if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::TEMPERATURE_CURRENT) && !device.gpuData.contains(ValueID::VOLT_CORE))
         ui->mainTabs->setTabEnabled(1,false);
 
-    if (!features.clkCoreAvailable && !features.clkMemAvailable) {
+    if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::CLK_MEM)) {
         ui->l_cClk->setVisible(false);
         ui->l_mClk->setVisible(false);
     }
 
-    if (!features.voltCoreAvailable && !features.voltMemAvailable) {
+    if (!device.gpuData.contains(ValueID::VOLT_CORE) && !data.contains(ValueID::VOLT_MEM)) {
         ui->l_cVolt->setVisible(false);
         ui->l_mVolt->setVisible(false);
     }
 
-    if (features.pwmAvailable && features.canChangeProfile) {
+    if (data.contains(ValueID::FAN_SPEED_PERCENT) && features.canChangeProfile) {
         qDebug() << "Fan control is available , configuring the fan control tab";
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
         ui->l_fanProfileUnsavedIndicator->setVisible(false);
@@ -215,7 +220,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->l_fanSpeed->setVisible(false);
     }
 
-    if (Q_LIKELY(features.currentPowerMethod == globalStuff::DPM)) {
+    if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM)) {
         ui->combo_pProfile->addItems(globalStuff::createDPMCombo());
         ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo());
     } else {
@@ -223,7 +228,7 @@ void radeon_profile::setupUiEnabledFeatures(const globalStuff::driverFeatures &f
         ui->combo_pProfile->addItems(globalStuff::createProfileCombo());
     }
 
-    ui->configGroups->setTabEnabled(2,device.daemonConnected() && device.getDriverFeatures().clocksSource == globalStuff::PM_FILE);
+    ui->configGroups->setTabEnabled(2,device.daemonConnected() && device.getDriverFeatures().clocksSource == ClocksDataSource::PM_FILE);
     ui->mainTabs->setTabEnabled(2,features.ocCoreAvailable);
 }
 
@@ -232,9 +237,7 @@ void radeon_profile::refreshGpuData() {
     device.getClocks();
     device.getTemperature();
     device.getGpuUsage();
-
-    if (device.getDriverFeatures().pwmAvailable)
-        device.getPwmSpeed();
+    device.getPwmSpeed();
 
     if (Q_LIKELY(execsRunning.count() == 0))
         return;
@@ -249,56 +252,56 @@ void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, c
 // -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
 // did not alter it, it stays and in result will be not displayed
 void radeon_profile::refreshUI() {
-    ui->l_cClk->setText(device.gpuClocksData.str.coreClk);
-    ui->l_mClk->setText(device.gpuClocksData.str.memClk);
-    ui->l_mVolt->setText(device.gpuClocksData.str.memVolt);
-    ui->l_cVolt->setText(device.gpuClocksData.str.coreVolt);
+    ui->l_cClk->setText(device.gpuData.value(ValueID::CLK_CORE).strValue);
+    ui->l_mClk->setText(device.gpuData.value(ValueID::CLK_MEM).strValue);
+    ui->l_mVolt->setText(device.gpuData.value(ValueID::VOLT_CORE).strValue);
+    ui->l_cVolt->setText(device.gpuData.value(ValueID::VOLT_MEM).strValue);
 
     // Header - Temperature
-    ui->l_temp->setText(device.gpuTemeperatureData.str.current);
+    ui->l_temp->setText(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).strValue);
 
     // Header - Fan speed
-    ui->l_fanSpeed->setText(device.gpuPwmData.str.pwmSpeed);
+    ui->l_fanSpeed->setText(device.gpuData.value(ValueID::FAN_SPEED_PERCENT).strValue);
 
-    ui->l_gpuUsage->setText(device.gpuUsageData.str.gpuLoad);
+    ui->l_gpuUsage->setText(device.gpuData.value(ValueID::GPU_LOAD_PERCENT).strValue);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
         ui->list_currentGPUData->clear();
 
-        if (device.gpuClocksData.powerLevel != -1)
-            addChild(ui->list_currentGPUData, tr("Power level"), device.gpuClocksData.str.powerLevel);
-        if (device.gpuClocksData.coreClk != -1)
-            addChild(ui->list_currentGPUData, tr("GPU clock"), device.gpuClocksData.str.coreClk);
-        if (device.gpuClocksData.memClk != -1)
-            addChild(ui->list_currentGPUData, tr("Memory clock"), device.gpuClocksData.str.memClk);
-        if (device.gpuClocksData.uvdCClk != -1)
-            addChild(ui->list_currentGPUData, tr("UVD core clock (cclk)"), device.gpuClocksData.str.uvdCClk);
-        if (device.gpuClocksData.uvdDClk != -1)
-            addChild(ui->list_currentGPUData, tr("UVD decoder clock (dclk)"), device.gpuClocksData.str.uvdDClk);
-        if (device.gpuClocksData.coreVolt != -1)
-            addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuClocksData.str.coreVolt);
-        if (device.gpuClocksData.memVolt != -1)
-            addChild(ui->list_currentGPUData, tr("I/O voltage (vddci)"), device.gpuClocksData.str.memVolt);
+        if (device.gpuData.contains(ValueID::POWER_LEVEL))
+            addChild(ui->list_currentGPUData, tr("Power level"), device.gpuData.value(ValueID::POWER_LEVEL).strValue);
+        if (device.gpuData.contains(ValueID::CLK_CORE))
+            addChild(ui->list_currentGPUData, tr("GPU clock"), device.gpuData.value(ValueID::CLK_CORE).strValue);
+        if (device.gpuData.contains(ValueID::CLK_MEM))
+            addChild(ui->list_currentGPUData, tr("Memory clock"), device.gpuData.value(ValueID::CLK_MEM).strValue);
+        if (device.gpuData.contains(ValueID::CLK_UVD))
+            addChild(ui->list_currentGPUData, tr("UVD core clock (cclk)"), device.gpuData.value(ValueID::CLK_UVD).strValue);
+        if (device.gpuData.contains(ValueID::DCLK_UVD))
+            addChild(ui->list_currentGPUData, tr("UVD decoder clock (dclk)"), device.gpuData.value(ValueID::DCLK_UVD).strValue);
+        if (device.gpuData.contains(ValueID::VOLT_CORE))
+            addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuData.value(ValueID::VOLT_CORE).strValue);
+        if (device.gpuData.contains(ValueID::VOLT_MEM))
+            addChild(ui->list_currentGPUData, tr("I/O voltage (vddci)"), device.gpuData.value(ValueID::VOLT_MEM).strValue);
 
         if (ui->list_currentGPUData->topLevelItemCount() == 0)
             addChild(ui->list_currentGPUData, tr("Can't read data"), tr("You need debugfs mounted and either root rights or the daemon running"));
 
-        addChild(ui->list_currentGPUData, tr("GPU temperature"), device.gpuTemeperatureData.str.current);
+        addChild(ui->list_currentGPUData, tr("GPU temperature"), device.gpuData.value(ValueID::TEMPERATURE_CURRENT).strValue);
     }
 }
 
 void radeon_profile::updateExecLogs() {
     for (int i = 0; i < execsRunning.count(); i++) {
         if (execsRunning.at(i)->getExecState() == QProcess::Running && execsRunning.at(i)->logEnabled) {
-            QString logData = QDateTime::currentDateTime().toString(logDateFormat) +";" + device.gpuClocksData.str.powerLevel + ";" +
-                    device.gpuClocksData.str.coreClk + ";"+
-                    device.gpuClocksData.str.memClk + ";"+
-                    device.gpuClocksData.str.uvdCClk + ";"+
-                    device.gpuClocksData.str.uvdDClk + ";"+
-                    device.gpuClocksData.str.coreVolt + ";"+
-                    device.gpuClocksData.str.memVolt + ";"+
-                    device.gpuTemeperatureData.str.current;
+            QString logData = QDateTime::currentDateTime().toString(logDateFormat) +";" + device.gpuData.value(ValueID::POWER_LEVEL, RPValue()).strValue + ";" +
+                    device.gpuData.value(ValueID::CLK_CORE).strValue + ";"+
+                    device.gpuData.value(ValueID::CLK_MEM).strValue + ";"+
+                    device.gpuData.value(ValueID::CLK_UVD).strValue + ";"+
+                    device.gpuData.value(ValueID::DCLK_UVD).strValue + ";"+
+                    device.gpuData.value(ValueID::VOLT_CORE).strValue + ";"+
+                    device.gpuData.value(ValueID::VOLT_MEM).strValue + ";"+
+                    device.gpuData.value(ValueID::TEMPERATURE_CURRENT).strValue;
             execsRunning.at(i)->appendToLog(logData);
         }
     }
@@ -309,7 +312,7 @@ void radeon_profile::timerEvent() {
     if (!refreshWhenHidden->isChecked() && this->isHidden()) {
 
         // even if in tray, keep the fan control active (if enabled)
-        if (device.getDriverFeatures().pwmAvailable && ui->btn_pwmProfile->isChecked()) {
+        if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && ui->btn_pwmProfile->isChecked()) {
             device.getTemperature();
             adjustFanSpeed();
         }
@@ -320,15 +323,15 @@ void radeon_profile::timerEvent() {
         refreshGpuData();
 
         ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerProfile));
-        if (device.getDriverFeatures().currentPowerMethod == globalStuff::DPM)
+        if (device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM)
             ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
 
-        if (device.getDriverFeatures().pwmAvailable && ui->btn_pwmProfile->isChecked())
+        if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && ui->btn_pwmProfile->isChecked())
             adjustFanSpeed();
 
 
         // lets say coreClk is essential to get stats (it is disabled in ui anyway when features.clocksAvailable is false)
-        if (ui->cb_stats->isChecked() && device.gpuClocksData.coreClk != -1) {
+        if (ui->cb_stats->isChecked() && device.gpuData.contains(ValueID::CLK_CORE)) {
             doTheStats();
 
             // do the math only when user looking at stats table
@@ -369,14 +372,14 @@ void radeon_profile::timerEvent() {
  * \f$speed\f$ is the speed to apply.
  */
 void radeon_profile::adjustFanSpeed() {
-    if (device.gpuTemeperatureData.current != device.gpuTemeperatureData.currentBefore) {
-        if (currentFanProfile.contains(device.gpuTemeperatureData.current)) {  // Exact match
-            device.setPwmValue(currentFanProfile.value(device.gpuTemeperatureData.current));
+    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value != device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value ) {
+        if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {  // Exact match
+            device.setPwmValue(currentFanProfile.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));
             return;
         }
 
         // find bounds of current temperature
-        QMap<int,unsigned int>::const_iterator high = currentFanProfile.upperBound(device.gpuTemeperatureData.current);
+        QMap<int,unsigned int>::const_iterator high = currentFanProfile.upperBound(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
         QMap<int,unsigned int>::const_iterator low = (currentFanProfile.size() > 1 ? high - 1 : high);
 
         int hSpeed = high.value(),
@@ -397,7 +400,7 @@ void radeon_profile::adjustFanSpeed() {
         int hTemperature = high.key(),
                 lTemperature = low.key();
 
-        float speed = (float)(hSpeed - lSpeed) / (float)(hTemperature - lTemperature)  * (device.gpuTemeperatureData.current - lTemperature)  + lSpeed;
+        float speed = (float)(hSpeed - lSpeed) / (float)(hTemperature - lTemperature)  * (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value - lTemperature)  + lSpeed;
 
         device.setPwmValue((speed < minFanStepsSpeed) ? minFanStepsSpeed : speed);
     }
@@ -417,29 +420,28 @@ void radeon_profile::refreshGraphs() {
     ui->plotVolts->replot();
 
     // choose bigger clock and adjust plot scale
-    int r = (device.gpuClocksData.memClk >= device.gpuClocksData.coreClk) ? device.gpuClocksData.memClk : device.gpuClocksData.coreClk;
+    int r = (device.gpuData.value(ValueID::CLK_MEM).value >= device.gpuData.value(ValueID::CLK_CORE).value) ? device.gpuData.value(ValueID::CLK_MEM).value : device.gpuData.value(ValueID::CLK_CORE).value;
     if (r > ui->plotClocks->yAxis->range().upper)
         ui->plotClocks->yAxis->setRangeUpper(r + 150);
 
     // add data to plots
-    ui->plotClocks->graph(0)->addData(ticksCounter,device.gpuClocksData.coreClk);
-    ui->plotClocks->graph(1)->addData(ticksCounter,device.gpuClocksData.memClk);
-    ui->plotClocks->graph(2)->addData(ticksCounter,device.gpuClocksData.uvdCClk);
-    ui->plotClocks->graph(3)->addData(ticksCounter,device.gpuClocksData.uvdDClk);
+    ui->plotClocks->graph(0)->addData(ticksCounter, device.gpuData.value(ValueID::CLK_CORE).value);
+    ui->plotClocks->graph(1)->addData(ticksCounter, device.gpuData.value(ValueID::CLK_MEM).value);
+    ui->plotClocks->graph(2)->addData(ticksCounter, device.gpuData.value(ValueID::CLK_UVD).value);
+    ui->plotClocks->graph(3)->addData(ticksCounter, device.gpuData.value(ValueID::DCLK_UVD).value);
 
-    if (device.gpuClocksData.coreVolt > ui->plotVolts->yAxis->range().upper)
-        ui->plotVolts->yAxis->setRangeUpper(device.gpuClocksData.coreVolt + 100);
+    if (device.gpuData.value(ValueID::VOLT_CORE).value > ui->plotVolts->yAxis->range().upper)
+        ui->plotVolts->yAxis->setRangeUpper(device.gpuData.value(ValueID::VOLT_CORE).value + 100);
 
-    ui->plotVolts->graph(0)->addData(ticksCounter,device.gpuClocksData.coreVolt);
-    ui->plotVolts->graph(1)->addData(ticksCounter,device.gpuClocksData.memVolt);
+    ui->plotVolts->graph(0)->addData(ticksCounter,device.gpuData.value(ValueID::VOLT_CORE).value);
+    ui->plotVolts->graph(1)->addData(ticksCounter,device.gpuData.value(ValueID::VOLT_MEM).value);
 
     // temperature graph
-    if (device.gpuTemeperatureData.max >= ui->plotTemp->yAxis->range().upper || device.gpuTemeperatureData.min <= ui->plotTemp->yAxis->range().lower)
-        ui->plotTemp->yAxis->setRange(device.gpuTemeperatureData.min - 5, device.gpuTemeperatureData.max + 5);
+    if (device.gpuData.value(ValueID::TEMPERATURE_MAX).value >= ui->plotTemp->yAxis->range().upper || device.gpuData.value(ValueID::TEMPERATURE_MIN).value <= ui->plotTemp->yAxis->range().lower)
+        ui->plotTemp->yAxis->setRange(device.gpuData.value(ValueID::TEMPERATURE_MIN).value - 5, device.gpuData.value(ValueID::TEMPERATURE_MAX).value + 5);
 
-    ui->plotTemp->graph(0)->addData(ticksCounter,device.gpuTemeperatureData.current);
-    ui->l_minMaxTemp->setText("Max: " + device.gpuTemeperatureData.str.max  + " | Min: " +
-                              device.gpuTemeperatureData.str.min + " | Avg: " + QString().setNum(device.gpuTemeperatureData.sum/ticksCounter,'f',1) + QString::fromUtf8("\u00B0C"));
+    ui->plotTemp->graph(0)->addData(ticksCounter, device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+    ui->l_minMaxTemp->setText("Max: " + device.gpuData.value(ValueID::TEMPERATURE_MAX).strValue  + " | Min: " + device.gpuData.value(ValueID::TEMPERATURE_MIN).strValue);
 }
 
 void radeon_profile::doTheStats() {
@@ -447,12 +449,12 @@ void radeon_profile::doTheStats() {
     statsTickCounter++;
 
     // figure out pm level based on data provided
-    QString pmLevelName = (device.gpuClocksData.powerLevel == -1) ? "" : "Power level:" + device.gpuClocksData.str.powerLevel, volt;
-    volt = (device.gpuClocksData.coreVolt == -1) ? "" : "(" + device.gpuClocksData.str.coreVolt+")";
-    pmLevelName = (device.gpuClocksData.coreClk == -1) ? pmLevelName : pmLevelName + " Core:" +device.gpuClocksData.str.coreClk + volt;
+    QString pmLevelName = (device.gpuData.contains(ValueID::POWER_LEVEL)) ? "" : "Power level:" + device.gpuData.value(ValueID::POWER_LEVEL).strValue, volt;
+    volt = (device.gpuData.contains(ValueID::VOLT_CORE)) ? "" : "(" +  device.gpuData.value(ValueID::VOLT_CORE).strValue+")";
+    pmLevelName = (device.gpuData.contains(ValueID::CLK_CORE)) ? pmLevelName : pmLevelName + " Core:" + device.gpuData.value(ValueID::CLK_CORE).strValue + volt;
 
-    volt = (device.gpuClocksData.memVolt == -1) ? "" : "(" + device.gpuClocksData.str.memVolt + ")";
-    pmLevelName = (device.gpuClocksData.memClk == -1) ? pmLevelName : pmLevelName + " Mem:" + device.gpuClocksData.str.memClk +  volt;
+    volt = (device.gpuData.contains(ValueID::VOLT_MEM)) ? "" : "(" +  device.gpuData.value(ValueID::VOLT_MEM).strValue + ")";
+    pmLevelName = (device.gpuData.contains(ValueID::CLK_MEM)) ? pmLevelName : pmLevelName + " Mem:" +  device.gpuData.value(ValueID::CLK_MEM).strValue +  volt;
 
     if (pmStats.contains(pmLevelName)) // This power level already exists, increment its count
         pmStats[pmLevelName]++;

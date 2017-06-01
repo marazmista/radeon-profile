@@ -86,13 +86,13 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 }
 
 void radeon_profile::changeProfileFromCombo() {
-    device.setPowerProfile(static_cast<globalStuff::powerProfiles>((device.getDriverFeatures().currentPowerMethod == globalStuff::DPM) ?
+    device.setPowerProfile(static_cast<PowerProfiles>((device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) ?
                                                                        ui->combo_pProfile->currentIndex() :
                                                                        ui->combo_pProfile->currentIndex() + 3)); // frist three in enum is dpm so we need to increase
 }
 
 void radeon_profile::changePowerLevelFromCombo() {
-    device.setForcePowerLevel((globalStuff::forcePowerLevels)ui->combo_pLevel->currentIndex());
+    device.setForcePowerLevel((ForcePowerLevels)ui->combo_pLevel->currentIndex());
 }
 
 // == others
@@ -114,7 +114,7 @@ void radeon_profile::on_btn_dpmPerformance_clicked() {
     //    device.setPowerProfile(globalStuff::PERFORMANCE);
 }
 
-void radeon_profile::resetMinMax() { device.gpuTemeperatureData.min = 0; device.gpuTemeperatureData.max = 0; }
+void radeon_profile::resetMinMax() { device.gpuData.remove(ValueID::TEMPERATURE_MIN); device.gpuData.remove(ValueID::TEMPERATURE_MAX); }
 
 void radeon_profile::changeTimeRange() {
     rangeX = ui->timeSlider->value();
@@ -167,7 +167,8 @@ void radeon_profile::gpuChanged()
 {
     timer->stop();
     device.changeGpu(ui->combo_gpus->currentIndex());
-    setupUiEnabledFeatures(device.getDriverFeatures());
+    refreshGpuData();
+    setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
     timerEvent();
     refreshBtnClicked();
     timer->start();
@@ -209,7 +210,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
 
         saveConfig();
 
-        if (device.getDriverFeatures().pwmAvailable)
+        if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT))
             device.setPwmManualControl(false);
     }
 
@@ -331,15 +332,15 @@ void radeon_profile::on_chProfile_clicked()
 
     if (ok) {
         if (selection == profile_default)
-            device.setPowerProfile(globalStuff::DEFAULT);
+            device.setPowerProfile(PowerProfiles::DEFAULT);
         else if (selection == profile_auto)
-            device.setPowerProfile(globalStuff::AUTO);
+            device.setPowerProfile(PowerProfiles::AUTO);
         else if (selection == profile_high)
-            device.setPowerProfile(globalStuff::HIGH);
+            device.setPowerProfile(PowerProfiles::HIGH);
         else if (selection == profile_mid)
-            device.setPowerProfile(globalStuff::MID);
+            device.setPowerProfile(PowerProfiles::MID);
         else if (selection == profile_low)
-            device.setPowerProfile(globalStuff::LOW);
+            device.setPowerProfile(PowerProfiles::LOW);
     }
 }
 

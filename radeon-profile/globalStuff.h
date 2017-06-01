@@ -28,6 +28,158 @@
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
+enum class ValueID {
+    CLK_CORE,
+    CLK_MEM,
+    VOLT_CORE,
+    VOLT_MEM,
+    CLK_UVD,
+    DCLK_UVD,
+    TEMPERATURE_CURRENT,
+    TEMPERATURE_BEFORE_CURRENT,
+    TEMPERATURE_MIN,
+    TEMPERATURE_MAX,
+    GPU_LOAD_PERCENT,
+    GPU_VRAM_USAGE_PERCENT,
+    GPU_VRAM_USAGE_MB,
+    FAN_SPEED_PERCENT,
+    FAN_SPEED_RPM,
+    POWER_LEVEL
+};
+
+enum class ValueUnit {
+    MEGAHERTZ,
+    PERCENT,
+    CELSIUS,
+    MEGABYTE,
+    MILIVOLT,
+    RPM,
+    NONE
+};
+
+enum PowerProfiles {
+    BATTERY, BALANCED, PERFORMANCE, AUTO, DEFAULT, LOW, MID, HIGH
+};
+
+enum ForcePowerLevels {
+    F_AUTO, F_LOW, F_HIGH
+};
+
+enum class ClocksDataSource {
+    IOCTL, PM_FILE, SOURCE_UNKNOWN
+};
+
+enum class DriverModule {
+    RADEON, AMDGPU, MODULE_UNKNOWN
+};
+
+enum class PowerMethod {
+    DPM = 0,  // kernel >= 3.11
+    PROFILE = 1,  // kernel <3.11 or dpm disabled
+    PM_UNKNOWN = 2
+};
+
+enum class TemperatureSensor {
+    SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
+    CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
+    PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
+    MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
+    TS_UNKNOWN
+};
+
+struct GpuSysInfo {
+    QString sysName, driverModuleString;
+    DriverModule module;
+};
+
+// structure which holds what can be display on ui and on its base
+// we enable ui elements
+struct DriverFeatures {
+    bool
+    canChangeProfile = false,
+    ocCoreAvailable = false,
+    ocMemAvailable = false;
+
+    PowerMethod currentPowerMethod;
+    ClocksDataSource clocksSource;
+    TemperatureSensor currentTemperatureSensor;
+    GpuSysInfo sysInfo;
+
+    DriverFeatures() {
+        currentPowerMethod = PowerMethod::PM_UNKNOWN;
+        currentTemperatureSensor = TemperatureSensor::TS_UNKNOWN;
+    }
+};
+
+struct GpuClocksStruct {
+    int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk, powerLevel;
+
+    GpuClocksStruct() {
+        coreClk = memClk =  coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = -1;
+    }
+};
+
+struct GpuTemperatureStruct {
+    int current, currentBefore, max, min;
+};
+
+struct GpuPwmStruct {
+    int pwmSpeed = 0, pwmSpeedRpm;
+};
+
+struct GpuUsageStruct {
+    float gpuLoad, gpuVramLoadPercent, gpuVramLoad;
+
+    GpuUsageStruct() {
+        gpuLoad = gpuVramLoad = gpuVramLoadPercent = -1;
+    }
+};
+
+struct GpuConstParams {
+     int pwmMaxSpeed, maxCoreClock = -1, maxMemClock = -1, vRamSize = -1;
+};
+
+// class for values that are plottable
+struct RPValue {
+    ValueUnit unit;
+    float value;
+    QString strValue;
+
+    RPValue() {
+        value = -1;
+    }
+
+    RPValue(ValueUnit u, float v = -1) {
+        unit = u;
+        value = v;
+        strValue = toString();
+    }
+
+    QString toString() {
+        if (value == -1)
+            return "";
+
+        switch (unit) {
+            case ValueUnit::MEGAHERTZ:
+                return QString::number(value) + "MHz";
+            case ValueUnit::MEGABYTE:
+                return QString::number(value) + "MB";
+            case ValueUnit::PERCENT:
+                return QString::number(value, 'f', 1) + "%";
+            case ValueUnit::MILIVOLT:
+                return QString::number(value) + "mV";
+            case ValueUnit::CELSIUS:
+                return QString::number(value) + QString::fromUtf8("\u00B0C");
+            case ValueUnit::RPM:
+                return QString::number(value) + "RPM";
+            default:
+                return QString::number(value);
+        }
+
+        return "";
+    }
+};
+
 class globalStuff {
 public:
     static QStringList grabSystemInfo(const QString cmd) {
@@ -66,155 +218,6 @@ public:
     static QStringList createProfileCombo() {
         return QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low;
     }
-
-    enum powerProfiles {
-        BATTERY, BALANCED, PERFORMANCE, AUTO, DEFAULT, LOW, MID, HIGH
-    };
-
-    enum forcePowerLevels {
-        F_AUTO, F_LOW, F_HIGH
-    };
-
-    enum driverModule {
-        RADEON, AMDGPU, MODULE_UNKNOWN
-    };
-
-    enum clocksDataSource {
-        IOCTL, PM_FILE, SOURCE_UNKNOWN
-    };
-
-//    enum pwmControl {
-//        PWM_DISABLED, PWM_MANUAL, PWM_AUTO
-//    };
-
-    enum powerMethod {
-        DPM = 0,  // kernel >= 3.11
-        PROFILE = 1,  // kernel <3.11 or dpm disabled
-        PM_UNKNOWN = 2
-    };
-
-    enum tempSensor {
-        SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
-        CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
-        PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
-        MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
-        TS_UNKNOWN
-    };
-
-    struct gpuSysInfo {
-        QString sysName, driverModuleString;
-        globalStuff::driverModule module;
-    };
-
-    // structure which holds what can be display on ui and on its base
-    // we enable ui elements
-    struct driverFeatures {
-        bool
-        canChangeProfile = false,
-
-        clkCoreAvailable = false,
-        clkMemAvailable = false,
-        voltCoreAvailable = false,
-        voltMemAvailable = false,
-
-        temperatureAvailable = false,
-
-        pwmAvailable = false,
-        fanRpmInfoAvailable = false,
-
-        ocCoreAvailable = false,
-        ocMemAvailable = false;
-
-
-        globalStuff::powerMethod currentPowerMethod;
-        globalStuff::clocksDataSource clocksSource;
-        globalStuff::tempSensor currentTemperatureSensor;
-        globalStuff::gpuSysInfo sysInfo;
-
-        driverFeatures() {
-            currentPowerMethod = PM_UNKNOWN;
-            currentTemperatureSensor = TS_UNKNOWN;
-        }
-    };
-
-    struct gpuClocksStructString {
-      QString powerLevel, coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
-    };
-
-    struct gpuClocksStruct {
-        int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk;
-        char powerLevel;
-        gpuClocksStructString str;
-
-        gpuClocksStruct() {
-            coreClk = memClk =  coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = -1;
-        }
-
-        void convertToString() {
-            str.coreClk = (coreClk != -1) ? QString::number(coreClk)+"MHz" : "";
-            str.memClk = (memClk != -1) ? QString::number(memClk)+"MHz" : "";
-            str.memVolt = (memVolt != -1) ? QString::number(memVolt)+"mV" : "";
-            str.coreVolt = (coreVolt != -1) ? QString::number(coreVolt)+"mV" : "";
-            str.uvdCClk = (uvdCClk != -1) ? QString::number(uvdCClk)+"MHz" : "";
-            str.uvdDClk =  (uvdDClk != -1) ?  QString::number(uvdDClk)+"MHz" : "";
-
-
-            if (powerLevel != -1)
-                str.powerLevel =  QString::number(powerLevel);
-        }
-    };
-
-    struct gpuTemperatureStructString {
-        QString current, max, min;
-    };
-
-    struct gpuTemperatureStruct {
-        float current, currentBefore, max, min, sum;
-        gpuTemperatureStructString str;
-
-        void convertToString() {
-            str.current = QString::number(current) + QString::fromUtf8("\u00B0C");
-            str.max = QString::number(max) + QString::fromUtf8("\u00B0C");
-            str.min = QString::number(min) + QString::fromUtf8("\u00B0C");
-        }
-    };
-
-    struct gpuPwmStructString {
-        QString pwmSpeed, pwmSpeedRpm;
-    };
-
-    struct gpuPwmStruct {
-        int pwmSpeed = 0, pwmSpeedRpm;
-        gpuPwmStructString str;
-
-        void convertToString() {
-            str.pwmSpeed = QString::number(pwmSpeed) + "%";
-            str.pwmSpeedRpm = QString::number(pwmSpeedRpm) + "RPM";
-        }
-    };
-
-    struct gpuUsageStructString {
-        QString gpuLoad, gpuVramLoadPercent, gpuVramLoad;
-    };
-
-    struct gpuUsageStruct {
-        float gpuLoad, gpuVramLoadPercent, gpuVramLoad;
-        gpuUsageStructString str;
-
-        gpuUsageStruct() {
-            gpuLoad = gpuVramLoad = gpuVramLoadPercent = -1;
-        }
-
-        void convertToString() {
-             str.gpuLoad = (gpuLoad != -1) ? QString::number(gpuLoad,'f',1) + "%" : "";
-             str.gpuVramLoadPercent = (gpuVramLoadPercent != -1) ? QString::number(gpuVramLoadPercent) + "%" : "";
-             str.gpuVramLoad = (gpuVramLoad != -1) ? QString::number(gpuVramLoad/1024/1024) + "MB" : "";
-        }
-    };
-
-    struct gpuConstParams {
-         int pwmMaxSpeed, maxCoreClock = -1, maxMemClock = -1, vRamSize = -1;
-    };
 
     // settings from config used across the source
     static struct globalCfgStruct {
