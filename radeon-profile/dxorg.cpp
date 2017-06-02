@@ -295,8 +295,8 @@ float dXorg::getTemperature() {
     return temp.toFloat();
 }
 
-GpuUsageStruct dXorg::getGpuUsage() {
-    GpuUsageStruct data;
+GpuLoadStruct dXorg::getGpuLoad() {
+    GpuLoadStruct data;
 
     ioctlHnd->getGpuUsage(&data.gpuLoad, 500000, 150);
     ioctlHnd->getVramUsagePercentage(&data.gpuVramLoadPercent);
@@ -620,8 +620,6 @@ void dXorg::setupRegex(const QString &data) {
 void dXorg::figureOutDriverFeatures() {
     if (getIoctlAvailability()) {
         features.clocksSource = ClocksDataSource::IOCTL;
-//        features.clkCoreAvailable = true;
-//        features.clkMemAvailable = true;
     } else {
         features.clocksSource = ClocksDataSource::PM_FILE;
         QString data = getClocksRawData(true);
@@ -633,17 +631,10 @@ void dXorg::figureOutDriverFeatures() {
         // copied to /tmp/
         if (test.coreClk == -1)
             test = getFeaturesFallback();
-
-//        features.clkCoreAvailable = !(test.coreClk == -1);
-//        features.clkMemAvailable = !(test.memClk == -1);
-//        features.voltCoreAvailable = !(test.coreVolt == -1);
-//        features.voltMemAvailable = !(test.memVolt == -1);
     }
 
     features.currentTemperatureSensor = getTemperatureSensor();
     features.currentPowerMethod = getPowerMethod();
-
-//    features.temperatureAvailable =  (features.currentTemperatureSensor == globalStuff::TS_UNKNOWN) ? false : true;
 
     switch (features.currentPowerMethod) {
     case PowerMethod::DPM: {
@@ -668,25 +659,6 @@ void dXorg::figureOutDriverFeatures() {
     case PowerMethod::PM_UNKNOWN:
         break;
     }
-
-//    if (!hwmonAttributes.pwm1.isEmpty()) {
-//        QFile f(hwmonAttributes.pwm1);
-//        if (f.open(QIODevice::ReadOnly)) {
-
-//            if (QString(f.readLine(2))[0] != pwm_disabled)
-////                features.pwmAvailable = true;
-
-//            f.close();
-//        }
-
-//        if (!hwmonAttributes.fan1_input.isEmpty()) {
-//            QFile frpm(hwmonAttributes.fan1_input);
-//            if (frpm.open(QIODevice::ReadOnly)) {
-////                features.fanRpmInfoAvailable = true;
-//                frpm.close();
-//            }
-//        }
-//    }
 
     features.ocCoreAvailable = !deviceFiles.sysFs.pp_sclk_od.isEmpty();
     features.ocMemAvailable = !deviceFiles.sysFs.pp_mclk_od.isEmpty();

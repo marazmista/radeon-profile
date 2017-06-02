@@ -75,6 +75,7 @@ public:
     static unsigned int minFanStepsSpeed;
 
     typedef QMap<int, unsigned int> fanProfileSteps;
+    
 private slots:
     void timerEvent();
     void initFutureHandler();
@@ -156,7 +157,6 @@ private slots:
     void on_btn_removeEvent_clicked();
     void on_btn_revokeEvent_clicked();
     void on_list_events_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
     void on_btn_saveAll_clicked();
 
 private:
@@ -227,6 +227,7 @@ private:
     void loadFanProfile(QXmlStreamReader &xml);
     void createDefaultFanProfile();
     void loadExecProfiles();
+    void setupUiElements();
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.

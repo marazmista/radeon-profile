@@ -90,6 +90,7 @@ bool gpu::initialize() {
 
     driverHandler = new dXorg(gpuList.at(0));
     gpuParams = driverHandler->getGpuConstParams();
+    defineAvailableDataContainer();
 
     return true;
 }
@@ -100,50 +101,108 @@ void gpu::changeGpu(int index) {
     driverHandler = new dXorg(gpuList.at(index));
     driverHandler->configure();
     gpuParams = driverHandler->getGpuConstParams();
+    defineAvailableDataContainer();
+}
+
+void gpu::defineAvailableDataContainer() {
+    GpuClocksStruct tmpClk = driverHandler->getClocks();
+
+    if (tmpClk.coreClk != -1)
+        gpuData.insert(ValueID::CLK_CORE, RPValue(ValueUnit::MEGAHERTZ, tmpClk.coreClk));
+
+    if (tmpClk.coreVolt != -1)
+        gpuData.insert(ValueID::VOLT_CORE, RPValue(ValueUnit::MILIVOLT, tmpClk.coreVolt));
+
+    if (tmpClk.memClk != -1)
+        gpuData.insert(ValueID::CLK_MEM, RPValue(ValueUnit::MEGAHERTZ, tmpClk.memClk));
+
+    if (tmpClk.memVolt != -1)
+        gpuData.insert(ValueID::VOLT_MEM, RPValue(ValueUnit::MILIVOLT, tmpClk.memVolt));
+
+    if (tmpClk.uvdCClk != -1)
+        gpuData.insert(ValueID::CLK_UVD, RPValue(ValueUnit::MEGAHERTZ, tmpClk.uvdCClk));
+
+    if (tmpClk.uvdDClk != -1)
+        gpuData.insert(ValueID::DCLK_UVD, RPValue(ValueUnit::MEGAHERTZ, tmpClk.uvdDClk));
+
+    if (tmpClk.powerLevel != -1)
+        gpuData.insert(ValueID::POWER_LEVEL, RPValue(ValueUnit::NONE, tmpClk.powerLevel));
+
+
+    GpuPwmStruct tmpPWm = driverHandler->getPwmSpeed();
+
+    if (tmpPWm.pwmSpeed != -1)
+        gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, ((float)tmpPWm.pwmSpeed / gpuParams.pwmMaxSpeed ) * 100));
+
+    if (tmpPWm.pwmSpeedRpm != -1)
+        gpuData.insert(ValueID::FAN_SPEED_RPM, RPValue(ValueUnit::RPM, tmpPWm.pwmSpeedRpm));
+
+
+    float tmpTemp = driverHandler->getTemperature();
+
+    if (tmpTemp != -1) {
+        gpuData.insert(ValueID::TEMPERATURE_CURRENT, RPValue(ValueUnit::CELSIUS, tmpTemp));
+        gpuData.insert(ValueID::TEMPERATURE_BEFORE_CURRENT, RPValue(ValueUnit::CELSIUS, tmpTemp));
+        gpuData.insert(ValueID::TEMPERATURE_MIN, RPValue(ValueUnit::CELSIUS, tmpTemp));
+        gpuData.insert(ValueID::TEMPERATURE_MAX, RPValue(ValueUnit::CELSIUS, tmpTemp));
+    }
+
+
+    GpuLoadStruct tmpLoad = driverHandler->getGpuLoad();
+
+    if (tmpLoad.gpuLoad != -1)
+         gpuData.insert(ValueID::GPU_LOAD_PERCENT, RPValue(ValueUnit::PERCENT, tmpLoad.gpuLoad));
+
+    if (tmpLoad.gpuVramLoad != -1)
+         gpuData.insert(ValueID::GPU_VRAM_LOAD_MB, RPValue(ValueUnit::PERCENT, tmpLoad.gpuVramLoad));
+
+    if (tmpLoad.gpuVramLoadPercent != -1)
+         gpuData.insert(ValueID::GPU_VRAM_LOAD_PERCENT, RPValue(ValueUnit::PERCENT, tmpLoad.gpuVramLoadPercent));
 }
 
 void gpu::getClocks() {
     GpuClocksStruct tmp = driverHandler->getClocks();
 
-    if (tmp.coreClk != -1)
-        gpuData.insert(ValueID::CLK_CORE, RPValue(ValueUnit::MEGAHERTZ, tmp.coreClk));
+    if (gpuData.contains(ValueID::CLK_CORE))
+        gpuData[ValueID::CLK_CORE].setValue(tmp.coreClk);
 
-    if (tmp.coreVolt != -1)
-        gpuData.insert(ValueID::VOLT_CORE, RPValue(ValueUnit::MILIVOLT, tmp.coreVolt));
+    if (gpuData.contains(ValueID::VOLT_CORE))
+         gpuData[ValueID::VOLT_CORE].setValue(tmp.coreVolt);
 
-    if (tmp.memClk != -1)
-        gpuData.insert(ValueID::CLK_MEM, RPValue(ValueUnit::MEGAHERTZ, tmp.memClk));
+    if (gpuData.contains(ValueID::CLK_MEM))
+         gpuData[ValueID::CLK_MEM].setValue(tmp.memClk);
 
-    if (tmp.memVolt != -1)
-        gpuData.insert(ValueID::VOLT_MEM, RPValue(ValueUnit::MILIVOLT, tmp.memVolt));
+    if (gpuData.contains(ValueID::VOLT_MEM))
+         gpuData[ValueID::VOLT_MEM].setValue(tmp.memVolt);
 
-    if (tmp.uvdCClk != -1)
-        gpuData.insert(ValueID::CLK_UVD, RPValue(ValueUnit::MEGAHERTZ, tmp.uvdCClk));
+    if (gpuData.contains(ValueID::CLK_UVD))
+         gpuData[ValueID::CLK_UVD].setValue(tmp.uvdCClk);
 
-    if (tmp.uvdDClk != -1)
-        gpuData.insert(ValueID::DCLK_UVD, RPValue(ValueUnit::MEGAHERTZ, tmp.uvdDClk));
+    if (gpuData.contains(ValueID::DCLK_UVD))
+         gpuData[ValueID::DCLK_UVD].setValue(tmp.uvdDClk);
 
-    if (tmp.powerLevel != -1)
-        gpuData.insert(ValueID::POWER_LEVEL, RPValue(ValueUnit::NONE, tmp.powerLevel));
-
+    if (gpuData.contains(ValueID::POWER_LEVEL))
+         gpuData[ValueID::POWER_LEVEL].setValue(tmp.powerLevel);
 }
 
 void gpu::getTemperature() {
-    gpuData.insert(ValueID::TEMPERATURE_BEFORE_CURRENT, gpuData.value(ValueID::TEMPERATURE_CURRENT, RPValue()));
-    gpuData.insert(ValueID::TEMPERATURE_CURRENT, RPValue(ValueUnit::CELSIUS, driverHandler->getTemperature()));
+    if (!gpuData.contains(ValueID::TEMPERATURE_CURRENT))
+        return;
 
+    gpuData[ValueID::TEMPERATURE_BEFORE_CURRENT].setValue(gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+    gpuData[ValueID::TEMPERATURE_CURRENT].setValue(driverHandler->getTemperature());
 
-    if (!gpuData.contains(ValueID::TEMPERATURE_MIN) ||  gpuData.value(ValueID::TEMPERATURE_MIN, RPValue()).value > gpuData.value(ValueID::TEMPERATURE_CURRENT).value)
-        gpuData.insert(ValueID::TEMPERATURE_MIN, gpuData.value(ValueID::TEMPERATURE_CURRENT));
+    if (gpuData.value(ValueID::TEMPERATURE_MIN, RPValue()).value > gpuData.value(ValueID::TEMPERATURE_CURRENT).value)
+        gpuData[ValueID::TEMPERATURE_MIN].setValue(gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
 
-    if (!gpuData.contains(ValueID::TEMPERATURE_MAX) || gpuData.value(ValueID::TEMPERATURE_MAX, RPValue()).value < gpuData.value(ValueID::TEMPERATURE_CURRENT).value)
-        gpuData.insert(ValueID::TEMPERATURE_MAX, gpuData.value(ValueID::TEMPERATURE_CURRENT));
+    if (gpuData.value(ValueID::TEMPERATURE_MAX, RPValue()).value < gpuData.value(ValueID::TEMPERATURE_CURRENT).value)
+        gpuData[ValueID::TEMPERATURE_MAX].setValue(gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
 }
 
-void gpu::getGpuUsage() {
+void gpu::getGpuLoad() {
 
     // getting gpu usage seems to be heavy and cause ui lag, so it is done in another thread
-    futureGpuUsage.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGpuUsage));
+    futureGpuLoad.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGpuLoad));
 }
 
 QList<QTreeWidgetItem *> gpu::getModuleInfo() const {

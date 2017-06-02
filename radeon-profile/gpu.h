@@ -18,7 +18,7 @@ class gpu : public QObject
 public:
     explicit gpu(QObject *parent = 0 ) : QObject(parent) {
         currentGpuIndex = 0;
-        connect(&futureGpuUsage, SIGNAL(finished()),this,SLOT(handleGpuUsageResult()));
+        connect(&futureGpuLoad, SIGNAL(finished()),this,SLOT(handleGpuUsageResult()));
     }
 
     ~gpu() {
@@ -43,7 +43,7 @@ public:
     void getClocks();
     void getTemperature();
     void getPwmSpeed();
-    void getGpuUsage();
+    void getGpuLoad();
     void getConstParams();
 
     void changeGpu(int index);
@@ -62,22 +62,24 @@ public:
 
 private slots:
     void handleGpuUsageResult() {
-         GpuUsageStruct tmp = futureGpuUsage.result();
+        GpuLoadStruct tmp = futureGpuLoad.result();
 
-         if (tmp.gpuLoad != -1)
-             gpuData.insert(ValueID::GPU_LOAD_PERCENT, RPValue(ValueUnit::PERCENT, tmp.gpuLoad));
+        if (gpuData.contains(ValueID::GPU_LOAD_PERCENT))
+            gpuData[ValueID::GPU_LOAD_PERCENT].setValue(tmp.gpuLoad);
 
-        if (tmp.gpuVramLoad != -1)
-            gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::MEGABYTE, tmp.gpuVramLoad));
+        if (gpuData.contains(ValueID::GPU_LOAD_PERCENT))
+            gpuData[ValueID::GPU_VRAM_LOAD_MB].setValue(tmp.gpuVramLoad);
 
-        if (tmp.gpuVramLoadPercent != -1) {
-            gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmp.gpuVramLoadPercent));
+        if (gpuData.contains(ValueID::GPU_VRAM_LOAD_PERCENT)) {
+            gpuData[ValueID::GPU_VRAM_LOAD_PERCENT].setValue(tmp.gpuVramLoadPercent);
         }
     }
 
 private:
     dXorg *driverHandler;
-    QFutureWatcher<GpuUsageStruct> futureGpuUsage;
+    QFutureWatcher<GpuLoadStruct> futureGpuLoad;
+    void defineAvailableDataContainer();
+
 };
 
 #endif // GPU_H

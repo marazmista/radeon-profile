@@ -28,6 +28,7 @@
 
 unsigned int radeon_profile::minFanStepsSpeed = 10;
 
+
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::radeon_profile)
@@ -61,17 +62,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     timer = new QTimer(this);
     timer->setInterval(ui->spin_timerInterval->value()*1000);
 
-    // setup ui elemensts
-    ui->mainTabs->setCurrentIndex(0);
-    ui->tabs_systemInfo->setCurrentIndex(0);
-    ui->configGroups->setCurrentIndex(0);
-    ui->list_currentGPUData->setHeaderHidden(false);
-    ui->execPages->setCurrentIndex(0);
-    setupGraphs();
-    setupForcePowerLevelMenu();
-    setupOptionsMenu();
-    setupContextMenus();
-    setupTrayIcon();
+    setupUiElements();
 
     for (int i = 0; i < device.gpuList.count(); ++i)
         ui->combo_gpus->addItem(device.gpuList.at(i).sysName);
@@ -93,9 +84,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     timer->start();
     timerEvent();
 
-    addRuntimeWidgets();
-    connectSignals();
-
     showWindow();
 }
 
@@ -106,6 +94,9 @@ radeon_profile::~radeon_profile()
 
 void radeon_profile::initFutureHandler() {
     setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
+    ui->centralWidget->setEnabled(true);
+
+    connectSignals();
     refreshUI();
 }
 
@@ -119,6 +110,23 @@ void radeon_profile::connectSignals()
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
     connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
 }
+
+void radeon_profile::setupUiElements()
+{
+    ui->mainTabs->setCurrentIndex(0);
+    ui->tabs_systemInfo->setCurrentIndex(0);
+    ui->configGroups->setCurrentIndex(0);
+    ui->list_currentGPUData->setHeaderHidden(false);
+    ui->execPages->setCurrentIndex(0);
+    setupGraphs();
+    setupForcePowerLevelMenu();
+    setupOptionsMenu();
+    setupContextMenus();
+    setupTrayIcon();
+    addRuntimeWidgets();
+    ui->centralWidget->setEnabled(false);
+}
+
 
 void radeon_profile::addRuntimeWidgets() {
     // add button for manual refresh glx info, connectors, mod params
@@ -236,7 +244,7 @@ void radeon_profile::refreshGpuData() {
     device.refreshPowerLevel();
     device.getClocks();
     device.getTemperature();
-    device.getGpuUsage();
+    device.getGpuLoad();
     device.getPwmSpeed();
 
     if (Q_LIKELY(execsRunning.count() == 0))
@@ -449,12 +457,7 @@ void radeon_profile::doTheStats() {
     statsTickCounter++;
 
     // figure out pm level based on data provided
-    QString pmLevelName = (device.gpuData.contains(ValueID::POWER_LEVEL)) ? "" : "Power level:" + device.gpuData.value(ValueID::POWER_LEVEL).strValue, volt;
-    volt = (device.gpuData.contains(ValueID::VOLT_CORE)) ? "" : "(" +  device.gpuData.value(ValueID::VOLT_CORE).strValue+")";
-    pmLevelName = (device.gpuData.contains(ValueID::CLK_CORE)) ? pmLevelName : pmLevelName + " Core:" + device.gpuData.value(ValueID::CLK_CORE).strValue + volt;
-
-    volt = (device.gpuData.contains(ValueID::VOLT_MEM)) ? "" : "(" +  device.gpuData.value(ValueID::VOLT_MEM).strValue + ")";
-    pmLevelName = (device.gpuData.contains(ValueID::CLK_MEM)) ? pmLevelName : pmLevelName + " Mem:" +  device.gpuData.value(ValueID::CLK_MEM).strValue +  volt;
+    QString pmLevelName = "Core: " + device.gpuData.value(ValueID::CLK_CORE).strValue + "  Mem: " + device.gpuData.value(ValueID::CLK_MEM).strValue;
 
     if (pmStats.contains(pmLevelName)) // This power level already exists, increment its count
         pmStats[pmLevelName]++;

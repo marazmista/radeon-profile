@@ -40,8 +40,8 @@ enum class ValueID {
     TEMPERATURE_MIN,
     TEMPERATURE_MAX,
     GPU_LOAD_PERCENT,
-    GPU_VRAM_USAGE_PERCENT,
-    GPU_VRAM_USAGE_MB,
+    GPU_VRAM_LOAD_PERCENT,
+    GPU_VRAM_LOAD_MB,
     FAN_SPEED_PERCENT,
     FAN_SPEED_RPM,
     POWER_LEVEL
@@ -119,18 +119,14 @@ struct GpuClocksStruct {
     }
 };
 
-struct GpuTemperatureStruct {
-    int current, currentBefore, max, min;
-};
-
 struct GpuPwmStruct {
     int pwmSpeed = 0, pwmSpeedRpm;
 };
 
-struct GpuUsageStruct {
+struct GpuLoadStruct {
     float gpuLoad, gpuVramLoadPercent, gpuVramLoad;
 
-    GpuUsageStruct() {
+    GpuLoadStruct() {
         gpuLoad = gpuVramLoad = gpuVramLoadPercent = -1;
     }
 };
@@ -151,6 +147,11 @@ struct RPValue {
 
     RPValue(ValueUnit u, float v = -1) {
         unit = u;
+        value = v;
+        strValue = toString();
+    }
+
+    void setValue(float v) {
         value = v;
         strValue = toString();
     }
