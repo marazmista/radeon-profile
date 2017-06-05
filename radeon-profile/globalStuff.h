@@ -208,6 +208,41 @@ public:
         return a.split('\n');
     }
 
+    static ValueUnit getUnitFomValueId(ValueID id) {
+        switch (id) {
+            case ValueID::CLK_CORE:
+            case ValueID::CLK_MEM:
+            case ValueID::CLK_UVD:
+            case ValueID::DCLK_UVD:
+                return ValueUnit::MEGAHERTZ;
+
+            case ValueID::VOLT_CORE:
+            case ValueID::VOLT_MEM:
+                return ValueUnit::MILIVOLT;
+
+            case ValueID::FAN_SPEED_PERCENT:
+            case ValueID::GPU_LOAD_PERCENT:
+            case ValueID::GPU_VRAM_LOAD_PERCENT:
+                return ValueUnit::PERCENT;
+
+            case ValueID::FAN_SPEED_RPM:
+                return ValueUnit::RPM;
+
+            case ValueID::TEMPERATURE_BEFORE_CURRENT:
+            case ValueID::TEMPERATURE_CURRENT:
+            case ValueID::TEMPERATURE_MAX:
+            case ValueID::TEMPERATURE_MIN:
+                return ValueUnit::CELSIUS;
+
+            case ValueID::GPU_VRAM_LOAD_MB:
+                return ValueUnit::MEGABYTE;
+
+            default:
+                return ValueUnit::NONE;
+        }
+        return ValueUnit::NONE;
+    }
+
     static QStringList createDPMCombo() {
         return QStringList() << dpm_battery << dpm_balanced << dpm_performance;
     }
