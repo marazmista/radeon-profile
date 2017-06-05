@@ -17,6 +17,7 @@
 
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
+#include "dialog_defineplot.h"
 
 #include <QTimer>
 #include <QTextStream>
@@ -58,16 +59,11 @@ radeon_profile::radeon_profile(QWidget *parent) :
     statsTickCounter = 0;
 	savedState = nullptr;
 
-    // timer init
-    timer = new QTimer(this);
-    timer->setInterval(ui->spin_timerInterval->value()*1000);
-
+    // load config, create runtime stuff, setup rest of ui
     setupUiElements();
 
     for (int i = 0; i < device.gpuList.count(); ++i)
         ui->combo_gpus->addItem(device.gpuList.at(i).sysName);
-
-    loadConfig();
 
     // start is heavy, delegated to another thread to show ui smoothly
     connect(&initFuture, SIGNAL(finished()), this,  SLOT(initFutureHandler()));
@@ -75,6 +71,10 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     if (ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
         ui->btn_applyOverclock->click();
+
+    // timer init
+    timer = new QTimer(this);
+    timer->setInterval(ui->spin_timerInterval->value()*1000);
 
     // fill tables with data at the start //
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
@@ -124,6 +124,9 @@ void radeon_profile::setupUiElements()
     setupContextMenus();
     setupTrayIcon();
     addRuntimeWidgets();
+
+    loadConfig();
+
     ui->centralWidget->setEnabled(false);
 }
 
@@ -163,7 +166,7 @@ void radeon_profile::addRuntimeWidgets() {
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
-void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const QMap<ValueID, RPValue> &data) {
+void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GpuDataContainer &data) {
     if (features.canChangeProfile && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
         ui->tabs_pm->setTabEnabled(0,features.currentPowerMethod == PowerMethod::PROFILE);
 
@@ -450,6 +453,12 @@ void radeon_profile::refreshGraphs() {
 
     ui->plotTemp->graph(0)->addData(ticksCounter, device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
     ui->l_minMaxTemp->setText("Max: " + device.gpuData.value(ValueID::TEMPERATURE_MAX).strValue  + " | Min: " + device.gpuData.value(ValueID::TEMPERATURE_MIN).strValue);
+
+
+    if (plotManager.definedPlots.count() > 0)
+        plotManager.updateSeries(ticksCounter, device.gpuData);
+
+
 }
 
 void radeon_profile::doTheStats() {
@@ -507,4 +516,33 @@ void radeon_profile::showWindow() {
         this->showMinimized();
     else
         this->showNormal();
+}
+
+void radeon_profile::on_btn_configurePlots_clicked()
+{
+    ui->stack_plots->setCurrentIndex(2);
+}
+
+void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
+{
+    ui->stack_plots->setCurrentIndex(1);
+}
+
+void radeon_profile::on_pushButton_clicked()
+{
+    plotManager.addPlot("test");
+    plotManager.definedPlots["test"]->addAxis(Qt::AlignRight, ValueUnit::PERCENT,  QPen(Qt::black));
+    plotManager.addSeries("test", ValueID::FAN_SPEED_PERCENT);
+
+    ui->grid_plots->addWidget(plotManager.definedPlots["test"]);
+
+}
+
+void radeon_profile::on_btn_addPlotDefinition_clicked()
+{
+    Dialog_definePlot *d = new Dialog_definePlot(this);
+    d->exec();
+
+    delete d;
+
 }

@@ -5,6 +5,7 @@
 #include "daemonComm.h"
 #include "execbin.h"
 #include "rpevent.h"
+#include "components/rpplot.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -159,6 +160,14 @@ private slots:
     void on_list_events_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_saveAll_clicked();
 
+    void on_btn_configurePlots_clicked();
+
+    void on_btn_applySavePlotsDefinitons_clicked();
+
+    void on_pushButton_clicked();
+
+    void on_btn_addPlotDefinition_clicked();
+
 private:
     struct currentStateInfo {
         PowerProfiles profile;
@@ -177,6 +186,7 @@ private:
     QButtonGroup pwmGroup;
 	currentStateInfo *savedState;
     QFutureWatcher<void> initFuture;
+    PlotManager plotManager;
 
     Ui::radeon_profile *ui;
     void setupGraphs();
@@ -193,7 +203,7 @@ private:
     void setupContextMenus();
     void refreshGpuData();
     void refreshGraphs();
-    void setupUiEnabledFeatures(const DriverFeatures &features, const QMap<ValueID, RPValue> &data);
+    void setupUiEnabledFeatures(const DriverFeatures &features, const GpuDataContainer &data);
     void loadVariables();
     void updateExecLogs();
     void addRuntimeWidgets();

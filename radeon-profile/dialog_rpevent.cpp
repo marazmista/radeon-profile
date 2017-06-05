@@ -19,7 +19,7 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
     ui->spin_fixedFanSpeed->setMinimum(radeon_profile::minFanStepsSpeed);
 }
 
-void Dialog_RPEvent::setFeatures(const QMap<ValueID, RPValue> &gpuData, const DriverFeatures &features, const QList<QString> &profiles) {
+void Dialog_RPEvent::setFeatures(const GpuDataContainer &gpuData, const DriverFeatures &features, const QList<QString> &profiles) {
     switch (features.currentPowerMethod) {
         case PowerMethod::DPM:
             ui->combo_dpmChange->addItems(globalStuff::createDPMCombo());

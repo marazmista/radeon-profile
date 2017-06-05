@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network widgets
+QT       += core gui network widgets charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     execbin.cpp \
     dialog_rpevent.cpp \
     eventsTab.cpp \
-    fanControlTab.cpp
+    fanControlTab.cpp \
+    dialog_defineplot.cpp
 
 HEADERS  += radeon_profile.h \
     qcustomplot.h \
@@ -52,10 +53,13 @@ HEADERS  += radeon_profile.h \
     execbin.h \
     dialog_rpevent.h \
     rpevent.h \
-    ioctlHandler.h
+    ioctlHandler.h \
+    components/rpplot.h \
+    dialog_defineplot.h
 
 FORMS    += radeon_profile.ui \
-    dialog_rpevent.ui
+    dialog_rpevent.ui \
+    dialog_defineplot.ui
 
 RESOURCES += \
     radeon-resource.qrc

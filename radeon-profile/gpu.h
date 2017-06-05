@@ -26,7 +26,7 @@ public:
     }
 
     // main map that has all info available by ValueID
-    QMap<ValueID, RPValue> gpuData;
+    GpuDataContainer gpuData;
     QList<GpuSysInfo> gpuList;
     GpuConstParams gpuParams;
 
@@ -59,6 +59,7 @@ public:
     bool overclock(int value);
     void resetOverclock();
     const DriverFeatures& getDriverFeatures();
+    void finalize();
 
 private slots:
     void handleGpuUsageResult() {
@@ -77,8 +78,8 @@ private slots:
 
 private:
     dXorg *driverHandler;
-    QFutureWatcher<GpuLoadStruct> futureGpuLoad;
     void defineAvailableDataContainer();
+    QFutureWatcher<GpuLoadStruct> futureGpuLoad;
 
 };
 

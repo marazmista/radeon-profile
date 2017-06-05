@@ -273,6 +273,11 @@ const DriverFeatures& gpu::getDriverFeatures() {
     return driverHandler->features;
 }
 
+void gpu::finalize() {
+    if (futureGpuLoad.isRunning())
+        futureGpuLoad.waitForFinished();
+}
+
 bool gpu::overclock(const int value){
     if (getDriverFeatures().ocCoreAvailable)
         return driverHandler->overclock(value);

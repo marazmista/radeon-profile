@@ -208,6 +208,8 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
         timer->stop();
         delete timer;
 
+        device.finalize();
+
         saveConfig();
 
         if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT))

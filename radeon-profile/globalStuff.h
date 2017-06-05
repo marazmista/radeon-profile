@@ -28,6 +28,7 @@
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
+
 enum class ValueID {
     CLK_CORE,
     CLK_MEM,
@@ -47,7 +48,7 @@ enum class ValueID {
     POWER_LEVEL
 };
 
-enum class ValueUnit {
+enum ValueUnit {
     MEGAHERTZ,
     PERCENT,
     CELSIUS,
@@ -180,6 +181,8 @@ struct RPValue {
         return "";
     }
 };
+
+typedef QMap<ValueID, RPValue> GpuDataContainer;
 
 class globalStuff {
 public:
