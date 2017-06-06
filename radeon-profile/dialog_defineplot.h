@@ -15,9 +15,9 @@ class Dialog_definePlot : public QDialog
 
 public:
     explicit Dialog_definePlot(QWidget *parent = 0);
-    explicit Dialog_definePlot(const PlotDefinitionSchema &s, QWidget *parent = 0);
 
     PlotDefinitionSchema getCreatedSchema();
+    void setEditedPlotSchema(const PlotDefinitionSchema &pds);
 
     ~Dialog_definePlot();
 
@@ -29,8 +29,6 @@ private slots:
 
     void on_buttonBox_accepted();
 
-    void on_tree_leftData_itemChanged(QTreeWidgetItem *item, int column);
-
     void on_tree_leftData_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
     void on_btn_setBackground_clicked();
@@ -41,12 +39,18 @@ private slots:
 
     void on_tree_rightData_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
+    void on_buttonBox_rejected();
+
+    void on_cb_enableLeftScale_clicked(bool checked);
+
+    void on_cb_enableRightScale_clicked(bool checked);
+
 private:
     Ui::Dialog_definePlot *ui;
     PlotDefinitionSchema schema;
     GpuDataContainer refernceGpuData;
 
-    QStringList penStyles = { tr("Solid line"), tr("Dash line"), tr("Dot Line") };
+    QStringList penStyles;
 
     void createStyleCombo();
     QStringList createUnitCombo();
@@ -54,6 +58,8 @@ private:
     QList<QTreeWidgetItem* > createDataListFromUnit(ValueUnit u);
     void init();
     QColor getColor(const QColor &c = Qt::black);
+    SeriesSchema addToSchemaData(const ValueUnit &u, const int itemIdx, const QColor &itemColor);
+    int penStyleToInt(const Qt::PenStyle &ps);
 
 };
 

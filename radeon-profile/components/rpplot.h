@@ -17,7 +17,30 @@
 class PlotManager;
 class RPPlot;
 
+struct SeriesSchema {
+    ValueID id;
+    QColor lineColor;
 
+    SeriesSchema() { }
+    SeriesSchema(const QColor &c) {
+        lineColor = c;
+    }
+
+    SeriesSchema(const ValueID &i, const QColor &c) {
+        id = i;
+        lineColor = c;
+    }
+};
+
+struct PlotDefinitionSchema {
+    QString name;
+    bool enableLeft, enableRight;
+    QColor background;
+    ValueUnit unitLeft, unitRight;
+    QPen penGridLeft, penGridRight;
+
+    QList<SeriesSchema> dataListLeft, dataListRight;
+};
 
 class YAxis : public QValueAxis {
 
@@ -77,6 +100,14 @@ public:
 //        timeAxis.setGridLinePen(QPen((QBrush(Qt::yellow)),1,Qt::DashLine));
     }
 
+    ~RPPlot() {
+        qDeleteAll(series);
+        series.clear();
+
+        delete axisLeft;
+        delete axisRight;
+    }
+
     void addAxis(const Qt::Alignment &a, const ValueUnit &u, const QPen &p) {
         YAxis *tmpax = new YAxis(u, this);
         tmpax->setGridLinePen(p);
@@ -106,17 +137,60 @@ public slots:
 class PlotManager {
 public:
     QMap<QString, RPPlot*> definedPlots;
+    QMap<QString, PlotDefinitionSchema> definedPlotsSchemas;
 
     PlotManager() {
     }
 
     void save();
 
-    void removePlot(const QString &name) {
-        for (const ValueID &k : definedPlots[name]->series.keys())
-            delete definedPlots[name]->series[k];
+    void addSchema(const PlotDefinitionSchema &pds) {
+        definedPlotsSchemas.insert(pds.name, pds);
+    }
 
-        delete definedPlots[name];
+    void removeSchema(const QString &name) {
+        definedPlotsSchemas.remove(name);
+    }
+
+    void removePlot(const QString &name) {
+        RPPlot *rpp = definedPlots.take(name);
+        qDeleteAll(rpp->series);
+        rpp->series.clear();
+
+        delete rpp;
+    }
+
+    void createPlotsFromSchemas() {
+        qDeleteAll(definedPlots);
+        definedPlots.clear();
+
+        for (const QString &k : definedPlotsSchemas.keys()) {
+            PlotDefinitionSchema pds = definedPlotsSchemas.value(k);
+
+            RPPlot *rpp = new  RPPlot();
+            rpp->name = pds.name;
+            definedPlots.insert(rpp->name, rpp);
+
+            setPlotBackground(rpp->name, pds.background);
+
+            if (pds.enableLeft) {
+                rpp->addAxis(Qt::AlignLeft, pds.unitLeft, pds.penGridLeft);
+
+                for (int i = 0; i < pds.dataListLeft.count(); ++i) {
+                    addSeries(rpp->name, pds.dataListLeft[i].id);
+                    setLineColor(rpp->name, pds.dataListLeft[i].id, pds.dataListLeft[i].lineColor);
+                }
+            }
+
+            if (pds.enableRight) {
+                rpp->addAxis(Qt::AlignRight, pds.unitRight, pds.penGridRight);
+
+                for (int i = 0; i < pds.dataListRight.count(); ++i) {
+                    addSeries(rpp->name, pds.dataListRight[i].id);
+                    setLineColor(rpp->name, pds.dataListRight[i].id, pds.dataListRight[i].lineColor);
+                }
+            }
+        }
     }
 
     void removeSeries(const QString &pn, const ValueID id) {
@@ -126,7 +200,7 @@ public:
     }
 
     void addPlot(const QString &name) {
-        RPPlot *rpp = new RPPlot();
+        RPPlot *rpp = new  RPPlot();
         definedPlots.insert(name,rpp);
     }
 
@@ -168,7 +242,7 @@ public:
 
     void updateSeries(int timestamp, const GpuDataContainer &data) {
         for (const QString &rppk : definedPlots.keys()) {
-            definedPlots[rppk]->timeAxis.setRange(timestamp -50, timestamp + 50);
+            definedPlots[rppk]->timeAxis.setRange(timestamp -100, timestamp + 20);
 
             for (const ValueID &dsk : definedPlots[rppk]->series.keys()) {
                 definedPlots[rppk]->series[dsk]->append(timestamp, data.value(dsk).value);
@@ -178,24 +252,7 @@ public:
                     definedPlots[rppk]->series[dsk]->remove(0);
             }
         }
-
     }
-};
-
-struct PlotDefinitionSchema {
-    struct PlotDataDefinition {
-        bool enabled;
-        ValueID id;
-        QColor lineColor;
-    };
-
-    QString name;
-    bool enableLeft, enableRight;
-    QColor background;
-    ValueUnit unitLeft, unitRight;
-    QPen penGridLeft, penGridRight;
-
-    QList<PlotDataDefinition> dataListLeft, dataListRight;
 };
 
 

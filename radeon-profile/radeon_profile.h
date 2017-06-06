@@ -164,9 +164,13 @@ private slots:
 
     void on_btn_applySavePlotsDefinitons_clicked();
 
-    void on_pushButton_clicked();
-
     void on_btn_addPlotDefinition_clicked();
+
+    void on_btn_removePlotDefinition_clicked();
+
+    void on_btn_modifyPlotDefinition_clicked();
+
+    void on_btn_cancelEditPlots_clicked();
 
 private:
     struct currentStateInfo {
@@ -187,6 +191,7 @@ private:
 	currentStateInfo *savedState;
     QFutureWatcher<void> initFuture;
     PlotManager plotManager;
+    QHBoxLayout *grid_plots;
 
     Ui::radeon_profile *ui;
     void setupGraphs();

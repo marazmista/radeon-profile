@@ -9,7 +9,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-dXorg::dXorg(const GpuSysInfo &si) {
+dXorg::dXorg(const GPUSysInfo &si) {
     features.sysInfo = si;
     configure();
 }
@@ -149,7 +149,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     return data;
 }
 
-GpuClocksStruct dXorg::getClocks() {
+GPUClocksStruct dXorg::getClocks() {
     switch (features.clocksSource) {
         case ClocksDataSource::IOCTL:
             return getClocksFromIoctl();
@@ -159,11 +159,11 @@ GpuClocksStruct dXorg::getClocks() {
             break;
     }
 
-    return GpuClocksStruct();
+    return GPUClocksStruct();
 }
 
-GpuClocksStruct dXorg::getClocksFromIoctl() {
-    GpuClocksStruct clocksData;
+GPUClocksStruct dXorg::getClocksFromIoctl() {
+    GPUClocksStruct clocksData;
 
     ioctlHnd->getCoreClock(&clocksData.coreClk);
     ioctlHnd->getMemoryClock(&clocksData.memClk);
@@ -172,8 +172,8 @@ GpuClocksStruct dXorg::getClocksFromIoctl() {
 }
 
 
-GpuClocksStruct dXorg::getClocksFromPmFile() {
-    GpuClocksStruct clocksData;
+GPUClocksStruct dXorg::getClocksFromPmFile() {
+    GPUClocksStruct clocksData;
     QString data = dXorg::getClocksRawData();
 
     // if nothing is there returns empty (-1) struct
@@ -295,8 +295,8 @@ float dXorg::getTemperature() {
     return temp.toFloat();
 }
 
-GpuLoadStruct dXorg::getGpuLoad() {
-    GpuLoadStruct data;
+GPULoadStruct dXorg::getGpuLoad() {
+    GPULoadStruct data;
 
     ioctlHnd->getGpuUsage(&data.gpuLoad, 500000, 150);
     ioctlHnd->getVramUsagePercentage(&data.gpuVramLoadPercent);
@@ -546,8 +546,8 @@ void dXorg::setPwmManualControl(bool manual) {
         setNewValue(hwmonAttributes.pwm1_enable, QString(mode));
 }
 
-GpuPwmStruct dXorg::getPwmSpeed() {
-    GpuPwmStruct tmp;
+GPUPwmStruct dXorg::getPwmSpeed() {
+    GPUPwmStruct tmp;
 
     QFile f(hwmonAttributes.pwm1);
 
@@ -624,7 +624,7 @@ void dXorg::figureOutDriverFeatures() {
         features.clocksSource = ClocksDataSource::PM_FILE;
         QString data = getClocksRawData(true);
         setupRegex(data);
-        GpuClocksStruct test = getClocks();
+        GPUClocksStruct test = getClocks();
 
         // still, sometimes there is miscomunication between daemon,
         // but vales are there, so look again in the file which daemon has
@@ -675,8 +675,8 @@ bool dXorg::getIoctlAvailability() {
     return true;
 }
 
-GpuConstParams dXorg::getGpuConstParams() {
-    GpuConstParams params;
+GPUConstParams dXorg::getGpuConstParams() {
+    GPUConstParams params;
 
     QFile fPwmMax(hwmonAttributes.pwm1_max);
     if (fPwmMax.open(QIODevice::ReadOnly)) {
@@ -692,8 +692,8 @@ GpuConstParams dXorg::getGpuConstParams() {
     return params;
 }
 
-GpuClocksStruct dXorg::getFeaturesFallback() {
-    GpuClocksStruct fallbackfeatures;
+GPUClocksStruct dXorg::getFeaturesFallback() {
+    GPUClocksStruct fallbackfeatures;
     QFile f("/tmp/"+features.sysInfo.driverModuleString+"_pm_info");
     if (f.open(QIODevice::ReadOnly)) {
         QString s = QString(f.readAll());

@@ -92,7 +92,7 @@ class dXorg
 
 public:
     dXorg() { }
-    dXorg(const GpuSysInfo &si);
+    dXorg(const GPUSysInfo &si);
 
     void cleanup() {
         delete ioctlHnd;
@@ -106,13 +106,13 @@ public:
         sharedMem.deleteLater();
     }
 
-    GpuClocksStruct getClocksFromPmFile();
-    GpuClocksStruct getClocksFromIoctl();
-    GpuClocksStruct getClocks();
+    GPUClocksStruct getClocksFromPmFile();
+    GPUClocksStruct getClocksFromIoctl();
+    GPUClocksStruct getClocks();
 
     float getTemperature();
-    GpuLoadStruct getGpuLoad();
-    GpuPwmStruct getPwmSpeed();
+    GPULoadStruct getGpuLoad();
+    GPUPwmStruct getPwmSpeed();
 
     QStringList getGLXInfo(QProcessEnvironment env);
     QList<QTreeWidgetItem *> getModuleInfo();
@@ -126,10 +126,10 @@ public:
 
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure();
-    GpuConstParams getGpuConstParams();
+    GPUConstParams getGpuConstParams();
     void reconfigureDaemon();
     bool daemonConnected();
-    GpuClocksStruct getFeaturesFallback();
+    GPUClocksStruct getFeaturesFallback();
     void setupRegex(const QString &data);
     bool overclock(int percentage);
     void resetOverclock();

@@ -70,7 +70,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     initFuture.setFuture(QtConcurrent::run(this, &radeon_profile::refreshGpuData));
 
     if (ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
-        ui->btn_applyOverclock->click();
+        on_btn_applyOverclock_clicked();
 
     // timer init
     timer = new QTimer(this);
@@ -163,6 +163,7 @@ void radeon_profile::addRuntimeWidgets() {
     pwmGroup.addButton(ui->btn_pwmAuto);
     pwmGroup.addButton(ui->btn_pwmFixed);
     pwmGroup.addButton(ui->btn_pwmProfile);
+
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
@@ -217,11 +218,11 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         if (ui->cb_saveFanMode->isChecked()) {
             switch (ui->fanModesTabs->currentIndex()) {
                 case 1:
-                    ui->btn_pwmFixed->click();
+                    on_btn_pwmFixed_clicked();
                     break;
                 case 2:
                     device.getTemperature();
-                    ui->btn_pwmProfile->click();
+                    on_btn_pwmProfile_clicked();
                     break;
             }
         }
@@ -455,7 +456,7 @@ void radeon_profile::refreshGraphs() {
     ui->l_minMaxTemp->setText("Max: " + device.gpuData.value(ValueID::TEMPERATURE_MAX).strValue  + " | Min: " + device.gpuData.value(ValueID::TEMPERATURE_MIN).strValue);
 
 
-    if (plotManager.definedPlots.count() > 0)
+    if (ui->stack_plots->currentIndex() == 1  &&  plotManager.definedPlots.count() > 0)
         plotManager.updateSeries(ticksCounter, device.gpuData);
 
 
@@ -525,24 +526,75 @@ void radeon_profile::on_btn_configurePlots_clicked()
 
 void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
 {
+    plotManager.createPlotsFromSchemas();
+
+    for (int i = 0; i < ui->list_plotDefinitions->topLevelItemCount(); ++i) {
+        if (ui->list_plotDefinitions->topLevelItem(i)->checkState(0) == Qt::Checked)
+             ui->grid_plots->addWidget(plotManager.definedPlots.value(ui->list_plotDefinitions->topLevelItem(i)->text(0)));
+    }
+
     ui->stack_plots->setCurrentIndex(1);
-}
-
-void radeon_profile::on_pushButton_clicked()
-{
-    plotManager.addPlot("test");
-    plotManager.definedPlots["test"]->addAxis(Qt::AlignRight, ValueUnit::PERCENT,  QPen(Qt::black));
-    plotManager.addSeries("test", ValueID::FAN_SPEED_PERCENT);
-
-    ui->grid_plots->addWidget(plotManager.definedPlots["test"]);
-
 }
 
 void radeon_profile::on_btn_addPlotDefinition_clicked()
 {
     Dialog_definePlot *d = new Dialog_definePlot(this);
-    d->exec();
+
+    if (d->exec()) {
+        PlotDefinitionSchema pds = d->getCreatedSchema();
+
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        item->setText(0, pds.name);
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        item->setCheckState(0,Qt::Checked);
+
+        if (plotManager.definedPlotsSchemas.contains(pds.name)) {
+            if (!askConfirmation(tr("Question"), tr("Plot definition with that name already exists. Replace?"))) {
+                delete d;
+                delete item;
+                return;
+            }
+        } else
+            ui->list_plotDefinitions->addTopLevelItem(item);
+
+
+        plotManager.addSchema(pds);
+    }
 
     delete d;
 
+}
+
+void radeon_profile::on_btn_removePlotDefinition_clicked()
+{
+    if (!ui->list_plotDefinitions->currentItem())
+        return;
+
+    if (!askConfirmation("",tr("Remove selected plot definition?")))
+        return;
+
+    plotManager.removeSchema(ui->list_plotDefinitions->currentItem()->text(0));
+    delete ui->list_plotDefinitions->currentItem();
+}
+
+void radeon_profile::on_btn_modifyPlotDefinition_clicked()
+{
+    if (ui->list_plotDefinitions->currentItem() == 0)
+        return;
+
+    PlotDefinitionSchema pds = plotManager.definedPlotsSchemas[ui->list_plotDefinitions->currentItem()->text(0)];
+
+    Dialog_definePlot *d = new Dialog_definePlot(this);
+    d->setEditedPlotSchema(pds);
+
+    if (d->exec()) {
+        PlotDefinitionSchema pds = d->getCreatedSchema();
+        plotManager.addSchema(pds);
+    }
+    delete d;
+}
+
+void radeon_profile::on_btn_cancelEditPlots_clicked()
+{
+    ui->stack_plots->setCurrentIndex(1);
 }

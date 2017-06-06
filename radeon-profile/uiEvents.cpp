@@ -211,9 +211,6 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
         device.finalize();
 
         saveConfig();
-
-        if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT))
-            device.setPwmManualControl(false);
     }
 
     QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm

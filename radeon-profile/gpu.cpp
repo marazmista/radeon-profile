@@ -58,7 +58,7 @@ void gpu::detectCards() {
             QString line = f.readLine(50).trimmed();
 
             if (line == "DRIVER=radeon") {
-                GpuSysInfo gsi;
+                GPUSysInfo gsi;
                 gsi.driverModuleString = "radeon";
                 gsi.module = DriverModule::RADEON;
                 gsi.sysName = out[i];
@@ -69,7 +69,7 @@ void gpu::detectCards() {
             }
 
             if (line == "DRIVER=amdgpu") {
-                GpuSysInfo gsi;
+                GPUSysInfo gsi;
                 gsi.driverModuleString = "amdgpu";
                 gsi.module = DriverModule::RADEON;
                 gsi.sysName = out[i];
@@ -105,7 +105,7 @@ void gpu::changeGpu(int index) {
 }
 
 void gpu::defineAvailableDataContainer() {
-    GpuClocksStruct tmpClk = driverHandler->getClocks();
+    GPUClocksStruct tmpClk = driverHandler->getClocks();
 
     if (tmpClk.coreClk != -1)
         gpuData.insert(ValueID::CLK_CORE, RPValue(ValueUnit::MEGAHERTZ, tmpClk.coreClk));
@@ -129,7 +129,7 @@ void gpu::defineAvailableDataContainer() {
         gpuData.insert(ValueID::POWER_LEVEL, RPValue(ValueUnit::NONE, tmpClk.powerLevel));
 
 
-    GpuPwmStruct tmpPWm = driverHandler->getPwmSpeed();
+    GPUPwmStruct tmpPWm = driverHandler->getPwmSpeed();
 
     if (tmpPWm.pwmSpeed != -1)
         gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, ((float)tmpPWm.pwmSpeed / gpuParams.pwmMaxSpeed ) * 100));
@@ -148,7 +148,7 @@ void gpu::defineAvailableDataContainer() {
     }
 
 
-    GpuLoadStruct tmpLoad = driverHandler->getGpuLoad();
+    GPULoadStruct tmpLoad = driverHandler->getGpuLoad();
 
     if (tmpLoad.gpuLoad != -1)
          gpuData.insert(ValueID::GPU_LOAD_PERCENT, RPValue(ValueUnit::PERCENT, tmpLoad.gpuLoad));
@@ -161,7 +161,7 @@ void gpu::defineAvailableDataContainer() {
 }
 
 void gpu::getClocks() {
-    GpuClocksStruct tmp = driverHandler->getClocks();
+    GPUClocksStruct tmp = driverHandler->getClocks();
 
     if (gpuData.contains(ValueID::CLK_CORE))
         gpuData[ValueID::CLK_CORE].setValue(tmp.coreClk);
@@ -263,7 +263,7 @@ void gpu::setPwmManualControl(bool manual) {
 }
 
 void gpu::getPwmSpeed() {
-    GpuPwmStruct tmp = driverHandler->getPwmSpeed();
+    GPUPwmStruct tmp = driverHandler->getPwmSpeed();
 
     gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, ((float)tmp.pwmSpeed / gpuParams.pwmMaxSpeed ) * 100));
     gpuData.insert(ValueID::FAN_SPEED_RPM, RPValue(ValueUnit::RPM, tmp.pwmSpeedRpm));
@@ -274,6 +274,9 @@ const DriverFeatures& gpu::getDriverFeatures() {
 }
 
 void gpu::finalize() {
+    if (gpuData.contains(ValueID::FAN_SPEED_PERCENT))
+        setPwmManualControl(false);
+
     if (futureGpuLoad.isRunning())
         futureGpuLoad.waitForFinished();
 }

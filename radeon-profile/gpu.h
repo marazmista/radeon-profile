@@ -27,8 +27,8 @@ public:
 
     // main map that has all info available by ValueID
     GpuDataContainer gpuData;
-    QList<GpuSysInfo> gpuList;
-    GpuConstParams gpuParams;
+    QList<GPUSysInfo> gpuList;
+    GPUConstParams gpuParams;
 
     char currentGpuIndex;
     QString currentPowerProfile, currentPowerLevel;
@@ -63,7 +63,7 @@ public:
 
 private slots:
     void handleGpuUsageResult() {
-        GpuLoadStruct tmp = futureGpuLoad.result();
+        GPULoadStruct tmp = futureGpuLoad.result();
 
         if (gpuData.contains(ValueID::GPU_LOAD_PERCENT))
             gpuData[ValueID::GPU_LOAD_PERCENT].setValue(tmp.gpuLoad);
@@ -79,7 +79,7 @@ private slots:
 private:
     dXorg *driverHandler;
     void defineAvailableDataContainer();
-    QFutureWatcher<GpuLoadStruct> futureGpuLoad;
+    QFutureWatcher<GPULoadStruct> futureGpuLoad;
 
 };
 

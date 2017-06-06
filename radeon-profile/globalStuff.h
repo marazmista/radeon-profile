@@ -88,7 +88,7 @@ enum class TemperatureSensor {
     TS_UNKNOWN
 };
 
-struct GpuSysInfo {
+struct GPUSysInfo {
     QString sysName, driverModuleString;
     DriverModule module;
 };
@@ -104,7 +104,7 @@ struct DriverFeatures {
     PowerMethod currentPowerMethod;
     ClocksDataSource clocksSource;
     TemperatureSensor currentTemperatureSensor;
-    GpuSysInfo sysInfo;
+    GPUSysInfo sysInfo;
 
     DriverFeatures() {
         currentPowerMethod = PowerMethod::PM_UNKNOWN;
@@ -112,27 +112,27 @@ struct DriverFeatures {
     }
 };
 
-struct GpuClocksStruct {
+struct GPUClocksStruct {
     int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk, powerLevel;
 
-    GpuClocksStruct() {
+    GPUClocksStruct() {
         coreClk = memClk =  coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = -1;
     }
 };
 
-struct GpuPwmStruct {
+struct GPUPwmStruct {
     int pwmSpeed = 0, pwmSpeedRpm;
 };
 
-struct GpuLoadStruct {
+struct GPULoadStruct {
     float gpuLoad, gpuVramLoadPercent, gpuVramLoad;
 
-    GpuLoadStruct() {
+    GPULoadStruct() {
         gpuLoad = gpuVramLoad = gpuVramLoadPercent = -1;
     }
 };
 
-struct GpuConstParams {
+struct GPUConstParams {
      int pwmMaxSpeed, maxCoreClock = -1, maxMemClock = -1, vRamSize = -1;
 };
 
