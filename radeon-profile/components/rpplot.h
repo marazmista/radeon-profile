@@ -9,28 +9,23 @@
 #include "globalStuff.h"
 #include <QDebug>
 
-// ZAMIAST NA ENUMACH DZIEDZCZ qvalueaxis i ustawiaj kolory itp, alignment
-// series collection w rp.cpp i tam update serii. chart tylko wyświetla
-
-// unit znamy na podstawie typu
-
 class PlotManager;
 class RPPlot;
 
-struct SeriesSchema {
-    ValueID id;
-    QColor lineColor;
+//struct SeriesSchema {
+//    ValueID id;
+//    QColor lineColor;
 
-    SeriesSchema() { }
-    SeriesSchema(const QColor &c) {
-        lineColor = c;
-    }
+//    SeriesSchema() { }
+//    SeriesSchema(const QColor &c) {
+//        lineColor = c;
+//    }
 
-    SeriesSchema(const ValueID &i, const QColor &c) {
-        id = i;
-        lineColor = c;
-    }
-};
+//    SeriesSchema(const ValueID &i, const QColor &c) {
+//        id = i;
+//        lineColor = c;
+//    }
+//};
 
 struct PlotDefinitionSchema {
     QString name;
@@ -39,7 +34,7 @@ struct PlotDefinitionSchema {
     ValueUnit unitLeft, unitRight;
     QPen penGridLeft, penGridRight;
 
-    QList<SeriesSchema> dataListLeft, dataListRight;
+    QMap<ValueID, QColor> dataListLeft, dataListRight;
 };
 
 class YAxis : public QValueAxis {
@@ -176,18 +171,19 @@ public:
             if (pds.enableLeft) {
                 rpp->addAxis(Qt::AlignLeft, pds.unitLeft, pds.penGridLeft);
 
-                for (int i = 0; i < pds.dataListLeft.count(); ++i) {
-                    addSeries(rpp->name, pds.dataListLeft[i].id);
-                    setLineColor(rpp->name, pds.dataListLeft[i].id, pds.dataListLeft[i].lineColor);
+                for (const ValueID &id : pds.dataListLeft.keys()) {
+                    addSeries(rpp->name, id);
+                    setLineColor(rpp->name, id, pds.dataListLeft.value(id));
                 }
             }
 
             if (pds.enableRight) {
                 rpp->addAxis(Qt::AlignRight, pds.unitRight, pds.penGridRight);
 
-                for (int i = 0; i < pds.dataListRight.count(); ++i) {
-                    addSeries(rpp->name, pds.dataListRight[i].id);
-                    setLineColor(rpp->name, pds.dataListRight[i].id, pds.dataListRight[i].lineColor);
+
+                for (const ValueID &id : pds.dataListRight.keys()) {
+                    addSeries(rpp->name, id);
+                    setLineColor(rpp->name, id, pds.dataListRight.value(id));
                 }
             }
         }
@@ -240,7 +236,7 @@ public:
         return true;
     }
 
-    void updateSeries(int timestamp, const GpuDataContainer &data) {
+    void updateSeries(int timestamp, const GPUDataContainer &data) {
         for (const QString &rppk : definedPlots.keys()) {
             definedPlots[rppk]->timeAxis.setRange(timestamp -100, timestamp + 20);
 

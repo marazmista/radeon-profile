@@ -26,7 +26,7 @@ public:
     }
 
     // main map that has all info available by ValueID
-    GpuDataContainer gpuData;
+    GPUDataContainer gpuData;
     QList<GPUSysInfo> gpuList;
     GPUConstParams gpuParams;
 

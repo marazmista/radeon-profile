@@ -66,41 +66,6 @@
     </size>
    </property>
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_6">
-      <property name="text">
-       <string>Unit</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1">
-     <widget class="QSpinBox" name="spin_rightLineThickness">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>10</number>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="1">
      <widget class="QPushButton" name="btn_rightScaleColor">
       <property name="text">
@@ -108,13 +73,7 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QWidget" name="widget_rightGridColor" native="true"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QComboBox" name="combo_rightScaleStyle"/>
-    </item>
-    <item row="5" column="0" colspan="2">
+    <item row="4" column="0" colspan="2">
      <widget class="QTreeWidget" name="tree_rightData">
       <property name="editTriggers">
        <set>QAbstractItemView::DoubleClicked</set>
@@ -149,15 +108,11 @@
       </column>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QLabel" name="label_7">
-      <property name="text">
-       <string>Line thickness</string>
-      </property>
-     </widget>
+    <item row="1" column="0">
+     <widget class="QComboBox" name="combo_rightScaleStyle"/>
     </item>
-    <item row="4" column="0">
-     <widget class="QComboBox" name="combo_rightUnit"/>
+    <item row="0" column="1">
+     <widget class="QWidget" name="widget_rightGridColor" native="true"/>
     </item>
     <item row="0" column="0">
      <widget class="QLabel" name="label_5">
@@ -166,30 +121,49 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <spacer name="verticalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
+    <item row="3" column="1">
+     <widget class="QSpinBox" name="spin_rightLineThickness">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="sizeHint" stdset="0">
+      <property name="minimumSize">
        <size>
-        <width>20</width>
-        <height>40</height>
+        <width>0</width>
+        <height>25</height>
        </size>
       </property>
-     </spacer>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>10</number>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Line thickness</string>
+      </property>
+     </widget>
     </item>
    </layout>
    <zorder>tree_rightData</zorder>
-   <zorder>label_6</zorder>
-   <zorder>label_7</zorder>
    <zorder>label_5</zorder>
    <zorder>btn_rightScaleColor</zorder>
    <zorder>widget_rightGridColor</zorder>
-   <zorder>combo_rightUnit</zorder>
    <zorder>combo_rightScaleStyle</zorder>
    <zorder>spin_rightLineThickness</zorder>
-   <zorder>verticalSpacer_3</zorder>
+   <zorder>label_7</zorder>
   </widget>
   <widget class="QWidget" name="widget_left" native="true">
    <property name="geometry">
@@ -213,37 +187,14 @@
     </size>
    </property>
    <layout class="QGridLayout" name="gridLayout_5">
-    <item row="3" column="1">
+    <item row="3" column="0">
      <widget class="QLabel" name="label_3">
       <property name="text">
        <string>Line thickness</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QPushButton" name="btn_leftScaleColor">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>24</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Set grid color</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QComboBox" name="combo_leftScaleStyle"/>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>Grid style</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0" colspan="2">
+    <item row="4" column="0" colspan="2">
      <widget class="QTreeWidget" name="tree_leftData">
       <property name="editTriggers">
        <set>QAbstractItemView::DoubleClicked</set>
@@ -275,33 +226,23 @@
       </column>
      </widget>
     </item>
-    <item row="2" column="1">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
+    <item row="1" column="1">
+     <widget class="QPushButton" name="btn_leftScaleColor">
+      <property name="maximumSize">
        <size>
-        <width>20</width>
-        <height>40</height>
+        <width>16777215</width>
+        <height>24</height>
        </size>
       </property>
-     </spacer>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_2">
       <property name="text">
-       <string>Unit</string>
+       <string>Set grid color</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QWidget" name="widget_leftGridColor" native="true"/>
+    <item row="1" column="0">
+     <widget class="QComboBox" name="combo_leftScaleStyle"/>
     </item>
-    <item row="4" column="0">
-     <widget class="QComboBox" name="combo_leftUnit"/>
-    </item>
-    <item row="4" column="1">
+    <item row="3" column="1">
      <widget class="QSpinBox" name="spin_leftLineThickness">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -322,6 +263,16 @@
        <number>10</number>
       </property>
      </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Grid style</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QWidget" name="widget_leftGridColor" native="true"/>
     </item>
    </layout>
   </widget>

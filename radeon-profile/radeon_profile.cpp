@@ -167,7 +167,7 @@ void radeon_profile::addRuntimeWidgets() {
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
-void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GpuDataContainer &data) {
+void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data) {
     if (features.canChangeProfile && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
         ui->tabs_pm->setTabEnabled(0,features.currentPowerMethod == PowerMethod::PROFILE);
 
@@ -539,6 +539,7 @@ void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
 void radeon_profile::on_btn_addPlotDefinition_clicked()
 {
     Dialog_definePlot *d = new Dialog_definePlot(this);
+    d->setAvailableGPUData(device.gpuData.keys());
 
     if (d->exec()) {
         PlotDefinitionSchema pds = d->getCreatedSchema();
@@ -586,6 +587,7 @@ void radeon_profile::on_btn_modifyPlotDefinition_clicked()
 
     Dialog_definePlot *d = new Dialog_definePlot(this);
     d->setEditedPlotSchema(pds);
+    d->setAvailableGPUData(device.gpuData.keys());
 
     if (d->exec()) {
         PlotDefinitionSchema pds = d->getCreatedSchema();

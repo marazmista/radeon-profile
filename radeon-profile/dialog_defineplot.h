@@ -18,14 +18,11 @@ public:
 
     PlotDefinitionSchema getCreatedSchema();
     void setEditedPlotSchema(const PlotDefinitionSchema &pds);
+    void setAvailableGPUData(const QList<ValueID> &gpu);
 
     ~Dialog_definePlot();
 
 private slots:
-
-    void on_combo_leftUnit_currentIndexChanged(int index);
-
-    void on_combo_rightUnit_currentIndexChanged(int index);
 
     void on_buttonBox_accepted();
 
@@ -45,21 +42,25 @@ private slots:
 
     void on_cb_enableRightScale_clicked(bool checked);
 
+    void on_tree_leftData_itemChanged(QTreeWidgetItem *item, int column);
+
+    void on_tree_rightData_itemChanged(QTreeWidgetItem *item, int column);
+
 private:
     Ui::Dialog_definePlot *ui;
     PlotDefinitionSchema schema;
-    GpuDataContainer refernceGpuData;
-
+    QList<ValueID> availableGPUData;
+    QMap<int, ValueID> listRelationToValueID;
     QStringList penStyles;
 
     void createStyleCombo();
     QStringList createUnitCombo();
-    QList<QTreeWidgetItem* > createList(QStringList titles);
+    QList<QTreeWidgetItem* > createList();
     QList<QTreeWidgetItem* > createDataListFromUnit(ValueUnit u);
     void init();
     QColor getColor(const QColor &c = Qt::black);
-    SeriesSchema addToSchemaData(const ValueUnit &u, const int itemIdx, const QColor &itemColor);
     int penStyleToInt(const Qt::PenStyle &ps);
+    void addSelectedItemToSchema(int itemIndex, QTreeWidgetItem *item , QMap<ValueID, QColor> &schemaDataList);
 
 };
 

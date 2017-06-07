@@ -208,7 +208,7 @@ private:
     void setupContextMenus();
     void refreshGpuData();
     void refreshGraphs();
-    void setupUiEnabledFeatures(const DriverFeatures &features, const GpuDataContainer &data);
+    void setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data);
     void loadVariables();
     void updateExecLogs();
     void addRuntimeWidgets();

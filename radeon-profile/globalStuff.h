@@ -29,7 +29,7 @@
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
 
-enum class ValueID {
+enum ValueID {
     CLK_CORE,
     CLK_MEM,
     VOLT_CORE,
@@ -182,7 +182,7 @@ struct RPValue {
     }
 };
 
-typedef QMap<ValueID, RPValue> GpuDataContainer;
+typedef QMap<ValueID, RPValue> GPUDataContainer;
 
 class globalStuff {
 public:
@@ -244,6 +244,45 @@ public:
                 return ValueUnit::NONE;
         }
         return ValueUnit::NONE;
+    }
+
+    static bool isValueIdPlottable(ValueID id) {
+        switch (id) {
+            case ValueID::CLK_CORE:
+            case ValueID::CLK_MEM:
+            case ValueID::VOLT_CORE:
+            case ValueID::VOLT_MEM:
+            case ValueID::FAN_SPEED_PERCENT:
+            case ValueID::GPU_LOAD_PERCENT:
+            case ValueID::GPU_VRAM_LOAD_PERCENT:
+            case ValueID::FAN_SPEED_RPM:
+            case ValueID::TEMPERATURE_CURRENT:
+            case ValueID::GPU_VRAM_LOAD_MB:
+                return true;
+
+            default:
+               break;
+        }
+         return false;
+    }
+
+    static QString getNameOfValueID(ValueID u) {
+        switch (u) {
+            case ValueID::CLK_CORE: return QObject::tr("Core clock");
+            case ValueID::CLK_MEM:  return QObject::tr("Meomory clock");
+            case ValueID::VOLT_CORE:  return QObject::tr("Core volt");
+            case ValueID::VOLT_MEM:  return QObject::tr("Memory volt");
+            case ValueID::FAN_SPEED_PERCENT:  return QObject::tr("Fan speed [%]");
+            case ValueID::GPU_LOAD_PERCENT:  return QObject::tr("GPU load");
+            case ValueID::GPU_VRAM_LOAD_PERCENT:  return QObject::tr("GPU Vram load [%]");
+            case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed [rpm]");
+            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature");
+            case ValueID::GPU_VRAM_LOAD_MB:  return QObject::tr("GPU Vram load [MB]");
+            default:
+                break;
+        }
+
+        return "";
     }
 
     static QStringList createDPMCombo() {
