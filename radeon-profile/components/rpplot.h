@@ -180,7 +180,6 @@ public:
             if (pds.enableRight) {
                 rpp->addAxis(Qt::AlignRight, pds.unitRight, pds.penGridRight);
 
-
                 for (const ValueID &id : pds.dataListRight.keys()) {
                     addSeries(rpp->name, id);
                     setLineColor(rpp->name, id, pds.dataListRight.value(id));

@@ -531,6 +531,7 @@ void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
     for (int i = 0; i < ui->list_plotDefinitions->topLevelItemCount(); ++i) {
         if (ui->list_plotDefinitions->topLevelItem(i)->checkState(0) == Qt::Checked)
              ui->grid_plots->addWidget(plotManager.definedPlots.value(ui->list_plotDefinitions->topLevelItem(i)->text(0)));
+
     }
 
     ui->stack_plots->setCurrentIndex(1);

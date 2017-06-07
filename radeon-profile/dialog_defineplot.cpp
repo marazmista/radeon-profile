@@ -116,6 +116,12 @@ void Dialog_definePlot::on_buttonBox_accepted()
         return;
     }
 
+    if (schema.dataListLeft.count() > 0)
+        schema.unitLeft = globalStuff::getUnitFomValueId(schema.dataListLeft.keys()[0]);
+
+    if (schema.dataListRight.count() > 0)
+        schema.unitRight = globalStuff::getUnitFomValueId(schema.dataListRight.keys()[0]);
+
     this->setResult(QDialog::Accepted);
 
     schema.background = ui->widget_background->palette().background().color();
