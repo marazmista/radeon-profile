@@ -125,7 +125,8 @@ struct GPUPwmStruct {
 };
 
 struct GPULoadStruct {
-    float gpuLoad, gpuVramLoadPercent, gpuVramLoad;
+    float gpuLoad;
+    long gpuVramLoadPercent, gpuVramLoad;
 
     GPULoadStruct() {
         gpuLoad = gpuVramLoad = gpuVramLoadPercent = -1;

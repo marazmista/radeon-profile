@@ -138,21 +138,21 @@ public:
      * @param data On success is filled with the value, in bytes.
      * @return Success.
      */
-    virtual bool getVramUsage(float *data) const = 0;
+    virtual bool getVramUsage(long *data) const = 0;
 
     /**
      * @brief Get the percentage of VRAM memory currently used.
      * @param data On success is filled with the value, as percentage.
      * @return Success.
      */
-    bool getVramUsagePercentage(float *data) const;
+    bool getVramUsagePercentage(long *data) const;
 
     /**
      * @brief Get VRAM memory total size.
      * @param data On success is filled with the value, in bytes.
      * @return Success.
      */
-    virtual bool getVramSize(float *data) const = 0;
+    virtual bool getVramSize(long *data) const = 0;
 
     /**
      * @brief Get the name of driver
@@ -189,8 +189,8 @@ public:
     bool getMemoryClock(int *data) const;
     bool getClocks(int *core, int *memory) const;
     bool getTemperature(int *data) const;
-    bool getVramSize(float *data) const;
-    bool getVramUsage(float *data) const;
+    bool getVramSize(long *data) const;
+    bool getVramUsage(long *data) const;
 };
 
 
@@ -221,8 +221,8 @@ public:
     bool getMemoryClock(int *data) const;
     bool getClocks(int *core, int *memory) const;
     bool getTemperature(int *data) const;
-    bool getVramSize(float *data) const;
-    bool getVramUsage(float *data) const;
+    bool getVramSize(long *data) const;
+    bool getVramUsage(long *data) const;
 };
 
 #endif

@@ -90,7 +90,6 @@ public:
         plotArea.addAxis(&timeAxis, Qt::AlignBottom);
 //        plotArea.setAnimationOptions(QChart::SeriesAnimations);
         setChart(&plotArea);
-
         timeAxis.setLabelsVisible(false);
 //        timeAxis.setGridLinePen(QPen((QBrush(Qt::yellow)),1,Qt::DashLine));
     }

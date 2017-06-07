@@ -101,7 +101,7 @@ bool amdgpuIoctlHandler::getClocks(int *core, int *memory) const {
 }
 
 
-bool amdgpuIoctlHandler::getVramUsage(float *data) const {
+bool amdgpuIoctlHandler::getVramUsage(long *data) const {
 #ifdef AMDGPU_INFO_VRAM_USAGE
     return getValue(data, sizeof(*data), AMDGPU_INFO_VRAM_USAGE);
 #else
@@ -111,7 +111,7 @@ bool amdgpuIoctlHandler::getVramUsage(float *data) const {
 }
 
 
-bool amdgpuIoctlHandler::getVramSize(float *data) const {
+bool amdgpuIoctlHandler::getVramSize(long *data) const {
 #ifdef AMDGPU_INFO_VRAM_GTT
     struct drm_amdgpu_info_vram_gtt info = {};
     bool success = getValue(&info, sizeof(info), AMDGPU_INFO_VRAM_GTT);

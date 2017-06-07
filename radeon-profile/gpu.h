@@ -68,7 +68,7 @@ private slots:
         if (gpuData.contains(ValueID::GPU_LOAD_PERCENT))
             gpuData[ValueID::GPU_LOAD_PERCENT].setValue(tmp.gpuLoad);
 
-        if (gpuData.contains(ValueID::GPU_LOAD_PERCENT))
+        if (gpuData.contains(ValueID::GPU_VRAM_LOAD_MB))
             gpuData[ValueID::GPU_VRAM_LOAD_MB].setValue(tmp.gpuVramLoad);
 
         if (gpuData.contains(ValueID::GPU_VRAM_LOAD_PERCENT)) {

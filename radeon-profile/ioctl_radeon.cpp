@@ -91,7 +91,7 @@ bool radeonIoctlHandler::getClocks(int *core, int *memory) const {
 }
 
 
-bool radeonIoctlHandler::getVramUsage(float *data) const {
+bool radeonIoctlHandler::getVramUsage(long *data) const {
 #ifdef RADEON_INFO_VRAM_USAGE
     return getValue(data, sizeof(*data), RADEON_INFO_VRAM_USAGE);
 #else
@@ -101,7 +101,7 @@ bool radeonIoctlHandler::getVramUsage(float *data) const {
 }
 
 
-bool radeonIoctlHandler::getVramSize(float *data) const {
+bool radeonIoctlHandler::getVramSize(long *data) const {
 #ifdef DRM_IOCTL_RADEON_GEM_INFO
     struct drm_radeon_gem_info buffer = {};
     const bool success = !ioctl(fd, DRM_IOCTL_RADEON_GEM_INFO, &buffer);
