@@ -31,7 +31,6 @@ void Dialog_definePlot::setAvailableGPUData(const QList<ValueID> &gpu) {
 }
 
 void Dialog_definePlot::setEditedPlotSchema(const PlotDefinitionSchema &pds) {
-    init();
     schema = pds;
 
     ui->line_name->setText(schema.name);
@@ -68,7 +67,6 @@ void Dialog_definePlot::loadListFromSchema(QTreeWidget *list, QMap<ValueID, QCol
 }
 
 void Dialog_definePlot::init() {
-    penStyles << tr("Solid line") << tr("Dash line") << tr("Dot Line");
     createStyleCombo();
     ui->widget_left->setVisible(false);
     ui->widget_right->setVisible(false);

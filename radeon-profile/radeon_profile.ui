@@ -1026,7 +1026,7 @@
            <enum>QFrame::Raised</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="pageLegacy">
            <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1079,7 +1079,7 @@
             <item row="0" column="0">
              <layout class="QGridLayout" name="grid_plots">
               <property name="spacing">
-               <number>2</number>
+               <number>0</number>
               </property>
              </layout>
             </item>

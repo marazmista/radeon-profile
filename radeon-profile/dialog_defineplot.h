@@ -51,7 +51,7 @@ private:
     PlotDefinitionSchema schema;
     QList<ValueID> availableGPUData;
     QMap<int, ValueID> listRelationToValueID;
-    QStringList penStyles;
+    QStringList penStyles = { tr("Solid line"), tr("Dash line"), tr("Dot Line") };
 
     void createStyleCombo();
     QStringList createUnitCombo();
