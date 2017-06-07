@@ -587,8 +587,8 @@ void radeon_profile::on_btn_modifyPlotDefinition_clicked()
     PlotDefinitionSchema pds = plotManager.definedPlotsSchemas[ui->list_plotDefinitions->currentItem()->text(0)];
 
     Dialog_definePlot *d = new Dialog_definePlot(this);
-    d->setEditedPlotSchema(pds);
     d->setAvailableGPUData(device.gpuData.keys());
+    d->setEditedPlotSchema(pds);
 
     if (d->exec()) {
         PlotDefinitionSchema pds = d->getCreatedSchema();

@@ -61,7 +61,7 @@ private:
     QColor getColor(const QColor &c = Qt::black);
     int penStyleToInt(const Qt::PenStyle &ps);
     void addSelectedItemToSchema(int itemIndex, QTreeWidgetItem *item , QMap<ValueID, QColor> &schemaDataList);
-
+    void loadListFromSchema(QTreeWidget *list, QMap<ValueID, QColor> selected);
 };
 
 #endif // DIALOG_DEFINEPLOT_H

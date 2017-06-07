@@ -48,11 +48,23 @@ void Dialog_definePlot::setEditedPlotSchema(const PlotDefinitionSchema &pds) {
     ui->spin_rightLineThickness->setValue(schema.penGridRight.width());
     ui->combo_leftScaleStyle->setCurrentIndex(penStyleToInt(schema.penGridLeft.style()));
     ui->combo_rightScaleStyle->setCurrentIndex(penStyleToInt(schema.penGridRight.style()));
+
+    loadListFromSchema(ui->tree_leftData, schema.dataListLeft);
+    loadListFromSchema(ui->tree_rightData, schema.dataListRight);
 }
 
 Dialog_definePlot::~Dialog_definePlot()
 {
     delete ui;
+}
+
+void Dialog_definePlot::loadListFromSchema(QTreeWidget *list, QMap<ValueID, QColor> selected) {
+    for (int i = 0; i < list->topLevelItemCount(); ++i) {
+        if (selected.contains(listRelationToValueID.value(i))) {
+           list->topLevelItem(i)->setCheckState(0, Qt::Checked);
+           list->topLevelItem(i)->setBackgroundColor(1, selected.value(listRelationToValueID.value(i)));
+        }
+    }
 }
 
 void Dialog_definePlot::init() {
