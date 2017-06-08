@@ -12,24 +12,9 @@
 class PlotManager;
 class RPPlot;
 
-//struct SeriesSchema {
-//    ValueID id;
-//    QColor lineColor;
-
-//    SeriesSchema() { }
-//    SeriesSchema(const QColor &c) {
-//        lineColor = c;
-//    }
-
-//    SeriesSchema(const ValueID &i, const QColor &c) {
-//        id = i;
-//        lineColor = c;
-//    }
-//};
-
 struct PlotDefinitionSchema {
     QString name;
-    bool enableLeft, enableRight;
+    bool enabled, enableLeft = false, enableRight = false;
     QColor background;
     ValueUnit unitLeft, unitRight;
     QPen penGridLeft, penGridRight;
@@ -92,6 +77,8 @@ public:
         setChart(&plotArea);
         timeAxis.setLabelsVisible(false);
 //        timeAxis.setGridLinePen(QPen((QBrush(Qt::yellow)),1,Qt::DashLine));
+//        this->layout()->setContentsMargins(QMargins(0,0,0,0));
+
     }
 
     ~RPPlot() {
@@ -136,13 +123,14 @@ public:
     PlotManager() {
     }
 
-    void save();
-
     void addSchema(const PlotDefinitionSchema &pds) {
         definedPlotsSchemas.insert(pds.name, pds);
     }
 
     void removeSchema(const QString &name) {
+        if (definedPlots.contains(name))
+            removePlot(name)
+                    ;
         definedPlotsSchemas.remove(name);
     }
 
@@ -154,36 +142,53 @@ public:
         delete rpp;
     }
 
-    void createPlotsFromSchemas() {
+    void disableSchema(const QString &name) {
+        removePlot(name);
+        definedPlotsSchemas.remove(name);
+    }
+
+    void enableSchema(const QString &name) {
+        definedPlotsSchemas[name].enabled = true;
+        createPlotFromSchema(name);
+    }
+
+    void createPlotFromSchema(const QString &name) {
+        PlotDefinitionSchema pds = definedPlotsSchemas.value(name);
+
+        RPPlot *rpp = new  RPPlot();
+        rpp->name = pds.name;
+        definedPlots.insert(rpp->name, rpp);
+
+        setPlotBackground(rpp->name, pds.background);
+
+        if (pds.enableLeft) {
+            rpp->addAxis(Qt::AlignLeft, pds.unitLeft, pds.penGridLeft);
+
+            for (const ValueID &id : pds.dataListLeft.keys()) {
+                addSeries(rpp->name, id);
+                setLineColor(rpp->name, id, pds.dataListLeft.value(id));
+            }
+        }
+
+        if (pds.enableRight) {
+            rpp->addAxis(Qt::AlignRight, pds.unitRight, pds.penGridRight);
+
+            for (const ValueID &id : pds.dataListRight.keys()) {
+                addSeries(rpp->name, id);
+                setLineColor(rpp->name, id, pds.dataListRight.value(id));
+            }
+        }
+    }
+
+    void recreatePlotsFromSchemas() {
         qDeleteAll(definedPlots);
         definedPlots.clear();
 
         for (const QString &k : definedPlotsSchemas.keys()) {
-            PlotDefinitionSchema pds = definedPlotsSchemas.value(k);
+            if (!definedPlotsSchemas.value(k).enabled)
+                continue;
 
-            RPPlot *rpp = new  RPPlot();
-            rpp->name = pds.name;
-            definedPlots.insert(rpp->name, rpp);
-
-            setPlotBackground(rpp->name, pds.background);
-
-            if (pds.enableLeft) {
-                rpp->addAxis(Qt::AlignLeft, pds.unitLeft, pds.penGridLeft);
-
-                for (const ValueID &id : pds.dataListLeft.keys()) {
-                    addSeries(rpp->name, id);
-                    setLineColor(rpp->name, id, pds.dataListLeft.value(id));
-                }
-            }
-
-            if (pds.enableRight) {
-                rpp->addAxis(Qt::AlignRight, pds.unitRight, pds.penGridRight);
-
-                for (const ValueID &id : pds.dataListRight.keys()) {
-                    addSeries(rpp->name, id);
-                    setLineColor(rpp->name, id, pds.dataListRight.value(id));
-                }
-            }
+            createPlotFromSchema(k);
         }
     }
 
@@ -211,7 +216,6 @@ public:
         RPPlot *p = definedPlots[name];
 
         DataSeries *ds = new DataSeries(id, p);
-
 
         p->plotArea.addSeries(ds);
 
@@ -242,8 +246,8 @@ public:
                 definedPlots[rppk]->series[dsk]->append(timestamp, data.value(dsk).value);
 
 
-                if (definedPlots[rppk]->series[dsk]->count() > 100)
-                    definedPlots[rppk]->series[dsk]->remove(0);
+//                if (definedPlots[rppk]->series[dsk]->count() > 100)
+//                    definedPlots[rppk]->series[dsk]->remove(0);
             }
         }
     }

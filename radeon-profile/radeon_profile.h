@@ -172,6 +172,10 @@ private slots:
 
     void on_btn_cancelEditPlots_clicked();
 
+    void on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, int column);
+
+    void on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
 private:
     struct currentStateInfo {
         PowerProfiles profile;
@@ -240,9 +244,13 @@ private:
     void loadExecProfile(const QXmlStreamReader &xml);
     void saveFanProfiles(QXmlStreamWriter &xml);
     void loadFanProfile(QXmlStreamReader &xml);
+    void savePlotSchemas(QXmlStreamWriter &xml);
+    void loadPlotSchemas(QXmlStreamReader &xml);
     void createDefaultFanProfile();
     void loadExecProfiles();
     void setupUiElements();
+    void createPlots();
+    void modifyPlotSchema(const QString &name);
 
     /**
      * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.

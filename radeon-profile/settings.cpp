@@ -78,6 +78,7 @@ void radeon_profile::saveConfig() {
     saveRpevents(xml);
     saveExecProfiles(xml);
     saveFanProfiles(xml);
+    savePlotSchemas(xml);
 
     xml.writeEndElement();
     xml.writeEndDocument();
@@ -147,6 +148,53 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
     xml.writeEndElement();
 }
 
+void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
+    xml.writeStartElement("Plots");
+
+    for (const QString &k : plotManager.definedPlotsSchemas.keys()) {
+        PlotDefinitionSchema pds = plotManager.definedPlotsSchemas.value(k);
+
+        xml.writeStartElement("plot");
+        xml.writeAttribute("name", k);
+        xml.writeAttribute("enabled", QString::number(pds.enabled));
+        xml.writeAttribute("enableLeft", QString::number(pds.enableLeft));
+        xml.writeAttribute("enableRight", QString::number(pds.enableRight));
+
+        xml.writeAttribute("background", pds.background.name());
+        xml.writeAttribute("unitLeft", QString::number(pds.unitLeft));
+        xml.writeAttribute("unitRight", QString::number(pds.unitRight));
+
+        xml.writeStartElement("penGrid");
+        xml.writeAttribute("align", "left");
+        xml.writeAttribute("style", QString::number(pds.penGridLeft.style()));
+        xml.writeAttribute("width", QString::number(pds.penGridLeft.width()));
+        xml.writeAttribute("color", pds.penGridLeft.color().name());
+        xml.writeEndElement();
+
+        xml.writeStartElement("penGrid");
+        xml.writeAttribute("align", "right");
+        xml.writeAttribute("style", QString::number(pds.penGridRight.style()));
+        xml.writeAttribute("width", QString::number(pds.penGridRight.width()));
+        xml.writeAttribute("color", pds.penGridRight.color().name());
+        xml.writeEndElement();
+
+        for (const ValueID &sk : pds.dataListLeft.keys()) {
+            xml.writeStartElement("serie");
+            xml.writeAttribute("align", "left");
+            xml.writeAttribute("id", QString::number(sk));
+            xml.writeAttribute("color", pds.dataListLeft.value(sk).name());
+            xml.writeEndElement();
+        }
+        for (const ValueID &sk : pds.dataListRight.keys()) {
+            xml.writeStartElement("serie");
+            xml.writeAttribute("align", "right");
+            xml.writeAttribute("id", QString::number(sk));
+            xml.writeAttribute("color", pds.dataListRight.value(sk).name());
+            xml.writeEndElement();
+        }
+    }
+    xml.writeEndElement();
+}
 
 
 void radeon_profile::loadConfig() {
@@ -275,6 +323,11 @@ void radeon_profile::loadConfig() {
                     loadFanProfile(xml);
                     continue;
                 }
+
+                if (xml.name().toString() == "plot") {
+                    loadPlotSchemas(xml);
+                    continue;
+                }
             }
         }
         f.close();
@@ -291,6 +344,12 @@ void radeon_profile::loadConfig() {
     if (ui->combo_fanProfiles->count() == 0)
         createDefaultFanProfile();
 
+    if (plotManager.definedPlotsSchemas.count() > 0) {
+        plotManager.recreatePlotsFromSchemas();
+        createPlots();
+    } else
+        ui->stack_plots->setCurrentIndex(2);
+
     makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));
 }
 
@@ -298,14 +357,14 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     RPEvent rpe;
     rpe.name = xml.attributes().value("name").toString();
     rpe.enabled = (xml.attributes().value("enabled") == "1");
-    rpe.type = static_cast<rpeventType>(xml.attributes().value("tiggerType").toString().toInt());
+    rpe.type = static_cast<rpeventType>(xml.attributes().value("tiggerType").toInt());
     rpe.activationBinary = xml.attributes().value("activationBinary").toString();
-    rpe.activationTemperature = xml.attributes().value("activationTemperature").toString().toInt();
-    rpe.dpmProfileChange = static_cast<PowerProfiles>(xml.attributes().value("dpmProfileChange").toString().toInt());
-    rpe.powerLevelChange = static_cast<ForcePowerLevels>(xml.attributes().value("powerLevelChange").toString().toInt());
-    rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toString().toInt();
+    rpe.activationTemperature = xml.attributes().value("activationTemperature").toInt();
+    rpe.dpmProfileChange = static_cast<PowerProfiles>(xml.attributes().value("dpmProfileChange").toInt());
+    rpe.powerLevelChange = static_cast<ForcePowerLevels>(xml.attributes().value("powerLevelChange").toInt());
+    rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toInt();
     rpe.fanProfileNameChange = xml.attributes().value("fanProfileNameChange").toString();
-    rpe.fanComboIndex = xml.attributes().value("fanComboIndex").toString().toInt();
+    rpe.fanComboIndex = xml.attributes().value("fanComboIndex").toInt();
 
     events.insert(rpe.name, rpe);
 
@@ -313,6 +372,50 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     item->setText(1, rpe.name);
     item->setCheckState(0,(rpe.enabled) ? Qt::Checked : Qt::Unchecked);
     ui->list_events->addTopLevelItem(item);
+}
+
+void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
+    PlotDefinitionSchema pds;
+    pds.name = xml.attributes().value("name").toString();
+    pds.enabled = xml.attributes().value("enabled").toInt();
+    pds.background = QColor(xml.attributes().value("background").toString());
+    pds.enableLeft = xml.attributes().value("enableLeft").toInt();
+    pds.enableRight = xml.attributes().value("enableRight").toInt();
+    pds.unitLeft = static_cast<ValueUnit>(xml.attributes().value("unitLeft").toInt());
+    pds.unitRight = static_cast<ValueUnit>(xml.attributes().value("unitRight").toInt());
+
+    while (xml.readNext()) {
+        if (xml.name().toString() == "penGrid") {
+            if (xml.attributes().value("align") == "left") {
+                pds.penGridLeft = QPen(QColor(xml.attributes().value("color").toString()),
+                                   xml.attributes().value("width").toInt(),
+                                   static_cast<Qt::PenStyle>(xml.attributes().value("style").toInt()));
+            }
+        } else if (xml.attributes().value("align") == "right") {
+            pds.penGridRight = QPen(QColor(xml.attributes().value("color").toString()),
+                                    xml.attributes().value("width").toInt(),
+                                    static_cast<Qt::PenStyle>(xml.attributes().value("style").toInt()));
+        }
+
+        if (xml.name().toString() == "serie") {
+            if (xml.attributes().value("align").toString() == "left")
+                pds.dataListLeft.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+            else if (xml.attributes().value("align").toString() == "right")
+                pds.dataListRight.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+
+        }
+
+        if (xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "plot") {
+            break;
+        }
+    }
+
+    plotManager.addSchema(pds);
+
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    item->setText(0, pds.name);
+    item->setCheckState(0,(pds.enabled) ? Qt::Checked : Qt::Unchecked);
+    ui->list_plotDefinitions->addTopLevelItem(item);
 }
 
 void radeon_profile::loadExecProfile(const QXmlStreamReader &xml) {

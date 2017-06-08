@@ -51,15 +51,14 @@ private:
     PlotDefinitionSchema schema;
     QList<ValueID> availableGPUData;
     QMap<int, ValueID> listRelationToValueID;
-    QStringList penStyles = { tr("Solid line"), tr("Dash line"), tr("Dot Line") };
+//    QStringList penStyles = { tr("Solid line"), tr("Dash line"), tr("Dot Line") };
 
-    void createStyleCombo();
+    void createStyleCombo(QComboBox *combo);
     QStringList createUnitCombo();
     QList<QTreeWidgetItem* > createList();
     QList<QTreeWidgetItem* > createDataListFromUnit(ValueUnit u);
     void init();
     QColor getColor(const QColor &c = Qt::black);
-    int penStyleToInt(const Qt::PenStyle &ps);
     void addSelectedItemToSchema(int itemIndex, QTreeWidgetItem *item , QMap<ValueID, QColor> &schemaDataList);
     void loadListFromSchema(QTreeWidget *list, QMap<ValueID, QColor> selected);
 };

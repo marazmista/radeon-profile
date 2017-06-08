@@ -519,6 +519,13 @@ void radeon_profile::showWindow() {
         this->showNormal();
 }
 
+void radeon_profile::createPlots() {
+    ui->grid_plots->layout()->setContentsMargins(QMargins(0,0,0,0));
+
+    for (const QString &name : plotManager.definedPlots.keys())
+        ui->grid_plots->addWidget(plotManager.definedPlots.value(name));
+}
+
 void radeon_profile::on_btn_configurePlots_clicked()
 {
     ui->stack_plots->setCurrentIndex(2);
@@ -526,13 +533,8 @@ void radeon_profile::on_btn_configurePlots_clicked()
 
 void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
 {
-    plotManager.createPlotsFromSchemas();
-
-    for (int i = 0; i < ui->list_plotDefinitions->topLevelItemCount(); ++i) {
-        if (ui->list_plotDefinitions->topLevelItem(i)->checkState(0) == Qt::Checked)
-             ui->grid_plots->addWidget(plotManager.definedPlots.value(ui->list_plotDefinitions->topLevelItem(i)->text(0)));
-
-    }
+    plotManager.recreatePlotsFromSchemas();
+    createPlots();
 
     ui->stack_plots->setCurrentIndex(1);
 }
@@ -542,7 +544,7 @@ void radeon_profile::on_btn_addPlotDefinition_clicked()
     Dialog_definePlot *d = new Dialog_definePlot(this);
     d->setAvailableGPUData(device.gpuData.keys());
 
-    if (d->exec()) {
+    if (d->exec() == QDialog::Accepted) {
         PlotDefinitionSchema pds = d->getCreatedSchema();
 
         QTreeWidgetItem *item = new QTreeWidgetItem();
@@ -564,7 +566,6 @@ void radeon_profile::on_btn_addPlotDefinition_clicked()
     }
 
     delete d;
-
 }
 
 void radeon_profile::on_btn_removePlotDefinition_clicked()
@@ -579,25 +580,51 @@ void radeon_profile::on_btn_removePlotDefinition_clicked()
     delete ui->list_plotDefinitions->currentItem();
 }
 
-void radeon_profile::on_btn_modifyPlotDefinition_clicked()
-{
-    if (ui->list_plotDefinitions->currentItem() == 0)
-        return;
-
-    PlotDefinitionSchema pds = plotManager.definedPlotsSchemas[ui->list_plotDefinitions->currentItem()->text(0)];
+void radeon_profile::modifyPlotSchema(const QString &name) {
+    PlotDefinitionSchema pds = plotManager.definedPlotsSchemas[name];
 
     Dialog_definePlot *d = new Dialog_definePlot(this);
     d->setAvailableGPUData(device.gpuData.keys());
     d->setEditedPlotSchema(pds);
 
-    if (d->exec()) {
+    if (d->exec() == QDialog::Accepted) {
         PlotDefinitionSchema pds = d->getCreatedSchema();
         plotManager.addSchema(pds);
     }
     delete d;
 }
 
+void radeon_profile::on_btn_modifyPlotDefinition_clicked()
+{
+    if (ui->list_plotDefinitions->currentItem() == 0)
+        return;
+
+    modifyPlotSchema(ui->list_plotDefinitions->currentItem()->text(0));
+}
+
 void radeon_profile::on_btn_cancelEditPlots_clicked()
 {
     ui->stack_plots->setCurrentIndex(1);
+}
+
+void radeon_profile::on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    Q_UNUSED(column);
+    modifyPlotSchema(item->text(0));
+}
+
+void radeon_profile::on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, int column)
+{
+    Q_UNUSED(column);
+
+    switch (item->checkState(0)) {
+        case Qt::Unchecked:
+            plotManager.disableSchema(item->text(0));
+            return;
+        case Qt::Checked:
+            plotManager.enableSchema(item->text(0));
+            return;
+        default:
+            return;
+    }
 }

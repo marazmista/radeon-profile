@@ -11,17 +11,17 @@ Dialog_definePlot::Dialog_definePlot(QWidget *parent) :
 
 }
 
-int Dialog_definePlot::penStyleToInt(const Qt::PenStyle &ps) {
-    switch (ps) {
-        case Qt::SolidLine:
-            return 0;
-        case Qt::DashLine:
-            return 1;
-        case Qt::DotLine:
-            return 2;
-    }
-    return 0;
-}
+//int Dialog_definePlot::penStyleToInt(const Qt::PenStyle &ps) {
+//    switch (ps) {
+//        case Qt::SolidLine:
+//            return 0;
+//        case Qt::DashLine:
+//            return 1;
+//        case Qt::DotLine:
+//            return 2;
+//    }
+//    return 0;
+//}
 
 void Dialog_definePlot::setAvailableGPUData(const QList<ValueID> &gpu) {
     availableGPUData = gpu;
@@ -45,8 +45,9 @@ void Dialog_definePlot::setEditedPlotSchema(const PlotDefinitionSchema &pds) {
     ui->spin_leftLineThickness->setValue(schema.penGridLeft.width());
     ui->widget_rightGridColor->setPalette(QPalette(schema.penGridRight.color()));
     ui->spin_rightLineThickness->setValue(schema.penGridRight.width());
-    ui->combo_leftScaleStyle->setCurrentIndex(penStyleToInt(schema.penGridLeft.style()));
-    ui->combo_rightScaleStyle->setCurrentIndex(penStyleToInt(schema.penGridRight.style()));
+    ;
+    ui->combo_leftScaleStyle->setCurrentIndex(ui->combo_leftScaleStyle->findData(QVariant::fromValue(schema.penGridLeft.style())));
+    ui->combo_rightScaleStyle->setCurrentIndex(ui->combo_rightScaleStyle->findData(QVariant::fromValue(schema.penGridRight.style())));
 
     loadListFromSchema(ui->tree_leftData, schema.dataListLeft);
     loadListFromSchema(ui->tree_rightData, schema.dataListRight);
@@ -67,7 +68,9 @@ void Dialog_definePlot::loadListFromSchema(QTreeWidget *list, QMap<ValueID, QCol
 }
 
 void Dialog_definePlot::init() {
-    createStyleCombo();
+    createStyleCombo(ui->combo_leftScaleStyle);
+    createStyleCombo(ui->combo_rightScaleStyle);
+
     ui->widget_left->setVisible(false);
     ui->widget_right->setVisible(false);
 
@@ -80,9 +83,10 @@ void Dialog_definePlot::init() {
     ui->widget_background->setAutoFillBackground(true);
 }
 
-void Dialog_definePlot::createStyleCombo() {
-    ui->combo_leftScaleStyle->addItems(penStyles);
-    ui->combo_rightScaleStyle->addItems(penStyles);
+void Dialog_definePlot::createStyleCombo(QComboBox *combo) {
+    combo->addItem(tr("Solid line"), QVariant::fromValue(Qt::SolidLine));
+    combo->addItem(tr("Dash line"), QVariant::fromValue(Qt::DashLine));
+    combo->addItem(tr("Dot Line"), QVariant::fromValue(Qt::DotLine));
 }
 
 QList<QTreeWidgetItem* > Dialog_definePlot::createList() {
@@ -101,17 +105,6 @@ QList<QTreeWidgetItem* > Dialog_definePlot::createList() {
         listRelationToValueID.insert(items.count() - 1, id);
     }
     return items;
-}
-
-Qt::PenStyle comboToStyle(int i) {
-    switch (i) {
-        case 0:
-            return Qt::SolidLine;
-        case 1:
-            return Qt::DashLine;
-        case 2:
-            return Qt::DotLine;
-    }
 }
 
 void Dialog_definePlot::on_buttonBox_accepted()
@@ -141,12 +134,13 @@ void Dialog_definePlot::on_buttonBox_accepted()
 
     schema.penGridLeft = QPen(ui->widget_leftGridColor->palette().background().color(),
                               ui->spin_leftLineThickness->value(),
-                              comboToStyle(ui->combo_leftScaleStyle->currentIndex()));
+                              static_cast<Qt::PenStyle>(ui->combo_leftScaleStyle->currentData().toInt()));
 
     schema.penGridRight = QPen(ui->widget_rightGridColor->palette().background().color(),
                               ui->spin_rightLineThickness->value(),
-                              comboToStyle(ui->combo_rightScaleStyle->currentIndex()));
+                              static_cast<Qt::PenStyle>(ui->combo_rightScaleStyle->currentData().toInt()));
 
+    this->setResult(QDialog::Accepted);
     this->accept();
 }
 
@@ -192,6 +186,7 @@ PlotDefinitionSchema Dialog_definePlot::getCreatedSchema() {
 
 void Dialog_definePlot::on_buttonBox_rejected()
 {
+    this->setResult(QDialog::Rejected);
     this->reject();
 }
 
