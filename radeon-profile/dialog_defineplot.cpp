@@ -11,18 +11,6 @@ Dialog_definePlot::Dialog_definePlot(QWidget *parent) :
 
 }
 
-//int Dialog_definePlot::penStyleToInt(const Qt::PenStyle &ps) {
-//    switch (ps) {
-//        case Qt::SolidLine:
-//            return 0;
-//        case Qt::DashLine:
-//            return 1;
-//        case Qt::DotLine:
-//            return 2;
-//    }
-//    return 0;
-//}
-
 void Dialog_definePlot::setAvailableGPUData(const QList<ValueID> &gpu) {
     availableGPUData = gpu;
 

@@ -415,11 +415,12 @@ void radeon_profile::adjustFanSpeed() {
 
 
 void radeon_profile::refreshGraphs() {
-    // count the tick and move graph to right
-    ticksCounter++;
+    if (ui->stack_plots->currentIndex() != 0 || plotManager.definedPlots.count() == 0)
+        return;
 
-    if (ui->stack_plots->currentIndex() == 0 &&  plotManager.definedPlots.count() > 0)
-        plotManager.updateSeries(ticksCounter, device.gpuData);
+    // count the tick to move timescale on plots
+    ticksCounter++;
+    plotManager.updateSeries(ticksCounter, device.gpuData);
 }
 
 void radeon_profile::doTheStats() {
@@ -440,7 +441,7 @@ void radeon_profile::doTheStats() {
 
 void radeon_profile::updateStatsTable() {
     // do the math with percents
-    for(QTreeWidgetItemIterator item(ui->list_stats); *item; item++) // For each item in list_stats
+    for (QTreeWidgetItemIterator item(ui->list_stats); *item; item++) // For each item in list_stats
         (*item)->setText(1,QString::number(pmStats.value((*item)->text(0))*100.0/statsTickCounter)+"%");
 }
 

@@ -126,8 +126,7 @@ public:
 
     void removePlot(const QString &name) {
         RPPlot *rpp = definedPlots.take(name);
-        qDeleteAll(rpp->series);
-        rpp->series.clear();
+        rpp->plotArea.removeAllSeries();
 
         delete rpp;
     }
@@ -230,7 +229,7 @@ public:
 
     void updateSeries(int timestamp, const GPUDataContainer &data) {
         for (const QString &rppk : definedPlots.keys()) {
-            definedPlots[rppk]->timeAxis.setRange(timestamp -100, timestamp + 20);
+            definedPlots[rppk]->timeAxis.setRange(timestamp - 150, timestamp + 10);
 
             for (const ValueID &dsk : definedPlots[rppk]->series.keys()) {
                 definedPlots[rppk]->series[dsk]->append(timestamp, data.value(dsk).value);
