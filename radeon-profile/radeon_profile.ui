@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>832</width>
-    <height>484</height>
+    <width>828</width>
+    <height>479</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -906,16 +906,16 @@
          <number>2</number>
         </property>
         <property name="leftMargin">
-         <number>2</number>
+         <number>3</number>
         </property>
         <property name="topMargin">
-         <number>2</number>
+         <number>3</number>
         </property>
         <property name="rightMargin">
-         <number>2</number>
+         <number>3</number>
         </property>
         <property name="bottomMargin">
-         <number>2</number>
+         <number>3</number>
         </property>
         <item>
          <widget class="QFrame" name="frame_2">
@@ -943,6 +943,12 @@
         </item>
         <item>
          <widget class="QStackedWidget" name="stack_plots">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
           </property>
@@ -953,11 +959,26 @@
            <number>0</number>
           </property>
           <widget class="QWidget" name="pagePlots">
-           <layout class="QGridLayout" name="gridLayout_15">
-            <item row="0" column="0">
-             <layout class="QGridLayout" name="grid_plots">
+           <layout class="QVBoxLayout" name="verticalLayout_20">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QGridLayout" name="grd_plots">
               <property name="spacing">
-               <number>0</number>
+               <number>2</number>
               </property>
              </layout>
             </item>
@@ -966,16 +987,16 @@
           <widget class="QWidget" name="pagePlotsConfig">
            <layout class="QHBoxLayout" name="horizontalLayout_15">
             <property name="leftMargin">
-             <number>2</number>
+             <number>3</number>
             </property>
             <property name="topMargin">
-             <number>2</number>
+             <number>3</number>
             </property>
             <property name="rightMargin">
-             <number>2</number>
+             <number>3</number>
             </property>
             <property name="bottomMargin">
-             <number>2</number>
+             <number>3</number>
             </property>
             <item>
              <layout class="QGridLayout" name="gridLayout_6">
@@ -1152,6 +1173,9 @@
            </item>
            <item row="0" column="1">
             <widget class="QPushButton" name="btn_options">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="toolTip">
               <string>Reset min max temps and graphs scale</string>
              </property>

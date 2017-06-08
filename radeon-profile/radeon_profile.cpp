@@ -480,10 +480,8 @@ void radeon_profile::showWindow() {
 }
 
 void radeon_profile::createPlots() {
-    ui->grid_plots->layout()->setContentsMargins(QMargins(0,0,0,0));
-
     for (const QString &name : plotManager.definedPlots.keys())
-        ui->grid_plots->addWidget(plotManager.definedPlots.value(name));
+        ui->pagePlots->layout()->addWidget(plotManager.definedPlots.value(name));
 }
 
 void radeon_profile::on_btn_configurePlots_clicked()

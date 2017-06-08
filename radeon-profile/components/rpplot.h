@@ -58,7 +58,7 @@ public:
 
 
     explicit RPPlot() : QChartView() {
-        plotArea.setMargins(QMargins(0,0,0,0));
+        plotArea.setMargins(QMargins(-8,-8,-8,-8));
         plotArea.setMinimumSize(0,0);
         plotArea.setBackgroundRoundness(0);
         plotArea.legend()->setVisible(false);
@@ -194,6 +194,7 @@ public:
 
     void setPlotBackground(const QString &name, const QColor &color) {
         definedPlots[name]->plotArea.setBackgroundBrush(QBrush(color));
+        definedPlots[name]->setBackgroundBrush(QBrush(color));
     }
 
     void setLineColor(const QString &pn, ValueID id, const QColor &color) {

@@ -114,7 +114,8 @@ void Dialog_definePlot::on_buttonBox_accepted()
         return;
     }
 
-    if (schema.dataListLeft.count() == 0 && schema.dataListRight.count() == 0) {
+    if ((schema.dataListLeft.count() == 0 && schema.dataListRight.count() == 0) ||
+            (!ui->cb_enableLeftScale->isChecked() && !ui->cb_enableRightScale->isChecked())) {
         QMessageBox::information(this, tr("Info"), tr("Cannot create empty plot."));
         return;
     }
