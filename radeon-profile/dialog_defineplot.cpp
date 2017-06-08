@@ -140,6 +140,8 @@ void Dialog_definePlot::on_buttonBox_accepted()
                               ui->spin_rightLineThickness->value(),
                               static_cast<Qt::PenStyle>(ui->combo_rightScaleStyle->currentData().toInt()));
 
+    schema.enabled = true;
+
     this->setResult(QDialog::Accepted);
     this->accept();
 }

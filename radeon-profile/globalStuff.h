@@ -269,15 +269,15 @@ public:
 
     static QString getNameOfValueID(ValueID u) {
         switch (u) {
-            case ValueID::CLK_CORE: return QObject::tr("Core clock");
-            case ValueID::CLK_MEM:  return QObject::tr("Meomory clock");
-            case ValueID::VOLT_CORE:  return QObject::tr("Core volt");
-            case ValueID::VOLT_MEM:  return QObject::tr("Memory volt");
+            case ValueID::CLK_CORE: return QObject::tr("Core clock [MHz]");
+            case ValueID::CLK_MEM:  return QObject::tr("Meomory clock [MHz]");
+            case ValueID::VOLT_CORE:  return QObject::tr("Core volt [mV]");
+            case ValueID::VOLT_MEM:  return QObject::tr("Memory volt [mV]");
             case ValueID::FAN_SPEED_PERCENT:  return QObject::tr("Fan speed [%]");
-            case ValueID::GPU_LOAD_PERCENT:  return QObject::tr("GPU load");
+            case ValueID::GPU_LOAD_PERCENT:  return QObject::tr("GPU load [%]");
             case ValueID::GPU_VRAM_LOAD_PERCENT:  return QObject::tr("GPU Vram load [%]");
             case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed [rpm]");
-            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature");
+            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature [C]");
             case ValueID::GPU_VRAM_LOAD_MB:  return QObject::tr("GPU Vram load [MB]");
             default:
                 break;

@@ -17,25 +17,16 @@ void radeon_profile::createDefaultFanProfile() {
 }
 
 void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {
-    ui->plotFanProfile->graph(0)->clearData();
     ui->list_fanSteps->clear();
 
     for (int temperature : profile.keys()) {
-        ui->plotFanProfile->graph(0)->addData(temperature, profile.value(temperature));
         ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.value(temperature))));
     }
-
-    ui->plotFanProfile->replot();
 }
 
 void radeon_profile::makeFanProfilePlot() {
-    ui->plotFanProfile->graph(0)->clearData();
+//    for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i)
 
-    for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i)
-        ui->plotFanProfile->graph(0)->addData(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(),
-                                              ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
-
-    ui->plotFanProfile->replot();
 }
 
 bool radeon_profile::isFanStepValid(const unsigned int temperature, const unsigned int fanSpeed) {
@@ -223,8 +214,6 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 
     // Remove the step from the list and from the graph
     delete current;
-    ui->plotFanProfile->graph(0)->removeData(temperature);
-    ui->plotFanProfile->replot();
 }
 
 

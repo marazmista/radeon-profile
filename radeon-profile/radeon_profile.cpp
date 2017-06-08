@@ -108,7 +108,7 @@ void radeon_profile::connectSignals()
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(changePowerLevelFromCombo()));
 
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
-    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
+//    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
 }
 
 void radeon_profile::setupUiElements()
@@ -118,7 +118,6 @@ void radeon_profile::setupUiElements()
     ui->configGroups->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
     ui->execPages->setCurrentIndex(0);
-    setupGraphs();
     setupForcePowerLevelMenu();
     setupOptionsMenu();
     setupContextMenus();
@@ -185,13 +184,9 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         ui->cb_eventsTracking->setChecked(false);
     }
 
-    ui->cb_showFreqGraph->setEnabled(data.contains(ValueID::CLK_CORE));
     ui->tabs_systemInfo->setTabEnabled(3,data.contains(ValueID::CLK_CORE));
-    ui->cb_showVoltsGraph->setEnabled(data.contains(ValueID::VOLT_CORE));
 
     if (!device.gpuData.contains(ValueID::TEMPERATURE_CURRENT)) {
-        ui->cb_showTempsGraph->setEnabled(false);
-        ui->plotTemp->setVisible(false);
         ui->l_temp->setVisible(false);
     }
 
@@ -422,44 +417,9 @@ void radeon_profile::adjustFanSpeed() {
 void radeon_profile::refreshGraphs() {
     // count the tick and move graph to right
     ticksCounter++;
-    ui->plotTemp->xAxis->setRange(ticksCounter + globalStuff::globalConfig.graphOffset, rangeX,Qt::AlignRight);
-    ui->plotTemp->replot();
 
-    ui->plotClocks->xAxis->setRange(ticksCounter + globalStuff::globalConfig.graphOffset,rangeX,Qt::AlignRight);
-    ui->plotClocks->replot();
-
-    ui->plotVolts->xAxis->setRange(ticksCounter + globalStuff::globalConfig.graphOffset,rangeX,Qt::AlignRight);
-    ui->plotVolts->replot();
-
-    // choose bigger clock and adjust plot scale
-    int r = (device.gpuData.value(ValueID::CLK_MEM).value >= device.gpuData.value(ValueID::CLK_CORE).value) ? device.gpuData.value(ValueID::CLK_MEM).value : device.gpuData.value(ValueID::CLK_CORE).value;
-    if (r > ui->plotClocks->yAxis->range().upper)
-        ui->plotClocks->yAxis->setRangeUpper(r + 150);
-
-    // add data to plots
-    ui->plotClocks->graph(0)->addData(ticksCounter, device.gpuData.value(ValueID::CLK_CORE).value);
-    ui->plotClocks->graph(1)->addData(ticksCounter, device.gpuData.value(ValueID::CLK_MEM).value);
-    ui->plotClocks->graph(2)->addData(ticksCounter, device.gpuData.value(ValueID::CLK_UVD).value);
-    ui->plotClocks->graph(3)->addData(ticksCounter, device.gpuData.value(ValueID::DCLK_UVD).value);
-
-    if (device.gpuData.value(ValueID::VOLT_CORE).value > ui->plotVolts->yAxis->range().upper)
-        ui->plotVolts->yAxis->setRangeUpper(device.gpuData.value(ValueID::VOLT_CORE).value + 100);
-
-    ui->plotVolts->graph(0)->addData(ticksCounter,device.gpuData.value(ValueID::VOLT_CORE).value);
-    ui->plotVolts->graph(1)->addData(ticksCounter,device.gpuData.value(ValueID::VOLT_MEM).value);
-
-    // temperature graph
-    if (device.gpuData.value(ValueID::TEMPERATURE_MAX).value >= ui->plotTemp->yAxis->range().upper || device.gpuData.value(ValueID::TEMPERATURE_MIN).value <= ui->plotTemp->yAxis->range().lower)
-        ui->plotTemp->yAxis->setRange(device.gpuData.value(ValueID::TEMPERATURE_MIN).value - 5, device.gpuData.value(ValueID::TEMPERATURE_MAX).value + 5);
-
-    ui->plotTemp->graph(0)->addData(ticksCounter, device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
-    ui->l_minMaxTemp->setText("Max: " + device.gpuData.value(ValueID::TEMPERATURE_MAX).strValue  + " | Min: " + device.gpuData.value(ValueID::TEMPERATURE_MIN).strValue);
-
-
-    if (ui->stack_plots->currentIndex() == 1  &&  plotManager.definedPlots.count() > 0)
+    if (ui->stack_plots->currentIndex() == 0 &&  plotManager.definedPlots.count() > 0)
         plotManager.updateSeries(ticksCounter, device.gpuData);
-
-
 }
 
 void radeon_profile::doTheStats() {
@@ -528,7 +488,7 @@ void radeon_profile::createPlots() {
 
 void radeon_profile::on_btn_configurePlots_clicked()
 {
-    ui->stack_plots->setCurrentIndex(2);
+    ui->stack_plots->setCurrentIndex(1);
 }
 
 void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
@@ -536,7 +496,7 @@ void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
     plotManager.recreatePlotsFromSchemas();
     createPlots();
 
-    ui->stack_plots->setCurrentIndex(1);
+    ui->stack_plots->setCurrentIndex(0);
 }
 
 void radeon_profile::on_btn_addPlotDefinition_clicked()
@@ -604,7 +564,7 @@ void radeon_profile::on_btn_modifyPlotDefinition_clicked()
 
 void radeon_profile::on_btn_cancelEditPlots_clicked()
 {
-    ui->stack_plots->setCurrentIndex(1);
+    ui->stack_plots->setCurrentIndex(0);
 }
 
 void radeon_profile::on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -619,10 +579,10 @@ void radeon_profile::on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, 
 
     switch (item->checkState(0)) {
         case Qt::Unchecked:
-            plotManager.disableSchema(item->text(0));
+            plotManager.modifySchemaState(item->text(0), false);
             return;
         case Qt::Checked:
-            plotManager.enableSchema(item->text(0));
+            plotManager.modifySchemaState(item->text(0), true);
             return;
         default:
             return;

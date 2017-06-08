@@ -27,7 +27,6 @@ CONFIG(release, debug|release){
 
 SOURCES += main.cpp\
         radeon_profile.cpp \
-    qcustomplot.cpp \
     uiElements.cpp \
     uiEvents.cpp \
     gpu.cpp \
@@ -45,7 +44,6 @@ SOURCES += main.cpp\
     dialog_defineplot.cpp
 
 HEADERS  += radeon_profile.h \
-    qcustomplot.h \
     gpu.h \
     dxorg.h \
     globalStuff.h \

@@ -938,82 +938,6 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="2">
-            <widget class="QSlider" name="timeSlider">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>200</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="minimum">
-              <number>30</number>
-             </property>
-             <property name="maximum">
-              <number>3600</number>
-             </property>
-             <property name="singleStep">
-              <number>10</number>
-             </property>
-             <property name="pageStep">
-              <number>180</number>
-             </property>
-             <property name="value">
-              <number>180</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>1h</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>30s</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="l_minMaxTemp">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="font">
-              <font>
-               <family>Monospace</family>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>temps label</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -1026,54 +950,8 @@
            <enum>QFrame::Raised</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
-          <widget class="QWidget" name="pageLegacy">
-           <layout class="QVBoxLayout" name="verticalLayout_20">
-            <property name="leftMargin">
-             <number>2</number>
-            </property>
-            <property name="topMargin">
-             <number>2</number>
-            </property>
-            <property name="rightMargin">
-             <number>2</number>
-            </property>
-            <property name="bottomMargin">
-             <number>2</number>
-            </property>
-            <item>
-             <widget class="QCustomPlot" name="plotTemp" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCustomPlot" name="plotClocks" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCustomPlot" name="plotVolts" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
           <widget class="QWidget" name="pagePlots">
            <layout class="QGridLayout" name="gridLayout_15">
             <item row="0" column="0">
@@ -1265,7 +1143,14 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="4">
+           <item row="0" column="3">
+            <widget class="QPushButton" name="btn_configurePlots">
+             <property name="text">
+              <string>Configure</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
             <widget class="QPushButton" name="btn_options">
              <property name="toolTip">
               <string>Reset min max temps and graphs scale</string>
@@ -1275,23 +1160,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="cb_showFreqGraph">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Clocks graph</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
+           <item row="0" column="0">
             <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1308,48 +1177,12 @@
             </spacer>
            </item>
            <item row="0" column="2">
-            <widget class="QCheckBox" name="cb_showVoltsGraph">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Volts graph</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="cb_showTempsGraph">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Temperature graph</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="5">
             <widget class="QPushButton" name="btn_export">
              <property name="enabled">
               <bool>false</bool>
              </property>
              <property name="text">
               <string>Export</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="6">
-            <widget class="QPushButton" name="btn_configurePlots">
-             <property name="text">
-              <string>Configure</string>
              </property>
             </widget>
            </item>
@@ -1677,7 +1510,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="page"/>
           <widget class="QWidget" name="page_fixed">
@@ -1775,6 +1608,65 @@
             <property name="spacing">
              <number>3</number>
             </property>
+            <item row="1" column="0">
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="1" column="0">
+               <widget class="QPushButton" name="btn_addFanStep">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>101</width>
+                  <height>21</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Add step</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="btn_removeFanStep">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>101</width>
+                  <height>21</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Remove step</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="2">
+               <widget class="QTreeWidget" name="list_fanSteps">
+                <property name="indentation">
+                 <number>2</number>
+                </property>
+                <column>
+                 <property name="text">
+                  <string>Temperature</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Fan Speed [%]</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+             </layout>
+            </item>
             <item row="0" column="0">
              <widget class="QWidget" name="widget_3" native="true">
               <property name="minimumSize">
@@ -1948,81 +1840,6 @@
                </property>
               </widget>
              </widget>
-            </item>
-            <item row="0" column="1" rowspan="2">
-             <widget class="QCustomPlot" name="plotFanProfile" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>300</width>
-                <height>0</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayout_3">
-              <item row="1" column="0">
-               <widget class="QPushButton" name="btn_addFanStep">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>101</width>
-                  <height>21</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Add step</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QPushButton" name="btn_removeFanStep">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>101</width>
-                  <height>21</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Remove step</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="2">
-               <widget class="QTreeWidget" name="list_fanSteps">
-                <property name="indentation">
-                 <number>2</number>
-                </property>
-                <column>
-                 <property name="text">
-                  <string>Temperature</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Fan Speed [%]</string>
-                 </property>
-                </column>
-               </widget>
-              </item>
-             </layout>
             </item>
            </layout>
           </widget>
@@ -3801,125 +3618,6 @@
             </property>
            </widget>
           </widget>
-          <widget class="QWidget" name="tab_graphsConfig">
-           <attribute name="title">
-            <string>Graphs</string>
-           </attribute>
-           <widget class="QLabel" name="label_6">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>171</width>
-              <height>24</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Line thickness:</string>
-            </property>
-           </widget>
-           <widget class="QSpinBox" name="spin_lineThick">
-            <property name="geometry">
-             <rect>
-              <x>190</x>
-              <y>10</y>
-              <width>42</width>
-              <height>24</height>
-             </rect>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>10</number>
-            </property>
-            <property name="value">
-             <number>2</number>
-            </property>
-           </widget>
-           <widget class="QTreeWidget" name="graphColorsList">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>40</y>
-              <width>300</width>
-              <height>275</height>
-             </rect>
-            </property>
-            <property name="indentation">
-             <number>5</number>
-            </property>
-            <attribute name="headerDefaultSectionSize">
-             <number>170</number>
-            </attribute>
-            <column>
-             <property name="text">
-              <string>Property</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Color</string>
-             </property>
-            </column>
-            <item>
-             <property name="text">
-              <string>Temperature background</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Clocks background</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Voltage background</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Temperature line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>GPU clock line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Mem clock line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>UVD video core line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>UVD decoder clock line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Core voltage line</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Mem voltage line</string>
-             </property>
-            </item>
-           </widget>
-          </widget>
           <widget class="QWidget" name="tab_daemonConfig">
            <attribute name="title">
             <string>Daemon</string>
@@ -4240,27 +3938,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_qcustomplot">
-              <property name="font">
-               <font>
-                <pointsize>12</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.qcustomplot.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;QCustomPlot library&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::RichText</enum>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="openExternalLinks">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QLabel" name="label_icon">
               <property name="font">
                <font>
@@ -4306,14 +3983,6 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QCustomPlot</class>
-   <extends>QWidget</extends>
-   <header>qcustomplot.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="radeon-resource.qrc"/>
  </resources>

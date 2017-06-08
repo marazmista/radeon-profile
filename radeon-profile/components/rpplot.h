@@ -45,18 +45,9 @@ public:
 
     DataSeries(ValueID t, QWidget *parent = 0) : QLineSeries(parent) {
         id = t;
-
-        switch (t) {
-            case ValueID::CLK_CORE:
-                setName(tr("GPU core clock"));
-                break;
-            default:
-                setName(tr("test"));
-                break;
-        }
+        setName(globalStuff::getNameOfValueID(id));
     }
 };
-
 
 class RPPlot : public QChartView
 {
@@ -68,10 +59,10 @@ public:
 
     explicit RPPlot() : QChartView() {
         plotArea.setMargins(QMargins(0,0,0,0));
+        plotArea.setMinimumSize(0,0);
         plotArea.setBackgroundRoundness(0);
         plotArea.legend()->setVisible(false);
         setRenderHint(QPainter::Antialiasing);
-        timeAxis.setRange(-50, 50);
         plotArea.addAxis(&timeAxis, Qt::AlignBottom);
 //        plotArea.setAnimationOptions(QChart::SeriesAnimations);
         setChart(&plotArea);
@@ -101,7 +92,6 @@ public:
 
         plotArea.addAxis(tmpax, a);
     }
-
 
     QChart plotArea;
     YAxis *axisLeft = nullptr,  *axisRight = nullptr;
@@ -142,14 +132,13 @@ public:
         delete rpp;
     }
 
-    void disableSchema(const QString &name) {
-        removePlot(name);
-        definedPlotsSchemas.remove(name);
-    }
+    void modifySchemaState(const QString &name, bool enabled) {
+        definedPlotsSchemas[name].enabled = enabled;
 
-    void enableSchema(const QString &name) {
-        definedPlotsSchemas[name].enabled = true;
-        createPlotFromSchema(name);
+        if (enabled)
+            createPlotFromSchema(name);
+        else
+            removePlot(name);
     }
 
     void createPlotFromSchema(const QString &name) {

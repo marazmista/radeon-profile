@@ -117,39 +117,7 @@ void radeon_profile::on_btn_dpmPerformance_clicked() {
 void radeon_profile::resetMinMax() { device.gpuData.remove(ValueID::TEMPERATURE_MIN); device.gpuData.remove(ValueID::TEMPERATURE_MAX); }
 
 void radeon_profile::changeTimeRange() {
-    rangeX = ui->timeSlider->value();
-}
-
-void radeon_profile::on_cb_showFreqGraph_clicked(const bool &checked)
-{
-    ui->plotClocks->setVisible(checked);
-}
-
-void radeon_profile::on_cb_showTempsGraph_clicked(const bool &checked)
-{
-    ui->plotTemp->setVisible(checked);
-}
-
-void radeon_profile::on_cb_showVoltsGraph_clicked(const bool &checked)
-{
-    ui->plotVolts->setVisible(checked);
-}
-
-void radeon_profile::resetGraphs() {
-    ui->plotClocks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
-    ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
-    ui->plotTemp->yAxis->setRange(10,20);
-}
-
-void radeon_profile::showLegend(const bool &checked) {
-    ui->plotClocks->legend->setVisible(checked);
-    ui->plotVolts->legend->setVisible(checked);
-    ui->plotClocks->replot();
-    ui->plotVolts->replot();
-}
-
-void radeon_profile::setGraphOffset(const bool &checked) {
-    globalStuff::globalConfig.graphOffset = (checked) ? 20 : 0;
+//    rangeX = ui->timeSlider->value();
 }
 
 void radeon_profile::changeEvent(QEvent *event)
@@ -222,12 +190,6 @@ void radeon_profile::closeFromTray() {
     this->close();
 }
 
-void radeon_profile::on_spin_lineThick_valueChanged(int arg1)
-{
-    Q_UNUSED(arg1)
-    setupGraphsStyle();
-}
-
 void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
 {
     timer->setInterval(arg1*1000);
@@ -262,17 +224,6 @@ void radeon_profile::refreshBtnClicked() {
     fillConnectors();
 
     fillModInfo();
-}
-
-void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
-{
-    Q_UNUSED(column)
-    QColor c = QColorDialog::getColor(item->backgroundColor(1));
-    if (c.isValid()) {
-        item->setBackgroundColor(1,c);
-        // apply colors
-        setupGraphsStyle();
-    }
 }
 
 void radeon_profile::on_cb_stats_clicked(bool checked)
@@ -396,20 +347,20 @@ void radeon_profile::on_slider_overclock_valueChanged(const int value){
 }
 
 void radeon_profile::on_btn_export_clicked(){
-    QString folder = QFileDialog::getExistingDirectory(this, tr("Export destination directory"));
+//    QString folder = QFileDialog::getExistingDirectory(this, tr("Export destination directory"));
 
-    if (!folder.isEmpty()) {
-        qDebug() << "Exporting graphs into " << folder;
+//    if (!folder.isEmpty()) {
+//        qDebug() << "Exporting graphs into " << folder;
 
-        if (ui->cb_showTempsGraph->isChecked())
-            ui->plotTemp->savePng(folder + "/temperature.png");
+//        if (ui->cb_showTempsGraph->isChecked())
+//            ui->plotTemp->savePng(folder + "/temperature.png");
 
-        if (ui->cb_showFreqGraph->isChecked())
-            ui->plotClocks->savePng(folder + "/clocks.png");
+//        if (ui->cb_showFreqGraph->isChecked())
+//            ui->plotClocks->savePng(folder + "/clocks.png");
 
-        if (ui->cb_showVoltsGraph->isChecked())
-            ui->plotVolts->savePng(folder + "/voltages.png");
-    }
+//        if (ui->cb_showVoltsGraph->isChecked())
+//            ui->plotVolts->savePng(folder + "/voltages.png");
+//    }
 }
 
 void radeon_profile::on_btn_saveAll_clicked()

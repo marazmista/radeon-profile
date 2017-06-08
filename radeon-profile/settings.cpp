@@ -36,7 +36,7 @@ void radeon_profile::saveConfig() {
 
     settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
     settings.setValue("graphOffset",optionsMenu->actions().at(1)->isChecked());
-    settings.setValue("graphRange",ui->timeSlider->value());
+//    settings.setValue("graphRange",ui->timeSlider->value());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
     settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
@@ -48,26 +48,9 @@ void radeon_profile::saveConfig() {
     settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
     settings.setValue("overclockValue", ui->slider_overclock->value());
 
-    // Graph settings
-    settings.setValue("graphLineThickness",ui->spin_lineThick->value());
-    settings.setValue("graphTempBackground",ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1));
-    settings.setValue("graphClocksBackground",ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1));
-    settings.setValue("graphVoltsBackground",ui->graphColorsList->topLevelItem(VOLTS_BG)->backgroundColor(1));
-    settings.setValue("graphTempLine",ui->graphColorsList->topLevelItem(TEMP_LINE)->backgroundColor(1));
-    settings.setValue("graphGPUClockLine",ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->backgroundColor(1));
-    settings.setValue("graphMemClockLine",ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->backgroundColor(1));
-    settings.setValue("graphUVDVideoLine",ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->backgroundColor(1));
-    settings.setValue("graphUVDDecoderLine",ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
-    settings.setValue("graphVoltsLine",ui->graphColorsList->topLevelItem(CORE_VOLTS_LINE)->backgroundColor(1));
-    settings.setValue("graphMemVoltsLine",ui->graphColorsList->topLevelItem(MEM_VOLTS_LINE)->backgroundColor(1));
-
-    settings.setValue("showTempGraphOnStart",ui->cb_showTempsGraph->isChecked());
-    settings.setValue("showFreqGraphOnStart",ui->cb_showFreqGraph->isChecked());
-    settings.setValue("showVoltsGraphOnStart",ui->cb_showVoltsGraph->isChecked());
     settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
     settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
     settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
-
 
     QString xmlString;
     QXmlStreamWriter xml(&xmlString);
@@ -192,6 +175,7 @@ void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
             xml.writeAttribute("color", pds.dataListRight.value(sk).name());
             xml.writeEndElement();
         }
+        xml.writeEndElement();
     }
     xml.writeEndElement();
 }
@@ -223,26 +207,7 @@ void radeon_profile::loadConfig() {
 
     optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
     optionsMenu->actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());
-    ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
-    // Graphs settings
-    ui->spin_lineThick->setValue(settings.value("graphLineThickness",2).toInt());
-    // detalis: http://qt-project.org/doc/qt-4.8/qvariant.html#a-note-on-gui-types
-    //ok, color is saved as QVariant, and read and convertsion it to QColor is below
-    ui->graphColorsList->topLevelItem(TEMP_BG)->setBackgroundColor(1,settings.value("graphTempBackground",QColor(Qt::darkGray)).value<QColor>());
-    ui->graphColorsList->topLevelItem(CLOCKS_BG)->setBackgroundColor(1,settings.value("graphClocksBackground",QColor(Qt::darkGray)).value<QColor>());
-    ui->graphColorsList->topLevelItem(VOLTS_BG)->setBackgroundColor(1,settings.value("graphVoltsBackground",QColor(Qt::darkGray)).value<QColor>());
-    ui->graphColorsList->topLevelItem(TEMP_LINE)->setBackgroundColor(1,settings.value("graphTempLine",QColor(Qt::yellow)).value<QColor>());
-    ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->setBackgroundColor(1,settings.value("graphGPUClockLine",QColor(Qt::black)).value<QColor>());
-    ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->setBackgroundColor(1,settings.value("graphMemClockLine",QColor(Qt::cyan)).value<QColor>());
-    ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->setBackgroundColor(1,settings.value("graphUVDVideoLine",QColor(Qt::red)).value<QColor>());
-    ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->setBackgroundColor(1,settings.value("graphUVDDecoderLine",QColor(Qt::green)).value<QColor>());
-    ui->graphColorsList->topLevelItem(CORE_VOLTS_LINE)->setBackgroundColor(1,settings.value("graphVoltsLine",QColor(Qt::blue)).value<QColor>());
-    ui->graphColorsList->topLevelItem(MEM_VOLTS_LINE)->setBackgroundColor(1,settings.value("graphMemVoltsLine",QColor(Qt::cyan)).value<QColor>());
-    setupGraphsStyle();
 
-    ui->cb_showTempsGraph->setChecked(settings.value("showTempGraphOnStart",true).toBool());
-    ui->cb_showFreqGraph->setChecked(settings.value("showFreqGraphOnStart",true).toBool());
-    ui->cb_showVoltsGraph->setChecked(settings.value("showVoltsGraphOnStart",false).toBool());
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
     ui->cb_eventsTracking->setChecked(settings.value("eventsTracking", false).toBool());
 
@@ -290,11 +255,7 @@ void radeon_profile::loadConfig() {
     ui->list_variables->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_vaules->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
 
-    showLegend(optionsMenu->actions().at(0)->isChecked());
-    changeTimeRange();
-    on_cb_showTempsGraph_clicked(ui->cb_showTempsGraph->isChecked());
-    on_cb_showFreqGraph_clicked(ui->cb_showFreqGraph->isChecked());
-    on_cb_showVoltsGraph_clicked(ui->cb_showVoltsGraph->isChecked());
+//    changeTimeRange();
 
     hideEventControls(true);
 
@@ -339,16 +300,16 @@ void radeon_profile::loadConfig() {
     // legacy load
     loadFanProfiles();
 
-
     // create default if empty
     if (ui->combo_fanProfiles->count() == 0)
         createDefaultFanProfile();
 
+    // create plots from xml config
     if (plotManager.definedPlotsSchemas.count() > 0) {
         plotManager.recreatePlotsFromSchemas();
         createPlots();
     } else
-        ui->stack_plots->setCurrentIndex(2);
+        ui->stack_plots->setCurrentIndex(1);
 
     makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));
 }

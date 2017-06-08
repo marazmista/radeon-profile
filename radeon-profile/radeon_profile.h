@@ -9,7 +9,6 @@
 
 #include <QMainWindow>
 #include <QString>
-#include "qcustomplot.h"
 #include <QVector>
 #include <QSystemTrayIcon>
 #include <QEvent>
@@ -41,20 +40,6 @@ class radeon_profile : public QMainWindow
 {
     Q_OBJECT
 
-    // names in this enum equals indexes in Qtreewidget in ui for selecting colors
-    enum graphColors {
-        TEMP_BG = 0,
-        CLOCKS_BG,
-        VOLTS_BG,
-        TEMP_LINE,
-        GPU_CLOCK_LINE,
-        MEM_CLOCK_LINE,
-        UVD_VIDEO_LINE,
-        UVD_DECODER_LINE,
-        CORE_VOLTS_LINE,
-        MEM_VOLTS_LINE
-    };
-
     enum itemValues {
         PROFILE_NAME,
         BINARY,
@@ -85,12 +70,6 @@ private slots:
     void on_btn_dpmPerformance_clicked();
     void changeTimeRange();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void on_cb_showFreqGraph_clicked(const bool &checked);
-    void on_cb_showTempsGraph_clicked(const bool &checked);
-    void on_cb_showVoltsGraph_clicked(const bool &checked);
-    void showLegend(const bool &checked);
-    void setGraphOffset(const bool &checked);
-    void resetGraphs();
     void forceAuto();
     void forceLow();
     void forceHigh();
@@ -101,12 +80,10 @@ private slots:
     void gpuChanged();
     void closeEvent(QCloseEvent *);
     void closeFromTray();
-    void on_spin_lineThick_valueChanged(int arg1);
     void on_spin_timerInterval_valueChanged(double arg1);
     void on_cb_graphs_clicked(bool checked);
     void on_cb_gpuData_clicked(bool checked);
     void refreshBtnClicked();
-    void on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_cb_stats_clicked(bool checked);
     void copyGlxInfoToClipboard();
     void copyConnectorsToClipboard();
@@ -198,7 +175,6 @@ private:
     QHBoxLayout *grid_plots;
 
     Ui::radeon_profile *ui;
-    void setupGraphs();
     void setupTrayIcon();
     void setupOptionsMenu();
     void refreshTooltip();
@@ -206,7 +182,6 @@ private:
     void changeEvent(QEvent *event);
     void saveConfig();
     void loadConfig();
-    void setupGraphsStyle();
     void doTheStats();
     void updateStatsTable();
     void setupContextMenus();
