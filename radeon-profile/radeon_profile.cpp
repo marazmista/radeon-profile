@@ -415,7 +415,7 @@ void radeon_profile::adjustFanSpeed() {
 
 
 void radeon_profile::refreshGraphs() {
-    if (ui->stack_plots->currentIndex() != 0 || plotManager.definedPlots.count() == 0)
+    if (ui->stack_plots->currentIndex() != 0 || plotManager.plots.count() == 0)
         return;
 
     // count the tick to move timescale on plots
@@ -481,8 +481,8 @@ void radeon_profile::showWindow() {
 }
 
 void radeon_profile::createPlots() {
-    for (const QString &name : plotManager.definedPlots.keys())
-        ui->pagePlots->layout()->addWidget(plotManager.definedPlots.value(name));
+    for (const QString &name : plotManager.plots.keys())
+        ui->pagePlots->layout()->addWidget(plotManager.plots.value(name));
 }
 
 void radeon_profile::on_btn_configurePlots_clicked()
@@ -511,7 +511,7 @@ void radeon_profile::on_btn_addPlotDefinition_clicked()
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
         item->setCheckState(0,Qt::Checked);
 
-        if (plotManager.definedPlotsSchemas.contains(pds.name)) {
+        if (plotManager.schemas.contains(pds.name)) {
             if (!askConfirmation(tr("Question"), tr("Plot definition with that name already exists. Replace?"))) {
                 delete d;
                 delete item;
@@ -540,7 +540,7 @@ void radeon_profile::on_btn_removePlotDefinition_clicked()
 }
 
 void radeon_profile::modifyPlotSchema(const QString &name) {
-    PlotDefinitionSchema pds = plotManager.definedPlotsSchemas[name];
+    PlotDefinitionSchema pds = plotManager.schemas[name];
 
     Dialog_definePlot *d = new Dialog_definePlot(this);
     d->setAvailableGPUData(device.gpuData.keys());

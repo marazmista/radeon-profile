@@ -134,8 +134,8 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
 void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
     xml.writeStartElement("Plots");
 
-    for (const QString &k : plotManager.definedPlotsSchemas.keys()) {
-        PlotDefinitionSchema pds = plotManager.definedPlotsSchemas.value(k);
+    for (const QString &k : plotManager.schemas.keys()) {
+        PlotDefinitionSchema pds = plotManager.schemas.value(k);
 
         xml.writeStartElement("plot");
         xml.writeAttribute("name", k);
@@ -305,7 +305,7 @@ void radeon_profile::loadConfig() {
         createDefaultFanProfile();
 
     // create plots from xml config
-    if (plotManager.definedPlotsSchemas.count() > 0) {
+    if (plotManager.schemas.count() > 0) {
         plotManager.recreatePlotsFromSchemas();
         createPlots();
     } else

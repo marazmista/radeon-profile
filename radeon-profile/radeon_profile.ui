@@ -978,7 +978,7 @@
             <item>
              <layout class="QGridLayout" name="grd_plots">
               <property name="spacing">
-               <number>2</number>
+               <number>3</number>
               </property>
              </layout>
             </item>
