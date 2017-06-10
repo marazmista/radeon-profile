@@ -104,8 +104,9 @@ void radeon_profile::connectSignals()
 {
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
-    connect(ui->combo_pProfile,SIGNAL(currentIndexChanged(int)),this,SLOT(changeProfileFromCombo()));
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(changePowerLevelFromCombo()));
+
+    connect(&dpmGroup, SIGNAL(buttonClicked(int)), this, SLOT(changePowerLevel(int)));
 
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
 //    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
@@ -163,6 +164,10 @@ void radeon_profile::addRuntimeWidgets() {
     pwmGroup.addButton(ui->btn_pwmFixed);
     pwmGroup.addButton(ui->btn_pwmProfile);
 
+    dpmGroup.addButton(ui->btn_dpmBattery, PowerProfiles::BATTERY);
+    dpmGroup.addButton(ui->btn_dpmBalanced, PowerProfiles::BALANCED);
+    dpmGroup.addButton(ui->btn_dpmPerformance, PowerProfiles::PERFORMANCE);
+
     //setup fan profile graph
     fanProfileChart = new QChartView(this);
     QChart *fanChart = new QChart();
@@ -196,21 +201,20 @@ void radeon_profile::addRuntimeWidgets() {
 
     ui->verticalLayout_22->addWidget(fanProfileChart);
 }
+
 // based on driverFeatures structure returned by gpu class, adjust ui elements
 void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data) {
     if (features.canChangeProfile && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
-        ui->tabs_pm->setTabEnabled(0,features.currentPowerMethod == PowerMethod::PROFILE);
+        ui->stack_pm->setCurrentIndex(features.currentPowerMethod);
 
-        ui->tabs_pm->setTabEnabled(1,features.currentPowerMethod == PowerMethod::DPM);
         changeProfile->setEnabled(features.currentPowerMethod == PowerMethod::PROFILE);
         dpmMenu->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
         ui->combo_pLevel->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
     } else {
-        ui->tabs_pm->setEnabled(false);
+        ui->stack_pm->setEnabled(false);
         changeProfile->setEnabled(false);
         dpmMenu->setEnabled(false);
         ui->combo_pLevel->setEnabled(false);
-        ui->combo_pProfile->setEnabled(false);
         ui->cb_eventsTracking->setEnabled(false);
         ui->cb_eventsTracking->setChecked(false);
     }
@@ -258,13 +262,8 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         ui->l_fanSpeed->setVisible(false);
     }
 
-    if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM)) {
-        ui->combo_pProfile->addItems(globalStuff::createDPMCombo());
+    if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM))
         ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo());
-    } else {
-        ui->combo_pLevel->setEnabled(false);
-        ui->combo_pProfile->addItems(globalStuff::createProfileCombo());
-    }
 
     ui->configGroups->setTabEnabled(2,device.daemonConnected() && device.getDriverFeatures().clocksSource == ClocksDataSource::PM_FILE);
     ui->mainTabs->setTabEnabled(2,features.ocCoreAvailable);
@@ -287,8 +286,6 @@ void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, c
     parent->addTopLevelItem(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
 }
 
-// -1 value means that we not show in table. it's default (in gpuClocksStruct constructor), and if we
-// did not alter it, it stays and in result will be not displayed
 void radeon_profile::refreshUI() {
     ui->l_cClk->setText(device.gpuData.value(ValueID::CLK_CORE).strValue);
     ui->l_mClk->setText(device.gpuData.value(ValueID::CLK_MEM).strValue);
@@ -360,9 +357,15 @@ void radeon_profile::timerEvent() {
     if (Q_LIKELY(ui->cb_gpuData->isChecked())) {
         refreshGpuData();
 
-        ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(device.currentPowerProfile));
-        if (device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM)
-            ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(device.currentPowerLevel));
+        if (device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) {
+            ui->combo_pLevel->setCurrentText(device.currentPowerLevel);
+            if (device.currentPowerProfile == dpm_battery)
+                ui->btn_dpmBattery->setChecked(true);
+            else if (device.currentPowerProfile == dpm_balanced)
+                ui->btn_dpmBalanced->setChecked(true);
+            else if (device.currentPowerProfile == dpm_performance)
+                ui->btn_dpmPerformance->setChecked(true);
+            }
 
         if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && ui->btn_pwmProfile->isChecked())
             adjustFanSpeed();

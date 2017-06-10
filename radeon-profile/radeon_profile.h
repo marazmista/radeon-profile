@@ -65,9 +65,6 @@ public:
 private slots:
     void timerEvent();
     void initFutureHandler();
-    void on_btn_dpmBattery_clicked();
-    void on_btn_dpmBalanced_clicked();
-    void on_btn_dpmPerformance_clicked();
     void changeTimeRange();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void forceAuto();
@@ -110,7 +107,6 @@ private slots:
     void on_btn_pwmFixed_clicked();
     void on_btn_pwmAuto_clicked();
     void on_btn_pwmProfile_clicked();
-    void changeProfileFromCombo();
     void changePowerLevelFromCombo();
     void on_btn_fanInfo_clicked();
     void on_btn_addFanStep_clicked();
@@ -136,7 +132,7 @@ private slots:
     void on_btn_revokeEvent_clicked();
     void on_list_events_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_saveAll_clicked();
-
+    void changePowerLevel(int level);
     void on_btn_configurePlots_clicked();
 
     void on_btn_applySavePlotsDefinitons_clicked();
@@ -168,7 +164,7 @@ private:
     QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
     unsigned int rangeX, ticksCounter, statsTickCounter;
-    QButtonGroup pwmGroup;
+    QButtonGroup pwmGroup, dpmGroup;
 	currentStateInfo *savedState;
     QFutureWatcher<void> initFuture;
     PlotManager plotManager;

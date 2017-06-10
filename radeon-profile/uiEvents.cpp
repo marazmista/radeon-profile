@@ -85,39 +85,21 @@ void radeon_profile::on_btn_pwmProfile_clicked()
     setCurrentFanProfile(ui->l_currentFanProfile->text(), fanProfiles.value(ui->l_currentFanProfile->text()));
 }
 
-void radeon_profile::changeProfileFromCombo() {
-    device.setPowerProfile(static_cast<PowerProfiles>((device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) ?
-                                                                       ui->combo_pProfile->currentIndex() :
-                                                                       ui->combo_pProfile->currentIndex() + 3)); // frist three in enum is dpm so we need to increase
-}
 
 void radeon_profile::changePowerLevelFromCombo() {
     device.setForcePowerLevel((ForcePowerLevels)ui->combo_pLevel->currentIndex());
-}
-
-// == others
-void radeon_profile::on_btn_dpmBattery_clicked() {
-    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_battery));
-
-    // device.setPowerProfile(globalStuff::BATTERY);
-}
-
-void radeon_profile::on_btn_dpmBalanced_clicked() {
-    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_balanced));
-
-    //    device.setPowerProfile(globalStuff::BALANCED);
-}
-
-void radeon_profile::on_btn_dpmPerformance_clicked() {
-    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_performance));
-
-    //    device.setPowerProfile(globalStuff::PERFORMANCE);
 }
 
 void radeon_profile::resetMinMax() { device.gpuData.remove(ValueID::TEMPERATURE_MIN); device.gpuData.remove(ValueID::TEMPERATURE_MAX); }
 
 void radeon_profile::changeTimeRange() {
 //    rangeX = ui->timeSlider->value();
+}
+
+void radeon_profile::changePowerLevel(int level) {
+            device.setPowerProfile(static_cast<PowerProfiles>((device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) ?
+                                                                               level :
+                                                                               level + 3));
 }
 
 void radeon_profile::changeEvent(QEvent *event)

@@ -74,7 +74,7 @@ enum class DriverModule {
     RADEON, AMDGPU, MODULE_UNKNOWN
 };
 
-enum class PowerMethod {
+enum PowerMethod {
     DPM = 0,  // kernel >= 3.11
     PROFILE = 1,  // kernel <3.11 or dpm disabled
     PM_UNKNOWN = 2

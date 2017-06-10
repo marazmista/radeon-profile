@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>828</width>
-    <height>479</height>
+    <width>842</width>
+    <height>478</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,10 +24,7 @@
     <normaloff>:/icon/extra/radeon-profile.png</normaloff>:/icon/extra/radeon-profile.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_13">
-    <property name="spacing">
-     <number>6</number>
-    </property>
+   <layout class="QGridLayout" name="gridLayout_15">
     <property name="leftMargin">
      <number>3</number>
     </property>
@@ -40,7 +37,7 @@
     <property name="bottomMargin">
      <number>3</number>
     </property>
-    <item>
+    <item row="0" column="0" colspan="2">
      <widget class="QWidget" name="widget_2" native="true">
       <property name="minimumSize">
        <size>
@@ -51,7 +48,7 @@
       <widget class="QLabel" name="label">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>0</y>
          <width>60</width>
          <height>24</height>
@@ -73,9 +70,9 @@
       <widget class="QComboBox" name="combo_gpus">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>2</x>
          <y>25</y>
-         <width>120</width>
+         <width>101</width>
          <height>25</height>
         </rect>
        </property>
@@ -95,74 +92,12 @@
         <string>Selected GPU</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="combo_pProfile">
-       <property name="geometry">
-        <rect>
-         <x>125</x>
-         <y>0</y>
-         <width>125</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>160</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Power profile</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="combo_pLevel">
-       <property name="geometry">
-        <rect>
-         <x>150</x>
-         <y>25</y>
-         <width>100</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>160</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Monospace</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Power level</string>
-       </property>
-      </widget>
       <widget class="QWidget" name="gridLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>260</x>
+         <x>110</x>
          <y>0</y>
-         <width>561</width>
+         <width>711</width>
          <height>51</height>
         </rect>
        </property>
@@ -173,7 +108,7 @@
         <property name="verticalSpacing">
          <number>2</number>
         </property>
-        <item row="0" column="5" rowspan="2">
+        <item row="0" column="4" rowspan="2">
          <spacer name="horizontalSpacer_71">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -251,37 +186,6 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2" rowspan="2">
-         <widget class="QLabel" name="l_temp">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Monospace</family>
-            <pointsize>20</pointsize>
-           </font>
-          </property>
-          <property name="toolTip">
-           <string>GPU temperature</string>
-          </property>
-          <property name="text">
-           <string>99.9°C</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="l_mClk">
           <property name="minimumSize">
@@ -345,23 +249,38 @@
          </widget>
         </item>
         <item row="0" column="3" rowspan="2">
-         <widget class="QPushButton" name="l_fanSpeed">
+         <widget class="QLabel" name="l_gpuUsage">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>50</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <family>Monospace</family>
             <pointsize>20</pointsize>
            </font>
           </property>
-          <property name="text">
-           <string>999%</string>
+          <property name="toolTip">
+           <string>GPU temperature</string>
           </property>
-          <property name="flat">
-           <bool>true</bool>
+          <property name="text">
+           <string>99.9°C</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
-        <item row="0" column="4" rowspan="2">
-         <widget class="QLabel" name="l_gpuUsage">
+        <item row="0" column="2" rowspan="2">
+         <widget class="QLabel" name="l_temp">
           <property name="minimumSize">
            <size>
             <width>40</width>
@@ -395,10 +314,261 @@
       </widget>
      </widget>
     </item>
-    <item>
+    <item row="1" column="0">
+     <widget class="QStackedWidget" name="stack_pm">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>101</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="pageDdp">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_13">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinimumSize</enum>
+        </property>
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item>
+         <widget class="QToolButton" name="btn_dpmBattery">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Battery</string>
+          </property>
+          <property name="icon">
+           <iconset resource="radeon-resource.qrc">
+            <normaloff>:/icon/symbols/arrow1.png</normaloff>:/icon/symbols/arrow1.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btn_dpmBalanced">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Balanced</string>
+          </property>
+          <property name="icon">
+           <iconset resource="radeon-resource.qrc">
+            <normaloff>:/icon/symbols/arrow2.png</normaloff>:/icon/symbols/arrow2.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btn_dpmPerformance">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Performance</string>
+          </property>
+          <property name="icon">
+           <iconset resource="radeon-resource.qrc">
+            <normaloff>:/icon/symbols/arrow3.png</normaloff>:/icon/symbols/arrow3.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="combo_pLevel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>160</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Monospace</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Power level</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="l_fanSpeed">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Monospace</family>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>999%</string>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::InstantPopup</enum>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::NoArrow</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+       <zorder>btn_dpmBattery</zorder>
+       <zorder>btn_dpmBalanced</zorder>
+       <zorder>btn_dpmPerformance</zorder>
+       <zorder>combo_pLevel</zorder>
+       <zorder>l_fanSpeed</zorder>
+       <zorder>verticalSpacer_5</zorder>
+      </widget>
+      <widget class="QWidget" name="pageProfile">
+       <layout class="QVBoxLayout" name="verticalLayout_23">
+        <item>
+         <widget class="QPushButton" name="chProfile">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Change profile</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="1">
      <widget class="QTabWidget" name="mainTabs">
       <property name="enabled">
        <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <property name="minimumSize">
        <size>
@@ -516,173 +686,6 @@
                <string>Value</string>
               </property>
              </column>
-            </widget>
-           </item>
-           <item>
-            <widget class="QTabWidget" name="tabs_pm">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>181</width>
-               <height>150</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>181</width>
-               <height>150</height>
-              </size>
-             </property>
-             <property name="tabPosition">
-              <enum>QTabWidget::North</enum>
-             </property>
-             <property name="currentIndex">
-              <number>1</number>
-             </property>
-             <property name="elideMode">
-              <enum>Qt::ElideNone</enum>
-             </property>
-             <property name="tabsClosable">
-              <bool>false</bool>
-             </property>
-             <widget class="QWidget" name="stdProfiles">
-              <attribute name="title">
-               <string>Profiles</string>
-              </attribute>
-              <widget class="QPushButton" name="chProfile">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>10</y>
-                 <width>161</width>
-                 <height>41</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Change profile</string>
-               </property>
-              </widget>
-             </widget>
-             <widget class="QWidget" name="dpmProfiles">
-              <attribute name="title">
-               <string>DPM</string>
-              </attribute>
-              <layout class="QGridLayout" name="gridLayout_4">
-               <property name="leftMargin">
-                <number>2</number>
-               </property>
-               <property name="topMargin">
-                <number>2</number>
-               </property>
-               <property name="rightMargin">
-                <number>2</number>
-               </property>
-               <property name="bottomMargin">
-                <number>2</number>
-               </property>
-               <property name="spacing">
-                <number>1</number>
-               </property>
-               <item row="5" column="0">
-                <widget class="QPushButton" name="btn_forceAuto">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Auto</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0" colspan="4">
-                <widget class="QPushButton" name="btn_dpmBattery">
-                 <property name="minimumSize">
-                  <size>
-                   <width>160</width>
-                   <height>28</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Battery</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="radeon-resource.qrc">
-                   <normaloff>:/icon/symbols/arrow1.png</normaloff>:/icon/symbols/arrow1.png</iconset>
-                 </property>
-                 <property name="flat">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0" colspan="4">
-                <widget class="QPushButton" name="btn_dpmBalanced">
-                 <property name="minimumSize">
-                  <size>
-                   <width>160</width>
-                   <height>28</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Balanced</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="radeon-resource.qrc">
-                   <normaloff>:/icon/symbols/arrow2.png</normaloff>:/icon/symbols/arrow2.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0" colspan="4">
-                <widget class="QPushButton" name="btn_dpmPerformance">
-                 <property name="minimumSize">
-                  <size>
-                   <width>160</width>
-                   <height>28</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Performance</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="radeon-resource.qrc">
-                   <normaloff>:/icon/symbols/arrow3.png</normaloff>:/icon/symbols/arrow3.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="3">
-                <widget class="QPushButton" name="btn_forceLow">
-                 <property name="maximumSize">
-                  <size>
-                   <width>50</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Low</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="2">
-                <widget class="QPushButton" name="btn_forceHigh">
-                 <property name="maximumSize">
-                  <size>
-                   <width>50</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>High</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
             </widget>
            </item>
           </layout>
