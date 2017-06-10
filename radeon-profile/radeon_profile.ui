@@ -961,7 +961,7 @@
           <widget class="QWidget" name="pagePlots">
            <layout class="QVBoxLayout" name="verticalLayout_20">
             <property name="spacing">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -975,13 +975,6 @@
             <property name="bottomMargin">
              <number>0</number>
             </property>
-            <item>
-             <layout class="QGridLayout" name="grd_plots">
-              <property name="spacing">
-               <number>3</number>
-              </property>
-             </layout>
-            </item>
            </layout>
           </widget>
           <widget class="QWidget" name="pagePlotsConfig">
