@@ -17,16 +17,20 @@ void radeon_profile::createDefaultFanProfile() {
 }
 
 void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {
+    fanSeries->clear();
     ui->list_fanSteps->clear();
 
     for (int temperature : profile.keys()) {
+        fanSeries->append(temperature, profile.value(temperature));
         ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.value(temperature))));
     }
 }
 
 void radeon_profile::makeFanProfilePlot() {
-//    for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i)
-
+    fanSeries->clear();
+    for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i) {
+        fanSeries->append(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(), ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
+    }
 }
 
 bool radeon_profile::isFanStepValid(const unsigned int temperature, const unsigned int fanSpeed) {

@@ -172,7 +172,8 @@ private:
 	currentStateInfo *savedState;
     QFutureWatcher<void> initFuture;
     PlotManager plotManager;
-    QHBoxLayout *grid_plots;
+    QChartView *fanProfileChart;
+    QLineSeries *fanSeries;
 
     Ui::radeon_profile *ui;
     void setupTrayIcon();

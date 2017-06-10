@@ -163,8 +163,39 @@ void radeon_profile::addRuntimeWidgets() {
     pwmGroup.addButton(ui->btn_pwmFixed);
     pwmGroup.addButton(ui->btn_pwmProfile);
 
-}
+    //setup fan profile graph
+    fanProfileChart = new QChartView(this);
+    QChart *fanChart = new QChart();
+    fanProfileChart->setRenderHint(QPainter::Antialiasing);
+    fanChart->setBackgroundBrush(QBrush(Qt::darkGray));
+    fanProfileChart->setChart(fanChart);
+    fanChart->setBackgroundRoundness(2);
+    fanChart->setMargins(QMargins(5,0,0,0));
+    fanSeries = new QLineSeries(fanChart);
+    fanChart->legend()->setVisible(false);
+    fanChart->addSeries(fanSeries);
+    fanSeries->setColor(Qt::yellow);
 
+    QValueAxis *axisTemperature = new QValueAxis(fanChart);
+    QValueAxis *axisSpeed = new QValueAxis(fanChart);
+    fanChart->addAxis(axisTemperature,Qt::AlignBottom);
+    fanChart->addAxis(axisSpeed, Qt::AlignLeft);
+    axisTemperature->setRange(0, 100);
+    axisSpeed->setRange(0, 100);
+    axisSpeed->setGridLineColor(Qt::white);
+    axisTemperature->setGridLineColor(Qt::white);
+    axisSpeed->setLabelsColor(Qt::white);
+    axisTemperature->setLabelsColor(Qt::white);
+    axisSpeed->setTitleText(tr("Fan Speed [%]"));
+    axisTemperature->setTitleText(tr("Temperature [°C]"));
+    axisSpeed->setTitleBrush(QBrush(Qt::white));
+    axisTemperature->setTitleBrush(QBrush(Qt::white));
+    fanSeries->attachAxis(axisTemperature);
+    fanSeries->attachAxis(axisSpeed);
+    fanSeries->setPointsVisible(true);
+
+    ui->verticalLayout_22->addWidget(fanProfileChart);
+}
 // based on driverFeatures structure returned by gpu class, adjust ui elements
 void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data) {
     if (features.canChangeProfile && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
@@ -496,6 +527,7 @@ void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
     createPlots();
 
     ui->stack_plots->setCurrentIndex(0);
+    ui->stack_plots->layout()->invalidate();
 }
 
 void radeon_profile::on_btn_addPlotDefinition_clicked()
@@ -549,7 +581,15 @@ void radeon_profile::modifyPlotSchema(const QString &name) {
     if (d->exec() == QDialog::Accepted) {
         PlotDefinitionSchema pds = d->getCreatedSchema();
         plotManager.addSchema(pds);
+
+        if (pds.name != name) {
+            QTreeWidgetItem *item = new QTreeWidgetItem();
+            item->setText(0, pds.name);
+            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+            item->setCheckState(0,Qt::Checked);
+        }
     }
+
     delete d;
 }
 

@@ -349,13 +349,13 @@ void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
         if (xml.name().toString() == "penGrid") {
             if (xml.attributes().value("align") == "left") {
                 pds.penGridLeft = QPen(QColor(xml.attributes().value("color").toString()),
-                                   xml.attributes().value("width").toInt(),
-                                   static_cast<Qt::PenStyle>(xml.attributes().value("style").toInt()));
+                                       xml.attributes().value("width").toInt(),
+                                       static_cast<Qt::PenStyle>(xml.attributes().value("style").toInt()));
+            } else if (xml.attributes().value("align") == "right") {
+                pds.penGridRight = QPen(QColor(xml.attributes().value("color").toString()),
+                                        xml.attributes().value("width").toInt(),
+                                        static_cast<Qt::PenStyle>(xml.attributes().value("style").toInt()));
             }
-        } else if (xml.attributes().value("align") == "right") {
-            pds.penGridRight = QPen(QColor(xml.attributes().value("color").toString()),
-                                    xml.attributes().value("width").toInt(),
-                                    static_cast<Qt::PenStyle>(xml.attributes().value("style").toInt()));
         }
 
         if (xml.name().toString() == "serie") {

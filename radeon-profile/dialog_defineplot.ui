@@ -74,7 +74,7 @@
      </widget>
     </item>
     <item row="4" column="0" colspan="2">
-     <widget class="QTreeWidget" name="tree_rightData">
+     <widget class="QTreeWidget" name="list_rightData">
       <property name="editTriggers">
        <set>QAbstractItemView::DoubleClicked</set>
       </property>
@@ -157,7 +157,7 @@
      </widget>
     </item>
    </layout>
-   <zorder>tree_rightData</zorder>
+   <zorder>list_rightData</zorder>
    <zorder>label_5</zorder>
    <zorder>btn_rightScaleColor</zorder>
    <zorder>widget_rightGridColor</zorder>
@@ -221,7 +221,7 @@
      </widget>
     </item>
     <item row="4" column="0" colspan="2">
-     <widget class="QTreeWidget" name="tree_leftData">
+     <widget class="QTreeWidget" name="list_leftData">
       <property name="editTriggers">
        <set>QAbstractItemView::DoubleClicked</set>
       </property>

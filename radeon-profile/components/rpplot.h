@@ -57,7 +57,7 @@ public:
     QString name;
 
     explicit RPPlot() : QChartView() {
-        plotArea.setMargins(QMargins(-5,-5,-5,-5));
+        plotArea.setMargins(QMargins(-5,-8,-5,-10));
         plotArea.setMinimumSize(0,0);
         plotArea.setBackgroundRoundness(0);
         plotArea.legend()->setVisible(false);
@@ -67,7 +67,7 @@ public:
         setChart(&plotArea);
         timeAxis.setLabelsVisible(false);
         timeAxis.setLineVisible(false);
-        timeAxis.setGridLineVisible(false);
+//        timeAxis.setGridLineVisible(false);
 //        timeAxis.setGridLinePen(QPen((QBrush(Qt::yellow)),1,Qt::DashLine));
     }
 
@@ -117,6 +117,8 @@ public:
             case ValueUnit::RPM:
                 axis->setRange(200, 500);
                 return;
+            default:
+                return;
         }
     }
 
@@ -158,11 +160,6 @@ public:
     QValueAxis timeAxis;
 
     QMap<ValueID, DataSeries*> series;
-private:
-
-signals:
-
-public slots:
 };
 
 class PlotManager {

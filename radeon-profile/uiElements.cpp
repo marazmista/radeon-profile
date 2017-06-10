@@ -97,9 +97,6 @@ void radeon_profile::setupOptionsMenu()
     optionsMenu->addAction(resetGraphs);
 
     connect(resetMinMax,SIGNAL(triggered()),this,SLOT(resetMinMax()));
-    connect(resetGraphs,SIGNAL(triggered()),this,SLOT(resetGraphs()));
-    connect(showLegend,SIGNAL(triggered(bool)),this,SLOT(showLegend(bool)));
-    connect(graphOffset,SIGNAL(triggered(bool)),this,SLOT(setGraphOffset(bool)));
 }
 
 void radeon_profile::setupForcePowerLevelMenu() {

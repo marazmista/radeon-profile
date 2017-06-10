@@ -1527,7 +1527,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="page"/>
           <widget class="QWidget" name="page_fixed">
@@ -1622,68 +1622,12 @@
             <property name="bottomMargin">
              <number>0</number>
             </property>
-            <property name="spacing">
+            <property name="horizontalSpacing">
+             <number>8</number>
+            </property>
+            <property name="verticalSpacing">
              <number>3</number>
             </property>
-            <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayout_3">
-              <item row="1" column="0">
-               <widget class="QPushButton" name="btn_addFanStep">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>101</width>
-                  <height>21</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Add step</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QPushButton" name="btn_removeFanStep">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>101</width>
-                  <height>21</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Remove step</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="2">
-               <widget class="QTreeWidget" name="list_fanSteps">
-                <property name="indentation">
-                 <number>2</number>
-                </property>
-                <column>
-                 <property name="text">
-                  <string>Temperature</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Fan Speed [%]</string>
-                 </property>
-                </column>
-               </widget>
-              </item>
-             </layout>
-            </item>
             <item row="0" column="0">
              <widget class="QWidget" name="widget_3" native="true">
               <property name="minimumSize">
@@ -1703,7 +1647,7 @@
                 <rect>
                  <x>0</x>
                  <y>30</y>
-                 <width>171</width>
+                 <width>151</width>
                  <height>22</height>
                 </rect>
                </property>
@@ -1711,7 +1655,7 @@
               <widget class="QPushButton" name="btn_activateFanProfile">
                <property name="geometry">
                 <rect>
-                 <x>180</x>
+                 <x>175</x>
                  <y>30</y>
                  <width>81</width>
                  <height>21</height>
@@ -1786,9 +1730,9 @@
               <widget class="QPushButton" name="btn_removeFanProfile">
                <property name="geometry">
                 <rect>
-                 <x>140</x>
+                 <x>130</x>
                  <y>80</y>
-                 <width>121</width>
+                 <width>125</width>
                  <height>21</height>
                 </rect>
                </property>
@@ -1799,7 +1743,7 @@
               <widget class="QLabel" name="l_fanProfileUnsavedIndicator">
                <property name="geometry">
                 <rect>
-                 <x>150</x>
+                 <x>145</x>
                  <y>50</y>
                  <width>111</width>
                  <height>31</height>
@@ -1857,6 +1801,68 @@
                </property>
               </widget>
              </widget>
+            </item>
+            <item row="1" column="0">
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="1" column="0">
+               <widget class="QPushButton" name="btn_addFanStep">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>101</width>
+                  <height>21</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Add step</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="btn_removeFanStep">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>101</width>
+                  <height>21</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Remove step</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="2">
+               <widget class="QTreeWidget" name="list_fanSteps">
+                <property name="indentation">
+                 <number>2</number>
+                </property>
+                <column>
+                 <property name="text">
+                  <string>Temperature</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Fan Speed [%]</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="0" column="1" rowspan="2">
+             <layout class="QVBoxLayout" name="verticalLayout_22"/>
             </item>
            </layout>
           </widget>

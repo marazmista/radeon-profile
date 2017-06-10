@@ -14,8 +14,8 @@ Dialog_definePlot::Dialog_definePlot(QWidget *parent) :
 void Dialog_definePlot::setAvailableGPUData(const QList<ValueID> &gpu) {
     availableGPUData = gpu;
 
-    ui->tree_leftData->addTopLevelItems(createList());
-    ui->tree_rightData->addTopLevelItems(createList());
+    ui->list_leftData->addTopLevelItems(createList());
+    ui->list_rightData->addTopLevelItems(createList());
 }
 
 void Dialog_definePlot::setEditedPlotSchema(const PlotDefinitionSchema &pds) {
@@ -33,12 +33,12 @@ void Dialog_definePlot::setEditedPlotSchema(const PlotDefinitionSchema &pds) {
     ui->spin_leftLineThickness->setValue(schema.penGridLeft.width());
     ui->widget_rightGridColor->setPalette(QPalette(schema.penGridRight.color()));
     ui->spin_rightLineThickness->setValue(schema.penGridRight.width());
-    ;
+
     ui->combo_leftScaleStyle->setCurrentIndex(ui->combo_leftScaleStyle->findData(QVariant::fromValue(schema.penGridLeft.style())));
     ui->combo_rightScaleStyle->setCurrentIndex(ui->combo_rightScaleStyle->findData(QVariant::fromValue(schema.penGridRight.style())));
 
-    loadListFromSchema(ui->tree_leftData, schema.dataListLeft);
-    loadListFromSchema(ui->tree_rightData, schema.dataListRight);
+    loadListFromSchema(ui->list_leftData, schema.dataListLeft);
+    loadListFromSchema(ui->list_rightData, schema.dataListRight);
 }
 
 Dialog_definePlot::~Dialog_definePlot()
@@ -62,10 +62,10 @@ void Dialog_definePlot::init() {
     ui->widget_left->setVisible(false);
     ui->widget_right->setVisible(false);
 
-    ui->tree_leftData->header()->resizeSection(0, 180);
-    ui->tree_rightData->header()->resizeSection(0, 180);
-    ui->tree_leftData->header()->resizeSection(1, 20);
-    ui->tree_rightData->header()->resizeSection(1, 20);
+    ui->list_leftData->header()->resizeSection(0, 180);
+    ui->list_rightData->header()->resizeSection(0, 180);
+    ui->list_leftData->header()->resizeSection(1, 20);
+    ui->list_rightData->header()->resizeSection(1, 20);
     ui->widget_rightGridColor->setAutoFillBackground(true);
     ui->widget_leftGridColor->setAutoFillBackground(true);
     ui->widget_background->setAutoFillBackground(true);
@@ -108,18 +108,20 @@ void Dialog_definePlot::on_buttonBox_accepted()
         return;
     }
 
-    if (schema.dataListLeft.count() > 0)
-        schema.unitLeft = globalStuff::getUnitFomValueId(schema.dataListLeft.keys()[0]);
-
-    if (schema.dataListRight.count() > 0)
-        schema.unitRight = globalStuff::getUnitFomValueId(schema.dataListRight.keys()[0]);
-
-    this->setResult(QDialog::Accepted);
-
     schema.background = ui->widget_background->palette().background().color();
     schema.enableLeft = ui->cb_enableLeftScale->isChecked();
     schema.enableRight = ui->cb_enableRightScale->isChecked();
     schema.name = ui->line_name->text();
+
+    if (schema.dataListLeft.count() > 0)
+        schema.unitLeft = globalStuff::getUnitFomValueId(schema.dataListLeft.keys()[0]);
+    else
+        schema.enableLeft = false;
+
+    if (schema.dataListRight.count() > 0)
+        schema.unitRight = globalStuff::getUnitFomValueId(schema.dataListRight.keys()[0]);
+    else
+        schema.enableRight = false;
 
     schema.penGridLeft = QPen(ui->widget_leftGridColor->palette().background().color(),
                               ui->spin_leftLineThickness->value(),
@@ -143,7 +145,7 @@ QColor Dialog_definePlot::getColor(const QColor &c) {
     return c;
 }
 
-void Dialog_definePlot::on_tree_leftData_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void Dialog_definePlot::on_list_leftData_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column)
     item->setBackgroundColor(1,getColor(item->backgroundColor(1)));
@@ -165,7 +167,7 @@ void Dialog_definePlot::on_btn_rightScaleColor_clicked()
     ui->widget_rightGridColor->setPalette(QPalette(getColor(ui->widget_rightGridColor->palette().background().color())));
 }
 
-void Dialog_definePlot::on_tree_rightData_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void Dialog_definePlot::on_list_rightData_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column)
     item->setBackgroundColor(1,getColor(item->backgroundColor(1)));
@@ -184,11 +186,15 @@ void Dialog_definePlot::on_buttonBox_rejected()
 void Dialog_definePlot::on_cb_enableLeftScale_clicked(bool checked)
 {
     ui->widget_left->setVisible(checked);
+    if (!checked)
+        schema.dataListLeft.clear();
 }
 
 void Dialog_definePlot::on_cb_enableRightScale_clicked(bool checked)
 {
     ui->widget_right->setVisible(checked);
+    if (!checked)
+        schema.dataListRight.clear();
 }
 
 void Dialog_definePlot::addSelectedItemToSchema(int itemIndex, QTreeWidgetItem *item , QMap<ValueID, QColor> &schemaDataList) {
@@ -204,12 +210,12 @@ void Dialog_definePlot::addSelectedItemToSchema(int itemIndex, QTreeWidgetItem *
     }
 }
 
-void Dialog_definePlot::on_tree_leftData_itemChanged(QTreeWidgetItem *item, int column)
+void Dialog_definePlot::on_list_leftData_itemChanged(QTreeWidgetItem *item, int column)
 {
-    addSelectedItemToSchema(ui->tree_leftData->indexOfTopLevelItem(item), item, schema.dataListLeft);
+    addSelectedItemToSchema(ui->list_leftData->indexOfTopLevelItem(item), item, schema.dataListLeft);
 }
 
-void Dialog_definePlot::on_tree_rightData_itemChanged(QTreeWidgetItem *item, int column)
+void Dialog_definePlot::on_list_rightData_itemChanged(QTreeWidgetItem *item, int column)
 {
-    addSelectedItemToSchema(ui->tree_rightData->indexOfTopLevelItem(item), item, schema.dataListRight);
+    addSelectedItemToSchema(ui->list_rightData->indexOfTopLevelItem(item), item, schema.dataListRight);
 }
