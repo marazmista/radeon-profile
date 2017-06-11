@@ -113,7 +113,7 @@ void Dialog_RPEvent::setEditedEvent(const RPEvent &rpe) {
     ui->combo_powerLevelChange->setCurrentIndex(rpe.powerLevelChange + 1);
 
     if (rpe.fanComboIndex > 1)
-        ui->combo_fanChange->setCurrentIndex(ui->combo_fanChange->findText(rpe.fanProfileNameChange));
+        ui->combo_fanChange->setCurrentText(rpe.fanProfileNameChange);
     else
         ui->combo_fanChange->setCurrentIndex(rpe.fanComboIndex);
 

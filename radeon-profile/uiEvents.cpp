@@ -19,19 +19,19 @@ bool closeFromTrayMenu;
 // === GUI events === //
 // == menu forcePowerLevel
 void radeon_profile::forceAuto() {
-    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_auto));
+    ui->combo_pLevel->setCurrentText(dpm_auto);
 
     // device.setForcePowerLevel(globalStuff::F_AUTO);
 }
 
 void radeon_profile::forceLow() {
-    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_low));
+    ui->combo_pLevel->setCurrentText(dpm_low);
 
     //  device.setForcePowerLevel(globalStuff::F_LOW);
 }
 
 void radeon_profile::forceHigh() {
-    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_high));
+    ui->combo_pLevel->setCurrentText(dpm_high);
     //    device.setForcePowerLevel(globalStuff::F_HIGH);
 }
 

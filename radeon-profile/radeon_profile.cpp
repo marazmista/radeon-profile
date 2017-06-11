@@ -138,6 +138,7 @@ void radeon_profile::createTopBar()
     if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
         PieProgressBar *fanPie = new PieProgressBar(100, ValueID::FAN_SPEED_PERCENT, Qt::blue, this);
         fanPie->setToolTip(tr("Fan speed"));
+        fanPie->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         topBarPies.insert(1, fanPie);
         ui->grid_topbar->addWidget(fanPie,0,3,2,1,Qt::AlignLeft);
     }
@@ -145,6 +146,7 @@ void radeon_profile::createTopBar()
     if (device.gpuData.contains(ValueID::GPU_USAGE_PERCENT)) {
         PieProgressBar *gpuUsagePie = new PieProgressBar(100, ValueID::GPU_USAGE_PERCENT, Qt::red, this);
         gpuUsagePie->setToolTip(tr("GPU usage"));
+        gpuUsagePie->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         topBarPies.insert(2, gpuUsagePie);
         ui->grid_topbar->addWidget(gpuUsagePie,0,4,2,1,Qt::AlignLeft);
     }
@@ -152,6 +154,7 @@ void radeon_profile::createTopBar()
     if (device.gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
         PieProgressBar *gpuVramUsagePie = new PieProgressBar(100, ValueID::GPU_VRAM_USAGE_PERCENT, Qt::yellow, this);
         gpuVramUsagePie->setToolTip(tr("GPU VRAM usage"));
+        gpuVramUsagePie->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         topBarPies.insert(3, gpuVramUsagePie);
         ui->grid_topbar->addWidget(gpuVramUsagePie,0,5,2,1,Qt::AlignLeft);
     }

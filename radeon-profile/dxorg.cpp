@@ -297,10 +297,12 @@ float dXorg::getTemperature() {
 
 GPUUsageStruct dXorg::getGpuUsage() {
     GPUUsageStruct data;
-
     ioctlHnd->getGpuUsage(&data.gpuUsage, 500000, 150);
     ioctlHnd->getVramUsagePercentage(&data.gpuVramUsagePercent);
     ioctlHnd->getVramUsage(&data.gpuVramUsage);
+
+    int tmp;
+    ioctlHnd->getTemperature(&tmp);
 
     return data;
 }

@@ -129,7 +129,7 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
 
     fanProfiles.insert(name, stepsListToMap());
     ui->combo_fanProfiles->addItem(name);
-    ui->combo_fanProfiles->setCurrentIndex(ui->combo_fanProfiles->findText(name));
+    ui->combo_fanProfiles->setCurrentText(name);
     setupFanProfilesMenu(true);
     fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
 }
