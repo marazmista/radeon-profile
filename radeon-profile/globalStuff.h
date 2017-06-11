@@ -40,9 +40,9 @@ enum ValueID {
     TEMPERATURE_BEFORE_CURRENT,
     TEMPERATURE_MIN,
     TEMPERATURE_MAX,
-    GPU_LOAD_PERCENT,
-    GPU_VRAM_LOAD_PERCENT,
-    GPU_VRAM_LOAD_MB,
+    GPU_USAGE_PERCENT,
+    GPU_VRAM_USAGE_PERCENT,
+    GPU_VRAM_USAGE_MB,
     FAN_SPEED_PERCENT,
     FAN_SPEED_RPM,
     POWER_LEVEL
@@ -124,12 +124,12 @@ struct GPUPwmStruct {
     int pwmSpeed = 0, pwmSpeedRpm;
 };
 
-struct GPULoadStruct {
-    float gpuLoad;
-    long gpuVramLoadPercent, gpuVramLoad;
+struct GPUUsageStruct {
+    float gpuUsage;
+    long gpuVramUsagePercent, gpuVramUsage;
 
-    GPULoadStruct() {
-        gpuLoad = gpuVramLoad = gpuVramLoadPercent = -1;
+    GPUUsageStruct() {
+        gpuUsage = gpuVramUsage = gpuVramUsagePercent = -1;
     }
 };
 
@@ -225,8 +225,8 @@ public:
                 return ValueUnit::MILIVOLT;
 
             case ValueID::FAN_SPEED_PERCENT:
-            case ValueID::GPU_LOAD_PERCENT:
-            case ValueID::GPU_VRAM_LOAD_PERCENT:
+            case ValueID::GPU_USAGE_PERCENT:
+            case ValueID::GPU_VRAM_USAGE_PERCENT:
                 return ValueUnit::PERCENT;
 
             case ValueID::FAN_SPEED_RPM:
@@ -238,7 +238,7 @@ public:
             case ValueID::TEMPERATURE_MIN:
                 return ValueUnit::CELSIUS;
 
-            case ValueID::GPU_VRAM_LOAD_MB:
+            case ValueID::GPU_VRAM_USAGE_MB:
                 return ValueUnit::MEGABYTE;
 
             default:
@@ -254,11 +254,11 @@ public:
             case ValueID::VOLT_CORE:
             case ValueID::VOLT_MEM:
             case ValueID::FAN_SPEED_PERCENT:
-            case ValueID::GPU_LOAD_PERCENT:
-            case ValueID::GPU_VRAM_LOAD_PERCENT:
+            case ValueID::GPU_USAGE_PERCENT:
+            case ValueID::GPU_VRAM_USAGE_PERCENT:
             case ValueID::FAN_SPEED_RPM:
             case ValueID::TEMPERATURE_CURRENT:
-            case ValueID::GPU_VRAM_LOAD_MB:
+            case ValueID::GPU_VRAM_USAGE_MB:
                 return true;
 
             default:
@@ -274,11 +274,11 @@ public:
             case ValueID::VOLT_CORE:  return QObject::tr("Core volt [mV]");
             case ValueID::VOLT_MEM:  return QObject::tr("Memory volt [mV]");
             case ValueID::FAN_SPEED_PERCENT:  return QObject::tr("Fan speed [%]");
-            case ValueID::GPU_LOAD_PERCENT:  return QObject::tr("GPU load [%]");
-            case ValueID::GPU_VRAM_LOAD_PERCENT:  return QObject::tr("GPU Vram load [%]");
+            case ValueID::GPU_USAGE_PERCENT:  return QObject::tr("GPU usage [%]");
+            case ValueID::GPU_VRAM_USAGE_PERCENT:  return QObject::tr("GPU Vram usage [%]");
             case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed [rpm]");
             case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature [C]");
-            case ValueID::GPU_VRAM_LOAD_MB:  return QObject::tr("GPU Vram load [MB]");
+            case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram usage [MB]");
             default:
                 break;
         }

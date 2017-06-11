@@ -111,7 +111,7 @@ public:
     GPUClocksStruct getClocks();
 
     float getTemperature();
-    GPULoadStruct getGpuLoad();
+    GPUUsageStruct getGpuUsage();
     GPUPwmStruct getPwmSpeed();
 
     QStringList getGLXInfo(QProcessEnvironment env);

@@ -96,6 +96,8 @@ void radeon_profile::initFutureHandler() {
     setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
     ui->centralWidget->setEnabled(true);
 
+    createTopBar();
+
     connectSignals();
     refreshUI();
 }
@@ -130,6 +132,30 @@ void radeon_profile::setupUiElements()
     ui->centralWidget->setEnabled(false);
 }
 
+
+void radeon_profile::createTopBar()
+{
+    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
+        PieProgressBar *fanPie = new PieProgressBar(100, ValueID::FAN_SPEED_PERCENT, Qt::blue, this);
+        fanPie->setToolTip(tr("Fan speed"));
+        topBarPies.insert(1, fanPie);
+        ui->grid_topbar->addWidget(fanPie,0,3,2,1,Qt::AlignLeft);
+    }
+
+    if (device.gpuData.contains(ValueID::GPU_USAGE_PERCENT)) {
+        PieProgressBar *gpuUsagePie = new PieProgressBar(100, ValueID::GPU_USAGE_PERCENT, Qt::red, this);
+        gpuUsagePie->setToolTip(tr("GPU usage"));
+        topBarPies.insert(2, gpuUsagePie);
+        ui->grid_topbar->addWidget(gpuUsagePie,0,4,2,1,Qt::AlignLeft);
+    }
+
+    if (device.gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
+        PieProgressBar *gpuVramUsagePie = new PieProgressBar(100, ValueID::GPU_VRAM_USAGE_PERCENT, Qt::yellow, this);
+        gpuVramUsagePie->setToolTip(tr("GPU VRAM usage"));
+        topBarPies.insert(3, gpuVramUsagePie);
+        ui->grid_topbar->addWidget(gpuVramUsagePie,0,5,2,1,Qt::AlignLeft);
+    }
+}
 
 void radeon_profile::addRuntimeWidgets() {
     // add button for manual refresh glx info, connectors, mod params
@@ -259,7 +285,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     } else {
         qDebug() << "Fan control is not available";
         ui->mainTabs->setTabEnabled(3,false);
-        ui->l_fanSpeed->setVisible(false);
+        ui->btn_fanControl->setVisible(false);
     }
 
     if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM))
@@ -273,7 +299,7 @@ void radeon_profile::refreshGpuData() {
     device.refreshPowerLevel();
     device.getClocks();
     device.getTemperature();
-    device.getGpuLoad();
+    device.getGpuUsage();
     device.getPwmSpeed();
 
     if (Q_LIKELY(execsRunning.count() == 0))
@@ -295,10 +321,9 @@ void radeon_profile::refreshUI() {
     // Header - Temperature
     ui->l_temp->setText(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).strValue);
 
-    // Header - Fan speed
-    ui->l_fanSpeed->setText(device.gpuData.value(ValueID::FAN_SPEED_PERCENT).strValue);
-
-    ui->l_gpuUsage->setText(device.gpuData.value(ValueID::GPU_LOAD_PERCENT).strValue);
+    // refresh pies
+    for (const int &k : topBarPies.keys())
+        topBarPies[k]->updateValue(device.gpuData);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {

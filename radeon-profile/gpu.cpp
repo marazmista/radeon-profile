@@ -148,16 +148,16 @@ void gpu::defineAvailableDataContainer() {
     }
 
 
-    GPULoadStruct tmpLoad = driverHandler->getGpuLoad();
+    GPUUsageStruct tmpUsage = driverHandler->getGpuUsage();
 
-    if (tmpLoad.gpuLoad != -1)
-         gpuData.insert(ValueID::GPU_LOAD_PERCENT, RPValue(ValueUnit::PERCENT, tmpLoad.gpuLoad));
+    if (tmpUsage.gpuUsage != -1)
+         gpuData.insert(ValueID::GPU_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuUsage));
 
-    if (tmpLoad.gpuVramLoad != -1)
-         gpuData.insert(ValueID::GPU_VRAM_LOAD_MB, RPValue(ValueUnit::PERCENT, tmpLoad.gpuVramLoad));
+    if (tmpUsage.gpuVramUsage != -1)
+         gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsage));
 
-    if (tmpLoad.gpuVramLoadPercent != -1)
-         gpuData.insert(ValueID::GPU_VRAM_LOAD_PERCENT, RPValue(ValueUnit::PERCENT, tmpLoad.gpuVramLoadPercent));
+    if (tmpUsage.gpuVramUsagePercent != -1)
+         gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsagePercent));
 }
 
 void gpu::getClocks() {
@@ -199,10 +199,10 @@ void gpu::getTemperature() {
         gpuData[ValueID::TEMPERATURE_MAX].setValue(gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
 }
 
-void gpu::getGpuLoad() {
+void gpu::getGpuUsage() {
 
     // getting gpu usage seems to be heavy and cause ui lag, so it is done in another thread
-    futureGpuLoad.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGpuLoad));
+    futureGpuUsage.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGpuUsage));
 }
 
 QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
@@ -277,8 +277,8 @@ void gpu::finalize() {
     if (gpuData.contains(ValueID::FAN_SPEED_PERCENT))
         setPwmManualControl(false);
 
-    if (futureGpuLoad.isRunning())
-        futureGpuLoad.waitForFinished();
+    if (futureGpuUsage.isRunning())
+        futureGpuUsage.waitForFinished();
 }
 
 bool gpu::overclock(const int value){

@@ -43,9 +43,9 @@ void radeon_profile::setupTrayIcon() {
     dpmSetPerformance->setText(tr("Performance"));
     dpmSetPerformance->setIcon(QIcon(":/icon/symbols/arrow3.png"));
 
-    connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(on_btn_dpmBattery_clicked()));
-    connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(on_btn_dpmBalanced_clicked()));
-    connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(on_btn_dpmPerformance_clicked()));
+//    connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(changePowerLevel(0)));
+//    connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(changePowerLevel(1)));
+//    connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(changePowerLevel(2)));
 
     dpmMenu->addAction(dpmSetBattery);
     dpmMenu->addAction(dpmSetBalanced);
@@ -176,7 +176,7 @@ void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
         fanProfilesMenu->addAction(a);
     }
 
-    ui->l_fanSpeed->setMenu(fanProfilesMenu);
+    ui->btn_fanControl->setMenu(fanProfilesMenu);
 }
 
 void radeon_profile::fillConnectors(){

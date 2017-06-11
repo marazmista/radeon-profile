@@ -6,6 +6,8 @@
 #include "execbin.h"
 #include "rpevent.h"
 #include "components/rpplot.h"
+#include "components/pieprogressbar.h"
+//#include "components/topbarcomponents.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -19,11 +21,6 @@
 #include <QButtonGroup>
 #include <QXmlStreamWriter>
 #include <QtConcurrent/QtConcurrent>
-
-#define startClocksScaleL 50
-#define startClocksScaleH 150
-#define startVoltsScaleL 500
-#define startVoltsScaleH 650
 
 #define minFanStepsTemp 0
 #define maxFanStepsTemp 99
@@ -170,6 +167,7 @@ private:
     PlotManager plotManager;
     QChartView *fanProfileChart;
     QLineSeries *fanSeries;
+    QMap<int, PieProgressBar*> topBarPies;
 
     Ui::radeon_profile *ui;
     void setupTrayIcon();
@@ -255,6 +253,7 @@ private:
     void fillConnectors();
     void fillModInfo();
     bool askConfirmation(const QString title, const QString question);
+    void createTopBar();
 };
 
 #endif // RADEON_PROFILE_H

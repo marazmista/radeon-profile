@@ -149,6 +149,7 @@ void radeon_profile::on_btn_activateFanProfile_clicked()
 
 void radeon_profile::setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile) {
     ui->l_currentFanProfile->setText(profileName);
+    ui->btn_fanControl->setText(profileName);
     fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
 
     currentFanProfile = profile;

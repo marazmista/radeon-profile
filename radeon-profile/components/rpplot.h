@@ -31,7 +31,7 @@ public:
 
     YAxis() { }
 
-    YAxis(ValueUnit u, QObject *parnt = 0) : QValueAxis(parnt) {
+    YAxis(ValueUnit u, QObject *parent = 0) : QValueAxis(parent) {
         unit = u;
     }
 };
@@ -83,6 +83,7 @@ public:
         YAxis *tmpax = new YAxis(u, this);
         tmpax->setGridLinePen(p);
         tmpax->setLabelsColor(p.color());
+        tmpax->setTitleBrush(p.brush());
 
         if (a == Qt::AlignRight)
             axisRight = tmpax;
@@ -268,9 +269,11 @@ public:
 
         if (p->axisLeft != nullptr && p->axisLeft->unit == tmpUnit) {
             p->setInitialScale(p->axisLeft, tmpUnit);
+            plots[name]->axisLeft->setTitleText(ds->name());
             ds->attachAxis(plots[name]->axisLeft);
         } else if (p->axisRight != nullptr && p->axisRight->unit == tmpUnit) {
             p->setInitialScale(p->axisRight, tmpUnit);
+            plots[name]->axisRight->setTitleText(ds->name());
             ds->attachAxis(p->axisRight);
         } else {
             delete ds;

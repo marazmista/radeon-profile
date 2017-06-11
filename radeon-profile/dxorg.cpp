@@ -295,12 +295,12 @@ float dXorg::getTemperature() {
     return temp.toFloat();
 }
 
-GPULoadStruct dXorg::getGpuLoad() {
-    GPULoadStruct data;
+GPUUsageStruct dXorg::getGpuUsage() {
+    GPUUsageStruct data;
 
-    ioctlHnd->getGpuUsage(&data.gpuLoad, 500000, 150);
-    ioctlHnd->getVramUsagePercentage(&data.gpuVramLoadPercent);
-    ioctlHnd->getVramUsage(&data.gpuVramLoad);
+    ioctlHnd->getGpuUsage(&data.gpuUsage, 500000, 150);
+    ioctlHnd->getVramUsagePercentage(&data.gpuVramUsagePercent);
+    ioctlHnd->getVramUsage(&data.gpuVramUsage);
 
     return data;
 }

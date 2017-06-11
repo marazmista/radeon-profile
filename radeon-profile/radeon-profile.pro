@@ -53,11 +53,14 @@ HEADERS  += radeon_profile.h \
     rpevent.h \
     ioctlHandler.h \
     components/rpplot.h \
-    dialog_defineplot.h
+    dialog_defineplot.h \
+    components/pieprogressbar.h \
+    components/topbarcomponents.h
 
 FORMS    += radeon_profile.ui \
     dialog_rpevent.ui \
-    dialog_defineplot.ui
+    dialog_defineplot.ui \
+    components/pieprogressbar.ui
 
 RESOURCES += \
     radeon-resource.qrc
