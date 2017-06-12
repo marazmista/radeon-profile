@@ -115,7 +115,8 @@ public:
      * @note A frequency > 100 Hz is suggested (A low sampling frequency reduces precision).
      * @return Success.
      */
-    bool getGpuUsage(float *data, int time, int frequency) const;
+    virtual bool getGpuUsage(float *data, int time, int frequency) const;
+    virtual bool getGpuUsage(float *data) const = 0;
 
     /**
      * @brief Get VRAM memory current clock (mclk).
@@ -191,6 +192,7 @@ public:
     bool getTemperature(int *data) const;
     bool getVramSize(long *data) const;
     bool getVramUsage(long *data) const;
+    bool getGpuUsage(float *data) const { return false; }
 };
 
 
@@ -205,6 +207,9 @@ protected:
     bool getValue(void *data, unsigned dataSize, unsigned command) const;
     bool readRegistry(unsigned *data) const;
     bool isCardActive(bool *data) const;
+
+private:
+    bool getSensorValue(void* data, unsigned dataSize, unsigned sensor) const;
 
 public:
     /**
@@ -223,6 +228,7 @@ public:
     bool getTemperature(int *data) const;
     bool getVramSize(long *data) const;
     bool getVramUsage(long *data) const;
+    bool getGpuUsage(float *data) const;
 };
 
 #endif

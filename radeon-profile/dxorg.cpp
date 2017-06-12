@@ -297,7 +297,15 @@ float dXorg::getTemperature() {
 
 GPUUsageStruct dXorg::getGpuUsage() {
     GPUUsageStruct data;
-    ioctlHnd->getGpuUsage(&data.gpuUsage, 500000, 150);
+    switch (features.sysInfo.module) {
+        case DriverModule::RADEON:
+            ioctlHnd->getGpuUsage(&data.gpuUsage, 500000, 150);
+            break;
+        case DriverModule::AMDGPU:
+            ioctlHnd->getGpuUsage(&data.gpuUsage);
+            break;
+    }
+
     ioctlHnd->getVramUsagePercentage(&data.gpuVramUsagePercent);
     ioctlHnd->getVramUsage(&data.gpuVramUsage);
 

@@ -11,7 +11,27 @@
 #endif
 
 
-amdgpuIoctlHandler::amdgpuIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIndex){}
+amdgpuIoctlHandler::amdgpuIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIndex) { }
+
+bool amdgpuIoctlHandler::getSensorValue(void *data, unsigned dataSize, unsigned sensor) const {
+#ifdef DRM_IOCTL_AMDGPU_INFO
+    struct drm_amdgpu_info buffer = {};
+    buffer.query = AMDGPU_INFO_SENSOR;
+    buffer.return_pointer = reinterpret_cast<uint64_t>(data);
+    buffer.return_size = dataSize;
+    buffer.sensor_info.type = sensor;
+    bool success = !ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
+    if (Q_UNLIKELY(!success))
+        perror("DRM_IOCTL_AMDGPU_INFO");
+    return success;
+#else
+    Q_UNUSED(data);
+    Q_UNUSED(command);
+    Q_UNUSED(dataSize);
+    return false;
+#endif
+}
+
 
 /**
  * @see https://cgit.freedesktop.org/mesa/drm/tree/include/drm/amdgpu_drm.h#n437
@@ -35,18 +55,32 @@ bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
 #endif
 }
 
+bool amdgpuIoctlHandler::getGpuUsage(float *data) const {
+#ifdef AMDGPU_INFO_SENSOR_GPU_LOAD
+    return getSensorValue(data, sizeof(data), AMDGPU_INFO_SENSOR_GPU_LOAD);
+#else
+    Q_UNUSED(data);
+    return false;
+#endif
+}
 
 bool amdgpuIoctlHandler::getTemperature(int *data) const {
-    qDebug() << "amdgpuIoctlHandler::getTemperature() is not available";
-    return false;
+#ifdef AMDGPU_INFO_SENSOR_GPU_TEMP
+    return getSensorValue(data, sizeof(data), AMDGPU_INFO_SENSOR_GPU_TEMP);
+#else
     Q_UNUSED(data);
+    return false;
+#endif
 }
-
 
 bool amdgpuIoctlHandler::getCoreClock(int *data) const {
-    return getClocks(data, NULL);
+#ifdef AMDGPU_INFO_SENSOR_GFX_SCLK
+    return getSensorValue(data, sizeof(data), AMDGPU_INFO_SENSOR_GFX_SCLK);
+#else
+    Q_UNUSED(data);
+    return false;
+#endif
 }
-
 
 bool amdgpuIoctlHandler::getMaxCoreClock(int *data) const {
     return getMaxClocks(data, NULL);
@@ -78,7 +112,12 @@ bool amdgpuIoctlHandler::getMaxClocks(int *core, int *memory) const {
 
 
 bool amdgpuIoctlHandler::getMemoryClock(int *data) const {
-    return getClocks(NULL, data);
+#ifdef  AMDGPU_INFO_SENSOR_GFX_MCLK
+    return getSensorValue(data, sizeof(data), AMDGPU_INFO_SENSOR_GFX_MCLK);
+#else
+    Q_UNUSED(data);
+    return false;
+#endif
 }
 
 
