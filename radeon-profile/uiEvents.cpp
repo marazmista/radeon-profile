@@ -330,24 +330,13 @@ void radeon_profile::on_slider_overclock_valueChanged(const int value){
     ui->label_overclockPercentage->setText(QString::number(value));
 }
 
-void radeon_profile::on_btn_export_clicked(){
-//    QString folder = QFileDialog::getExistingDirectory(this, tr("Export destination directory"));
-
-//    if (!folder.isEmpty()) {
-//        qDebug() << "Exporting graphs into " << folder;
-
-//        if (ui->cb_showTempsGraph->isChecked())
-//            ui->plotTemp->savePng(folder + "/temperature.png");
-
-//        if (ui->cb_showFreqGraph->isChecked())
-//            ui->plotClocks->savePng(folder + "/clocks.png");
-
-//        if (ui->cb_showVoltsGraph->isChecked())
-//            ui->plotVolts->savePng(folder + "/voltages.png");
-//    }
-}
 
 void radeon_profile::on_btn_saveAll_clicked()
 {
     saveConfig();
+}
+
+void radeon_profile::on_slider_timeRange_valueChanged(int value)
+{
+    plotManager.setTimeRange(value);
 }

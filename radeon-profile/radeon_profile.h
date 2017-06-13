@@ -118,7 +118,6 @@ private slots:
     void on_btn_saveFanProfile_clicked();
     void on_btn_saveAsFanProfile_clicked();
     void fanProfileMenuActionClicked(QAction *a);
-    void on_btn_export_clicked();
     void on_cb_zeroPercentFanSpeed_clicked(bool checked);
     void on_combo_fanProfiles_currentIndexChanged(const QString &arg1);
     void on_btn_addEvent_clicked();
@@ -146,6 +145,8 @@ private slots:
 
     void on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
+    void on_slider_timeRange_valueChanged(int value);
+
 private:
     struct currentStateInfo {
         PowerProfiles profile;
@@ -171,7 +172,6 @@ private:
 
     Ui::radeon_profile *ui;
     void setupTrayIcon();
-    void setupOptionsMenu();
     void refreshTooltip();
     void setupForcePowerLevelMenu();
     void changeEvent(QEvent *event);

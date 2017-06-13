@@ -931,7 +931,7 @@
              <number>3</number>
             </property>
             <item>
-             <layout class="QGridLayout" name="gridLayout_6">
+             <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,0,0,0">
               <property name="leftMargin">
                <number>10</number>
               </property>
@@ -1005,22 +1005,9 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Apply and save</string>
+                 <string>Apply</string>
                 </property>
                </widget>
-              </item>
-              <item row="4" column="3">
-               <spacer name="horizontalSpacer_8">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
               <item row="1" column="1">
                <widget class="QPushButton" name="btn_addPlotDefinition">
@@ -1069,6 +1056,50 @@
                 </property>
                </widget>
               </item>
+              <item row="1" column="3" rowspan="3">
+               <widget class="QGroupBox" name="groupBox">
+                <property name="title">
+                 <string>General plots settings</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_24">
+                 <item>
+                  <widget class="QCheckBox" name="cb_plotsRightGap">
+                   <property name="text">
+                    <string>Gap on the right side of plot</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_7">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+                <zorder>cb_plotsRightGap</zorder>
+                <zorder>verticalSpacer_7</zorder>
+               </widget>
+              </item>
+              <item row="5" column="3">
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
             </item>
            </layout>
@@ -1096,7 +1127,7 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="3">
+           <item row="0" column="4">
             <widget class="QPushButton" name="btn_configurePlots">
              <property name="text">
               <string>Configure</string>
@@ -1104,19 +1135,22 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QPushButton" name="btn_options">
-             <property name="enabled">
-              <bool>false</bool>
+            <widget class="QSlider" name="slider_timeRange">
+             <property name="minimum">
+              <number>60</number>
              </property>
-             <property name="toolTip">
-              <string>Reset min max temps and graphs scale</string>
+             <property name="maximum">
+              <number>1800</number>
              </property>
-             <property name="text">
-              <string>Options</string>
+             <property name="value">
+              <number>600</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
+           <item row="0" column="3">
             <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1132,13 +1166,17 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="btn_export">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Export</string>
+              <string>1m</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>30m</string>
              </property>
             </widget>
            </item>

@@ -122,7 +122,6 @@ void radeon_profile::setupUiElements()
     ui->list_currentGPUData->setHeaderHidden(false);
     ui->execPages->setCurrentIndex(0);
     setupForcePowerLevelMenu();
-    setupOptionsMenu();
     setupContextMenus();
     setupTrayIcon();
     addRuntimeWidgets();
@@ -557,11 +556,14 @@ void radeon_profile::on_btn_configurePlots_clicked()
 
 void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
 {
+    plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
+
     plotManager.recreatePlotsFromSchemas();
     createPlots();
 
     ui->stack_plots->setCurrentIndex(0);
     ui->stack_plots->layout()->invalidate();
+
 }
 
 void radeon_profile::on_btn_addPlotDefinition_clicked()

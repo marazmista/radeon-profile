@@ -172,11 +172,24 @@ public:
 };
 
 class PlotManager {
+private:
+    int timeRange = 150,
+        rightGap = 10;
+
 public:
     QMap<QString, RPPlot*> plots;
     QMap<QString, PlotDefinitionSchema> schemas;
 
+
     PlotManager() {
+    }
+
+    void setRightGap(bool setting) {
+        rightGap = (setting) ? 10 : 0;
+    }
+
+    void setTimeRange(int range) {
+        timeRange = range;
     }
 
     void addSchema(const PlotDefinitionSchema &pds) {
@@ -293,7 +306,7 @@ public:
 
     void updateSeries(int timestamp, const GPUDataContainer &data) {
         for (const QString &rppk : plots.keys()) {
-            plots[rppk]->timeAxis.setRange(timestamp - 150, timestamp + 10);
+            plots[rppk]->timeAxis.setRange(timestamp - timeRange, timestamp + rightGap);
             plots[rppk]->updatePlot(timestamp, data);
 
 //                if (definedPlots[rppk]->series[dsk]->count() > 100)

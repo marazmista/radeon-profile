@@ -34,9 +34,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
     settings.setValue("aleternateRowColors",ui->cb_alternateRow->isChecked());
 
-    settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
-    settings.setValue("graphOffset",optionsMenu->actions().at(1)->isChecked());
-//    settings.setValue("graphRange",ui->timeSlider->value());
+    settings.setValue("graphOffset", ui->cb_plotsRightGap->isChecked());
+    settings.setValue("graphRange",ui->slider_timeRange->value());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
     settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
@@ -196,9 +195,8 @@ void radeon_profile::loadConfig() {
     if (ui->cb_saveFanMode->isChecked())
         ui->fanModesTabs->setCurrentIndex(settings.value("fanMode",0).toInt());
 
-    optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
-    optionsMenu->actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());
-
+    ui->cb_plotsRightGap->setChecked(settings.value("graphOffset",true).toBool());
+    ui->slider_timeRange->setValue(settings.value("graphRange",600).toInt());
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
     ui->cb_eventsTracking->setChecked(settings.value("eventsTracking", false).toBool());
 
@@ -246,14 +244,11 @@ void radeon_profile::loadConfig() {
     ui->list_variables->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_vaules->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
 
-//    changeTimeRange();
-
+    plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
     hideEventControls(true);
 
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
-    globalStuff::globalConfig.graphOffset = ((optionsMenu->actions().at(1)->isChecked()) ? 20 : 0);
-
 
     QFile f(auxStuffPath);
     if (f.open(QIODevice::ReadOnly)) {

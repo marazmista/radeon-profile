@@ -303,7 +303,6 @@ public:
     static struct globalCfgStruct {
         float interval;
         bool daemonAutoRefresh, rootMode;
-        int graphOffset;
     } globalConfig;
 };
 

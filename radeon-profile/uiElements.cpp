@@ -69,36 +69,6 @@ void radeon_profile::setupTrayIcon() {
     connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 }
 
-void radeon_profile::setupOptionsMenu()
-{
-    optionsMenu = new QMenu(this);
-    ui->btn_options->setMenu(optionsMenu);
-
-    QAction *resetMinMax = new QAction(optionsMenu);
-    resetMinMax->setText(tr("Reset min/max temperature"));
-
-    QAction *resetGraphs = new QAction(optionsMenu);
-    resetGraphs->setText(tr("Reset graphs vertical scale"));
-
-    QAction *showLegend = new QAction(optionsMenu);
-    showLegend->setText(tr("Show legend"));
-    showLegend->setCheckable(true);
-    showLegend->setChecked(true);
-
-    QAction *graphOffset = new QAction(optionsMenu);
-    graphOffset->setText(tr("Graph offset on right"));
-    graphOffset->setCheckable(true);
-    graphOffset->setChecked(true);
-
-    optionsMenu->addAction(showLegend);
-    optionsMenu->addAction(graphOffset);
-    optionsMenu->addSeparator();
-    optionsMenu->addAction(resetMinMax);
-    optionsMenu->addAction(resetGraphs);
-
-    connect(resetMinMax,SIGNAL(triggered()),this,SLOT(resetMinMax()));
-}
-
 void radeon_profile::setupForcePowerLevelMenu() {
     forcePowerMenu = new QMenu(this);
 
