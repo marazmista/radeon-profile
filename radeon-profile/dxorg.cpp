@@ -56,13 +56,17 @@ void dXorg::configure() {
         command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR); // Configuration flag
         command.append(deviceFiles.debugfs_pm_info).append(SEPARATOR); // Path where the daemon will read clocks
 
-        if (features.clocksSource == ClocksDataSource::IOCTL)
-            command.append(DAEMON_DISABLE_SHAREDMEM).append(SEPARATOR);
+        if (features.clocksSource == ClocksDataSource::IOCTL) {
+            command.append(DAEMON_DISABLE_SHAREDMEM).append(SEPARATOR).append('1').append(SEPARATOR);
+            qDebug() << "Sending daemon config command: " << command;
+            dcomm.sendCommand(command);
+        } else {
+            command.append(DAEMON_DISABLE_SHAREDMEM).append(SEPARATOR).append('0').append(SEPARATOR);
+            qDebug() << "Sending daemon config command: " << command;
+            dcomm.sendCommand(command);
 
-        qDebug() << "Sending daemon config command: " << command;
-        dcomm.sendCommand(command);
-
-        reconfigureDaemon(); // Set up timer
+            reconfigureDaemon(); // Set up timer
+        }
     } else
         qCritical() << "Daemon is not connected, therefore it can't be configured";
 }
@@ -72,7 +76,7 @@ void dXorg::reconfigureDaemon() { // Set up the timer
         qDebug() << "Configuring daemon timer";
         QString command;
 
-        if (globalStuff::globalConfig.daemonAutoRefresh){ // SIGNAL_TIMER_ON + SEPARATOR + INTERVAL + SEPARATOR
+        if (globalStuff::globalConfig.daemonAutoRefresh) { // SIGNAL_TIMER_ON + SEPARATOR + INTERVAL + SEPARATOR
             command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR); // Enable timer
             command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR); // Set timer interval
         }

@@ -35,12 +35,12 @@ class dXorg
         deviceSysFsStruct() { }
 
         deviceSysFsStruct(const QString &devicePath) {
-            power_method = devicePath + "/power_method";
-            power_profile = devicePath + "/power_profile";
-            power_dpm_state = devicePath + "/power_dpm_state";
-            power_dpm_force_performance_level = devicePath + "/power_dpm_force_performance_level";
-            pp_sclk_od = devicePath + "/pp_sclk_od";
-            pp_mclk_od = devicePath + "/pp_mclk_od";
+            power_method = devicePath + "power_method";
+            power_profile = devicePath + "power_profile";
+            power_dpm_state = devicePath + "power_dpm_state";
+            power_dpm_force_performance_level = devicePath + "power_dpm_force_performance_level";
+            pp_sclk_od = devicePath + "pp_sclk_od";
+            pp_mclk_od = devicePath + "pp_mclk_od";
 
             if (!QFile::exists(power_method))
                 power_method = "";

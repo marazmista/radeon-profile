@@ -69,9 +69,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     connect(&initFuture, SIGNAL(finished()), this,  SLOT(initFutureHandler()));
     initFuture.setFuture(QtConcurrent::run(this, &radeon_profile::refreshGpuData));
 
-    if (ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
-        on_btn_applyOverclock_clicked();
-
     // timer init
     timer = new QTimer(this);
     timer->setInterval(ui->spin_timerInterval->value()*1000);
@@ -107,6 +104,7 @@ void radeon_profile::connectSignals()
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(changePowerLevelFromCombo()));
+
 
     connect(&dpmGroup, SIGNAL(buttonClicked(int)), this, SLOT(changePowerLevel(int)));
 
@@ -296,8 +294,12 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM))
         ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo());
 
-    ui->configGroups->setTabEnabled(2,device.daemonConnected() && device.getDriverFeatures().clocksSource == ClocksDataSource::PM_FILE);
-    ui->mainTabs->setTabEnabled(2,features.ocCoreAvailable);
+    ui->configGroups->setTabEnabled(1,device.daemonConnected() && device.getDriverFeatures().clocksSource == ClocksDataSource::PM_FILE);
+
+    if (features.canChangeProfile && features.ocCoreAvailable && ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
+        on_btn_applyOverclock_clicked();
+
+    ui->mainTabs->setTabEnabled(2,features.ocCoreAvailable && features.canChangeProfile);
 }
 
 void radeon_profile::refreshGpuData() {
