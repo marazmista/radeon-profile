@@ -4,9 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network widgets charts
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
+QT       += core gui network widgets charts printsupport
 
 TARGET = radeon-profile
 TEMPLATE = app
@@ -41,7 +39,8 @@ SOURCES += main.cpp\
     dialog_rpevent.cpp \
     eventsTab.cpp \
     fanControlTab.cpp \
-    dialog_defineplot.cpp
+    dialog_defineplot.cpp \
+    plotsTab.cpp
 
 HEADERS  += radeon_profile.h \
     gpu.h \

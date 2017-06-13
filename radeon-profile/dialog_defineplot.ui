@@ -34,12 +34,6 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="maximumSize">
-    <size>
-     <width>16777215</width>
-     <height>20</height>
-    </size>
-   </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
@@ -109,6 +103,9 @@
       <property name="value">
        <number>4</number>
       </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -164,7 +161,7 @@
       </column>
       <column>
        <property name="text">
-        <string>Line color</string>
+        <string>Color</string>
        </property>
       </column>
      </widget>
@@ -275,6 +272,9 @@
       <property name="value">
        <number>4</number>
       </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -310,7 +310,7 @@
       </column>
       <column>
        <property name="text">
-        <string>Line color</string>
+        <string>Color</string>
        </property>
       </column>
      </widget>
@@ -329,7 +329,7 @@
     <rect>
      <x>10</x>
      <y>60</y>
-     <width>181</width>
+     <width>271</width>
      <height>18</height>
     </rect>
    </property>
@@ -342,7 +342,7 @@
     <rect>
      <x>290</x>
      <y>60</y>
-     <width>112</width>
+     <width>271</width>
      <height>18</height>
     </rect>
    </property>
@@ -355,15 +355,9 @@
     <rect>
      <x>290</x>
      <y>30</y>
-     <width>141</width>
+     <width>171</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>16777215</width>
-     <height>20</height>
-    </size>
    </property>
    <property name="text">
     <string>Set background color</string>

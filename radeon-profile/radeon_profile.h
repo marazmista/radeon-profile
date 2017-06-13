@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20161221
+#define appVersion 20170613
 
 namespace Ui {
 class radeon_profile;
@@ -130,21 +130,13 @@ private slots:
     void on_btn_saveAll_clicked();
     void changePowerLevel(int level);
     void on_btn_configurePlots_clicked();
-
     void on_btn_applySavePlotsDefinitons_clicked();
-
     void on_btn_addPlotDefinition_clicked();
-
     void on_btn_removePlotDefinition_clicked();
-
     void on_btn_modifyPlotDefinition_clicked();
-
     void on_btn_cancelEditPlots_clicked();
-
     void on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, int column);
-
     void on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
     void on_slider_timeRange_valueChanged(int value);
 
 private:
@@ -154,6 +146,7 @@ private:
         short fanIndex;
         QString fanProfileName;
     };
+
     gpu device;
     static const QString settingsPath;
     QList<execBin*> execsRunning;
@@ -161,7 +154,7 @@ private:
     QMap<QString, fanProfileSteps> fanProfiles;
     QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
-    unsigned int rangeX, ticksCounter, statsTickCounter;
+    unsigned int ticksCounter, statsTickCounter;
     QButtonGroup pwmGroup, dpmGroup;
 	currentStateInfo *savedState;
     QFutureWatcher<void> initFuture;

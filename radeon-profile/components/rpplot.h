@@ -92,6 +92,7 @@ public:
         tmpax->setLabelsColor(p.color());
         tmpax->setTitleBrush(p.brush());
         tmpax->setTickCount(ticks);
+        tmpax->setTitleText(globalStuff::getNameOfUnit(u));
 
         if (a == Qt::AlignRight)
             axisRight = tmpax;
@@ -184,8 +185,8 @@ public:
     PlotManager() {
     }
 
-    void setRightGap(bool setting) {
-        rightGap = (setting) ? 10 : 0;
+    void setRightGap(bool enabled) {
+        rightGap = (enabled) ? 10 : 0;
     }
 
     void setTimeRange(int range) {
@@ -288,11 +289,9 @@ public:
 
         if (p->axisLeft != nullptr && p->axisLeft->unit == tmpUnit) {
             p->setInitialScale(p->axisLeft, tmpUnit);
-            plots[name]->axisLeft->setTitleText(ds->name());
             ds->attachAxis(plots[name]->axisLeft);
         } else if (p->axisRight != nullptr && p->axisRight->unit == tmpUnit) {
             p->setInitialScale(p->axisRight, tmpUnit);
-            plots[name]->axisRight->setTitleText(ds->name());
             ds->attachAxis(p->axisRight);
         } else {
             delete ds;

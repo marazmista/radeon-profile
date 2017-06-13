@@ -278,8 +278,23 @@ public:
             case ValueID::GPU_USAGE_PERCENT:  return QObject::tr("GPU usage [%]");
             case ValueID::GPU_VRAM_USAGE_PERCENT:  return QObject::tr("GPU Vram usage [%]");
             case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed [rpm]");
-            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature [C]");
+            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature [")+QString::fromUtf8("\u00B0C]");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram usage [MB]");
+            default:
+                break;
+        }
+
+        return "";
+    }
+
+    static QString getNameOfUnit(ValueUnit u) {
+        switch (u) {
+            case ValueUnit::MEGAHERTZ: return QObject::tr("Megahertz [MHz]");
+            case ValueUnit::MEGABYTE: return QObject::tr("Megabyte [MB]");
+            case ValueUnit::PERCENT: return QObject::tr("Percent [%]");
+            case ValueUnit::MILIVOLT: return QObject::tr("Milivolt [mV]");
+            case ValueUnit::CELSIUS: return QObject::tr("Temperature [")+QString::fromUtf8("\u00B0C]");
+            case ValueUnit::RPM: return QObject::tr("Speed [RPM]");
             default:
                 break;
         }
