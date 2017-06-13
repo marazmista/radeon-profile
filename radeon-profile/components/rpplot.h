@@ -12,14 +12,21 @@
 class PlotManager;
 class RPPlot;
 
+struct PlotAxisSchema {
+    bool enabled = false;
+    ValueUnit unit;
+    QPen penGrid;
+    int ticks;
+
+    QMap<ValueID, QColor> dataList;
+};
+
 struct PlotDefinitionSchema {
     QString name;
-    bool enabled, enableLeft = false, enableRight = false;
+    bool enabled;
     QColor background;
-    ValueUnit unitLeft, unitRight;
-    QPen penGridLeft, penGridRight;
 
-    QMap<ValueID, QColor> dataListLeft, dataListRight;
+    PlotAxisSchema left, right;
 };
 
 class YAxis : public QValueAxis {
@@ -79,11 +86,12 @@ public:
         delete axisRight;
     }
 
-    void addAxis(const Qt::Alignment &a, const ValueUnit &u, const QPen &p) {
+    void addAxis(const Qt::Alignment &a, const ValueUnit &u, const QPen &p, const int ticks) {
         YAxis *tmpax = new YAxis(u, this);
         tmpax->setGridLinePen(p);
         tmpax->setLabelsColor(p.color());
         tmpax->setTitleBrush(p.brush());
+        tmpax->setTickCount(ticks);
 
         if (a == Qt::AlignRight)
             axisRight = tmpax;
@@ -196,6 +204,15 @@ public:
             removePlot(name);
     }
 
+    void createAxis(RPPlot *plot, const PlotAxisSchema &pas, Qt::Alignment align) {
+        plot->addAxis(align, pas.unit, pas.penGrid, pas.ticks);
+
+        for (const ValueID &id : pas.dataList.keys()) {
+            if (addSeries(plot->name, id))
+                setLineColor(plot->name, id, pas.dataList.value(id));
+        }
+    }
+
     void createPlotFromSchema(const QString &name) {
         PlotDefinitionSchema pds = schemas.value(name);
 
@@ -205,22 +222,11 @@ public:
 
         setPlotBackground(rpp->name, pds.background);
 
-        if (pds.enableLeft) {
-            rpp->addAxis(Qt::AlignLeft, pds.unitLeft, pds.penGridLeft);
+        if (pds.left.enabled)
+            createAxis(rpp, pds.left, Qt::AlignLeft);
 
-            for (const ValueID &id : pds.dataListLeft.keys()) {
-                if (addSeries(rpp->name, id))
-                    setLineColor(rpp->name, id, pds.dataListLeft.value(id));
-            }
-        }
-
-        if (pds.enableRight) {
-            rpp->addAxis(Qt::AlignRight, pds.unitRight, pds.penGridRight);
-
-            for (const ValueID &id : pds.dataListRight.keys()) {
-                if (addSeries(rpp->name, id))
-                    setLineColor(rpp->name, id, pds.dataListRight.value(id));
-            }
+        if (pds.right.enabled) {
+            createAxis(rpp, pds.right, Qt::AlignRight);
         }
     }
 

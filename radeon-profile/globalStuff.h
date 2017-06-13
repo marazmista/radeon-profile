@@ -126,15 +126,16 @@ struct GPUPwmStruct {
 
 struct GPUUsageStruct {
     float gpuUsage;
-    long gpuVramUsagePercent, gpuVramUsage;
+    long gpuVRAMUsagePercent, gpuVRAMUsage;
 
     GPUUsageStruct() {
-        gpuUsage = gpuVramUsage = gpuVramUsagePercent = -1;
+        gpuUsage = gpuVRAMUsage = gpuVRAMUsagePercent = -1;
     }
 };
 
 struct GPUConstParams {
-     int pwmMaxSpeed, maxCoreClock = -1, maxMemClock = -1, vRamSize = -1;
+     int pwmMaxSpeed, maxCoreClock = -1, maxMemClock = -1;
+     long VRAMSize = -1;
 };
 
 // class for values that are plottable

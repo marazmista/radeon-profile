@@ -216,6 +216,8 @@ private:
     void loadFanProfile(QXmlStreamReader &xml);
     void savePlotSchemas(QXmlStreamWriter &xml);
     void loadPlotSchemas(QXmlStreamReader &xml);
+    void writePlotAxisSchemaToXml(QXmlStreamWriter &xml, const QString side, const PlotAxisSchema &pas);
+    void loadPlotAxisSchema(const QXmlStreamReader &xml, PlotAxisSchema &pas);
     void createDefaultFanProfile();
     void loadExecProfiles();
     void setupUiElements();

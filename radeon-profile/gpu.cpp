@@ -148,16 +148,16 @@ void gpu::defineAvailableDataContainer() {
     }
 
 
-    GPUUsageStruct tmpUsage = driverHandler->getGpuUsage();
+    GPUUsageStruct tmpUsage = driverHandler->getGPUUsage();
 
     if (tmpUsage.gpuUsage != -1)
          gpuData.insert(ValueID::GPU_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuUsage));
 
-    if (tmpUsage.gpuVramUsage != -1)
-         gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsage));
+    if (tmpUsage.gpuVRAMUsage != -1)
+         gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVRAMUsage));
 
-    if (tmpUsage.gpuVramUsagePercent != -1)
-         gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsagePercent));
+    if (tmpUsage.gpuVRAMUsagePercent != -1)
+         gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVRAMUsagePercent));
 }
 
 void gpu::getClocks() {
@@ -202,7 +202,7 @@ void gpu::getTemperature() {
 void gpu::getGpuUsage() {
 
     // getting gpu usage seems to be heavy and cause ui lag, so it is done in another thread
-    futureGpuUsage.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGpuUsage));
+    futureGpuUsage.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGPUUsage));
 }
 
 QList<QTreeWidgetItem *> gpu::getModuleInfo() const {

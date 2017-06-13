@@ -131,6 +131,26 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
     xml.writeEndElement();
 }
 
+void radeon_profile::writePlotAxisSchemaToXml(QXmlStreamWriter &xml, const QString side, const PlotAxisSchema &pas) {
+    xml.writeStartElement("axis");
+    xml.writeAttribute("align", side);
+    xml.writeAttribute("enabled", QString::number(pas.enabled));
+    xml.writeAttribute("unit", QString::number(pas.unit));
+    xml.writeAttribute("ticks", QString::number(pas.ticks));
+    xml.writeAttribute("penStyle", QString::number(pas.penGrid.style()));
+    xml.writeAttribute("penWidth", QString::number(pas.penGrid.width()));
+    xml.writeAttribute("penColor", pas.penGrid.color().name());
+    xml.writeEndElement();
+
+    for (const ValueID &sk : pas.dataList.keys()) {
+        xml.writeStartElement("serie");
+        xml.writeAttribute("align", side);
+        xml.writeAttribute("id", QString::number(sk));
+        xml.writeAttribute("color", pas.dataList.value(sk).name());
+        xml.writeEndElement();
+    }
+}
+
 void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
     xml.writeStartElement("Plots");
 
@@ -140,43 +160,14 @@ void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
         xml.writeStartElement("plot");
         xml.writeAttribute("name", k);
         xml.writeAttribute("enabled", QString::number(pds.enabled));
-        xml.writeAttribute("enableLeft", QString::number(pds.enableLeft));
-        xml.writeAttribute("enableRight", QString::number(pds.enableRight));
-
         xml.writeAttribute("background", pds.background.name());
-        xml.writeAttribute("unitLeft", QString::number(pds.unitLeft));
-        xml.writeAttribute("unitRight", QString::number(pds.unitRight));
 
-        xml.writeStartElement("penGrid");
-        xml.writeAttribute("align", "left");
-        xml.writeAttribute("style", QString::number(pds.penGridLeft.style()));
-        xml.writeAttribute("width", QString::number(pds.penGridLeft.width()));
-        xml.writeAttribute("color", pds.penGridLeft.color().name());
-        xml.writeEndElement();
+        writePlotAxisSchemaToXml(xml, "left", pds.left);
+        writePlotAxisSchemaToXml(xml, "right", pds.right);
 
-        xml.writeStartElement("penGrid");
-        xml.writeAttribute("align", "right");
-        xml.writeAttribute("style", QString::number(pds.penGridRight.style()));
-        xml.writeAttribute("width", QString::number(pds.penGridRight.width()));
-        xml.writeAttribute("color", pds.penGridRight.color().name());
-        xml.writeEndElement();
-
-        for (const ValueID &sk : pds.dataListLeft.keys()) {
-            xml.writeStartElement("serie");
-            xml.writeAttribute("align", "left");
-            xml.writeAttribute("id", QString::number(sk));
-            xml.writeAttribute("color", pds.dataListLeft.value(sk).name());
-            xml.writeEndElement();
-        }
-        for (const ValueID &sk : pds.dataListRight.keys()) {
-            xml.writeStartElement("serie");
-            xml.writeAttribute("align", "right");
-            xml.writeAttribute("id", QString::number(sk));
-            xml.writeAttribute("color", pds.dataListRight.value(sk).name());
-            xml.writeEndElement();
-        }
         xml.writeEndElement();
     }
+
     xml.writeEndElement();
 }
 
@@ -335,34 +326,37 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     ui->list_events->addTopLevelItem(item);
 }
 
+void radeon_profile::loadPlotAxisSchema(const QXmlStreamReader &xml, PlotAxisSchema &pas) {
+    pas.unit = static_cast<ValueUnit>(xml.attributes().value("unit").toInt());
+    pas.ticks = xml.attributes().value("ticks").toInt();
+    pas.enabled = xml.attributes().value("enabled").toInt();
+
+    pas.penGrid = QPen(QColor(xml.attributes().value("penColor").toString()),
+                      xml.attributes().value("penWidth").toInt(),
+                      static_cast<Qt::PenStyle>(xml.attributes().value("penStyle").toInt()));
+}
+
 void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
     PlotDefinitionSchema pds;
     pds.name = xml.attributes().value("name").toString();
     pds.enabled = xml.attributes().value("enabled").toInt();
     pds.background = QColor(xml.attributes().value("background").toString());
-    pds.enableLeft = xml.attributes().value("enableLeft").toInt();
-    pds.enableRight = xml.attributes().value("enableRight").toInt();
-    pds.unitLeft = static_cast<ValueUnit>(xml.attributes().value("unitLeft").toInt());
-    pds.unitRight = static_cast<ValueUnit>(xml.attributes().value("unitRight").toInt());
 
     while (xml.readNext()) {
-        if (xml.name().toString() == "penGrid") {
-            if (xml.attributes().value("align") == "left") {
-                pds.penGridLeft = QPen(QColor(xml.attributes().value("color").toString()),
-                                       xml.attributes().value("width").toInt(),
-                                       static_cast<Qt::PenStyle>(xml.attributes().value("style").toInt()));
-            } else if (xml.attributes().value("align") == "right") {
-                pds.penGridRight = QPen(QColor(xml.attributes().value("color").toString()),
-                                        xml.attributes().value("width").toInt(),
-                                        static_cast<Qt::PenStyle>(xml.attributes().value("style").toInt()));
-            }
+        if (xml.name().toString() == "axis") {
+
+            if (xml.attributes().value("align") == "left")
+                loadPlotAxisSchema(xml, pds.left);
+            else if (xml.attributes().value("align") == "right")
+                loadPlotAxisSchema(xml, pds.right);
+
         }
 
         if (xml.name().toString() == "serie") {
             if (xml.attributes().value("align").toString() == "left")
-                pds.dataListLeft.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+                pds.left.dataList.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
             else if (xml.attributes().value("align").toString() == "right")
-                pds.dataListRight.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+                pds.right.dataList.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
 
         }
 

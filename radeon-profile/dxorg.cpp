@@ -295,12 +295,12 @@ float dXorg::getTemperature() {
     return temp.toFloat();
 }
 
-GPUUsageStruct dXorg::getGpuUsage() {
+GPUUsageStruct dXorg::getGPUUsage() {
     GPUUsageStruct data;
 
     ioctlHnd->getGpuUsage(&data.gpuUsage);
-    ioctlHnd->getVramUsagePercentage(&data.gpuVramUsagePercent);
-    ioctlHnd->getVramUsage(&data.gpuVramUsage);
+    ioctlHnd->getVramUsagePercentage(&data.gpuVRAMUsagePercent);
+    ioctlHnd->getVramUsage(&data.gpuVRAMUsage);
 
     return data;
 }
@@ -687,6 +687,7 @@ GPUConstParams dXorg::getGpuConstParams() {
     if (ioctlHnd != nullptr && ioctlHnd->isValid()) {
         ioctlHnd->getMaxCoreClock(&params.maxCoreClock);
         ioctlHnd->getMaxMemoryClock(&params.maxMemClock);
+        ioctlHnd->getVramSize(&params.VRAMSize);
     }
 
     return params;

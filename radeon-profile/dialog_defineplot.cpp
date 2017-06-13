@@ -23,22 +23,25 @@ void Dialog_definePlot::setEditedPlotSchema(const PlotDefinitionSchema &pds) {
 
     ui->line_name->setText(schema.name);
 
-    ui->cb_enableLeftScale->setChecked(schema.enableLeft);
-    ui->cb_enableRightScale->setChecked(schema.enableRight);
-    on_cb_enableLeftScale_clicked(schema.enableLeft);
-    on_cb_enableRightScale_clicked(schema.enableRight);
+    ui->cb_enableLeftScale->setChecked(schema.left.enabled);
+    ui->cb_enableRightScale->setChecked(schema.right.enabled);
+    on_cb_enableLeftScale_clicked(schema.left.enabled);
+    on_cb_enableRightScale_clicked(schema.right.enabled);
 
     ui->widget_background->setPalette(QPalette(schema.background));
-    ui->widget_leftGridColor->setPalette(QPalette(schema.penGridLeft.color()));
-    ui->spin_leftLineThickness->setValue(schema.penGridLeft.width());
-    ui->widget_rightGridColor->setPalette(QPalette(schema.penGridRight.color()));
-    ui->spin_rightLineThickness->setValue(schema.penGridRight.width());
+    ui->widget_leftGridColor->setPalette(QPalette(schema.left.penGrid.color()));
+    ui->slider_thickLeft->setValue(schema.left.penGrid.width());
+    ui->widget_rightGridColor->setPalette(QPalette(schema.right.penGrid.color()));
+    ui->slider_thickRight->setValue(schema.right.penGrid.width());
 
-    ui->combo_leftScaleStyle->setCurrentIndex(ui->combo_leftScaleStyle->findData(QVariant::fromValue(schema.penGridLeft.style())));
-    ui->combo_rightScaleStyle->setCurrentIndex(ui->combo_rightScaleStyle->findData(QVariant::fromValue(schema.penGridRight.style())));
+    ui->slider_ticksLeft->setValue(schema.left.ticks);
+    ui->slider_ticksRight->setValue(schema.right.ticks);
 
-    loadListFromSchema(ui->list_leftData, schema.dataListLeft);
-    loadListFromSchema(ui->list_rightData, schema.dataListRight);
+    ui->combo_leftScaleStyle->setCurrentIndex(ui->combo_leftScaleStyle->findData(QVariant::fromValue(schema.left.penGrid.style())));
+    ui->combo_rightScaleStyle->setCurrentIndex(ui->combo_rightScaleStyle->findData(QVariant::fromValue(schema.right.penGrid.style())));
+
+    loadListFromSchema(ui->list_leftData, schema.left.dataList);
+    loadListFromSchema(ui->list_rightData, schema.right.dataList);
 }
 
 Dialog_definePlot::~Dialog_definePlot()
@@ -102,33 +105,36 @@ void Dialog_definePlot::on_buttonBox_accepted()
         return;
     }
 
-    if ((schema.dataListLeft.count() == 0 && schema.dataListRight.count() == 0) ||
+    if ((schema.left.dataList.count() == 0 && schema.right.dataList.count() == 0) ||
             (!ui->cb_enableLeftScale->isChecked() && !ui->cb_enableRightScale->isChecked())) {
         QMessageBox::information(this, tr("Info"), tr("Cannot create empty plot."));
         return;
     }
 
     schema.background = ui->widget_background->palette().background().color();
-    schema.enableLeft = ui->cb_enableLeftScale->isChecked();
-    schema.enableRight = ui->cb_enableRightScale->isChecked();
     schema.name = ui->line_name->text();
+    schema.left.enabled = ui->cb_enableLeftScale->isChecked();
+    schema.right.enabled = ui->cb_enableRightScale->isChecked();
+    schema.left.ticks = ui->slider_ticksLeft->value();
+    schema.right.ticks = ui->slider_ticksRight->value();
 
-    if (schema.dataListLeft.count() > 0)
-        schema.unitLeft = globalStuff::getUnitFomValueId(schema.dataListLeft.keys()[0]);
+
+    if (schema.left.dataList.count() > 0)
+        schema.left.unit = globalStuff::getUnitFomValueId(schema.left.dataList.keys()[0]);
     else
-        schema.enableLeft = false;
+        schema.left.enabled = false;
 
-    if (schema.dataListRight.count() > 0)
-        schema.unitRight = globalStuff::getUnitFomValueId(schema.dataListRight.keys()[0]);
+    if (schema.right.dataList.count() > 0)
+        schema.right.unit = globalStuff::getUnitFomValueId(schema.right.dataList.keys()[0]);
     else
-        schema.enableRight = false;
+        schema.right.enabled = false;
 
-    schema.penGridLeft = QPen(ui->widget_leftGridColor->palette().background().color(),
-                              ui->spin_leftLineThickness->value(),
+    schema.left.penGrid = QPen(ui->widget_leftGridColor->palette().background().color(),
+                              ui->slider_thickLeft->value(),
                               static_cast<Qt::PenStyle>(ui->combo_leftScaleStyle->currentData().toInt()));
 
-    schema.penGridRight = QPen(ui->widget_rightGridColor->palette().background().color(),
-                              ui->spin_rightLineThickness->value(),
+    schema.right.penGrid = QPen(ui->widget_rightGridColor->palette().background().color(),
+                              ui->slider_thickRight->value(),
                               static_cast<Qt::PenStyle>(ui->combo_rightScaleStyle->currentData().toInt()));
 
     schema.enabled = true;
@@ -187,14 +193,14 @@ void Dialog_definePlot::on_cb_enableLeftScale_clicked(bool checked)
 {
     ui->widget_left->setVisible(checked);
     if (!checked)
-        schema.dataListLeft.clear();
+        schema.left.dataList.clear();
 }
 
 void Dialog_definePlot::on_cb_enableRightScale_clicked(bool checked)
 {
     ui->widget_right->setVisible(checked);
     if (!checked)
-        schema.dataListRight.clear();
+        schema.right.dataList.clear();
 }
 
 void Dialog_definePlot::addSelectedItemToSchema(int itemIndex, QTreeWidgetItem *item , QMap<ValueID, QColor> &schemaDataList) {
@@ -212,10 +218,12 @@ void Dialog_definePlot::addSelectedItemToSchema(int itemIndex, QTreeWidgetItem *
 
 void Dialog_definePlot::on_list_leftData_itemChanged(QTreeWidgetItem *item, int column)
 {
-    addSelectedItemToSchema(ui->list_leftData->indexOfTopLevelItem(item), item, schema.dataListLeft);
+    Q_UNUSED(column);
+    addSelectedItemToSchema(ui->list_leftData->indexOfTopLevelItem(item), item, schema.left.dataList);
 }
 
 void Dialog_definePlot::on_list_rightData_itemChanged(QTreeWidgetItem *item, int column)
 {
-    addSelectedItemToSchema(ui->list_rightData->indexOfTopLevelItem(item), item, schema.dataListRight);
+    Q_UNUSED(column);
+    addSelectedItemToSchema(ui->list_rightData->indexOfTopLevelItem(item), item, schema.right.dataList);
 }

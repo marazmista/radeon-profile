@@ -69,10 +69,10 @@ private slots:
             gpuData[ValueID::GPU_USAGE_PERCENT].setValue(tmp.gpuUsage);
 
         if (gpuData.contains(ValueID::GPU_VRAM_USAGE_MB))
-            gpuData[ValueID::GPU_VRAM_USAGE_MB].setValue(tmp.gpuVramUsage);
+            gpuData[ValueID::GPU_VRAM_USAGE_MB].setValue(tmp.gpuVRAMUsage);
 
         if (gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
-            gpuData[ValueID::GPU_VRAM_USAGE_PERCENT].setValue(tmp.gpuVramUsagePercent);
+            gpuData[ValueID::GPU_VRAM_USAGE_PERCENT].setValue(tmp.gpuVRAMUsagePercent);
         }
     }
 
