@@ -158,6 +158,8 @@ void radeon_profile::createTopBar()
         topBarPies.insert(3, gpuVramUsagePie);
         ui->grid_topbar->addWidget(gpuVramUsagePie,0,5,2,1,Qt::AlignLeft);
     }
+
+    ui->grid_topbar->setColumnStretch(ui->grid_topbar->columnCount()-1, 1);
 }
 
 void radeon_profile::addRuntimeWidgets() {
@@ -229,6 +231,7 @@ void radeon_profile::addRuntimeWidgets() {
     fanSeries->setPointsVisible(true);
 
     ui->verticalLayout_22->addWidget(fanProfileChart);
+
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
