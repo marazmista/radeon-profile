@@ -63,7 +63,6 @@ bool radeonIoctlHandler::getMaxCoreClock(int *data) const {
 #endif
 }
 
-
 bool radeonIoctlHandler::getMaxMemoryClock(int *data) const {
     qDebug() << "radeonIoctlHandler::getMaxMemoryClock() is not available";
     return false;
@@ -100,6 +99,9 @@ bool radeonIoctlHandler::getVramUsage(long *data) const {
 #endif
 }
 
+bool radeonIoctlHandler::getGpuUsage(float *data) const {
+    return ioctlHandler::getGpuUsage(data, 500000, 150);
+}
 
 bool radeonIoctlHandler::getVramSize(long *data) const {
 #ifdef DRM_IOCTL_RADEON_GEM_INFO

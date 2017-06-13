@@ -192,7 +192,7 @@ public:
     bool getTemperature(int *data) const;
     bool getVramSize(long *data) const;
     bool getVramUsage(long *data) const;
-    bool getGpuUsage(float *data) const { return false; }
+    bool getGpuUsage(float *data) const;
 };
 
 
