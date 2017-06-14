@@ -34,7 +34,7 @@ bool amdgpuIoctlHandler::getSensorValue(void *data, unsigned dataSize, unsigned 
 
 
 /**
- * @see https://cgit.freedesktop.org/mesa/drm/tree/include/drm/amdgpu_drm.h#n437
+ * @see https://cgit.freedesktop.org/mesa/drm/tree/include/drm/amdgpu_drm.h#n535
  * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/amdgpu_drm.h#n471
  */
 bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned command) const {
@@ -77,8 +77,7 @@ bool amdgpuIoctlHandler::getCoreClock(int *data) const {
 #ifdef AMDGPU_INFO_SENSOR_GFX_SCLK
     return getSensorValue(data, sizeof(data), AMDGPU_INFO_SENSOR_GFX_SCLK);
 #else
-    Q_UNUSED(data);
-    return false;
+    return getClocks(data, NULL);
 #endif
 }
 
@@ -115,8 +114,7 @@ bool amdgpuIoctlHandler::getMemoryClock(int *data) const {
 #ifdef  AMDGPU_INFO_SENSOR_GFX_MCLK
     return getSensorValue(data, sizeof(data), AMDGPU_INFO_SENSOR_GFX_MCLK);
 #else
-    Q_UNUSED(data);
-    return false;
+    return getClocks(NULL, data);
 #endif
 }
 
