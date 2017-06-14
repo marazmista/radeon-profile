@@ -134,7 +134,7 @@ struct GPUUsageStruct {
 };
 
 struct GPUConstParams {
-     int pwmMaxSpeed, maxCoreClock = -1, maxMemClock = -1;
+     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1;
      long VRAMSize = -1;
 };
 

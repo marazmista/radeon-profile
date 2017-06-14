@@ -131,7 +131,7 @@ void gpu::defineAvailableDataContainer() {
 
     GPUPwmStruct tmpPWm = driverHandler->getPwmSpeed();
 
-    if (tmpPWm.pwmSpeed != -1)
+    if (tmpPWm.pwmSpeed != -1 && gpuParams.pwmMaxSpeed != -1)
         gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, ((float)tmpPWm.pwmSpeed / gpuParams.pwmMaxSpeed ) * 100));
 
     if (tmpPWm.pwmSpeedRpm != -1)
@@ -255,7 +255,8 @@ void gpu::setForcePowerLevel(ForcePowerLevels _newForcePowerLevel) {
 }
 
 void gpu::setPwmValue(unsigned int value) {
-    driverHandler->setPwmValue(gpuParams.pwmMaxSpeed * value / 100);
+    if(gpuParams.pwmMaxSpeed != -1)
+        driverHandler->setPwmValue(gpuParams.pwmMaxSpeed * value / 100);
 }
 
 void gpu::setPwmManualControl(bool manual) {
@@ -265,7 +266,8 @@ void gpu::setPwmManualControl(bool manual) {
 void gpu::getPwmSpeed() {
     GPUPwmStruct tmp = driverHandler->getPwmSpeed();
 
-    gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, ((float)tmp.pwmSpeed / gpuParams.pwmMaxSpeed ) * 100));
+    if(gpuParams.pwmMaxSpeed != -1)
+        gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, ((float)tmp.pwmSpeed / gpuParams.pwmMaxSpeed ) * 100));
     gpuData.insert(ValueID::FAN_SPEED_RPM, RPValue(ValueUnit::RPM, tmp.pwmSpeedRpm));
 }
 
