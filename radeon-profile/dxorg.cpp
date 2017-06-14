@@ -555,7 +555,7 @@ GPUPwmStruct dXorg::getPwmSpeed() {
 
     QFile f(hwmonAttributes.pwm1);
 
-    if (f.open(QIODevice::ReadOnly)) {
+    if (f.exists() && f.open(QIODevice::ReadOnly)) {
        tmp.pwmSpeed = QString(f.readLine(4)).toInt();
        f.close();
     }
