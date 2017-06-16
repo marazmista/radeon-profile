@@ -77,7 +77,8 @@ bool amdgpuIoctlHandler::getCoreClock(int *data) const {
 #ifdef AMDGPU_INFO_SENSOR_GFX_SCLK
     return getSensorValue(data, sizeof(data), AMDGPU_INFO_SENSOR_GFX_SCLK);
 #else
-    return getClocks(data, NULL);
+    Q_UNUSED(data);
+    return false;
 #endif
 }
 
@@ -114,7 +115,8 @@ bool amdgpuIoctlHandler::getMemoryClock(int *data) const {
 #ifdef  AMDGPU_INFO_SENSOR_GFX_MCLK
     return getSensorValue(data, sizeof(data), AMDGPU_INFO_SENSOR_GFX_MCLK);
 #else
-    return getClocks(NULL, data);
+    Q_UNUSED(data);
+    return false;
 #endif
 }
 
