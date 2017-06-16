@@ -271,7 +271,7 @@ public:
     static QString getNameOfValueID(ValueID u) {
         switch (u) {
             case ValueID::CLK_CORE: return QObject::tr("Core clock [MHz]");
-            case ValueID::CLK_MEM:  return QObject::tr("Meomory clock [MHz]");
+            case ValueID::CLK_MEM:  return QObject::tr("Memory clock [MHz]");
             case ValueID::VOLT_CORE:  return QObject::tr("Core volt [mV]");
             case ValueID::VOLT_MEM:  return QObject::tr("Memory volt [mV]");
             case ValueID::FAN_SPEED_PERCENT:  return QObject::tr("Fan speed [%]");
