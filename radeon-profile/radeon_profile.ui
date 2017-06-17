@@ -268,7 +268,6 @@
        <zorder>btn_dpmPerformance</zorder>
        <zorder>combo_pLevel</zorder>
        <zorder>btn_fanControl</zorder>
-       <zorder>verticalSpacer_5</zorder>
       </widget>
       <widget class="QWidget" name="pageProfile">
        <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -1084,7 +1083,6 @@
                  </item>
                 </layout>
                 <zorder>cb_plotsRightGap</zorder>
-                <zorder>verticalSpacer_7</zorder>
                </widget>
               </item>
               <item row="5" column="3">
