@@ -98,8 +98,8 @@ ioctlHandler::~ioctlHandler(){
 bool ioctlHandler::getGpuUsage(float *data, int time, int frequency) const {
 #define ONE_SECOND 1000000
     const unsigned int sleep = ONE_SECOND/frequency;
-    unsigned int slept, activeCount = 0, totalCount = 0;
-    for(slept = 0; slept < time; usleep(sleep), slept+=sleep, totalCount++){
+    unsigned int activeCount = 0, totalCount = 0;
+    for(int slept = 0; slept < time; usleep(sleep), slept+=sleep, totalCount++){
         bool active;
         if(!isCardActive(&active))
             return false; // Read failed, exit
