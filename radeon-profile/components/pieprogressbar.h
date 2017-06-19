@@ -9,6 +9,8 @@
 #include "globalStuff.h"
 #include "ui_pieprogressbar.h"
 
+using namespace QtCharts;
+
 namespace Ui {
 class PieProgressBar;
 }

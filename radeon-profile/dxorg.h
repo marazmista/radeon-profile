@@ -13,6 +13,7 @@
 #include <QList>
 #include <QTreeWidgetItem>
 #include <QSharedMemory>
+#include <QFile>
 
 
 #define SHARED_MEM_SIZE 128

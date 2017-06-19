@@ -9,6 +9,8 @@
 #include "globalStuff.h"
 #include <QDebug>
 
+using namespace QtCharts;
+
 class PlotManager;
 class RPPlot;
 

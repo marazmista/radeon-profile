@@ -134,7 +134,7 @@ struct GPUUsageStruct {
 };
 
 struct GPUConstParams {
-     int pwmMaxSpeed, maxCoreClock = -1, maxMemClock = -1;
+     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1;
      long VRAMSize = -1;
 };
 
@@ -271,7 +271,7 @@ public:
     static QString getNameOfValueID(ValueID u) {
         switch (u) {
             case ValueID::CLK_CORE: return QObject::tr("Core clock [MHz]");
-            case ValueID::CLK_MEM:  return QObject::tr("Meomory clock [MHz]");
+            case ValueID::CLK_MEM:  return QObject::tr("Memory clock [MHz]");
             case ValueID::VOLT_CORE:  return QObject::tr("Core volt [mV]");
             case ValueID::VOLT_MEM:  return QObject::tr("Memory volt [mV]");
             case ValueID::FAN_SPEED_PERCENT:  return QObject::tr("Fan speed [%]");
