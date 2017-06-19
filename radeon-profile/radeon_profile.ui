@@ -263,11 +263,6 @@
          </widget>
         </item>
        </layout>
-       <zorder>btn_dpmBattery</zorder>
-       <zorder>btn_dpmBalanced</zorder>
-       <zorder>btn_dpmPerformance</zorder>
-       <zorder>combo_pLevel</zorder>
-       <zorder>btn_fanControl</zorder>
       </widget>
       <widget class="QWidget" name="pageProfile">
        <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -362,7 +357,7 @@
           <number>5</number>
          </property>
          <property name="horizontalSpacing">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="verticalSpacing">
           <number>2</number>
@@ -1082,7 +1077,6 @@
                   </spacer>
                  </item>
                 </layout>
-                <zorder>cb_plotsRightGap</zorder>
                </widget>
               </item>
               <item row="5" column="3">

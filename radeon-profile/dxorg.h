@@ -127,7 +127,7 @@ public:
 
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure();
-    GPUConstParams getGpuConstParams();
+//    GPUConstParams getGpuConstParams();
     void reconfigureDaemon();
     bool daemonConnected();
     GPUClocksStruct getFeaturesFallback();
@@ -135,6 +135,7 @@ public:
     bool overclock(int percentage);
     void resetOverclock();
     DriverFeatures features;
+    GPUConstParams params;
 
 private:
     QChar gpuSysIndex;
@@ -157,6 +158,7 @@ private:
     QString findSysFsHwmonForGpu();
     bool getIoctlAvailability();
     void figureOutDriverFeatures();
+    void figureOutConstParams();
 };
 
 #endif // DXORG_H

@@ -121,15 +121,15 @@ struct GPUClocksStruct {
 };
 
 struct GPUPwmStruct {
-    int pwmSpeed = 0, pwmSpeedRpm;
+    int pwmSpeed = -1, pwmSpeedRpm = -1;
 };
 
 struct GPUUsageStruct {
     float gpuUsage;
-    long gpuVRAMUsagePercent, gpuVRAMUsage;
+    long gpuVramUsagePercent, gpuVramUsage;
 
     GPUUsageStruct() {
-        gpuUsage = gpuVRAMUsage = gpuVRAMUsagePercent = -1;
+        gpuUsage = gpuVramUsage = gpuVramUsagePercent = -1;
     }
 };
 

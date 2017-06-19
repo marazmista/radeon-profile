@@ -28,7 +28,6 @@ public:
     // main map that has all info available by ValueID
     GPUDataContainer gpuData;
     QList<GPUSysInfo> gpuList;
-    GPUConstParams gpuParams;
 
     char currentGpuIndex;
     QString currentPowerProfile, currentPowerLevel;
@@ -59,6 +58,7 @@ public:
     bool overclock(int value);
     void resetOverclock();
     const DriverFeatures& getDriverFeatures();
+    const GPUConstParams& getGpuConstParams();
     void finalize();
 
 private slots:
@@ -69,10 +69,10 @@ private slots:
             gpuData[ValueID::GPU_USAGE_PERCENT].setValue(tmp.gpuUsage);
 
         if (gpuData.contains(ValueID::GPU_VRAM_USAGE_MB))
-            gpuData[ValueID::GPU_VRAM_USAGE_MB].setValue(tmp.gpuVRAMUsage);
+            gpuData[ValueID::GPU_VRAM_USAGE_MB].setValue(tmp.gpuVramUsage);
 
         if (gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
-            gpuData[ValueID::GPU_VRAM_USAGE_PERCENT].setValue(tmp.gpuVRAMUsagePercent);
+            gpuData[ValueID::GPU_VRAM_USAGE_PERCENT].setValue(tmp.gpuVramUsagePercent);
         }
     }
 

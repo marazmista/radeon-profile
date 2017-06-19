@@ -12,6 +12,7 @@
 dXorg::dXorg(const GPUSysInfo &si) {
     features.sysInfo = si;
     configure();
+    figureOutConstParams();
 }
 
 void dXorg::configure() {
@@ -303,8 +304,8 @@ GPUUsageStruct dXorg::getGPUUsage() {
     GPUUsageStruct data;
 
     ioctlHnd->getGpuUsage(&data.gpuUsage);
-    ioctlHnd->getVramUsagePercentage(&data.gpuVRAMUsagePercent);
-    ioctlHnd->getVramUsage(&data.gpuVRAMUsage);
+    ioctlHnd->getVramUsagePercentage(&data.gpuVramUsagePercent);
+    ioctlHnd->getVramUsage(&data.gpuVramUsage);
 
     return data;
 }
@@ -522,6 +523,8 @@ void dXorg::setForcePowerLevel(ForcePowerLevels _newForcePowerLevel) {
 }
 
 void dXorg::setPwmValue(unsigned int value) {
+    value = params.pwmMaxSpeed * value / 100;
+
     if (daemonConnected()) {
         QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
         command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
@@ -553,14 +556,17 @@ void dXorg::setPwmManualControl(bool manual) {
 GPUPwmStruct dXorg::getPwmSpeed() {
     GPUPwmStruct tmp;
 
+    if (hwmonAttributes.pwm1.isEmpty())
+        return tmp;
+
     QFile f(hwmonAttributes.pwm1);
 
-    if (f.exists() && f.open(QIODevice::ReadOnly)) {
-       tmp.pwmSpeed = QString(f.readLine(4)).toInt();
+    if (f.open(QIODevice::ReadOnly)) {
+       tmp.pwmSpeed = (QString(f.readLine(4)).toFloat() / params.pwmMaxSpeed) * 100;
        f.close();
     }
 
-    if (hwmonAttributes.fan1_input != "") {
+    if (!hwmonAttributes.fan1_input.isEmpty()) {
         f.setFileName(hwmonAttributes.fan1_input);
         if (f.open(QIODevice::ReadOnly)) {
             tmp.pwmSpeedRpm = QString(f.readLine(6)).toInt();
@@ -672,16 +678,10 @@ bool dXorg::getIoctlAvailability() {
     if (ioctlHnd == nullptr || !ioctlHnd->isValid())
         return false;
 
-    int c, m;
-    if (!ioctlHnd->getClocks(&c, &m))
-        return false;
-
     return true;
 }
 
-GPUConstParams dXorg::getGpuConstParams() {
-    GPUConstParams params;
-
+void dXorg::figureOutConstParams() {
     QFile fPwmMax(hwmonAttributes.pwm1_max);
     if (fPwmMax.open(QIODevice::ReadOnly)) {
         params.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
@@ -693,8 +693,6 @@ GPUConstParams dXorg::getGpuConstParams() {
         ioctlHnd->getMaxMemoryClock(&params.maxMemClock);
         ioctlHnd->getVramSize(&params.VRAMSize);
     }
-
-    return params;
 }
 
 GPUClocksStruct dXorg::getFeaturesFallback() {
