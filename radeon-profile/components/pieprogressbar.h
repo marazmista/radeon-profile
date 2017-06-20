@@ -60,17 +60,15 @@ protected:
         f.setFamily("Monospace");
         f.setPointSize(8);
         label.setFont(f);
-        label.setAlignment(Qt::AlignCenter);
 
         QPalette p = this->palette();
         setAutoFillBackground(true);
         p.setColor(QPalette::Background, Qt::black);
 
         chartView = new QChartView(this);
-        chartView->setAlignment(Qt::AlignCenter);
 
-        data.setPieStartAngle(-235);
-        data.setPieEndAngle(90);
+        data.setPieStartAngle(-210);
+        data.setPieEndAngle(130);
         data.setHoleSize(0.32);
 
         data.append("",maxValue / 3);
@@ -99,7 +97,7 @@ protected:
         chartView->setRenderHint(QPainter::Antialiasing);
 
         ui->grid->addWidget(chartView,0,0,Qt::AlignCenter);
-        ui->grid->addWidget(&label,0,0,Qt::AlignBottom | Qt::AlignRight);
+        ui->grid->addWidget(&label,0,0,Qt::AlignBottom | Qt::AlignHCenter);
 //        label.setGeometry(label.geometry().top()-50, label.geometry().left(), label.width(), label.height());
     }
 

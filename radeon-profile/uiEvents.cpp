@@ -320,3 +320,19 @@ void radeon_profile::on_slider_timeRange_valueChanged(int value)
 {
     plotManager.setTimeRange(value);
 }
+
+void radeon_profile::on_cb_daemonData_clicked(bool checked)
+{
+    if (!checked)
+        return;
+
+    if (device.gpuList[ui->combo_gpus->currentIndex()].module == DriverModule::RADEON)
+        return;
+
+    if (checked && !askConfirmation(tr("Question"), tr("Kernel: ") + QSysInfo::kernelVersion()+ "\n" + tr("Module used: ") +
+            device.gpuList[ui->combo_gpus->currentIndex()].driverModuleString + "\n\n" +
+            tr("Checking this option may cause problems and is not recommended when you use Linux 4.12<= and amdgpu module.\n\nDo you want to check it anyway?"))) {
+
+        ui->cb_daemonData->setChecked(false);
+    }
+}

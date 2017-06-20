@@ -226,7 +226,6 @@ void radeon_profile::addRuntimeWidgets() {
     fanSeries->setPointsVisible(true);
 
     ui->verticalLayout_22->addWidget(fanProfileChart);
-
 }
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements

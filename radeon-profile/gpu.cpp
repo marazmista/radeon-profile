@@ -143,19 +143,16 @@ void gpu::defineAvailableDataContainer() {
         gpuData.insert(ValueID::TEMPERATURE_MAX, RPValue(ValueUnit::CELSIUS, tmpTemp));
     }
 
+    GPUUsage tmpUsage = driverHandler->getGPUUsage();
 
-    if (getDriverFeatures().dataSource == DataSource::IOCTL) {
-        GPUUsage tmpUsage = driverHandler->getGPUUsage();
+    if (tmpUsage.gpuUsage != -1)
+        gpuData.insert(ValueID::GPU_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuUsage));
 
-        if (tmpUsage.gpuUsage != -1)
-            gpuData.insert(ValueID::GPU_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuUsage));
+    if (tmpUsage.gpuVramUsage != -1)
+        gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsage));
 
-        if (tmpUsage.gpuVramUsage != -1)
-            gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsage));
-
-        if (tmpUsage.gpuVramUsagePercent != -1)
-            gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsagePercent));
-    }
+    if (tmpUsage.gpuVramUsagePercent != -1)
+        gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsagePercent));
 }
 
 void gpu::getClocks() {
@@ -198,8 +195,6 @@ void gpu::getTemperature() {
 }
 
 void gpu::getGpuUsage() {
-    if (getDriverFeatures().dataSource != DataSource::IOCTL)
-        return;
 
     // getting gpu usage seems to be heavy and cause ui lag, so it is done in another thread
     futureGpuUsage.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGPUUsage));

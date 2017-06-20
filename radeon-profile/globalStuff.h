@@ -66,7 +66,7 @@ enum ForcePowerLevels {
     F_AUTO, F_LOW, F_HIGH
 };
 
-enum class DataSource {
+enum class ClocksDataSource {
     IOCTL, PM_FILE, SOURCE_UNKNOWN
 };
 
@@ -102,7 +102,7 @@ struct DriverFeatures {
     ocMemAvailable = false;
 
     PowerMethod currentPowerMethod;
-    DataSource dataSource;
+    ClocksDataSource clocksDataSource = ClocksDataSource::SOURCE_UNKNOWN;
     TemperatureSensor currentTemperatureSensor;
     GPUSysInfo sysInfo;
 

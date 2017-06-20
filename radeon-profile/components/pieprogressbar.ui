@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>PieProgressBar</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
+  <layout class="QGridLayout" name="grid">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -29,19 +29,6 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <item row="0" column="0">
-    <layout class="QGridLayout" name="grid">
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <property name="spacing">
-      <number>0</number>
-     </property>
-    </layout>
-   </item>
   </layout>
  </widget>
  <resources/>

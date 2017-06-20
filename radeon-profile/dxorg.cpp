@@ -16,22 +16,25 @@ dXorg::dXorg(const GPUSysInfo &si) {
 }
 
 void dXorg::configure() {
-    if (!globalStuff::globalConfig.daemonData)
-        setupIoctl();
-
-    if (!globalStuff::globalConfig.rootMode)
-        dcomm.connectToDaemon();
-
     figureOutGpuDataFilePaths(features.sysInfo.sysName);
-    figureOutDriverFeatures();
+    setupIoctl();
 
-    if (features.dataSource == DataSource::PM_FILE)
+    if (globalStuff::globalConfig.rootMode) {
+        figureOutDriverFeatures();
+        return;
+    }
+
+    if (globalStuff::globalConfig.daemonData)
         setupSharedMem();
+
+    dcomm.connectToDaemon();
 
     if (daemonConnected())
         setupDaemon();
     else
         qCritical() << "Daemon is not connected, therefore it can't be configured";
+
+    figureOutDriverFeatures();
 }
 
 void dXorg::setupIoctl() {
@@ -41,6 +44,22 @@ void dXorg::setupIoctl() {
         ioctlHnd = new amdgpuIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
 }
 
+//https://stackoverflow.com/a/18866593
+QString getRandomString()
+{
+   const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+   const int randomStringLength = 12;
+
+   QString randomString;
+   for (int i = 0; i < randomStringLength; ++i) {
+       int index = qrand() % possibleCharacters.length();
+       QChar nextChar = possibleCharacters.at(index);
+       randomString.append(nextChar);
+   }
+
+   return randomString;
+}
+
 void dXorg::setupSharedMem() {
     qDebug() << "Configure shared mem";
 
@@ -48,7 +67,7 @@ void dXorg::setupSharedMem() {
     // is called on every change gpu, so later, shared mem already exists
     if (!sharedMem.isAttached()) {
         qDebug() << "Shared memory is not attached, creating it";
-        sharedMem.setKey("radeon-profile");
+        sharedMem.setKey(getRandomString());
 
         if (!sharedMem.create(SHARED_MEM_SIZE)) {
             if (sharedMem.error() == QSharedMemory::AlreadyExists) {
@@ -68,7 +87,7 @@ void dXorg::setupDaemon() {
     QString command;
 
     if (!globalStuff::globalConfig.daemonData) {
-        command.append(DAEMON_DISABLE_SHAREDMEM).append(SEPARATOR).append('1').append(SEPARATOR);
+        command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append('_').append(SEPARATOR);
         qDebug() << "Sending daemon config command: " << command;
         dcomm.sendCommand(command);
         return;
@@ -76,7 +95,7 @@ void dXorg::setupDaemon() {
 
     command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR);
     command.append(deviceFiles.debugfs_pm_info).append(SEPARATOR);
-    command.append(DAEMON_DISABLE_SHAREDMEM).append(SEPARATOR).append('0').append(SEPARATOR);
+    command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append(sharedMem.key()).append(SEPARATOR);
 
     if (globalStuff::globalConfig.daemonAutoRefresh) {
         command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR);
@@ -154,12 +173,12 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
 }
 
 GPUClocks dXorg::getClocks() {
-    switch (features.dataSource) {
-        case DataSource::IOCTL:
+    switch (features.clocksDataSource) {
+        case ClocksDataSource::IOCTL:
             return getClocksFromIoctl();
-        case DataSource::PM_FILE:
+        case ClocksDataSource::PM_FILE:
             return getClocksFromPmFile();
-        case DataSource::SOURCE_UNKNOWN:
+        case ClocksDataSource::SOURCE_UNKNOWN:
             break;
     }
 
@@ -627,10 +646,10 @@ void dXorg::setupRegex(const QString &data) {
 }
 
 void dXorg::figureOutDriverFeatures() {
-    if (getIoctlAvailability()) {
-        features.dataSource = DataSource::IOCTL;
-    } else {
-        features.dataSource = DataSource::PM_FILE;
+    if (getIoctlAvailability() && !globalStuff::globalConfig.daemonData)
+        features.clocksDataSource = ClocksDataSource::IOCTL;
+    else {
+        features.clocksDataSource = ClocksDataSource::PM_FILE;
         QString data = getClocksRawData(true);
         setupRegex(data);
         GPUClocks test = getClocks();

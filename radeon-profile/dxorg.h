@@ -98,7 +98,7 @@ public:
     void cleanup() {
         delete ioctlHnd;
 
-        if(sharedMem.isAttached()){
+        if (sharedMem.isAttached()){
             // In case the closing signal interrupts a sharedMem lock+read+unlock phase, sharedmem is unlocked
             sharedMem.unlock();
             sharedMem.detach();
