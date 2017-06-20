@@ -646,6 +646,8 @@ void dXorg::setupRegex(const QString &data) {
 }
 
 void dXorg::figureOutDriverFeatures() {
+    features.currentPowerMethod = getPowerMethod();
+
     if (getIoctlAvailability() && !globalStuff::globalConfig.daemonData)
         features.clocksDataSource = ClocksDataSource::IOCTL;
     else {
@@ -662,7 +664,6 @@ void dXorg::figureOutDriverFeatures() {
     }
 
     features.currentTemperatureSensor = getTemperatureSensor();
-    features.currentPowerMethod = getPowerMethod();
 
     switch (features.currentPowerMethod) {
     case PowerMethod::DPM: {
