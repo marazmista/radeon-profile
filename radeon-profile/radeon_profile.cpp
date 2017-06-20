@@ -45,6 +45,15 @@ radeon_profile::radeon_profile(QWidget *parent) :
         ui->label_rootWarrning->setVisible(false);
     }
 
+    ticksCounter = 0;
+    statsTickCounter = 0;
+	savedState = nullptr;
+
+    // create runtime stuff, setup rest of ui
+    setupUiElements();
+
+    loadConfig();
+
     if (!device.initialize()) {
         QMessageBox::critical(this,tr("Error"), tr("No Radeon cards have been found in the system."));
 
@@ -53,13 +62,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
         return;
     }
-
-    ticksCounter = 0;
-    statsTickCounter = 0;
-	savedState = nullptr;
-
-    // load config, create runtime stuff, setup rest of ui
-    setupUiElements();
 
     for (int i = 0; i < device.gpuList.count(); ++i)
         ui->combo_gpus->addItem(device.gpuList.at(i).sysName);
@@ -115,15 +117,12 @@ void radeon_profile::setupUiElements()
 {
     ui->mainTabs->setCurrentIndex(0);
     ui->tabs_systemInfo->setCurrentIndex(0);
-    ui->configGroups->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
     ui->execPages->setCurrentIndex(0);
     setupForcePowerLevelMenu();
     setupContextMenus();
     setupTrayIcon();
     addRuntimeWidgets();
-
-    loadConfig();
 
     ui->centralWidget->setEnabled(false);
 }
@@ -288,12 +287,13 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         qDebug() << "Fan control is not available";
         ui->mainTabs->setTabEnabled(3,false);
         ui->btn_fanControl->setVisible(false);
+        ui->group_cfgFan->setEnabled(false);
     }
 
     if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM))
         ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo());
 
-    ui->configGroups->setTabEnabled(1,device.daemonConnected() && device.getDriverFeatures().clocksSource == ClocksDataSource::PM_FILE);
+    ui->group_cfgDaemon->setEnabled(device.daemonConnected());
 
     if (features.canChangeProfile && features.ocCoreAvailable && ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
         on_btn_applyOverclock_clicked();
@@ -416,16 +416,6 @@ void radeon_profile::timerEvent() {
     if (Q_LIKELY(ui->cb_graphs->isChecked()))
         refreshGraphs();
 
-    if (ui->cb_glxInfo->isChecked()) {
-        ui->list_glxinfo->clear();
-        ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
-    }
-
-    if (ui->cb_connectors->isChecked())
-        fillConnectors();
-
-    if (ui->cb_modParams->isChecked())
-        fillModInfo();
 
     refreshTooltip();
 
@@ -519,15 +509,6 @@ void radeon_profile::refreshTooltip()
 
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
     trayIcon->setToolTip(tooltipdata);
-}
-
-void radeon_profile::configureDaemonAutoRefresh (bool enabled, int interval) {
-    globalStuff::globalConfig.daemonAutoRefresh = enabled;
-
-    if(enabled)
-        globalStuff::globalConfig.interval = interval;
-
-    device.reconfigureDaemon();
 }
 
 bool radeon_profile::askConfirmation(const QString title, const QString question){

@@ -179,11 +179,6 @@ void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
     timer->setInterval(arg1*1000);
 }
 
-void radeon_profile::on_cb_graphs_clicked(bool checked)
-{
-    ui->mainTabs->setTabEnabled(1,checked);
-}
-
 void radeon_profile::on_cb_gpuData_clicked(bool checked)
 {
     ui->cb_graphs->setEnabled(checked);
@@ -191,9 +186,6 @@ void radeon_profile::on_cb_gpuData_clicked(bool checked)
 
     if (ui->cb_stats->isChecked())
         ui->tabs_systemInfo->setTabEnabled(3,checked);
-
-    if (ui->cb_graphs->isChecked())
-        ui->mainTabs->setTabEnabled(1,checked);
 
     if (!checked) {
         ui->list_currentGPUData->clear();
@@ -278,11 +270,6 @@ void radeon_profile::on_chProfile_clicked()
     }
 }
 
-void radeon_profile::on_btn_reconfigureDaemon_clicked()
-{
-    configureDaemonAutoRefresh(ui->cb_daemonAutoRefresh->isChecked(), ui->spin_timerInterval->value());
-}
-
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
 {
     if (execsRunning.at(index)->getExecState() == QProcess::Running) {
@@ -312,13 +299,6 @@ void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
     ui->slider_overclock->setEnabled(enable);
     ui->btn_applyOverclock->setEnabled(enable);
     ui->cb_overclockAtLaunch->setEnabled(enable);
-
-    if(enable)
-        qDebug() << "Enabling overclock";
-    else {
-        qDebug() << "Disabling overclock";
-        device.resetOverclock();
-    }
 }
 
 void radeon_profile::on_btn_applyOverclock_clicked(){

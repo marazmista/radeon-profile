@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>849</width>
-    <height>493</height>
+    <width>926</width>
+    <height>486</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -37,8 +37,8 @@
     <property name="bottomMargin">
      <number>3</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
+    <item row="1" column="0">
+     <widget class="QComboBox" name="combo_gpus">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
         <horstretch>0</horstretch>
@@ -47,15 +47,12 @@
       </property>
       <property name="font">
        <font>
-        <family>Noto Sans</family>
-        <pointsize>15</pointsize>
+        <family>Monospace</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
-      <property name="text">
-       <string>GPU</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+      <property name="toolTip">
+       <string>Selected GPU</string>
       </property>
      </widget>
     </item>
@@ -296,25 +293,6 @@
       </widget>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QComboBox" name="combo_gpus">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <family>Monospace</family>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Selected GPU</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1" rowspan="2">
      <widget class="QWidget" name="widget_topbar" native="true">
       <property name="sizePolicy">
@@ -493,6 +471,28 @@
         </layout>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Noto Sans</family>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>GPU</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
      </widget>
     </item>
     <item row="2" column="1">
@@ -889,7 +889,7 @@
            <enum>QFrame::Raised</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="pagePlots">
            <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1056,6 +1056,21 @@
                  <string>General plots settings</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_24">
+                 <property name="spacing">
+                  <number>5</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>3</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>3</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>3</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>3</number>
+                 </property>
                  <item>
                   <widget class="QCheckBox" name="cb_plotsRightGap">
                    <property name="text">
@@ -3261,402 +3276,401 @@
        <attribute name="title">
         <string>Configuration</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_11">
+       <layout class="QVBoxLayout" name="verticalLayout_28">
         <property name="leftMargin">
-         <number>4</number>
+         <number>5</number>
         </property>
         <property name="topMargin">
-         <number>4</number>
+         <number>5</number>
         </property>
         <property name="rightMargin">
-         <number>4</number>
+         <number>5</number>
         </property>
         <property name="bottomMargin">
-         <number>4</number>
+         <number>5</number>
         </property>
-        <item row="0" column="0">
-         <widget class="QTabWidget" name="configGroups">
-          <property name="tabPosition">
-           <enum>QTabWidget::West</enum>
+        <item>
+         <widget class="QScrollArea" name="scrollArea">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
           </property>
-          <property name="currentIndex">
-           <number>0</number>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
           </property>
-          <widget class="QWidget" name="tab_mainConfig">
-           <attribute name="title">
-            <string>Main</string>
-           </attribute>
-           <widget class="QCheckBox" name="cb_startMinimized">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>774</width>
+             <height>537</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_27">
+            <property name="spacing">
+             <number>5</number>
             </property>
-            <property name="text">
-             <string>Start minimized</string>
+            <property name="leftMargin">
+             <number>5</number>
             </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_minimizeTray">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>30</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
+            <property name="topMargin">
+             <number>3</number>
             </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+            <property name="rightMargin">
+             <number>3</number>
             </property>
-            <property name="text">
-             <string>Minimize to tray</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_closeTray">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>50</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>On close hide to tray</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_saveWindowGeometry">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>70</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Save window geometry</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_alternateRow">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>90</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Alternate row colors on lists</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_2">
-            <property name="geometry">
-             <rect>
-              <x>320</x>
-              <y>10</y>
-              <width>161</width>
-              <height>24</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Refresh interval [s]</string>
-            </property>
-           </widget>
-           <widget class="QDoubleSpinBox" name="spin_timerInterval">
-            <property name="geometry">
-             <rect>
-              <x>520</x>
-              <y>10</y>
-              <width>61</width>
-              <height>24</height>
-             </rect>
-            </property>
-            <property name="decimals">
-             <number>0</number>
-            </property>
-            <property name="minimum">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>1.000000000000000</double>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_5">
-            <property name="geometry">
-             <rect>
-              <x>320</x>
-              <y>50</y>
-              <width>289</width>
-              <height>12</height>
-             </rect>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>15</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Update:</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_gpuData">
-            <property name="geometry">
-             <rect>
-              <x>320</x>
-              <y>70</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>GPU data, power profile, temperature</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_graphs">
-            <property name="geometry">
-             <rect>
-              <x>320</x>
-              <y>90</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Graphs</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_stats">
-            <property name="geometry">
-             <rect>
-              <x>320</x>
-              <y>110</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Power levels statistics</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_glxInfo">
-            <property name="geometry">
-             <rect>
-              <x>320</x>
-              <y>130</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>GLX Info</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_connectors">
-            <property name="geometry">
-             <rect>
-              <x>320</x>
-              <y>150</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Connectors</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_modParams">
-            <property name="geometry">
-             <rect>
-              <x>320</x>
-              <y>170</y>
-              <width>289</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Module parameters</string>
-            </property>
-           </widget>
-           <widget class="QComboBox" name="cb_execDbcAction">
-            <property name="geometry">
-             <rect>
-              <x>210</x>
-              <y>170</y>
-              <width>91</width>
-              <height>24</height>
-             </rect>
+            <property name="bottomMargin">
+             <number>3</number>
             </property>
             <item>
-             <property name="text">
-              <string>Run</string>
-             </property>
+             <widget class="QGroupBox" name="group_cfgGeneral">
+              <property name="title">
+               <string>General</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_26">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="cb_startMinimized">
+                 <property name="text">
+                  <string>Start minimized</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cb_minimizeTray">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Minimize to tray</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cb_closeTray">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>On close hide to tray</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cb_saveWindowGeometry">
+                 <property name="text">
+                  <string>Save window geometry</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cb_alternateRow">
+                 <property name="text">
+                  <string>Alternate row colors on lists</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
             </item>
             <item>
-             <property name="text">
-              <string>Edit</string>
-             </property>
+             <widget class="QGroupBox" name="group_cfgRefresh">
+              <property name="title">
+               <string>Refresh</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_14">
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <item row="3" column="0">
+                <widget class="QCheckBox" name="cb_graphs">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Graphs</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QCheckBox" name="cb_stats">
+                 <property name="text">
+                  <string>Power levels statistics</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QCheckBox" name="cb_gpuData">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>GPU data, power profile, temperature</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="maximumSize">
+                  <size>
+                   <width>350</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Refresh interval [s]</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QDoubleSpinBox" name="spin_timerInterval">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>100</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="minimum">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>1.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_5">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>15</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Update:</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
             </item>
-           </widget>
-           <widget class="QLabel" name="label_16">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>170</y>
-              <width>181</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Double click action on exec item</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_execSysEnv">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>192</y>
-              <width>291</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Explicit append system env to exec command</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_saveFanMode">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>110</y>
-              <width>301</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Save selected fan control mode</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="cb_zeroPercentFanSpeed">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>130</y>
-              <width>291</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Enable 0% fan speed</string>
-            </property>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="tab_daemonConfig">
-           <attribute name="title">
-            <string>Daemon</string>
-           </attribute>
-           <widget class="QCheckBox" name="cb_daemonAutoRefresh">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>211</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="toolTip">
-             <string>Good option to check. Causes that daemon gets data from system automaticly with interval when GUI is on instead of waiting for request to read this data. Interval is the same as GUI.</string>
-            </property>
-            <property name="text">
-             <string>Refresh data without request</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="btn_reconfigureDaemon">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>40</y>
-              <width>211</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="toolTip">
-             <string>Apply new configuration and send it to daemon.</string>
-            </property>
-            <property name="text">
-             <string>Reconfigure daemon</string>
-            </property>
-           </widget>
+            <item>
+             <widget class="QGroupBox" name="group_cfgFan">
+              <property name="title">
+               <string>Fan</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_29">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="cb_saveFanMode">
+                 <property name="text">
+                  <string>Save selected fan control mode</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cb_zeroPercentFanSpeed">
+                 <property name="text">
+                  <string>Enable 0% fan speed</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="group_cfgDaemon">
+              <property name="title">
+               <string>Daemon (restart required)</string>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_25">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="cb_daemonData">
+                 <property name="text">
+                  <string>Use daemon as a data provider</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cb_daemonAutoRefresh">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>Good option to check. Causes that daemon gets data from system automaticly with interval when GUI is on instead of waiting for request to read this data. Interval is the same as GUI.</string>
+                 </property>
+                 <property name="text">
+                  <string>Refresh data without request</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="group_cfgExecs">
+              <property name="title">
+               <string>Execs</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_11">
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_16">
+                 <property name="text">
+                  <string>Double click action on exec item:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QComboBox" name="cb_execDbcAction">
+                 <item>
+                  <property name="text">
+                   <string>Run</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Edit</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QCheckBox" name="cb_execSysEnv">
+                 <property name="text">
+                  <string>Explicit append system env to exec command</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item>
          <widget class="QPushButton" name="btn_saveAll">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>150</width>
@@ -3675,6 +3689,8 @@
          </widget>
         </item>
        </layout>
+       <zorder>btn_saveAll</zorder>
+       <zorder>scrollArea</zorder>
       </widget>
       <widget class="QWidget" name="aboutTab">
        <attribute name="title">

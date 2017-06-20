@@ -107,13 +107,17 @@ public:
         sharedMem.deleteLater();
     }
 
-    GPUClocksStruct getClocksFromPmFile();
-    GPUClocksStruct getClocksFromIoctl();
-    GPUClocksStruct getClocks();
+    DriverFeatures features;
+    GPUConstParams params;
+
+
+    GPUClocks getClocksFromPmFile();
+    GPUClocks getClocksFromIoctl();
+    GPUClocks getClocks();
 
     float getTemperature();
-    GPUUsageStruct getGPUUsage();
-    GPUPwmStruct getPwmSpeed();
+    GPUUsage getGPUUsage();
+    GPUPwm getPwmSpeed();
 
     QStringList getGLXInfo(QProcessEnvironment env);
     QList<QTreeWidgetItem *> getModuleInfo();
@@ -127,15 +131,13 @@ public:
 
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure();
-//    GPUConstParams getGpuConstParams();
     void reconfigureDaemon();
     bool daemonConnected();
-    GPUClocksStruct getFeaturesFallback();
+    GPUClocks getFeaturesFallback();
     void setupRegex(const QString &data);
     bool overclock(int percentage);
     void resetOverclock();
-    DriverFeatures features;
-    GPUConstParams params;
+
 
 private:
     QChar gpuSysIndex;
@@ -147,7 +149,7 @@ private:
     hwmonAttributesStruct hwmonAttributes;
 
     daemonComm dcomm;
-    ioctlHandler *ioctlHnd;
+    ioctlHandler *ioctlHnd = nullptr;
 
 
     QString getClocksRawData(bool forFeatures = false);
@@ -159,6 +161,9 @@ private:
     bool getIoctlAvailability();
     void figureOutDriverFeatures();
     void figureOutConstParams();
+    void setupIoctl();
+    void setupSharedMem();
+    void setupDaemon();
 };
 
 #endif // DXORG_H

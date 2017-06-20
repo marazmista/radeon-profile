@@ -40,10 +40,6 @@ static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
     "/usr/share/hwdata/pnp.ids"
 };
 
-void gpu::reconfigureDaemon() {
-    driverHandler->reconfigureDaemon();
-}
-
 bool gpu::daemonConnected() {
    return driverHandler->daemonConnected();
 }
@@ -94,6 +90,8 @@ bool gpu::initialize() {
     return true;
 }
 
+
+
 void gpu::changeGpu(int index) {
     delete driverHandler;
 
@@ -103,7 +101,7 @@ void gpu::changeGpu(int index) {
 }
 
 void gpu::defineAvailableDataContainer() {
-    GPUClocksStruct tmpClk = driverHandler->getClocks();
+    GPUClocks tmpClk = driverHandler->getClocks();
 
     if (tmpClk.coreClk != -1)
         gpuData.insert(ValueID::CLK_CORE, RPValue(ValueUnit::MEGAHERTZ, tmpClk.coreClk));
@@ -127,7 +125,7 @@ void gpu::defineAvailableDataContainer() {
         gpuData.insert(ValueID::POWER_LEVEL, RPValue(ValueUnit::NONE, tmpClk.powerLevel));
 
 
-    GPUPwmStruct tmpPwm = driverHandler->getPwmSpeed();
+    GPUPwm tmpPwm = driverHandler->getPwmSpeed();
 
     if (tmpPwm.pwmSpeed != -1)
         gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, tmpPwm.pwmSpeed));
@@ -146,20 +144,22 @@ void gpu::defineAvailableDataContainer() {
     }
 
 
-    GPUUsageStruct tmpUsage = driverHandler->getGPUUsage();
+    if (getDriverFeatures().dataSource == DataSource::IOCTL) {
+        GPUUsage tmpUsage = driverHandler->getGPUUsage();
 
-    if (tmpUsage.gpuUsage != -1)
-         gpuData.insert(ValueID::GPU_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuUsage));
+        if (tmpUsage.gpuUsage != -1)
+            gpuData.insert(ValueID::GPU_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuUsage));
 
-    if (tmpUsage.gpuVramUsage != -1)
-         gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsage));
+        if (tmpUsage.gpuVramUsage != -1)
+            gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsage));
 
-    if (tmpUsage.gpuVramUsagePercent != -1)
-         gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsagePercent));
+        if (tmpUsage.gpuVramUsagePercent != -1)
+            gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsagePercent));
+    }
 }
 
 void gpu::getClocks() {
-    GPUClocksStruct tmp = driverHandler->getClocks();
+    GPUClocks tmp = driverHandler->getClocks();
 
     if (gpuData.contains(ValueID::CLK_CORE))
         gpuData[ValueID::CLK_CORE].setValue(tmp.coreClk);
@@ -198,6 +198,8 @@ void gpu::getTemperature() {
 }
 
 void gpu::getGpuUsage() {
+    if (getDriverFeatures().dataSource != DataSource::IOCTL)
+        return;
 
     // getting gpu usage seems to be heavy and cause ui lag, so it is done in another thread
     futureGpuUsage.setFuture(QtConcurrent::run(driverHandler,&dXorg::getGPUUsage));
@@ -264,7 +266,7 @@ void gpu::getPwmSpeed() {
     if (!gpuData.contains(ValueID::FAN_SPEED_PERCENT))
         return;
 
-    GPUPwmStruct tmp = driverHandler->getPwmSpeed();
+    GPUPwm tmp = driverHandler->getPwmSpeed();
 
     gpuData[ValueID::FAN_SPEED_PERCENT].setValue(tmp.pwmSpeed);
 

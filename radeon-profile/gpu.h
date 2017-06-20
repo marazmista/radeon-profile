@@ -53,7 +53,6 @@ public:
 
     void detectCards();
     bool initialize();
-    void reconfigureDaemon();
     bool daemonConnected();
     bool overclock(int value);
     void resetOverclock();
@@ -63,7 +62,7 @@ public:
 
 private slots:
     void handleGpuUsageResult() {
-        GPUUsageStruct tmp = futureGpuUsage.result();
+        GPUUsage tmp = futureGpuUsage.result();
 
         if (gpuData.contains(ValueID::GPU_USAGE_PERCENT))
             gpuData[ValueID::GPU_USAGE_PERCENT].setValue(tmp.gpuUsage);
@@ -79,7 +78,7 @@ private slots:
 private:
     dXorg *driverHandler;
     void defineAvailableDataContainer();
-    QFutureWatcher<GPUUsageStruct> futureGpuUsage;
+    QFutureWatcher<GPUUsage> futureGpuUsage;
 
 };
 

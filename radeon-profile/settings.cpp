@@ -26,9 +26,6 @@ void radeon_profile::saveConfig() {
     settings.setValue("updateInterval",ui->spin_timerInterval->value());
     settings.setValue("updateGPUData",ui->cb_gpuData->isChecked());
     settings.setValue("updateGraphs",ui->cb_graphs->isChecked());
-    settings.setValue("updateGLXInfo",ui->cb_glxInfo->isChecked());
-    settings.setValue("updateConnectors",ui->cb_connectors->isChecked());
-    settings.setValue("updateModParams",ui->cb_modParams->isChecked());
     settings.setValue("saveWindowGeometry",ui->cb_saveWindowGeometry->isChecked());
     settings.setValue("windowGeometry",this->geometry());
     settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
@@ -50,6 +47,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
     settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
     settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
+
+    settings.setValue("daemonData", ui->cb_daemonData->isChecked());
 
     QString xmlString;
     QXmlStreamWriter xml(&xmlString);
@@ -180,9 +179,6 @@ void radeon_profile::loadConfig() {
     ui->spin_timerInterval->setValue(settings.value("updateInterval",1).toDouble());
     ui->cb_gpuData->setChecked(settings.value("updateGPUData",true).toBool());
     ui->cb_graphs->setChecked(settings.value("updateGraphs",true).toBool());
-    ui->cb_glxInfo->setChecked(settings.value("updateGLXInfo",false).toBool());
-    ui->cb_connectors->setChecked(settings.value("updateConnectors",false).toBool());
-    ui->cb_modParams->setChecked(settings.value("updateModParams",false).toBool());
     ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
     ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
@@ -203,6 +199,10 @@ void radeon_profile::loadConfig() {
     ui->cb_enableOverclock->setChecked(settings.value("overclockEnabled",false).toBool());
     ui->cb_overclockAtLaunch->setChecked(settings.value("overclockAtLaunch",false).toBool());
     ui->slider_overclock->setValue(settings.value("overclockValue",0).toInt());
+
+    ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
+
+    globalStuff::globalConfig.daemonData = ui->cb_daemonData->isChecked();
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
@@ -226,11 +226,6 @@ void radeon_profile::loadConfig() {
             ui->tabs_systemInfo->setTabEnabled(3,false);
     } else
         ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "GPU data is disabled."));
-
-    if (ui->cb_graphs->isChecked() && ui->cb_graphs->isEnabled())
-        ui->mainTabs->setTabEnabled(1,true);
-    else
-        ui->mainTabs->setTabEnabled(1,false);
 
     if (ui->cb_zeroPercentFanSpeed->isChecked())
         setupMinFanSpeedSetting(0);

@@ -16,12 +16,8 @@ dXorg::dXorg(const GPUSysInfo &si) {
 }
 
 void dXorg::configure() {
-    if (features.sysInfo.module == DriverModule::RADEON)
-        ioctlHnd = new radeonIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
-    else if (features.sysInfo.module == DriverModule::AMDGPU)
-        ioctlHnd = new amdgpuIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
-    else
-        ioctlHnd = nullptr;
+    if (!globalStuff::globalConfig.daemonData)
+        setupIoctl();
 
     if (!globalStuff::globalConfig.rootMode)
         dcomm.connectToDaemon();
@@ -29,65 +25,68 @@ void dXorg::configure() {
     figureOutGpuDataFilePaths(features.sysInfo.sysName);
     figureOutDriverFeatures();
 
-    if (features.clocksSource != ClocksDataSource::IOCTL) {
-        qDebug() << "Running in non-root mode, connecting and configuring the daemon";
-        // create the shared mem block. The if comes from that configure method
-        // is called on every change gpu, so later, shared mem already exists
-        if (!sharedMem.isAttached()) {
-            qDebug() << "Shared memory is not attached, creating it";
-            sharedMem.setKey("radeon-profile");
+    if (features.dataSource == DataSource::PM_FILE)
+        setupSharedMem();
 
-            if (!sharedMem.create(SHARED_MEM_SIZE)) {
-                if (sharedMem.error() == QSharedMemory::AlreadyExists){
-                    qDebug() << "Shared memory already exists, attaching to it";
-
-                    if (!sharedMem.attach())
-                        qCritical() << "Unable to attach to the shared memory: " << sharedMem.errorString();
-
-                } else
-                    qCritical() << "Unable to create the shared memory: " << sharedMem.errorString();
-            }
-        }
-    }
-
-    if (daemonConnected()) {
-        qDebug() << "Daemon is connected, configuring it";
-        //  Configure the daemon to read the data
-        QString command; // SIGNAL_CONFIG + SEPARATOR + CLOCKS_PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR); // Configuration flag
-        command.append(deviceFiles.debugfs_pm_info).append(SEPARATOR); // Path where the daemon will read clocks
-
-        if (features.clocksSource == ClocksDataSource::IOCTL) {
-            command.append(DAEMON_DISABLE_SHAREDMEM).append(SEPARATOR).append('1').append(SEPARATOR);
-            qDebug() << "Sending daemon config command: " << command;
-            dcomm.sendCommand(command);
-        } else {
-            command.append(DAEMON_DISABLE_SHAREDMEM).append(SEPARATOR).append('0').append(SEPARATOR);
-            qDebug() << "Sending daemon config command: " << command;
-            dcomm.sendCommand(command);
-
-            reconfigureDaemon(); // Set up timer
-        }
-    } else
+    if (daemonConnected())
+        setupDaemon();
+    else
         qCritical() << "Daemon is not connected, therefore it can't be configured";
 }
 
-void dXorg::reconfigureDaemon() { // Set up the timer
-    if (daemonConnected()) {
-        qDebug() << "Configuring daemon timer";
-        QString command;
+void dXorg::setupIoctl() {
+    if (features.sysInfo.module == DriverModule::RADEON)
+        ioctlHnd = new radeonIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
+    else if (features.sysInfo.module == DriverModule::AMDGPU)
+        ioctlHnd = new amdgpuIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
+}
 
-        if (globalStuff::globalConfig.daemonAutoRefresh) { // SIGNAL_TIMER_ON + SEPARATOR + INTERVAL + SEPARATOR
-            command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR); // Enable timer
-            command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR); // Set timer interval
+void dXorg::setupSharedMem() {
+    qDebug() << "Configure shared mem";
+
+    // create the shared mem block. The if comes from that configure method
+    // is called on every change gpu, so later, shared mem already exists
+    if (!sharedMem.isAttached()) {
+        qDebug() << "Shared memory is not attached, creating it";
+        sharedMem.setKey("radeon-profile");
+
+        if (!sharedMem.create(SHARED_MEM_SIZE)) {
+            if (sharedMem.error() == QSharedMemory::AlreadyExists) {
+                qDebug() << "Shared memory already exists, attaching to it";
+
+                if (!sharedMem.attach())
+                    qCritical() << "Unable to attach to the shared memory: " << sharedMem.errorString();
+
+            } else
+                qCritical() << "Unable to create the shared memory: " << sharedMem.errorString();
         }
-        else // SIGNAL_TIMER_OFF + SEPARATOR
-            command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR); // Disable timer
+    }
+}
 
-        qDebug() << "Sending daemon reconfig signal: " << command;
+void dXorg::setupDaemon() {
+    qDebug() << "Daemon is connected, configuring it";
+    QString command;
+
+    if (!globalStuff::globalConfig.daemonData) {
+        command.append(DAEMON_DISABLE_SHAREDMEM).append(SEPARATOR).append('1').append(SEPARATOR);
+        qDebug() << "Sending daemon config command: " << command;
         dcomm.sendCommand(command);
-    } else
-        qWarning() << "Daemon is not connected, therefore it's timer can't be reconfigured";
+        return;
+    }
+
+    command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR);
+    command.append(deviceFiles.debugfs_pm_info).append(SEPARATOR);
+    command.append(DAEMON_DISABLE_SHAREDMEM).append(SEPARATOR).append('0').append(SEPARATOR);
+
+    if (globalStuff::globalConfig.daemonAutoRefresh) {
+        command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR);
+        command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR);
+    }
+    else
+        command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR);
+
+    qDebug() << "Sending daemon config command: " << command;
+    dcomm.sendCommand(command);
 }
 
 bool dXorg::daemonConnected() {
@@ -154,21 +153,21 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     return data;
 }
 
-GPUClocksStruct dXorg::getClocks() {
-    switch (features.clocksSource) {
-        case ClocksDataSource::IOCTL:
+GPUClocks dXorg::getClocks() {
+    switch (features.dataSource) {
+        case DataSource::IOCTL:
             return getClocksFromIoctl();
-        case ClocksDataSource::PM_FILE:
+        case DataSource::PM_FILE:
             return getClocksFromPmFile();
-        case ClocksDataSource::SOURCE_UNKNOWN:
+        case DataSource::SOURCE_UNKNOWN:
             break;
     }
 
-    return GPUClocksStruct();
+    return GPUClocks();
 }
 
-GPUClocksStruct dXorg::getClocksFromIoctl() {
-    GPUClocksStruct clocksData;
+GPUClocks dXorg::getClocksFromIoctl() {
+    GPUClocks clocksData;
 
     ioctlHnd->getCoreClock(&clocksData.coreClk);
     ioctlHnd->getMemoryClock(&clocksData.memClk);
@@ -177,8 +176,8 @@ GPUClocksStruct dXorg::getClocksFromIoctl() {
 }
 
 
-GPUClocksStruct dXorg::getClocksFromPmFile() {
-    GPUClocksStruct clocksData;
+GPUClocks dXorg::getClocksFromPmFile() {
+    GPUClocks clocksData;
     QString data = dXorg::getClocksRawData();
 
     // if nothing is there returns empty (-1) struct
@@ -300,8 +299,8 @@ float dXorg::getTemperature() {
     return temp.toFloat();
 }
 
-GPUUsageStruct dXorg::getGPUUsage() {
-    GPUUsageStruct data;
+GPUUsage dXorg::getGPUUsage() {
+    GPUUsage data;
 
     ioctlHnd->getGpuUsage(&data.gpuUsage);
     ioctlHnd->getVramUsagePercentage(&data.gpuVramUsagePercent);
@@ -553,8 +552,8 @@ void dXorg::setPwmManualControl(bool manual) {
         setNewValue(hwmonAttributes.pwm1_enable, QString(mode));
 }
 
-GPUPwmStruct dXorg::getPwmSpeed() {
-    GPUPwmStruct tmp;
+GPUPwm dXorg::getPwmSpeed() {
+    GPUPwm tmp;
 
     if (hwmonAttributes.pwm1.isEmpty())
         return tmp;
@@ -629,12 +628,12 @@ void dXorg::setupRegex(const QString &data) {
 
 void dXorg::figureOutDriverFeatures() {
     if (getIoctlAvailability()) {
-        features.clocksSource = ClocksDataSource::IOCTL;
+        features.dataSource = DataSource::IOCTL;
     } else {
-        features.clocksSource = ClocksDataSource::PM_FILE;
+        features.dataSource = DataSource::PM_FILE;
         QString data = getClocksRawData(true);
         setupRegex(data);
-        GPUClocksStruct test = getClocks();
+        GPUClocks test = getClocks();
 
         // still, sometimes there is miscomunication between daemon,
         // but vales are there, so look again in the file which daemon has
@@ -695,8 +694,8 @@ void dXorg::figureOutConstParams() {
     }
 }
 
-GPUClocksStruct dXorg::getFeaturesFallback() {
-    GPUClocksStruct fallbackfeatures;
+GPUClocks dXorg::getFeaturesFallback() {
+    GPUClocks fallbackfeatures;
     QFile f("/tmp/"+features.sysInfo.driverModuleString+"_pm_info");
     if (f.open(QIODevice::ReadOnly)) {
         QString s = QString(f.readAll());

@@ -75,7 +75,6 @@ private slots:
     void closeEvent(QCloseEvent *);
     void closeFromTray();
     void on_spin_timerInterval_valueChanged(double arg1);
-    void on_cb_graphs_clicked(bool checked);
     void on_cb_gpuData_clicked(bool checked);
     void refreshBtnClicked();
     void on_cb_stats_clicked(bool checked);
@@ -84,7 +83,6 @@ private slots:
     void resetStats();
     void on_cb_alternateRow_clicked(bool checked);
     void on_chProfile_clicked();
-    void on_btn_reconfigureDaemon_clicked();
     void on_btn_cancel_clicked();
     void on_btn_addExecProfile_clicked();
     void on_list_vaules_itemClicked(QListWidgetItem *item);

@@ -66,7 +66,7 @@ enum ForcePowerLevels {
     F_AUTO, F_LOW, F_HIGH
 };
 
-enum class ClocksDataSource {
+enum class DataSource {
     IOCTL, PM_FILE, SOURCE_UNKNOWN
 };
 
@@ -102,7 +102,7 @@ struct DriverFeatures {
     ocMemAvailable = false;
 
     PowerMethod currentPowerMethod;
-    ClocksDataSource clocksSource;
+    DataSource dataSource;
     TemperatureSensor currentTemperatureSensor;
     GPUSysInfo sysInfo;
 
@@ -112,23 +112,19 @@ struct DriverFeatures {
     }
 };
 
-struct GPUClocksStruct {
-    int coreClk, memClk, coreVolt, memVolt, uvdCClk, uvdDClk, powerLevel;
-
-    GPUClocksStruct() {
-        coreClk = memClk =  coreVolt = memVolt = uvdCClk = uvdDClk = powerLevel = -1;
-    }
+struct GPUClocks {
+    int coreClk = -1, memClk = -1, coreVolt = -1, memVolt = -1, uvdCClk = -1, uvdDClk = -1, powerLevel = -1;
 };
 
-struct GPUPwmStruct {
+struct GPUPwm {
     int pwmSpeed = -1, pwmSpeedRpm = -1;
 };
 
-struct GPUUsageStruct {
+struct GPUUsage {
     float gpuUsage;
     long gpuVramUsagePercent, gpuVramUsage;
 
-    GPUUsageStruct() {
+    GPUUsage() {
         gpuUsage = gpuVramUsage = gpuVramUsagePercent = -1;
     }
 };
@@ -138,7 +134,6 @@ struct GPUConstParams {
      long VRAMSize = -1;
 };
 
-// class for values that are plottable
 struct RPValue {
     ValueUnit unit;
     float value;
@@ -317,7 +312,7 @@ public:
     // settings from config used across the source
     static struct globalCfgStruct {
         float interval;
-        bool daemonAutoRefresh, rootMode;
+        bool daemonAutoRefresh, rootMode, daemonData = false;
     } globalConfig;
 };
 
