@@ -522,7 +522,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -895,7 +895,7 @@
            <enum>QFrame::Raised</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="pagePlots">
            <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -3313,7 +3313,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-197</y>
+             <y>0</y>
              <width>774</width>
              <height>537</height>
             </rect>

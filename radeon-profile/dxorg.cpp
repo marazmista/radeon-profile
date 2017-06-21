@@ -48,14 +48,10 @@ void dXorg::setupIoctl() {
 QString getRandomString()
 {
    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
-   const int randomStringLength = 12;
 
    QString randomString;
-   for (int i = 0; i < randomStringLength; ++i) {
-       int index = qrand() % possibleCharacters.length();
-       QChar nextChar = possibleCharacters.at(index);
-       randomString.append(nextChar);
-   }
+   for (int i = 0; i < 10; ++i)
+       randomString.append(possibleCharacters.at(qrand() % possibleCharacters.length()));
 
    return randomString;
 }
@@ -701,16 +697,19 @@ bool dXorg::getIoctlAvailability() {
 }
 
 void dXorg::figureOutConstParams() {
-    QFile fPwmMax(hwmonAttributes.pwm1_max);
-    if (fPwmMax.open(QIODevice::ReadOnly)) {
-        params.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
-        fPwmMax.close();
-    }
-
     if (ioctlHnd != nullptr && ioctlHnd->isValid()) {
         ioctlHnd->getMaxCoreClock(&params.maxCoreClock);
         ioctlHnd->getMaxMemoryClock(&params.maxMemClock);
         ioctlHnd->getVramSize(&params.VRAMSize);
+    }
+
+    if (hwmonAttributes.pwm1_max.isEmpty())
+        return;
+
+    QFile fPwmMax(hwmonAttributes.pwm1_max);
+    if (fPwmMax.open(QIODevice::ReadOnly)) {
+        params.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
+        fPwmMax.close();
     }
 }
 
