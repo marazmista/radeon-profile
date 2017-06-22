@@ -149,7 +149,7 @@ void gpu::defineAvailableDataContainer() {
         gpuData.insert(ValueID::GPU_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuUsage));
 
     if (tmpUsage.gpuVramUsage != -1)
-        gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsage));
+        gpuData.insert(ValueID::GPU_VRAM_USAGE_MB, RPValue(ValueUnit::MEGABYTE, tmpUsage.gpuVramUsage));
 
     if (tmpUsage.gpuVramUsagePercent != -1)
         gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsagePercent));

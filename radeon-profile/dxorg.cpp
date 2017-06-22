@@ -318,8 +318,10 @@ GPUUsage dXorg::getGPUUsage() {
     GPUUsage data;
 
     ioctlHnd->getGpuUsage(&data.gpuUsage);
-    ioctlHnd->getVramUsagePercentage(&data.gpuVramUsagePercent);
     ioctlHnd->getVramUsage(&data.gpuVramUsage);
+
+    data.gpuVramUsage /= 1048576; // 1024 * 1024
+    data.gpuVramUsagePercent = (100 * data.gpuVramUsage) / params.VRAMSize;
 
     return data;
 }
@@ -701,6 +703,7 @@ void dXorg::figureOutConstParams() {
         ioctlHnd->getMaxCoreClock(&params.maxCoreClock);
         ioctlHnd->getMaxMemoryClock(&params.maxMemClock);
         ioctlHnd->getVramSize(&params.VRAMSize);
+        params.VRAMSize /= 1048576;
     }
 
     if (hwmonAttributes.pwm1_max.isEmpty())

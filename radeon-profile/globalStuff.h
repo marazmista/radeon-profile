@@ -121,12 +121,8 @@ struct GPUPwm {
 };
 
 struct GPUUsage {
-    float gpuUsage;
-    long gpuVramUsagePercent, gpuVramUsage;
-
-    GPUUsage() {
-        gpuUsage = gpuVramUsage = gpuVramUsagePercent = -1;
-    }
+    float gpuUsage = -1;
+    long gpuVramUsagePercent = -1, gpuVramUsage = -1;
 };
 
 struct GPUConstParams {
@@ -263,8 +259,8 @@ public:
          return false;
     }
 
-    static QString getNameOfValueID(ValueID u) {
-        switch (u) {
+    static QString getNameOfValueID(ValueID id) {
+        switch (id) {
             case ValueID::CLK_CORE: return QObject::tr("Core clock [MHz]");
             case ValueID::CLK_MEM:  return QObject::tr("Memory clock [MHz]");
             case ValueID::VOLT_CORE:  return QObject::tr("Core volt [mV]");
