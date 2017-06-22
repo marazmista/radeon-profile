@@ -24,7 +24,6 @@ void radeon_profile::saveConfig() {
     settings.setValue("minimizeToTray",ui->cb_minimizeTray->isChecked());
     settings.setValue("closeToTray",ui->cb_closeTray->isChecked());
     settings.setValue("updateInterval",ui->spin_timerInterval->value());
-    settings.setValue("updateGPUData",ui->cb_gpuData->isChecked());
     settings.setValue("updateGraphs",ui->cb_graphs->isChecked());
     settings.setValue("saveWindowGeometry",ui->cb_saveWindowGeometry->isChecked());
     settings.setValue("windowGeometry",this->geometry());
@@ -177,7 +176,6 @@ void radeon_profile::loadConfig() {
     ui->cb_minimizeTray->setChecked(settings.value("minimizeToTray",false).toBool());
     ui->cb_closeTray->setChecked(settings.value("closeToTray",false).toBool());
     ui->spin_timerInterval->setValue(settings.value("updateInterval",1).toDouble());
-    ui->cb_gpuData->setChecked(settings.value("updateGPUData",true).toBool());
     ui->cb_graphs->setChecked(settings.value("updateGraphs",true).toBool());
     ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
     ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
@@ -216,16 +214,10 @@ void radeon_profile::loadConfig() {
                          desktopSize.height() / 2); // Height
     }
 
-    ui->cb_graphs->setEnabled(ui->cb_gpuData->isChecked());
-    ui->cb_stats->setEnabled(ui->cb_gpuData->isChecked());
-
-    if (ui->cb_gpuData->isChecked()) {
-        if (ui->cb_stats->isChecked())
-            ui->tabs_systemInfo->setTabEnabled(3,true);
-        else
-            ui->tabs_systemInfo->setTabEnabled(3,false);
-    } else
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "GPU data is disabled."));
+    if (ui->cb_stats->isChecked())
+        ui->tabs_systemInfo->setTabEnabled(3,true);
+    else
+        ui->tabs_systemInfo->setTabEnabled(3,false);
 
     if (ui->cb_zeroPercentFanSpeed->isChecked())
         setupMinFanSpeedSetting(0);

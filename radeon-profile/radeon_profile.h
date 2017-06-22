@@ -138,6 +138,7 @@ private slots:
     void on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_slider_timeRange_valueChanged(int value);
     void on_cb_daemonData_clicked(bool checked);
+    void on_btn_pauseRefresh_toggled(bool checked);
 
 private:
     struct currentStateInfo {

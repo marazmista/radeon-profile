@@ -336,3 +336,11 @@ void radeon_profile::on_cb_daemonData_clicked(bool checked)
         ui->cb_daemonData->setChecked(false);
     }
 }
+
+void radeon_profile::on_btn_pauseRefresh_toggled(bool checked)
+{
+    if (checked)
+        timer->stop();
+    else
+        timer->start();
+}

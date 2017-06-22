@@ -339,6 +339,21 @@ void radeon_profile::refreshUI() {
         for (int i = 0; i < ui->list_currentGPUData->topLevelItemCount(); ++i)
             ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue);
     }
+
+    if (device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) {
+        ui->combo_pLevel->setCurrentText(device.currentPowerLevel);
+        if (device.currentPowerProfile == dpm_battery)
+            ui->btn_dpmBattery->setChecked(true);
+        else if (device.currentPowerProfile == dpm_balanced)
+            ui->btn_dpmBalanced->setChecked(true);
+        else if (device.currentPowerProfile == dpm_performance)
+            ui->btn_dpmPerformance->setChecked(true);
+    }
+
+    // do the math only when user looking at stats table
+    if (ui->tabs_systemInfo->currentIndex() == 3 && ui->mainTabs->currentIndex() == 0)
+        updateStatsTable();
+
 }
 
 void radeon_profile::createCurrentGpuDataListItems()
@@ -382,42 +397,25 @@ void radeon_profile::timerEvent() {
         return;
     }
 
-    if (Q_LIKELY(ui->cb_gpuData->isChecked())) {
-        refreshGpuData();
+    refreshGpuData();
 
-        if (device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) {
-            ui->combo_pLevel->setCurrentText(device.currentPowerLevel);
-            if (device.currentPowerProfile == dpm_battery)
-                ui->btn_dpmBattery->setChecked(true);
-            else if (device.currentPowerProfile == dpm_balanced)
-                ui->btn_dpmBalanced->setChecked(true);
-            else if (device.currentPowerProfile == dpm_performance)
-                ui->btn_dpmPerformance->setChecked(true);
-            }
-
-        if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && ui->btn_pwmProfile->isChecked())
-            adjustFanSpeed();
-
-
-        // lets say coreClk is essential to get stats (it is disabled in ui anyway when features.clocksAvailable is false)
-        if (ui->cb_stats->isChecked() && device.gpuData.contains(ValueID::CLK_CORE)) {
-            doTheStats();
-
-            // do the math only when user looking at stats table
-            if (ui->tabs_systemInfo->currentIndex() == 3 && ui->mainTabs->currentIndex() == 0)
-                updateStatsTable();
-        }
-        refreshUI();
-    }
+    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && ui->btn_pwmProfile->isChecked())
+        adjustFanSpeed();
 
     if (Q_LIKELY(ui->cb_graphs->isChecked()))
         refreshGraphs();
 
-
-    refreshTooltip();
-
     if (ui->cb_eventsTracking->isChecked())
         checkEvents();
+
+    // lets say coreClk is essential to get stats (it is disabled in ui anyway when features.clocksAvailable is false)
+    if (ui->cb_stats->isChecked() && device.gpuData.contains(ValueID::CLK_CORE))
+        doTheStats();
+
+    if (!isMinimized() && !isHidden())
+        refreshUI();
+
+    refreshTooltip();
 }
 
 /**
