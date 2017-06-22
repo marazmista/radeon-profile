@@ -59,6 +59,7 @@ public:
 
     typedef QMap<int, unsigned int> fanProfileSteps;
     
+    
 private slots:
     void timerEvent();
     void initFutureHandler();
@@ -161,6 +162,7 @@ private:
     QChartView *fanProfileChart;
     QLineSeries *fanSeries;
     QMap<int, PieProgressBar*> topBarPies;
+    QMap<int, ValueID> keysInCurrentGpuList;
 
     Ui::radeon_profile *ui;
     void setupTrayIcon();
@@ -185,10 +187,6 @@ private:
     void refreshUI();
     void connectSignals();
     void setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile);
-
-    /**
-     * @brief If the temperature has changed adjust the fan speed
-     */
     void adjustFanSpeed();
     fanProfileSteps stepsListToMap();
     void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
@@ -215,39 +213,14 @@ private:
     void setupUiElements();
     void createPlots();
     void modifyPlotSchema(const QString &name);
-
-    /**
-     * @brief configureDaemonAutoRefresh Reconfigures the daemon with indicated auto-refresh settings.
-     * @param enabled If true enables auto-refresh, otherwise disables it.
-     * @param interval Seconds between each update.
-     */
-    void configureDaemonAutoRefresh(bool enabled = true, int interval = 1);
-
-    /**
-     * @brief showWindow reveals the main window, unless the "Start Minimized" setting is checked
-     */
-    void showWindow();
-
-    /**
-     * @brief fanStepIsValid Checks if the given parameters are a valid fan step.
-     * @param temperature
-     * @param fanSpeed
-     * @return If the step is valid.
-     */
-    bool isFanStepValid(unsigned int temperature, unsigned int fanSpeed);
-
-    /**
-     * @brief addFanStep Adds a single fan step to the custom curve steps.
-     * If another step with the same temperature exists already it is overwritten.
-     * @param temperature
-     * @param fanSpeed
-     */
-    void addFanStep (int temperature, int fanSpeed);
-
+    void createCurrentGpuDataListItems();
     void fillConnectors();
     void fillModInfo();
     bool askConfirmation(const QString title, const QString question);
     void createTopBar();
+    void showWindow();
+    bool isFanStepValid(unsigned int temperature, unsigned int fanSpeed);
+    void addFanStep (int temperature, int fanSpeed);
 };
 
 #endif // RADEON_PROFILE_H

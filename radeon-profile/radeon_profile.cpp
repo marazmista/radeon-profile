@@ -80,7 +80,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     fillModInfo();
 
     timer->start();
-    timerEvent();
+//    timerEvent();
 
     showWindow();
 }
@@ -298,6 +298,8 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         on_btn_applyOverclock_clicked();
 
     ui->mainTabs->setTabEnabled(2,features.ocCoreAvailable && features.canChangeProfile);
+
+    createCurrentGpuDataListItems();
 }
 
 void radeon_profile::refreshGpuData() {
@@ -317,6 +319,8 @@ void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, c
     parent->addTopLevelItem(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
 }
 
+
+
 void radeon_profile::refreshUI() {
     ui->l_cClk->setText(device.gpuData.value(ValueID::CLK_CORE).strValue);
     ui->l_mClk->setText(device.gpuData.value(ValueID::CLK_MEM).strValue);
@@ -332,27 +336,21 @@ void radeon_profile::refreshUI() {
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
-        ui->list_currentGPUData->clear();
+        for (int i = 0; i < ui->list_currentGPUData->topLevelItemCount(); ++i)
+            ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue);
+    }
+}
 
-        if (device.gpuData.contains(ValueID::POWER_LEVEL))
-            addChild(ui->list_currentGPUData, tr("Power level"), device.gpuData.value(ValueID::POWER_LEVEL).strValue);
-        if (device.gpuData.contains(ValueID::CLK_CORE))
-            addChild(ui->list_currentGPUData, tr("GPU clock"), device.gpuData.value(ValueID::CLK_CORE).strValue);
-        if (device.gpuData.contains(ValueID::CLK_MEM))
-            addChild(ui->list_currentGPUData, tr("Memory clock"), device.gpuData.value(ValueID::CLK_MEM).strValue);
-        if (device.gpuData.contains(ValueID::CLK_UVD))
-            addChild(ui->list_currentGPUData, tr("UVD core clock (cclk)"), device.gpuData.value(ValueID::CLK_UVD).strValue);
-        if (device.gpuData.contains(ValueID::DCLK_UVD))
-            addChild(ui->list_currentGPUData, tr("UVD decoder clock (dclk)"), device.gpuData.value(ValueID::DCLK_UVD).strValue);
-        if (device.gpuData.contains(ValueID::VOLT_CORE))
-            addChild(ui->list_currentGPUData, tr("GPU voltage (vddc)"), device.gpuData.value(ValueID::VOLT_CORE).strValue);
-        if (device.gpuData.contains(ValueID::VOLT_MEM))
-            addChild(ui->list_currentGPUData, tr("I/O voltage (vddci)"), device.gpuData.value(ValueID::VOLT_MEM).strValue);
+void radeon_profile::createCurrentGpuDataListItems()
+{
+    for (int i = 0; i < device.gpuData.keys().count(); ++i) {
 
-        if (ui->list_currentGPUData->topLevelItemCount() == 0)
-            addChild(ui->list_currentGPUData, tr("Can't read data"), tr("You need debugfs mounted and either root rights or the daemon running"));
+        // exclude before current from list
+        if (device.gpuData.keys().at(i) == ValueID::TEMPERATURE_BEFORE_CURRENT)
+            continue;
 
-        addChild(ui->list_currentGPUData, tr("GPU temperature"), device.gpuData.value(ValueID::TEMPERATURE_CURRENT).strValue);
+        addChild(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
+        keysInCurrentGpuList.insert(ui->list_currentGPUData->topLevelItemCount() - 1, device.gpuData.keys().at(i));
     }
 }
 
