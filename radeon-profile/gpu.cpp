@@ -90,7 +90,9 @@ bool gpu::initialize() {
     return true;
 }
 
-
+bool gpu::isInitialized() {
+    return gpuList.count() > 0;
+}
 
 void gpu::changeGpu(int index) {
     delete driverHandler;
@@ -285,9 +287,9 @@ void gpu::finalize() {
         futureGpuUsage.waitForFinished();
 }
 
-bool gpu::overclock(const int value){
+bool gpu::setOverclockValue(const int value){
     if (getDriverFeatures().ocCoreAvailable)
-        return driverHandler->overclock(value);
+        return driverHandler->setOverclockValue(value);
 
     qWarning() << "Error overclocking: overclocking is not supported";
     return false;

@@ -283,10 +283,18 @@ void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
     ui->slider_overclock->setEnabled(enable);
     ui->btn_applyOverclock->setEnabled(enable);
     ui->cb_overclockAtLaunch->setEnabled(enable);
+
+    if (!device.isInitialized())
+        return;
+
+    if (ui->slider_overclock->value() > 0)
+        device.setOverclockValue(ui->slider_overclock->value());
+    else
+        device.setOverclockValue(0);
 }
 
 void radeon_profile::on_btn_applyOverclock_clicked(){
-    if (!device.overclock(ui->slider_overclock->value()))
+    if (!device.setOverclockValue(ui->slider_overclock->value()))
         QMessageBox::warning(this, tr("Error"), tr("An error occurred, overclock failed"));
 }
 

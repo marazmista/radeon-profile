@@ -54,11 +54,12 @@ public:
     void detectCards();
     bool initialize();
     bool daemonConnected();
-    bool overclock(int value);
+    bool setOverclockValue(int value);
     void resetOverclock();
     const DriverFeatures& getDriverFeatures();
     const GPUConstParams& getGpuConstParams();
     void finalize();
+    bool isInitialized();
 
 private slots:
     void handleGpuUsageResult() {

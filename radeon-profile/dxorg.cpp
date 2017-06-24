@@ -738,7 +738,7 @@ GPUClocks dXorg::getFeaturesFallback() {
     return fallbackfeatures;
 }
 
-bool dXorg::overclock(const int percentage) {
+bool dXorg::setOverclockValue(const int percentage) {
     if ((percentage > 20) || (percentage < 0))
         qWarning() << "Error overclocking: invalid percentage passed: " << percentage;
     else if (daemonConnected()) { // Signal the daemon to set the overclock value
@@ -761,5 +761,5 @@ bool dXorg::overclock(const int percentage) {
 }
 
 void dXorg::resetOverclock() {
-    overclock(0);
+    setOverclockValue(0);
 }

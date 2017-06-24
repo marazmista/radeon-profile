@@ -69,6 +69,7 @@ private slots:
     void forceLow();
     void forceHigh();
     void resetMinMax();
+
     void gpuChanged();
     void closeEvent(QCloseEvent *);
     void closeFromTray();
