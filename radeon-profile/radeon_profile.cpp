@@ -123,6 +123,7 @@ void radeon_profile::setupUiElements()
     setupContextMenus();
     setupTrayIcon();
     addRuntimeWidgets();
+    createGeneralMenu();
 
     ui->centralWidget->setEnabled(false);
 }
@@ -372,7 +373,8 @@ void radeon_profile::createCurrentGpuDataListItems()
                 device.gpuData.keys().at(i) == ValueID::TEMPERATURE_MIN)
             continue;
 
-        addChild(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
+        QString name = globalStuff::getNameOfValueID(device.gpuData.keys().at(i));
+        addChild(ui->list_currentGPUData, name.left(name.lastIndexOf(" ")), "");
         keysInCurrentGpuList.insert(ui->list_currentGPUData->topLevelItemCount() - 1, device.gpuData.keys().at(i));
     }
 }

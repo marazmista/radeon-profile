@@ -69,6 +69,25 @@ void radeon_profile::setupTrayIcon() {
     connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 }
 
+void radeon_profile::createGeneralMenu() {
+    generalMenu = new QMenu(this);
+    ui->btn_general->setMenu(generalMenu);
+
+    QAction *pause = new QAction(generalMenu);
+    pause->setCheckable(true);
+    pause->setText(tr("Pause refresh temporairly"));
+    pause->setIcon(QIcon(":/icon/symbols/pause.png"));
+    connect(pause, SIGNAL(toggled(bool)), this,SLOT(pauseRefresh(bool)));
+
+    QAction *resetTemp = new QAction(generalMenu);
+    resetTemp->setText(tr("Reset min and max temperatures"));
+    connect(resetTemp,SIGNAL(triggered()), this, SLOT(resetMinMax()));
+
+    generalMenu->addAction(pause);
+    generalMenu->addSeparator();
+    generalMenu->addAction(resetTemp);
+}
+
 void radeon_profile::setupForcePowerLevelMenu() {
     forcePowerMenu = new QMenu(this);
 

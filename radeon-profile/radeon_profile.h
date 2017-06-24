@@ -53,7 +53,7 @@ public:
 
     QSystemTrayIcon *trayIcon;
     QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
-    QMenu *dpmMenu, *trayMenu, *optionsMenu, *forcePowerMenu, *fanProfilesMenu;
+    QMenu *dpmMenu, *trayMenu, *generalMenu, *forcePowerMenu, *fanProfilesMenu;
     QTimer *timer = nullptr;
     static unsigned int minFanStepsSpeed;
 
@@ -63,15 +63,13 @@ public:
 private slots:
     void timerEvent();
     void initFutureHandler();
-    void changeTimeRange();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void forceAuto();
     void forceLow();
     void forceHigh();
     void resetMinMax();
-
     void gpuChanged();
-    void closeEvent(QCloseEvent *);
+    void closeEvent(QCloseEvent *e);
     void closeFromTray();
     void on_spin_timerInterval_valueChanged(double arg1);
     void on_cb_gpuData_clicked(bool checked);
@@ -136,7 +134,8 @@ private slots:
     void on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_slider_timeRange_valueChanged(int value);
     void on_cb_daemonData_clicked(bool checked);
-    void on_btn_pauseRefresh_toggled(bool checked);
+    void pauseRefresh(bool checked);
+    void on_btn_general_clicked();
 
 private:
     struct currentStateInfo {
@@ -220,6 +219,7 @@ private:
     void showWindow();
     bool isFanStepValid(unsigned int temperature, unsigned int fanSpeed);
     void addFanStep (int temperature, int fanSpeed);
+    void createGeneralMenu();
 };
 
 #endif // RADEON_PROFILE_H

@@ -76,10 +76,9 @@ void radeon_profile::changePowerLevelFromCombo() {
     device.setForcePowerLevel((ForcePowerLevels)ui->combo_pLevel->currentIndex());
 }
 
-void radeon_profile::resetMinMax() { device.gpuData.remove(ValueID::TEMPERATURE_MIN); device.gpuData.remove(ValueID::TEMPERATURE_MAX); }
-
-void radeon_profile::changeTimeRange() {
-//    rangeX = ui->timeSlider->value();
+void radeon_profile::resetMinMax() {
+    device.gpuData[ValueID::TEMPERATURE_MIN].setValue(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+    device.gpuData[ValueID::TEMPERATURE_MAX].setValue(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
 }
 
 void radeon_profile::changePowerLevel(int level) {
@@ -329,10 +328,15 @@ void radeon_profile::on_cb_daemonData_clicked(bool checked)
     }
 }
 
-void radeon_profile::on_btn_pauseRefresh_toggled(bool checked)
+void radeon_profile::pauseRefresh(bool checked)
 {
     if (checked)
         timer->stop();
     else
         timer->start();
+}
+
+void radeon_profile::on_btn_general_clicked()
+{
+    ui->btn_general->showMenu();
 }
