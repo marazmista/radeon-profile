@@ -201,6 +201,8 @@ void radeon_profile::loadConfig() {
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
 
     globalStuff::globalConfig.daemonData = ui->cb_daemonData->isChecked();
+    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
+    globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
@@ -233,9 +235,6 @@ void radeon_profile::loadConfig() {
 
     plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
     hideEventControls(true);
-
-    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
-    globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
 
     QFile f(auxStuffPath);
     if (f.open(QIODevice::ReadOnly)) {

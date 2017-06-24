@@ -271,7 +271,7 @@ public:
             case ValueID::GPU_USAGE_PERCENT:  return QObject::tr("GPU usage [%]");
             case ValueID::GPU_VRAM_USAGE_PERCENT:  return QObject::tr("GPU Vram usage [%]");
             case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed [rpm]");
-            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature (current) [")+QString::fromUtf8("\u00B0C]");
+            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature [")+QString::fromUtf8("\u00B0C]");
             case ValueID::TEMPERATURE_MAX: return QObject::tr("Temperature (max) [")+QString::fromUtf8("\u00B0C]");
             case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min) [")+QString::fromUtf8("\u00B0C]");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram usage [MB]");

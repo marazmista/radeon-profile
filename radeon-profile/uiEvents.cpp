@@ -35,22 +35,6 @@ void radeon_profile::forceHigh() {
     //    device.setForcePowerLevel(globalStuff::F_HIGH);
 }
 
-// == buttons for forcePowerLevel
-void radeon_profile::on_btn_forceAuto_clicked()
-{
-    forceAuto();
-}
-
-void radeon_profile::on_btn_forceHigh_clicked()
-{
-    forceHigh();
-}
-
-void radeon_profile::on_btn_forceLow_clicked()
-{
-    forceLow();
-}
-
 // == fan control
 void radeon_profile::on_btn_pwmFixedApply_clicked()
 {
@@ -302,7 +286,7 @@ void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
 }
 
 void radeon_profile::on_btn_applyOverclock_clicked(){
-    if( ! device.overclock(ui->slider_overclock->value()))
+    if (!device.overclock(ui->slider_overclock->value()))
         QMessageBox::warning(this, tr("Error"), tr("An error occurred, overclock failed"));
 }
 

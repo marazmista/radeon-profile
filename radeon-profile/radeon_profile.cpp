@@ -294,7 +294,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
     ui->group_cfgDaemon->setEnabled(device.daemonConnected());
 
-    if (features.canChangeProfile && features.ocCoreAvailable && ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked())
+    if (features.canChangeProfile && features.ocCoreAvailable && ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked() && ui->slider_overclock->value() > 0)
         on_btn_applyOverclock_clicked();
 
     ui->mainTabs->setTabEnabled(2,features.ocCoreAvailable && features.canChangeProfile);
@@ -319,8 +319,6 @@ void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, c
     parent->addTopLevelItem(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
 }
 
-
-
 void radeon_profile::refreshUI() {
     ui->l_cClk->setText(device.gpuData.value(ValueID::CLK_CORE).strValue);
     ui->l_mClk->setText(device.gpuData.value(ValueID::CLK_MEM).strValue);
@@ -336,8 +334,16 @@ void radeon_profile::refreshUI() {
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
-        for (int i = 0; i < ui->list_currentGPUData->topLevelItemCount(); ++i)
+        for (int i = 0; i < ui->list_currentGPUData->topLevelItemCount(); ++i) {
+            if (keysInCurrentGpuList.value(i) == ValueID::TEMPERATURE_CURRENT) {
+                ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue +
+                                                                  " (max: "+ device.gpuData.value(ValueID::TEMPERATURE_MAX).strValue + " min: "+ device.gpuData.value(ValueID::TEMPERATURE_MIN).strValue+")");
+                continue;
+            }
+
+
             ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue);
+        }
     }
 
     if (device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) {
@@ -361,7 +367,9 @@ void radeon_profile::createCurrentGpuDataListItems()
     for (int i = 0; i < device.gpuData.keys().count(); ++i) {
 
         // exclude before current from list
-        if (device.gpuData.keys().at(i) == ValueID::TEMPERATURE_BEFORE_CURRENT)
+        if (device.gpuData.keys().at(i) == ValueID::TEMPERATURE_BEFORE_CURRENT ||
+                device.gpuData.keys().at(i) == ValueID::TEMPERATURE_MAX ||
+                device.gpuData.keys().at(i) == ValueID::TEMPERATURE_MIN)
             continue;
 
         addChild(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
@@ -412,6 +420,7 @@ void radeon_profile::timerEvent() {
     if (ui->cb_stats->isChecked() && device.gpuData.contains(ValueID::CLK_CORE))
         doTheStats();
 
+    // don't refresh ui dynamic stuff when min or hidden
     if (!isMinimized() && !isHidden())
         refreshUI();
 
