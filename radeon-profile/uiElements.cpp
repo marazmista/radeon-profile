@@ -43,9 +43,9 @@ void radeon_profile::setupTrayIcon() {
     dpmSetPerformance->setText(tr("Performance"));
     dpmSetPerformance->setIcon(QIcon(":/icon/symbols/arrow3.png"));
 
-//    connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(changePowerLevel(0)));
-//    connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(changePowerLevel(1)));
-//    connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(changePowerLevel(2)));
+    connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(setBattery()));
+    connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(setBalanced()));
+    connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(setPerformance()));
 
     dpmMenu->addAction(dpmSetBattery);
     dpmMenu->addAction(dpmSetBalanced);

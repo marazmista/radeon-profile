@@ -35,6 +35,18 @@ void radeon_profile::forceHigh() {
     //    device.setForcePowerLevel(globalStuff::F_HIGH);
 }
 
+void radeon_profile::setBattery() {
+    setPowerLevel(0);
+}
+
+void radeon_profile::setBalanced() {
+    setPowerLevel(1);
+}
+
+void radeon_profile::setPerformance() {
+    setPowerLevel(2);
+}
+
 // == fan control
 void radeon_profile::on_btn_pwmFixedApply_clicked()
 {
@@ -72,7 +84,7 @@ void radeon_profile::on_btn_pwmProfile_clicked()
     setCurrentFanProfile(ui->l_currentFanProfile->text(), fanProfiles.value(ui->l_currentFanProfile->text()));
 }
 
-void radeon_profile::changePowerLevelFromCombo() {
+void radeon_profile::setPowerLevelFromCombo() {
     device.setForcePowerLevel((ForcePowerLevels)ui->combo_pLevel->currentIndex());
 }
 
@@ -81,7 +93,7 @@ void radeon_profile::resetMinMax() {
     device.gpuData[ValueID::TEMPERATURE_MAX].setValue(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
 }
 
-void radeon_profile::changePowerLevel(int level) {
+void radeon_profile::setPowerLevel(int level) {
             device.setPowerProfile(static_cast<PowerProfiles>((device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) ?
                                                                                level :
                                                                                level + 3));

@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20170613
+#define appVersion 20170625
 
 namespace Ui {
 class radeon_profile;
@@ -67,6 +67,9 @@ private slots:
     void forceAuto();
     void forceLow();
     void forceHigh();
+    void setBattery();
+    void setBalanced();
+    void setPerformance();
     void resetMinMax();
     void gpuChanged();
     void closeEvent(QCloseEvent *e);
@@ -99,7 +102,7 @@ private slots:
     void on_btn_pwmFixed_clicked();
     void on_btn_pwmAuto_clicked();
     void on_btn_pwmProfile_clicked();
-    void changePowerLevelFromCombo();
+    void setPowerLevelFromCombo();
     void on_btn_fanInfo_clicked();
     void on_btn_addFanStep_clicked();
     void on_btn_removeFanStep_clicked();
@@ -123,7 +126,7 @@ private slots:
     void on_btn_revokeEvent_clicked();
     void on_list_events_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_saveAll_clicked();
-    void changePowerLevel(int level);
+    void setPowerLevel(int level);
     void on_btn_configurePlots_clicked();
     void on_btn_applySavePlotsDefinitons_clicked();
     void on_btn_addPlotDefinition_clicked();

@@ -104,10 +104,10 @@ void radeon_profile::connectSignals()
 {
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
-    connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(changePowerLevelFromCombo()));
+    connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(setPowerLevelFromCombo()));
 
 
-    connect(&dpmGroup, SIGNAL(buttonClicked(int)), this, SLOT(changePowerLevel(int)));
+    connect(&dpmGroup, SIGNAL(buttonClicked(int)), this, SLOT(setPowerLevel(int)));
 
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
 //    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
@@ -309,11 +309,6 @@ void radeon_profile::refreshGpuData() {
     device.getTemperature();
     device.getGpuUsage();
     device.getPwmSpeed();
-
-    if (Q_LIKELY(execsRunning.count() == 0))
-        return;
-
-    updateExecLogs();
 }
 
 void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
@@ -427,18 +422,12 @@ void radeon_profile::timerEvent() {
         refreshUI();
 
     refreshTooltip();
+
+
+    if (Q_UNLIKELY(execsRunning.count() > 0))
+        updateExecLogs();
 }
 
-/**
- * If the fan profile contains a direct match for the current temperature, it is used.<br>
- * Otherwise find the closest matches and use linear interpolation:<br>
- * \f$speed(temp) = \frac{hSpeed - lSpeed}{hTemperature - lTemperature} * (temp - lTemperature)  + lSpeed\f$<br>
- * Where:<br>
- * \f$(hTemperature, hSpeed)\f$ is the higher closest match;<br>
- * \f$(lTemperature, lSpeed)\f$ is the lower closest match;<br>
- * \f$temp\f$ is the current temperature;<br>
- * \f$speed\f$ is the speed to apply.
- */
 void radeon_profile::adjustFanSpeed() {
     if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value != device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value ) {
         if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {  // Exact match
