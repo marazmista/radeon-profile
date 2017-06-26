@@ -892,7 +892,7 @@
              <number>3</number>
             </property>
             <item>
-             <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,0,0,0">
+             <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,0,0">
               <property name="leftMargin">
                <number>10</number>
               </property>
@@ -1005,19 +1005,19 @@
                </widget>
               </item>
               <item row="5" column="2">
-               <widget class="QPushButton" name="btn_cancelEditPlots">
-                <property name="maximumSize">
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
                  <size>
-                  <width>16777215</width>
-                  <height>25</height>
+                  <width>40</width>
+                  <height>20</height>
                  </size>
                 </property>
-                <property name="text">
-                 <string>Cancel</string>
-                </property>
-               </widget>
+               </spacer>
               </item>
-              <item row="1" column="3" rowspan="3">
+              <item row="1" column="2" rowspan="3">
                <widget class="QGroupBox" name="groupBox">
                 <property name="title">
                  <string>General plots settings</string>
@@ -1060,19 +1060,6 @@
                  </item>
                 </layout>
                </widget>
-              </item>
-              <item row="5" column="3">
-               <spacer name="horizontalSpacer_8">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
              </layout>
             </item>

@@ -211,15 +211,6 @@ public:
         delete rpp;
     }
 
-    void modifySchemaState(const QString &name, bool enabled) {
-        schemas[name].enabled = enabled;
-
-        if (enabled)
-            createPlotFromSchema(name);
-        else
-            removePlot(name);
-    }
-
     void createAxis(RPPlot *plot, const PlotAxisSchema &pas, Qt::Alignment align) {
         plot->addAxis(align, pas.unit, pas.penGrid, pas.ticks);
 

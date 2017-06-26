@@ -132,7 +132,6 @@ private slots:
     void on_btn_addPlotDefinition_clicked();
     void on_btn_removePlotDefinition_clicked();
     void on_btn_modifyPlotDefinition_clicked();
-    void on_btn_cancelEditPlots_clicked();
     void on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, int column);
     void on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_slider_timeRange_valueChanged(int value);
