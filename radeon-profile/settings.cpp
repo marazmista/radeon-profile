@@ -277,10 +277,7 @@ void radeon_profile::loadConfig() {
         createDefaultFanProfile();
 
     // create plots from xml config
-    if (plotManager.schemas.count() > 0) {
-        plotManager.recreatePlotsFromSchemas();
-        createPlots();
-    } else
+    if (plotManager.schemas.count() == 0)
         ui->stack_plots->setCurrentIndex(1);
 
     makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));

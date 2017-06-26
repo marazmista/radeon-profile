@@ -14,6 +14,10 @@ using namespace QtCharts;
 class PlotManager;
 class RPPlot;
 
+struct PlotInitialValues {
+    int left = 0, right = 0;
+};
+
 struct PlotAxisSchema {
     bool enabled = false;
     ValueUnit unit;
@@ -112,28 +116,6 @@ public:
         }
     }
 
-    void setInitialScale(YAxis *axis,  ValueUnit unit) {
-        switch (unit) {
-            case ValueUnit::PERCENT:
-                axis->setRange(0, 100);
-                return;
-
-            case ValueUnit::CELSIUS:
-                axis->setRange(30, 50);
-                return;
-
-            case ValueUnit::MEGAHERTZ:
-            case ValueUnit::MILIVOLT:
-                axis->setRange(200, 500);
-                return;
-            case ValueUnit::RPM:
-                axis->setRange(200, 500);
-                return;
-            default:
-                return;
-        }
-    }
-
     void rescale(YAxis *axis,  float value,  ValueUnit unit) {
         // percent has const scale 0-100
         if (unit == ValueUnit::PERCENT)
@@ -161,6 +143,12 @@ public:
                 case ValueUnit::CELSIUS:
                     axis->setMin(value - 5);
                     return;
+                case ValueUnit::MEGAHERTZ:
+                case ValueUnit::MEGABYTE:
+                case ValueUnit::RPM:
+                case ValueUnit::MILIVOLT:
+                    axis->setMin(value - 100);
+                    return;
                 default:
                     return;
             }
@@ -179,6 +167,8 @@ private:
     int timeRange = 150,
         rightGap = 10;
 
+    const int maxRange = 1800;
+
 public:
     QMap<QString, RPPlot*> plots;
     QMap<QString, PlotDefinitionSchema> schemas;
@@ -193,6 +183,30 @@ public:
 
     void setTimeRange(int range) {
         timeRange = range;
+    }
+
+    void setInitialYRange(YAxis *axis, const int &intialValue) {
+        switch (axis->unit) {
+            case ValueUnit::PERCENT:
+                axis->setRange(0, 100);
+                return;
+
+            case ValueUnit::CELSIUS:
+                axis->setRange(intialValue - 5, intialValue + 5);
+                return;
+
+            case ValueUnit::MEGAHERTZ:
+            case ValueUnit::MILIVOLT:
+            case ValueUnit::RPM:
+                axis->setRange(intialValue - 100, intialValue + 200);
+                return;
+
+            case ValueUnit::MEGABYTE:
+                axis->setRange(intialValue - 100, intialValue + 100);
+                return;
+            default:
+                return;
+        }
     }
 
     void addSchema(const PlotDefinitionSchema &pds) {
@@ -220,7 +234,7 @@ public:
         }
     }
 
-    void createPlotFromSchema(const QString &name) {
+    void createPlotFromSchema(const QString &name, const PlotInitialValues &intialValues) {
         PlotDefinitionSchema pds = schemas.value(name);
 
         RPPlot *rpp = new  RPPlot();
@@ -229,15 +243,21 @@ public:
 
         setPlotBackground(rpp->name, pds.background);
 
-        if (pds.left.enabled)
+        if (pds.left.enabled) {
             createAxis(rpp, pds.left, Qt::AlignLeft);
+            setInitialYRange(rpp->axisLeft, intialValues.left);
+        }
 
         if (pds.right.enabled) {
             createAxis(rpp, pds.right, Qt::AlignRight);
+            setInitialYRange(rpp->axisRight, intialValues.right);
         }
     }
 
-    void recreatePlotsFromSchemas() {
+    void createPlotsFromSchemas(const GPUDataContainer &referenceData) {
+        if (schemas.count() == 0)
+            return;
+
         qDeleteAll(plots);
         plots.clear();
 
@@ -245,7 +265,14 @@ public:
             if (!schemas.value(k).enabled)
                 continue;
 
-            createPlotFromSchema(k);
+            PlotInitialValues piv;
+            if (schemas.value(k).left.enabled)
+                piv.left = referenceData.value(schemas.value(k).left.dataList.keys().at(0)).value;
+
+            if (schemas.value(k).right.enabled)
+                piv.right = referenceData.value(schemas.value(k).right.dataList.keys().at(0)).value;
+
+            createPlotFromSchema(k, piv);
         }
     }
 
@@ -280,13 +307,11 @@ public:
         ds->attachAxis(&p->timeAxis);
         ds->id = id;
 
-        if (p->axisLeft != nullptr && p->axisLeft->unit == tmpUnit) {
-            p->setInitialScale(p->axisLeft, tmpUnit);
+        if (p->axisLeft != nullptr && p->axisLeft->unit == tmpUnit)
             ds->attachAxis(plots[name]->axisLeft);
-        } else if (p->axisRight != nullptr && p->axisRight->unit == tmpUnit) {
-            p->setInitialScale(p->axisRight, tmpUnit);
+        else if (p->axisRight != nullptr && p->axisRight->unit == tmpUnit)
             ds->attachAxis(p->axisRight);
-        } else {
+        else {
             delete ds;
             return false;
         }
@@ -296,14 +321,26 @@ public:
         return true;
     }
 
+    void cleanupSeries() {
+        for (const QString &rppk : plots.keys()) {
+            for (ValueID &sk : plots.value(rppk)->series.keys()) {
+                if (plots[rppk]->series[sk]->count() > maxRange)
+                    plots[rppk]->series[sk]->remove(0);
+            }
+        }
+    }
+
     void updateSeries(int timestamp, const GPUDataContainer &data) {
+        // cleaunp every 60 refreshes
+        bool cleanup = timestamp % 60 == 0;
+
         for (const QString &rppk : plots.keys()) {
             plots[rppk]->timeAxis.setRange(timestamp - timeRange, timestamp + rightGap);
             plots[rppk]->updatePlot(timestamp, data);
-
-//                if (definedPlots[rppk]->series[dsk]->count() > 100)
-//                    definedPlots[rppk]->series[dsk]->remove(0);
         }
+
+        if (cleanup)
+            cleanupSeries();
     }
 };
 

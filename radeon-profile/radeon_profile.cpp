@@ -70,17 +70,15 @@ radeon_profile::radeon_profile(QWidget *parent) :
     connect(&initFuture, SIGNAL(finished()), this,  SLOT(initFutureHandler()));
     initFuture.setFuture(QtConcurrent::run(this, &radeon_profile::refreshGpuData));
 
-    // timer init
-    timer = new QTimer(this);
-    timer->setInterval(ui->spin_timerInterval->value()*1000);
-
     // fill tables with data at the start //
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
     fillConnectors();
     fillModInfo();
 
+    // timer init
+    timer = new QTimer(this);
+    timer->setInterval(ui->spin_timerInterval->value()*1000);
     timer->start();
-//    timerEvent();
 
     showWindow();
 }
@@ -95,6 +93,8 @@ void radeon_profile::initFutureHandler() {
     ui->centralWidget->setEnabled(true);
 
     createTopBar();
+    plotManager.createPlotsFromSchemas(device.gpuData);
+    addPlotsToLayout();
 
     connectSignals();
     refreshUI();
@@ -105,12 +105,8 @@ void radeon_profile::connectSignals()
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(setPowerLevelFromCombo()));
-
-
     connect(&dpmGroup, SIGNAL(buttonClicked(int)), this, SLOT(setPowerLevel(int)));
-
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
-//    connect(ui->timeSlider,SIGNAL(valueChanged(int)),this,SLOT(changeTimeRange()));
 }
 
 void radeon_profile::setupUiElements()
@@ -422,7 +418,6 @@ void radeon_profile::timerEvent() {
         refreshUI();
 
     refreshTooltip();
-
 
     if (Q_UNLIKELY(execsRunning.count() > 0))
         updateExecLogs();

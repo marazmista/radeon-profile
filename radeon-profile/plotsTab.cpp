@@ -5,7 +5,7 @@
 #include "ui_radeon_profile.h"
 #include "dialog_defineplot.h"
 
-void radeon_profile::createPlots() {
+void radeon_profile::addPlotsToLayout() {
     for (const QString &name : plotManager.plots.keys())
         ui->pagePlots->layout()->addWidget(plotManager.plots.value(name));
 }
@@ -46,7 +46,15 @@ void radeon_profile::on_btn_addPlotDefinition_clicked()
 
 
         plotManager.addSchema(pds);
-        plotManager.createPlotFromSchema(pds.name);
+
+        PlotInitialValues piv;
+        if (pds.left.enabled)
+            piv.left = device.gpuData.value(pds.left.dataList.keys().at(0)).value;
+
+        if (pds.right.enabled)
+            piv.right = device.gpuData.value(pds.right.dataList.keys().at(0)).value;
+
+        plotManager.createPlotFromSchema(pds.name, piv);
         ui->pagePlots->layout()->addWidget(plotManager.plots.value(pds.name));
     }
 
@@ -109,10 +117,19 @@ void radeon_profile::on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, 
         case Qt::Unchecked:
             plotManager.removePlot(item->text(0));
             return;
-        case Qt::Checked:
-            plotManager.createPlotFromSchema(item->text(0));
+        case Qt::Checked: {
+            PlotDefinitionSchema pds = plotManager.schemas.value(item->text(0));
+            PlotInitialValues piv;
+            if (pds.left.enabled)
+                piv.left = device.gpuData.value(pds.left.dataList.keys().at(0)).value;
+
+            if (pds.right.enabled)
+                piv.right = device.gpuData.value(pds.right.dataList.keys().at(0)).value;
+
+            plotManager.createPlotFromSchema(item->text(0), piv);
             ui->pagePlots->layout()->addWidget(plotManager.plots.value(item->text(0)));
             return;
+        }
         default:
             return;
     }

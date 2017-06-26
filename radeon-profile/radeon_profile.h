@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20170625
+#define appVersion 20170626
 
 namespace Ui {
 class radeon_profile;
@@ -211,7 +211,7 @@ private:
     void createDefaultFanProfile();
     void loadExecProfiles();
     void setupUiElements();
-    void createPlots();
+    void addPlotsToLayout();
     void modifyPlotSchema(const QString &name);
     void createCurrentGpuDataListItems();
     void fillConnectors();
