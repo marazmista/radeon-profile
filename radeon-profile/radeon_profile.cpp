@@ -287,7 +287,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     }
 
     if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM))
-        ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo());
+        ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo(device.getDriverFeatures().sysInfo.module));
 
     ui->group_cfgDaemon->setEnabled(device.daemonConnected());
 

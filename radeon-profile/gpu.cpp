@@ -287,7 +287,7 @@ void gpu::finalize() {
         futureGpuUsage.waitForFinished();
 }
 
-bool gpu::setOverclockValue(const int value){
+bool gpu::setOverclockValue(const int value) {
     if (getDriverFeatures().ocCoreAvailable)
         return driverHandler->setOverclockValue(value);
 

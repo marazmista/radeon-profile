@@ -290,7 +290,7 @@ int radeon_profile::askNumber(const int value, const int min, const int max, con
     return number;
 }
 
-void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
+void radeon_profile::on_cb_enableOverclock_toggled(const bool enable) {
     ui->slider_overclock->setEnabled(enable);
     ui->btn_applyOverclock->setEnabled(enable);
     ui->cb_overclockAtLaunch->setEnabled(enable);
@@ -298,7 +298,7 @@ void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
     if (!device.isInitialized())
         return;
 
-    if (ui->slider_overclock->value() > 0)
+    if (ui->slider_overclock->value() > 0 && enable)
         device.setOverclockValue(ui->slider_overclock->value());
     else
         device.setOverclockValue(0);

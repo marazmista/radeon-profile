@@ -23,7 +23,7 @@ void Dialog_RPEvent::setFeatures(const GPUDataContainer &gpuData, const DriverFe
     switch (features.currentPowerMethod) {
         case PowerMethod::DPM:
             ui->combo_dpmChange->addItems(globalStuff::createDPMCombo());
-            ui->combo_powerLevelChange->addItems(globalStuff::createPowerLevelCombo());
+            ui->combo_powerLevelChange->addItems(globalStuff::createPowerLevelCombo(features.sysInfo.module));
             break;
         case PowerMethod::PROFILE:
             ui->combo_dpmChange->addItems(globalStuff::createProfileCombo());

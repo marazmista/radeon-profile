@@ -464,9 +464,9 @@ void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
         qWarning() << "Unable to open " << filePath << " to write " << newValue;
 }
 
-void dXorg::setPowerProfile(PowerProfiles _newPowerProfile) {
+void dXorg::setPowerProfile(PowerProfiles newPowerProfile) {
     QString newValue;
-    switch (_newPowerProfile) {
+    switch (newPowerProfile) {
     case PowerProfiles::BATTERY:
         newValue = dpm_battery;
         break;
@@ -504,26 +504,42 @@ void dXorg::setPowerProfile(PowerProfiles _newPowerProfile) {
         dcomm.sendCommand(command);
     } else {
         // enum is int, so first three values are dpm, rest are profile
-        if (_newPowerProfile <= PowerProfiles::PERFORMANCE)
+        if (newPowerProfile <= PowerProfiles::PERFORMANCE)
             setNewValue(deviceFiles.sysFs.power_dpm_state, newValue);
         else
             setNewValue(deviceFiles.sysFs.power_profile, newValue);
     }
 }
 
-void dXorg::setForcePowerLevel(ForcePowerLevels _newForcePowerLevel) {
+void dXorg::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
     QString newValue;
-    switch (_newForcePowerLevel) {
-    case ForcePowerLevels::F_AUTO:
-        newValue = dpm_auto;
-        break;
-    case ForcePowerLevels::F_HIGH:
-        newValue = dpm_high;
-        break;
-    case ForcePowerLevels::F_LOW:
-        newValue = dpm_low;
-    default:
-        break;
+    switch (newForcePowerLevel) {
+        case ForcePowerLevels::F_AUTO:
+            newValue = dpm_auto;
+            break;
+        case ForcePowerLevels::F_HIGH:
+            newValue = dpm_high;
+            break;
+        case ForcePowerLevels::F_LOW:
+            newValue = dpm_low;
+            break;
+        case ForcePowerLevels::F_MANUAL:
+            newValue = dpm_manual;
+            break;
+        case  ForcePowerLevels::F_PROFILE_STANDARD:
+            newValue = dpm_profile_standard;
+            break;
+        case  ForcePowerLevels::F_PROFILE_MIN_SCLK:
+            newValue = dpm_profile_min_sclk;
+            break;
+        case ForcePowerLevels::F_PROFILE_MIN_MCLK:
+            newValue = dpm_profile_min_mclk;
+            break;
+        case ForcePowerLevels::F_PROFILE_PEAK:
+            newValue = dpm_profile_peak;
+            break;
+        default:
+            return;
     }
 
     if (daemonConnected()) {

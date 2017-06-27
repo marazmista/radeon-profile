@@ -124,8 +124,8 @@ public:
     QString getCurrentPowerLevel();
     QString getCurrentPowerProfile();
 
-    void setPowerProfile(PowerProfiles _newPowerProfile);
-    void setForcePowerLevel(ForcePowerLevels);
+    void setPowerProfile(PowerProfiles newPowerProfile);
+    void setForcePowerLevel(ForcePowerLevels newForcePowerLevel);
     void setPwmManualControl(bool manual);
     void setPwmValue(unsigned int value);
 

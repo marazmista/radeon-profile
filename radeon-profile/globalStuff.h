@@ -15,6 +15,11 @@
 #define dpm_high "high"
 #define dpm_auto "auto"
 #define dpm_low "low"
+#define dpm_manual "manual"
+#define dpm_profile_standard "profile_standard"
+#define dpm_profile_min_sclk "profile_min_sclk"
+#define dpm_profile_min_mclk "profile_min_mclk"
+#define dpm_profile_peak "profile_peak"
 
 #define profile_auto "auto"
 #define profile_default "default"
@@ -63,7 +68,7 @@ enum PowerProfiles {
 };
 
 enum ForcePowerLevels {
-    F_AUTO, F_LOW, F_HIGH
+    F_AUTO, F_LOW, F_HIGH, F_MANUAL, F_PROFILE_STANDARD, F_PROFILE_MIN_SCLK, F_PROFILE_MIN_MCLK, F_PROFILE_PEAK
 };
 
 enum class ClocksDataSource {
@@ -301,8 +306,18 @@ public:
         return QStringList() << dpm_battery << dpm_balanced << dpm_performance;
     }
 
-    static QStringList createPowerLevelCombo() {
-        return QStringList() << dpm_auto << dpm_low << dpm_high;
+    static QStringList createPowerLevelCombo(const DriverModule dm) {
+        switch (dm) {
+            case DriverModule::RADEON:
+
+            case DriverModule::AMDGPU:
+                return QStringList() << dpm_auto << dpm_low << dpm_high << dpm_manual <<
+                                        dpm_profile_standard << dpm_profile_min_sclk << dpm_profile_min_mclk << dpm_profile_peak;
+            default:
+                break;
+        }
+
+        return QStringList();
     }
 
     static QStringList createProfileCombo() {
