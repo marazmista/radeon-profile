@@ -313,7 +313,7 @@ public:
     static QStringList createPowerLevelCombo(const DriverModule dm) {
         switch (dm) {
             case DriverModule::RADEON:
-
+                return QStringList() << dpm_auto << dpm_low << dpm_high;
             case DriverModule::AMDGPU:
                 return QStringList() << dpm_auto << dpm_low << dpm_high << dpm_manual <<
                                         dpm_profile_standard << dpm_profile_min_sclk << dpm_profile_min_mclk << dpm_profile_peak;
