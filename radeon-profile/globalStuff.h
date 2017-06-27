@@ -93,6 +93,10 @@ enum class TemperatureSensor {
     TS_UNKNOWN
 };
 
+enum class OverclockType {
+    OC_SCLK, OC_MCLK
+};
+
 struct GPUSysInfo {
     QString sysName, driverModuleString;
     DriverModule module;

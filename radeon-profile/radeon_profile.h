@@ -110,7 +110,7 @@ private slots:
     void on_fanSpeedSlider_valueChanged(int value);
     void on_cb_enableOverclock_toggled(bool enable);
     void on_btn_applyOverclock_clicked();
-    void on_slider_overclock_valueChanged(int value);
+    void on_slider_ocSclk_valueChanged(int value);
     void on_btn_activateFanProfile_clicked();
     void on_btn_removeFanProfile_clicked();
     void on_btn_saveFanProfile_clicked();
@@ -138,6 +138,7 @@ private slots:
     void on_cb_daemonData_clicked(bool checked);
     void pauseRefresh(bool checked);
     void on_btn_general_clicked();
+    void on_slider_ocMclk_valueChanged(const int value);
 
 private:
     struct currentStateInfo {

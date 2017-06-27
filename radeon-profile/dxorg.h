@@ -135,9 +135,7 @@ public:
     bool daemonConnected();
     GPUClocks getFeaturesFallback();
     void setupRegex(const QString &data);
-    bool setOverclockValue(int percentage);
-    void resetOverclock();
-
+    void setOverclockValue(const OverclockType &type, const int percentage);
 
 private:
     QChar gpuSysIndex;

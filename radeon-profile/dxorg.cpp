@@ -754,28 +754,23 @@ GPUClocks dXorg::getFeaturesFallback() {
     return fallbackfeatures;
 }
 
-bool dXorg::setOverclockValue(const int percentage) {
-    if ((percentage > 20) || (percentage < 0))
-        qWarning() << "Error overclocking: invalid percentage passed: " << percentage;
-    else if (daemonConnected()) { // Signal the daemon to set the overclock value
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(QString::number(percentage)).append(SEPARATOR); // The overclock level
-        command.append(deviceFiles.sysFs.pp_sclk_od).append(SEPARATOR); // The path where the overclock level should be written in
+void dXorg::setOverclockValue(const OverclockType &type, const int percentage) {
+    QString ocFile;
+    if (type == OverclockType::OC_SCLK && features.ocCoreAvailable)
+        ocFile = deviceFiles.sysFs.pp_sclk_od;
+    else if (type == OverclockType::OC_MCLK && features.ocMemAvailable)
+        ocFile = deviceFiles.sysFs.pp_mclk_od;
+    else
+        return;
+
+    if (daemonConnected()) {
+        QString command;
+        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR);
+        command.append(QString::number(percentage)).append(SEPARATOR);
+        command.append(ocFile).append(SEPARATOR);
 
         qDebug() << "Sending overclock signal: " << command;
         dcomm.sendCommand(command);
-        return true;
-    } else if(globalStuff::globalConfig.rootMode){ // Root mode, set it directly
-        setNewValue(deviceFiles.sysFs.pp_sclk_od, QString::number(percentage));
-
-        return true;
-    } else // Overclock requires root access to sysfs
-        qWarning() << "Error overclocking: daemon is not connected and no root access is available";
-
-    return false;
-}
-
-void dXorg::resetOverclock() {
-    setOverclockValue(0);
+    } else
+        setNewValue(ocFile, QString::number(percentage));
 }

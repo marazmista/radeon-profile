@@ -41,7 +41,8 @@ void radeon_profile::saveConfig() {
 
     settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
     settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
-    settings.setValue("overclockValue", ui->slider_overclock->value());
+    settings.setValue("overclockValue", ui->slider_ocSclk->value());
+    settings.setValue("overclockMemValue", ui->slider_ocMclk->value());
 
     settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
     settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
@@ -196,7 +197,8 @@ void radeon_profile::loadConfig() {
 
     ui->cb_enableOverclock->setChecked(settings.value("overclockEnabled",false).toBool());
     ui->cb_overclockAtLaunch->setChecked(settings.value("overclockAtLaunch",false).toBool());
-    ui->slider_overclock->setValue(settings.value("overclockValue",0).toInt());
+    ui->slider_ocSclk->setValue(settings.value("overclockValue",0).toInt());
+    ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
 
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
 

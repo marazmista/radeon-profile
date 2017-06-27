@@ -291,28 +291,37 @@ int radeon_profile::askNumber(const int value, const int min, const int max, con
 }
 
 void radeon_profile::on_cb_enableOverclock_toggled(const bool enable) {
-    ui->slider_overclock->setEnabled(enable);
+    ui->slider_ocSclk->setEnabled(enable);
+    ui->slider_ocMclk->setEnabled(enable);
     ui->btn_applyOverclock->setEnabled(enable);
     ui->cb_overclockAtLaunch->setEnabled(enable);
 
     if (!device.isInitialized())
         return;
 
-    if (ui->slider_overclock->value() > 0 && enable)
-        device.setOverclockValue(ui->slider_overclock->value());
+    if (enable)
+        on_btn_applyOverclock_clicked();
     else
-        device.setOverclockValue(0);
+        device.resetOverclock();
 }
 
-void radeon_profile::on_btn_applyOverclock_clicked(){
-    if (!device.setOverclockValue(ui->slider_overclock->value()))
-        QMessageBox::warning(this, tr("Error"), tr("An error occurred, overclock failed"));
+void radeon_profile::on_btn_applyOverclock_clicked() {
+    if (ui->slider_ocSclk->value() > 0)
+        device.setOverclockValue(OverclockType::OC_SCLK, ui->slider_ocSclk->value());
+
+    if (ui->slider_ocMclk->value() > 0)
+        device.setOverclockValue(OverclockType::OC_MCLK, ui->slider_ocMclk->value());
 }
 
-void radeon_profile::on_slider_overclock_valueChanged(const int value){
-    ui->label_overclockPercentage->setText(QString::number(value));
+void radeon_profile::on_slider_ocSclk_valueChanged(const int value)
+{
+    ui->l_ocSclk->setText(QString::number(value));
 }
 
+void radeon_profile::on_slider_ocMclk_valueChanged(const int value)
+{
+    ui->l_ocMclk->setText(QString::number(value));
+}
 
 void radeon_profile::on_btn_saveAll_clicked()
 {

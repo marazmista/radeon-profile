@@ -291,10 +291,11 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
     ui->group_cfgDaemon->setEnabled(device.daemonConnected());
 
-    if (features.canChangeProfile && features.ocCoreAvailable && ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked() && ui->slider_overclock->value() > 0)
+    if (features.canChangeProfile && features.ocCoreAvailable && ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked()
+            && ui->slider_ocMclk->value() > 0 && ui->slider_ocSclk->value() > 0)
         on_btn_applyOverclock_clicked();
 
-    ui->mainTabs->setTabEnabled(2,features.ocCoreAvailable && features.canChangeProfile);
+    ui->mainTabs->setTabEnabled(2,features.canChangeProfile && features.ocCoreAvailable && features.ocMemAvailable);
 
     createCurrentGpuDataListItems();
 }
@@ -329,10 +330,10 @@ void radeon_profile::refreshUI() {
         for (int i = 0; i < ui->list_currentGPUData->topLevelItemCount(); ++i) {
             if (keysInCurrentGpuList.value(i) == ValueID::TEMPERATURE_CURRENT) {
                 ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue +
-                                                                  " (max: "+ device.gpuData.value(ValueID::TEMPERATURE_MAX).strValue + " min: "+ device.gpuData.value(ValueID::TEMPERATURE_MIN).strValue+")");
+                                                                  " (max: "+ device.gpuData.value(ValueID::TEMPERATURE_MAX).strValue +
+                                                                  " min: "+ device.gpuData.value(ValueID::TEMPERATURE_MIN).strValue+")");
                 continue;
             }
-
 
             ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue);
         }

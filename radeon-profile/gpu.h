@@ -54,7 +54,7 @@ public:
     void detectCards();
     bool initialize();
     bool daemonConnected();
-    bool setOverclockValue(int value);
+    void setOverclockValue(const OverclockType &type, int value);
     void resetOverclock();
     const DriverFeatures& getDriverFeatures();
     const GPUConstParams& getGpuConstParams();

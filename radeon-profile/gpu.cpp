@@ -287,17 +287,13 @@ void gpu::finalize() {
         futureGpuUsage.waitForFinished();
 }
 
-bool gpu::setOverclockValue(const int value) {
-    if (getDriverFeatures().ocCoreAvailable)
-        return driverHandler->setOverclockValue(value);
-
-    qWarning() << "Error overclocking: overclocking is not supported";
-    return false;
+void gpu::setOverclockValue(const OverclockType &type, const int value) {
+        driverHandler->setOverclockValue(type, value);
 }
 
-void gpu::resetOverclock(){
-    if (getDriverFeatures().ocCoreAvailable)
-        driverHandler->resetOverclock();
+void gpu::resetOverclock() {
+    driverHandler->setOverclockValue(OverclockType::OC_SCLK, 0);
+    driverHandler->setOverclockValue(OverclockType::OC_MCLK, 0);
 }
 
 // Function that returns the human readable output of a property value
