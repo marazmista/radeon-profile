@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20170626
+#define appVersion 20170627
 
 namespace Ui {
 class radeon_profile;
@@ -222,6 +222,7 @@ private:
     bool isFanStepValid(unsigned int temperature, unsigned int fanSpeed);
     void addFanStep (int temperature, int fanSpeed);
     void createGeneralMenu();
+    PlotInitialValues figureOutInitialScale(const PlotDefinitionSchema &pds);
 };
 
 #endif // RADEON_PROFILE_H

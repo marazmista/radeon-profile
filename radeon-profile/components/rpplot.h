@@ -276,12 +276,6 @@ public:
         }
     }
 
-    void removeSeries(const QString &pn, const ValueID id) {
-        RPPlot *p =  plots.take(pn);
-        p->plotArea.removeSeries(p->series[id]);
-        delete p;
-    }
-
     void addPlot(const QString &name) {
         RPPlot *rpp = new  RPPlot();
         plots.insert(name,rpp);
@@ -308,7 +302,7 @@ public:
         ds->id = id;
 
         if (p->axisLeft != nullptr && p->axisLeft->unit == tmpUnit)
-            ds->attachAxis(plots[name]->axisLeft);
+            ds->attachAxis(p->axisLeft);
         else if (p->axisRight != nullptr && p->axisRight->unit == tmpUnit)
             ds->attachAxis(p->axisRight);
         else {
@@ -331,15 +325,13 @@ public:
     }
 
     void updateSeries(int timestamp, const GPUDataContainer &data) {
-        // cleaunp every 60 refreshes
-        bool cleanup = timestamp % 60 == 0;
-
         for (const QString &rppk : plots.keys()) {
             plots[rppk]->timeAxis.setRange(timestamp - timeRange, timestamp + rightGap);
             plots[rppk]->updatePlot(timestamp, data);
         }
 
-        if (cleanup)
+        // cleaunp every 60 refreshes
+        if (timestamp % 60 == 0)
             cleanupSeries();
     }
 };

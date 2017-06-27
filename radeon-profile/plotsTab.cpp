@@ -22,6 +22,18 @@ void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
     ui->stack_plots->setCurrentIndex(0);
 }
 
+PlotInitialValues radeon_profile::figureOutInitialScale(const PlotDefinitionSchema &pds)
+{
+    PlotInitialValues piv;
+    if (pds.left.enabled)
+        piv.left = device.gpuData.value(pds.left.dataList.keys().at(0)).value;
+
+    if (pds.right.enabled)
+        piv.right = device.gpuData.value(pds.right.dataList.keys().at(0)).value;
+
+    return piv;
+}
+
 void radeon_profile::on_btn_addPlotDefinition_clicked()
 {
     Dialog_definePlot *d = new Dialog_definePlot(this);
@@ -46,15 +58,7 @@ void radeon_profile::on_btn_addPlotDefinition_clicked()
 
 
         plotManager.addSchema(pds);
-
-        PlotInitialValues piv;
-        if (pds.left.enabled)
-            piv.left = device.gpuData.value(pds.left.dataList.keys().at(0)).value;
-
-        if (pds.right.enabled)
-            piv.right = device.gpuData.value(pds.right.dataList.keys().at(0)).value;
-
-        plotManager.createPlotFromSchema(pds.name, piv);
+        plotManager.createPlotFromSchema(pds.name, figureOutInitialScale(pds));
         ui->pagePlots->layout()->addWidget(plotManager.plots.value(pds.name));
     }
 
@@ -82,14 +86,18 @@ void radeon_profile::modifyPlotSchema(const QString &name) {
 
     if (d->exec() == QDialog::Accepted) {
         PlotDefinitionSchema pds = d->getCreatedSchema();
-        plotManager.addSchema(pds);
 
         if (pds.name != name) {
             QTreeWidgetItem *item = new QTreeWidgetItem();
             item->setText(0, pds.name);
             item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
             item->setCheckState(0,Qt::Checked);
-        }
+        } else
+            plotManager.removePlot(pds.name);
+
+        plotManager.addSchema(pds);
+        plotManager.createPlotFromSchema(pds.name, figureOutInitialScale(pds));
+        ui->pagePlots->layout()->addWidget(plotManager.plots.value(pds.name));
     }
 
     delete d;
@@ -119,14 +127,7 @@ void radeon_profile::on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, 
             return;
         case Qt::Checked: {
             PlotDefinitionSchema pds = plotManager.schemas.value(item->text(0));
-            PlotInitialValues piv;
-            if (pds.left.enabled)
-                piv.left = device.gpuData.value(pds.left.dataList.keys().at(0)).value;
-
-            if (pds.right.enabled)
-                piv.right = device.gpuData.value(pds.right.dataList.keys().at(0)).value;
-
-            plotManager.createPlotFromSchema(item->text(0), piv);
+            plotManager.createPlotFromSchema(item->text(0), figureOutInitialScale(pds));
             ui->pagePlots->layout()->addWidget(plotManager.plots.value(item->text(0)));
             return;
         }
