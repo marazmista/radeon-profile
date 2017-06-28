@@ -219,10 +219,10 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
         env.insert("DRI_PRIME",gpuName.at(gpuName.length()-1));
     QStringList driver = globalStuff::grabSystemInfo("xdriinfo",env).filter("Screen 0:",Qt::CaseInsensitive);
     if (!driver.isEmpty())  // because of segfault when no xdriinfo
-        data << "Driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
+        data << "OpenGL driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
 
-    data << driverHandler->getGLXInfo(env);
+    data << globalStuff::grabSystemInfo("glxinfo -B",env).filter(QRegExp(".+"));
 
     return data;
 }

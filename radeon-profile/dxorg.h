@@ -119,7 +119,6 @@ public:
     GPUUsage getGPUUsage();
     GPUPwm getPwmSpeed();
 
-    QStringList getGLXInfo(QProcessEnvironment env);
     QList<QTreeWidgetItem *> getModuleInfo();
     QString getCurrentPowerLevel();
     QString getCurrentPowerProfile();
