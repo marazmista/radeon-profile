@@ -8,6 +8,8 @@
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QStringList>
+#include <QFile>
+#include <QMap>
 
 #define dpm_battery "battery"
 #define dpm_performance "performance"
@@ -93,50 +95,9 @@ enum class TemperatureSensor {
     TS_UNKNOWN
 };
 
-enum class OverclockType {
-    OC_SCLK, OC_MCLK
-};
-
 struct GPUSysInfo {
     QString sysName, driverModuleString;
     DriverModule module;
-};
-
-// structure which holds what can be display on ui and on its base
-// we enable ui elements
-struct DriverFeatures {
-    bool
-    canChangeProfile = false,
-    ocCoreAvailable = false,
-    ocMemAvailable = false;
-
-    PowerMethod currentPowerMethod;
-    ClocksDataSource clocksDataSource = ClocksDataSource::SOURCE_UNKNOWN;
-    TemperatureSensor currentTemperatureSensor;
-    GPUSysInfo sysInfo;
-
-    DriverFeatures() {
-        currentPowerMethod = PowerMethod::PM_UNKNOWN;
-        currentTemperatureSensor = TemperatureSensor::TS_UNKNOWN;
-    }
-};
-
-struct GPUClocks {
-    int coreClk = -1, memClk = -1, coreVolt = -1, memVolt = -1, uvdCClk = -1, uvdDClk = -1, powerLevel = -1;
-};
-
-struct GPUPwm {
-    int pwmSpeed = -1, pwmSpeedRpm = -1;
-};
-
-struct GPUUsage {
-    float gpuUsage = -1;
-    long gpuVramUsagePercent = -1, gpuVramUsage = -1;
-};
-
-struct GPUConstParams {
-     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1;
-     long VRAMSize = -1;
 };
 
 struct RPValue {
@@ -185,6 +146,124 @@ struct RPValue {
 };
 
 typedef QMap<ValueID, RPValue> GPUDataContainer;
+typedef QMap<int, QString> PowerPlayTable;
+
+// structure which holds what can be display on ui and on its base
+// we enable ui elements
+struct DriverFeatures {
+    bool
+    canChangeProfile = false,
+    ocCoreAvailable = false,
+    ocMemAvailable = false,
+    freqCoreAvailable = false,
+    freqMemAvailable = false;
+
+    PowerMethod currentPowerMethod;
+    ClocksDataSource clocksDataSource = ClocksDataSource::SOURCE_UNKNOWN;
+    TemperatureSensor currentTemperatureSensor;
+    GPUSysInfo sysInfo;
+    PowerPlayTable sclkTable, mclkTable;
+
+    DriverFeatures() {
+        currentPowerMethod = PowerMethod::PM_UNKNOWN;
+        currentTemperatureSensor = TemperatureSensor::TS_UNKNOWN;
+    }
+};
+
+struct DeviceSysFs {
+    QString
+    power_method,
+    power_profile,
+    power_dpm_state,
+    power_dpm_force_performance_level,
+    pp_sclk_od,
+    pp_mclk_od,
+    pp_dpm_sclk,
+    pp_dpm_mclk;
+
+    DeviceSysFs() { }
+
+    DeviceSysFs(const QString &devicePath) {
+        power_method = devicePath + "power_method";
+        power_profile = devicePath + "power_profile";
+        power_dpm_state = devicePath + "power_dpm_state";
+        power_dpm_force_performance_level = devicePath + "power_dpm_force_performance_level";
+        pp_sclk_od = devicePath + "pp_sclk_od";
+        pp_mclk_od = devicePath + "pp_mclk_od";
+        pp_dpm_sclk = "/mnt/stuff/ttt/pp_dpm_sclk";
+        pp_dpm_mclk = "/mnt/stuff/ttt/pp_dpm_mclk";
+
+        if (!QFile::exists(power_method))
+            power_method = "";
+
+        if (!QFile::exists(power_profile))
+            power_profile = "";
+
+        if (!QFile::exists(power_dpm_state))
+            power_dpm_state = "";
+
+        if (!QFile::exists(power_dpm_force_performance_level))
+            power_dpm_force_performance_level = "";
+
+        if (!QFile::exists(pp_sclk_od))
+            pp_sclk_od = "";
+
+        if (!QFile::exists(pp_mclk_od))
+            pp_mclk_od = "";
+
+        if (!QFile::exists(pp_dpm_sclk))
+            pp_dpm_sclk = "";
+
+        if (!QFile::exists(pp_dpm_mclk))
+            pp_dpm_mclk = "";
+    }
+};
+
+struct DeviceFilePaths {
+    QString debugfs_pm_info, moduleParams;
+    DeviceSysFs sysFs;
+};
+
+struct HwmonAttributes {
+    QString temp1, pwm1, pwm1_enable, pwm1_max, fan1_input;
+
+    HwmonAttributes() { }
+
+    HwmonAttributes(const QString &hwmonPath) {
+        temp1 = hwmonPath + "/temp1_input";
+        pwm1 = hwmonPath + "/pwm1";
+        pwm1_enable = hwmonPath + "/pwm1_enable";
+        pwm1_max = hwmonPath + "/pwm1_max";
+        fan1_input = hwmonPath + "/fan1_input";
+
+        if (!QFile::exists(temp1))
+            temp1 = "";
+
+        if (!QFile::exists(pwm1_enable))
+            pwm1 = pwm1_enable = pwm1_max = "";
+
+        if (!QFile::exists(fan1_input))
+            fan1_input = "";
+    }
+};
+
+struct GPUClocks {
+    int coreClk = -1, memClk = -1, coreVolt = -1, memVolt = -1, uvdCClk = -1, uvdDClk = -1, powerLevel = -1;
+};
+
+struct GPUPwm {
+    int pwmSpeed = -1, pwmSpeedRpm = -1;
+};
+
+struct GPUUsage {
+    float gpuUsage = -1;
+    long gpuVramUsagePercent = -1, gpuVramUsage = -1;
+};
+
+struct GPUConstParams {
+     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1;
+     long VRAMSize = -1;
+};
 
 class globalStuff {
 public:

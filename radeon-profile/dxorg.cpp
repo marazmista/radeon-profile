@@ -112,13 +112,13 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     QString devicePath = "/sys/class/drm/" + gpuName + "/device/";
     deviceFiles.moduleParams = devicePath + "driver/module/holders/" + features.sysInfo.driverModuleString + "/parameters/";
     deviceFiles.debugfs_pm_info = "/sys/kernel/debug/dri/" + gpuName.right(1) + "/"+features.sysInfo.driverModuleString + "_pm_info"; // this path contains only index
-    deviceFiles.sysFs = deviceSysFsStruct(devicePath);
+    deviceFiles.sysFs = DeviceSysFs(devicePath);
 
     QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
 
     hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0" : hwmonDevicePath));
 
-    hwmonAttributes = hwmonAttributesStruct(hwmonDevicePath);
+    hwmonAttributes = HwmonAttributes(hwmonDevicePath);
 }
 
 // method for gather info about clocks from deamon or from debugfs if root
@@ -490,15 +490,9 @@ void dXorg::setPowerProfile(PowerProfiles newPowerProfile) {
     default: break;
     }
 
-    if (daemonConnected()) {
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(newValue).append(SEPARATOR); // Power profile to be set
-        command.append(deviceFiles.sysFs.power_dpm_state).append(SEPARATOR); // The path where the power profile should be written in
-
-        qDebug() << "Sending daemon power profile signal: " << command;
-        dcomm.sendCommand(command);
-    } else {
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(deviceFiles.sysFs.power_dpm_state, newValue));
+    else {
         // enum is int, so first three values are dpm, rest are profile
         if (newPowerProfile <= PowerProfiles::PERFORMANCE)
             setNewValue(deviceFiles.sysFs.power_dpm_state, newValue);
@@ -538,47 +532,28 @@ void dXorg::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
             return;
     }
 
-    if (daemonConnected()) {
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(newValue).append(SEPARATOR); // Power profile to be forcibly set
-        command.append(deviceFiles.sysFs.power_dpm_force_performance_level).append(SEPARATOR); // The path where the power profile should be written in
-
-        qDebug() << "Sending daemon forced power profile signal: " << command;
-        dcomm.sendCommand(command);
-    } else
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(deviceFiles.sysFs.power_dpm_force_performance_level, newValue));
+    else
         setNewValue(deviceFiles.sysFs.power_dpm_force_performance_level, newValue);
 }
 
 void dXorg::setPwmValue(unsigned int value) {
     value = params.pwmMaxSpeed * value / 100;
 
-    if (daemonConnected()) {
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(QString::number(value)).append(SEPARATOR); // PWM value to be set
-        command.append(hwmonAttributes.pwm1).append(SEPARATOR); // The path where the PWM value should be written in
-
-        qDebug() << "Sending daemon fan pwm speed signal: " << command;
-        dcomm.sendCommand(command);
-    } else
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(hwmonAttributes.pwm1, QString::number(value)));
+    else
         setNewValue(hwmonAttributes.pwm1,QString().setNum(value));
 }
 
 void dXorg::setPwmManualControl(bool manual) {
-    char mode = manual ? pwm_manual : pwm_auto;
+    QString mode = QString(manual ? pwm_manual : pwm_auto);
 
-    if (daemonConnected()) {
-        //  Tell the daemon to set the pwm mode into the right file
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(mode).append(SEPARATOR); // The PWM mode to set
-        command.append(hwmonAttributes.pwm1_enable).append(SEPARATOR); // The path where the PWM mode should be written in
-
-        qDebug() << "Sending daemon fan pwm enable signal: " << command;
-        dcomm.sendCommand(command);
-    } else  //  No daemon available
-        setNewValue(hwmonAttributes.pwm1_enable, QString(mode));
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(hwmonAttributes.pwm1_enable, mode));
+    else
+        setNewValue(hwmonAttributes.pwm1_enable, mode);
 }
 
 GPUPwm dXorg::getPwmSpeed() {
@@ -701,6 +676,16 @@ void dXorg::figureOutDriverFeatures() {
 
     features.ocCoreAvailable = !deviceFiles.sysFs.pp_sclk_od.isEmpty();
     features.ocMemAvailable = !deviceFiles.sysFs.pp_mclk_od.isEmpty();
+
+    if (!deviceFiles.sysFs.pp_dpm_sclk.isEmpty()) {
+        features.sclkTable = loadPowerPlayTable(deviceFiles.sysFs.pp_dpm_sclk);
+        features.freqCoreAvailable = features.sclkTable.count() > 0;
+    }
+
+    if (!deviceFiles.sysFs.pp_dpm_mclk.isEmpty()) {
+        features.mclkTable = loadPowerPlayTable(deviceFiles.sysFs.pp_dpm_mclk);
+        features.freqMemAvailable = features.mclkTable.count() > 0;
+    }
 }
 
 bool dXorg::getIoctlAvailability() {
@@ -750,23 +735,46 @@ GPUClocks dXorg::getFeaturesFallback() {
     return fallbackfeatures;
 }
 
-void dXorg::setOverclockValue(const OverclockType &type, const int percentage) {
-    QString ocFile;
-    if (type == OverclockType::OC_SCLK && features.ocCoreAvailable)
-        ocFile = deviceFiles.sysFs.pp_sclk_od;
-    else if (type == OverclockType::OC_MCLK && features.ocMemAvailable)
-        ocFile = deviceFiles.sysFs.pp_mclk_od;
+void dXorg::setOverclockValue(const QString &file, const int percentage) {
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(file, QString::number(percentage)));
     else
-        return;
-
-    if (daemonConnected()) {
-        QString command;
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR);
-        command.append(QString::number(percentage)).append(SEPARATOR);
-        command.append(ocFile).append(SEPARATOR);
-
-        qDebug() << "Sending overclock signal: " << command;
-        dcomm.sendCommand(command);
-    } else
-        setNewValue(ocFile, QString::number(percentage));
+        setNewValue(file, QString::number(percentage));
 }
+
+PowerPlayTable dXorg::loadPowerPlayTable(const QString &file) {
+    QFile f(file);
+    PowerPlayTable ppt;
+
+    if (!f.open(QIODevice::ReadOnly))
+        return ppt;
+
+    QStringList sl = QString(f.readAll()).split('\n', QString::SkipEmptyParts);
+
+    for (const QString &s : sl) {
+        QStringList tmp = s.split(":");
+        ppt.insert(tmp[0].toInt(), tmp[1].split(" ")[1]);
+    }
+
+    return ppt;
+}
+
+void dXorg::setPowerPlayFreq(const QString &file, const int tableIndex) {
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(file, QString::number(tableIndex)));
+    else
+        setNewValue(file, QString::number(tableIndex));
+}
+
+QString dXorg::createDaemonSetCmd(const QString &file, const QString &value)
+{
+    QString command;
+    command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR);
+    command.append(value).append(SEPARATOR);
+    command.append(file).append(SEPARATOR);
+
+    qDebug() << "Daemon command: " << command;
+
+    return command;
+}
+

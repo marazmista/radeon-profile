@@ -229,12 +229,10 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
 
 QString gpu::getCurrentPowerLevel() {
     return driverHandler->getCurrentPowerLevel().trimmed();
-
 }
 
 QString gpu::getCurrentPowerProfile()  {
     return driverHandler->getCurrentPowerProfile().trimmed();
-
 }
 
 void gpu::refreshPowerLevel() {
@@ -248,7 +246,6 @@ void gpu::setPowerProfile(PowerProfiles newPowerProfile) {
 
 void gpu::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
     driverHandler->setForcePowerLevel(newForcePowerLevel);
-
 }
 
 void gpu::setPwmValue(unsigned int value) {
@@ -279,21 +276,27 @@ const GPUConstParams& gpu::getGpuConstParams() {
     return driverHandler->params;
 }
 
+const DeviceFilePaths &gpu::getDriverFiles() {
+    return driverHandler->deviceFiles;
+}
+
 void gpu::finalize() {
     if (gpuData.contains(ValueID::FAN_SPEED_PERCENT))
         setPwmManualControl(false);
+
+    resetOverclock();
 
     if (futureGpuUsage.isRunning())
         futureGpuUsage.waitForFinished();
 }
 
-void gpu::setOverclockValue(const OverclockType &type, const int value) {
-        driverHandler->setOverclockValue(type, value);
+void gpu::setOverclockValue(const QString &file, const int value) {
+        driverHandler->setOverclockValue(file, value);
 }
 
 void gpu::resetOverclock() {
-    driverHandler->setOverclockValue(OverclockType::OC_SCLK, 0);
-    driverHandler->setOverclockValue(OverclockType::OC_MCLK, 0);
+    driverHandler->setOverclockValue(getDriverFiles().sysFs.pp_sclk_od, 0);
+    driverHandler->setOverclockValue(getDriverFiles().sysFs.pp_mclk_od, 0);
 }
 
 // Function that returns the human readable output of a property value
@@ -455,7 +458,7 @@ QString getAspectRatio(const float width, const float height = 1){
     return out.isEmpty() ? QString::number(ratio, 'g', 3) + ":1" : out;
 }
 
-void addChild(QTreeWidgetItem * parent, const QString &leftColumn, const QString &rightColumn) {
+void addItemToTreeList(QTreeWidgetItem * parent, const QString &leftColumn, const QString &rightColumn) {
     parent->addChild(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
 }
 
@@ -556,7 +559,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
         // Add resolution
         QString screenResolution = QString::number(DisplayWidth(display,screenIndex));
         screenResolution += " x " + QString::number(DisplayHeight(display, screenIndex));
-        addChild(screenItem, QObject::tr("Resolution"), screenResolution);
+        addItemToTreeList(screenItem, QObject::tr("Resolution"), screenResolution);
 
         // Add screen minimum and maximum resolutions
         int screenMinWidth, screenMinHeight, screenMaxWidth, screenMaxHeight;
@@ -564,13 +567,13 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
         XRRGetScreenSizeRange(display, screenRoot, &screenMinWidth, &screenMinHeight, &screenMaxWidth, &screenMaxHeight);
 
         QString screenMinResolution = QString::number(screenMinWidth) + " x " + QString::number(screenMinHeight);
-        addChild(screenItem, QObject::tr("Minimum resolution"), screenMinResolution);
+        addItemToTreeList(screenItem, QObject::tr("Minimum resolution"), screenMinResolution);
 
         QString screenMaxResolution = QString::number(screenMaxWidth) + " x " + QString::number(screenMaxHeight);
-        addChild(screenItem, QObject::tr("Maximum resolution"), screenMaxResolution);
+        addItemToTreeList(screenItem, QObject::tr("Maximum resolution"), screenMaxResolution);
 
         // Adding screen virtual dimension
-        addChild(screenItem, QObject::tr("Virtual size"), QObject::tr("%n mm x ", NULL, DisplayWidthMM(display, screenIndex)) + QObject::tr("%n mm", NULL, DisplayHeightMM(display, screenIndex)));
+        addItemToTreeList(screenItem, QObject::tr("Virtual size"), QObject::tr("%n mm x ", NULL, DisplayWidthMM(display, screenIndex)) + QObject::tr("%n mm", NULL, DisplayHeightMM(display, screenIndex)));
 
         // Retrieve screen resources (connectors, configurations, timestamps etc.)
         XRRScreenResources * screenResources = XRRGetScreenResources(display, screenRoot);
@@ -614,9 +617,9 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
             if(configInfo == NULL) { // This output is not active
                 qDebug() << "Output" << outputIndex << "has no active mode";
-                addChild(outputItem, QObject::tr("Active"), QObject::tr("No"));
+                addItemToTreeList(outputItem, QObject::tr("Active"), QObject::tr("No"));
             } else { // The output is active: add resolution, refresh rate and the offset
-                addChild(outputItem, QObject::tr("Active"), QObject::tr("Yes"));
+                addItemToTreeList(outputItem, QObject::tr("Active"), QObject::tr("Yes"));
                 qDebug() << "    Analyzing active mode";
 
                 screenActiveOutputs++;
@@ -625,19 +628,19 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                 // Add current resolution
                 QString outputResolution = QString::number(configInfo->width) + " x " + QString::number(configInfo->height);
                 outputResolution += " (" + getAspectRatio(configInfo->width, configInfo->height) + ')';
-                addChild(outputItem, QObject::tr("Resolution"), outputResolution);
+                addItemToTreeList(outputItem, QObject::tr("Resolution"), outputResolution);
 
                 //Add refresh rate
                 float vRefreshRate = getVerticalRefreshRate(getModeInfo(screenResources, *activeMode));
                 if(vRefreshRate != -1){
                     QString outputVRate = QString::number(vRefreshRate, 'g', 3) + " Hz";
-                    addChild(outputItem, QObject::tr("Refresh rate"), outputVRate);
+                    addItemToTreeList(outputItem, QObject::tr("Refresh rate"), outputVRate);
                 }
 
                 // Add the position in the current configuration (useful only in multi-head)
                 // It's the offset from the top left corner
                 QString outputOffset = QString::number(configInfo->x) + ", " + QString::number(configInfo->y);
-                addChild(outputItem, QObject::tr("Offset"), outputOffset);
+                addItemToTreeList(outputItem, QObject::tr("Offset"), outputOffset);
 
                 // Calculate and add the screen software brightness level
                 XRRCrtcGamma * gammaInfo = XRRGetCrtcGamma(display, outputInfo->crtc);
@@ -649,7 +652,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                     // Source of the brightness formula: https://en.wikipedia.org/wiki/Relative_luminance
                     if(brightnessPercent > 0){
                         QString  softBrightness = QString::number(brightnessPercent, 'g', 3) + " %";
-                        addChild(outputItem, QObject::tr("Brightness (software)"), softBrightness);
+                        addItemToTreeList(outputItem, QObject::tr("Brightness (software)"), softBrightness);
                     }
                     XRRFreeGamma(gammaInfo);
                 }
@@ -664,7 +667,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
             // Get other details (monitor size, possible configurations and properties)
             // Add monitor size
             double diagonal = sqrt(pow(outputInfo->mm_width, 2) + pow(outputInfo->mm_height, 2)) * MILLIMETERS_PER_INCH;
-            addChild(outputItem, QObject::tr("Size"), QObject::tr("%n mm x ", NULL, outputInfo->mm_width) + QObject::tr("%n mm ", NULL, outputInfo->mm_height) + QObject::tr("(%n inches)", NULL, diagonal));
+            addItemToTreeList(outputItem, QObject::tr("Size"), QObject::tr("%n mm x ", NULL, outputInfo->mm_width) + QObject::tr("%n mm ", NULL, outputInfo->mm_height) + QObject::tr("(%n inches)", NULL, diagonal));
 
             // Create the root QTreeWidgetItem of the possible modes (resolution, Refresh rate, HSync, VSync, etc) list
             QTreeWidgetItem * modeListItem = new QTreeWidgetItem(QStringList() << QObject::tr("Supported modes"));
@@ -710,7 +713,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                 if(modeIndex == outputInfo->npreferred)
                     modeDetails += " (preferred)";
 
-                addChild(modeListItem, modeName, modeDetails);
+                addItemToTreeList(modeListItem, modeName, modeDetails);
             }
 
             // Create the root QTreeWidgetItem of the property list
@@ -763,7 +766,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                         readableEDID += QString("%1").arg(propertyRawData[i], 2, 16, QChar('0'));
                     }
 
-                    addChild(propertyListItem, propertyName, readableEDID);
+                    addItemToTreeList(propertyListItem, propertyName, readableEDID);
 
                     // Parse the EDID to gather info
                     const quint8 header[8] = {0x00,0xff,0xff,0xff,0xff,0xff,0xff,0x00}; // Fixed EDID header
@@ -780,7 +783,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                         serialNumber += propertyRawData[EDID_OFFSET_SERIAL_NUMBER + 2] * 0x10000;
                         serialNumber += propertyRawData[EDID_OFFSET_SERIAL_NUMBER + 3] * 0x1000000;
                         QString serial = (serialNumber > 0) ? QString::number(serialNumber) : QObject::tr("Not available");
-                        addChild(propertyListItem, QObject::tr("Serial number"), serial);
+                        addItemToTreeList(propertyListItem, QObject::tr("Serial number"), serial);
                     }
                     //End of EDID
                 } else { //Not EDID
@@ -828,7 +831,7 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
                         free(propertyInfo);
                     }
                     // Print the property
-                    addChild(propertyListItem, propertyName, propertyValue);
+                    addItemToTreeList(propertyListItem, propertyName, propertyValue);
                 }
                 // Property completed: deallocate the property raw data
                 free(propertyRawData);

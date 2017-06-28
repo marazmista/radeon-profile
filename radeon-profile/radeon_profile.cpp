@@ -291,13 +291,39 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
     ui->group_cfgDaemon->setEnabled(device.daemonConnected());
 
-    if (features.canChangeProfile && features.ocCoreAvailable && ui->cb_enableOverclock->isChecked() && ui->cb_overclockAtLaunch->isChecked()
-            && ui->slider_ocMclk->value() > 0 && ui->slider_ocSclk->value() > 0)
-        on_btn_applyOverclock_clicked();
-
-    ui->mainTabs->setTabEnabled(2,features.canChangeProfile && features.ocCoreAvailable && features.ocMemAvailable);
-
     createCurrentGpuDataListItems();
+
+    // oc working only on amdgpu
+    if (features.canChangeProfile && device.getDriverFeatures().sysInfo.module == DriverModule::AMDGPU) {
+        if (device.getDriverFeatures().ocCoreAvailable) {
+            on_btn_applyOverclock_clicked();
+
+            ui->slider_ocMclk->setEnabled(device.getDriverFeatures().ocMemAvailable);
+            ui->label_memOc->setEnabled(device.getDriverFeatures().ocMemAvailable);
+            ui->l_ocMclk->setEnabled(device.getDriverFeatures().ocMemAvailable);
+        } else {
+            ui->group_oc->setCheckable(false);
+            ui->group_oc->setEnabled(false);
+        }
+
+        if (device.getDriverFeatures().freqCoreAvailable) {
+            ui->slider_freqSclk->setMaximum(device.getDriverFeatures().sclkTable.count() - 1);
+            ui->slider_freqSclk->setValue(0);
+
+            if (device.getDriverFeatures().freqMemAvailable) {
+                ui->slider_freqMclk->setMaximum(device.getDriverFeatures().mclkTable.count() - 1);
+                ui->slider_freqMclk->setValue(0);
+            } else {
+                ui->slider_freqMclk->setEnabled(false);
+                ui->label_memFreq->setEnabled(device.getDriverFeatures().freqMemAvailable);
+                ui->l_freqMclk->setEnabled(device.getDriverFeatures().freqMemAvailable);
+            }
+        } else {
+            ui->group_freq->setCheckable(false);
+            ui->group_freq->setEnabled(false);
+        }
+    } else
+        ui->mainTabs->setTabEnabled(2, false);
 }
 
 void radeon_profile::refreshGpuData() {

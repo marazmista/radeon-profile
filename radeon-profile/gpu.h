@@ -54,10 +54,11 @@ public:
     void detectCards();
     bool initialize();
     bool daemonConnected();
-    void setOverclockValue(const OverclockType &type, int value);
+    void setOverclockValue(const QString &file, int value);
     void resetOverclock();
     const DriverFeatures& getDriverFeatures();
     const GPUConstParams& getGpuConstParams();
+    const DeviceFilePaths& getDriverFiles();
     void finalize();
     bool isInitialized();
 

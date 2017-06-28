@@ -39,8 +39,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("fanProfileName",ui->l_currentFanProfile->text());
     settings.setValue("enableZeroPercentFanSpeed", ui->cb_zeroPercentFanSpeed->isChecked());
 
-    settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
-    settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
+    settings.setValue("overclockEnabled", ui->group_oc->isChecked());
+    settings.setValue("manualFreqEnabled", ui->group_freq->isChecked());
     settings.setValue("overclockValue", ui->slider_ocSclk->value());
     settings.setValue("overclockMemValue", ui->slider_ocMclk->value());
 
@@ -195,8 +195,8 @@ void radeon_profile::loadConfig() {
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
     ui->cb_eventsTracking->setChecked(settings.value("eventsTracking", false).toBool());
 
-    ui->cb_enableOverclock->setChecked(settings.value("overclockEnabled",false).toBool());
-    ui->cb_overclockAtLaunch->setChecked(settings.value("overclockAtLaunch",false).toBool());
+    ui->group_oc->setChecked(settings.value("overclockEnabled",false).toBool());
+    ui->group_freq->setChecked(settings.value("manualFreqEnabled",false).toBool());
     ui->slider_ocSclk->setValue(settings.value("overclockValue",0).toInt());
     ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
 

@@ -108,7 +108,6 @@ private slots:
     void on_btn_removeFanStep_clicked();
     void on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_fanSpeedSlider_valueChanged(int value);
-    void on_cb_enableOverclock_toggled(bool enable);
     void on_btn_applyOverclock_clicked();
     void on_slider_ocSclk_valueChanged(int value);
     void on_btn_activateFanProfile_clicked();
@@ -139,6 +138,10 @@ private slots:
     void pauseRefresh(bool checked);
     void on_btn_general_clicked();
     void on_slider_ocMclk_valueChanged(const int value);
+    void on_group_oc_toggled(bool arg1);
+    void on_slider_freqSclk_valueChanged(int value);
+    void on_slider_freqMclk_valueChanged(int value);
+    void on_group_freq_toggled(bool arg1);
 
 private:
     struct currentStateInfo {
@@ -224,6 +227,7 @@ private:
     void addFanStep (int temperature, int fanSpeed);
     void createGeneralMenu();
     PlotInitialValues figureOutInitialScale(const PlotDefinitionSchema &pds);
+    void applyOc();
 };
 
 #endif // RADEON_PROFILE_H

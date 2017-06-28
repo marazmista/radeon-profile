@@ -290,37 +290,62 @@ int radeon_profile::askNumber(const int value, const int min, const int max, con
     return number;
 }
 
-void radeon_profile::on_cb_enableOverclock_toggled(const bool enable) {
-    ui->slider_ocSclk->setEnabled(enable);
-    ui->slider_ocMclk->setEnabled(enable);
-    ui->btn_applyOverclock->setEnabled(enable);
-    ui->cb_overclockAtLaunch->setEnabled(enable);
+void radeon_profile::applyOc()
+{
+    device.setOverclockValue(device.getDriverFiles().sysFs.pp_sclk_od, ui->slider_ocSclk->value());
+    device.setOverclockValue(device.getDriverFiles().sysFs.pp_mclk_od, ui->slider_ocMclk->value());
+}
 
+void radeon_profile::on_btn_applyOverclock_clicked() {
+    if (ui->group_oc->isChecked())
+        applyOc();
+
+    if (ui->group_freq->isChecked()) {
+
+    }
+}
+
+void radeon_profile::on_group_oc_toggled(bool arg1)
+{
     if (!device.isInitialized())
         return;
 
-    if (enable)
-        on_btn_applyOverclock_clicked();
+    if (arg1)
+        applyOc();
     else
         device.resetOverclock();
 }
 
-void radeon_profile::on_btn_applyOverclock_clicked() {
-    if (ui->slider_ocSclk->value() > 0)
-        device.setOverclockValue(OverclockType::OC_SCLK, ui->slider_ocSclk->value());
+void radeon_profile::on_group_freq_toggled(bool arg1)
+{
+    if (!device.isInitialized())
+        return;
 
-    if (ui->slider_ocMclk->value() > 0)
-        device.setOverclockValue(OverclockType::OC_MCLK, ui->slider_ocMclk->value());
+    if (arg1)
+        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+    else
+        device.setForcePowerLevel(ForcePowerLevels::F_AUTO);
 }
 
 void radeon_profile::on_slider_ocSclk_valueChanged(const int value)
 {
-    ui->l_ocSclk->setText(QString::number(value));
+    ui->l_ocSclk->setText(QString::number(value) + "%");
 }
 
 void radeon_profile::on_slider_ocMclk_valueChanged(const int value)
 {
-    ui->l_ocMclk->setText(QString::number(value));
+    ui->l_ocMclk->setText(QString::number(value) + "%");
+}
+
+void radeon_profile::on_slider_freqSclk_valueChanged(int value)
+{
+    ui->l_freqSclk->setText(device.getDriverFeatures().sclkTable.value(value));
+}
+
+void radeon_profile::on_slider_freqMclk_valueChanged(int value)
+{
+    ui->l_freqMclk->setText(device.getDriverFeatures().mclkTable.value(value));
+
 }
 
 void radeon_profile::on_btn_saveAll_clicked()

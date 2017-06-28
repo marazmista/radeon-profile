@@ -20,75 +20,8 @@
 
 class dXorg
 {
-    struct rxPatternsStruct {
+    struct RxPatterns {
         QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
-    };
-
-    struct deviceSysFsStruct {
-        QString
-        power_method,
-        power_profile,
-        power_dpm_state,
-        power_dpm_force_performance_level,
-        pp_sclk_od,
-        pp_mclk_od;
-
-        deviceSysFsStruct() { }
-
-        deviceSysFsStruct(const QString &devicePath) {
-            power_method = devicePath + "power_method";
-            power_profile = devicePath + "power_profile";
-            power_dpm_state = devicePath + "power_dpm_state";
-            power_dpm_force_performance_level = devicePath + "power_dpm_force_performance_level";
-            pp_sclk_od = devicePath + "pp_sclk_od";
-            pp_mclk_od = devicePath + "pp_mclk_od";
-
-            if (!QFile::exists(power_method))
-                power_method = "";
-
-            if (!QFile::exists(power_profile))
-                power_profile = "";
-
-            if (!QFile::exists(power_dpm_state))
-                power_dpm_state = "";
-
-            if (!QFile::exists(power_dpm_force_performance_level))
-                power_dpm_force_performance_level = "";
-
-            if (!QFile::exists(pp_sclk_od))
-                pp_sclk_od = "";
-
-            if (!QFile::exists(pp_mclk_od))
-                pp_mclk_od = "";
-        }
-    };
-
-    struct deviceFilePathsStruct {
-        QString debugfs_pm_info, moduleParams;
-        deviceSysFsStruct sysFs;
-    };
-
-    struct hwmonAttributesStruct {
-        QString temp1, pwm1, pwm1_enable, pwm1_max, fan1_input;
-
-        hwmonAttributesStruct() { }
-
-        hwmonAttributesStruct(const QString &hwmonPath) {
-            temp1 = hwmonPath + "/temp1_input";
-            pwm1 = hwmonPath + "/pwm1";
-            pwm1_enable = hwmonPath + "/pwm1_enable";
-            pwm1_max = hwmonPath + "/pwm1_max";
-            fan1_input = hwmonPath + "/fan1_input";
-
-            if (!QFile::exists(temp1))
-                temp1 = "";
-
-            if (!QFile::exists(pwm1_enable))
-                pwm1 = pwm1_enable = pwm1_max = "";
-
-            if (!QFile::exists(fan1_input))
-                fan1_input = "";
-        }
     };
 
 public:
@@ -109,7 +42,7 @@ public:
 
     DriverFeatures features;
     GPUConstParams params;
-
+    DeviceFilePaths deviceFiles;
 
     GPUClocks getClocksFromPmFile();
     GPUClocks getClocksFromIoctl();
@@ -134,20 +67,19 @@ public:
     bool daemonConnected();
     GPUClocks getFeaturesFallback();
     void setupRegex(const QString &data);
-    void setOverclockValue(const OverclockType &type, const int percentage);
+    void setOverclockValue(const QString &file, const int percentage);
+    void setPowerPlayFreq(const QString &file, const int tableIndex);
 
 private:
     QChar gpuSysIndex;
     QSharedMemory sharedMem;
     int sensorsGPUtempIndex;
     short rxMatchIndex, clocksValueDivider;
-    deviceFilePathsStruct deviceFiles;
-    rxPatternsStruct rxPatterns;
-    hwmonAttributesStruct hwmonAttributes;
+    RxPatterns rxPatterns;
+    HwmonAttributes hwmonAttributes;
 
     daemonComm dcomm;
     ioctlHandler *ioctlHnd = nullptr;
-
 
     QString getClocksRawData(bool forFeatures = false);
     QString findSysfsHwmonForGPU();
@@ -161,6 +93,8 @@ private:
     void setupIoctl();
     void setupSharedMem();
     void setupDaemon();
+    PowerPlayTable loadPowerPlayTable(const QString &file);
+    QString createDaemonSetCmd(const QString &file, const QString &tableIndex);
 };
 
 #endif // DXORG_H
