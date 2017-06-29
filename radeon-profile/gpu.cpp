@@ -221,6 +221,7 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
     if (!driver.isEmpty())  // because of segfault when no xdriinfo
         data << "OpenGL driver:"+ driver.filter("Screen 0:",Qt::CaseInsensitive)[0].split(":",QString::SkipEmptyParts)[1];
 
+    data << "Kernel driver: " + gpuList.at(currentGpuIndex).driverModuleString;
 
     data << globalStuff::grabSystemInfo("glxinfo -B",env).filter(QRegExp(".+"));
 
