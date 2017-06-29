@@ -277,7 +277,7 @@ const GPUConstParams& gpu::getGpuConstParams() {
 }
 
 const DeviceFilePaths &gpu::getDriverFiles() {
-    return driverHandler->deviceFiles;
+    return driverHandler->driverFiles;
 }
 
 void gpu::finalize() {
@@ -298,6 +298,11 @@ void gpu::resetOverclock() {
     driverHandler->setOverclockValue(getDriverFiles().sysFs.pp_sclk_od, 0);
     driverHandler->setOverclockValue(getDriverFiles().sysFs.pp_mclk_od, 0);
 }
+
+int gpu::getCurrentPowerPlayTableId(const QString &file) {
+    return driverHandler->getCurrentPowerPlayTableId(file);
+}
+
 
 // Function that returns the human readable output of a property value
 // For reference:

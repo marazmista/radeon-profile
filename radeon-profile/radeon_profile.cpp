@@ -308,12 +308,10 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
         if (device.getDriverFeatures().freqCoreAvailable) {
             ui->slider_freqSclk->setMaximum(device.getDriverFeatures().sclkTable.count() - 1);
-            ui->slider_freqSclk->setValue(0);
 
-            if (device.getDriverFeatures().freqMemAvailable) {
+            if (device.getDriverFeatures().freqMemAvailable)
                 ui->slider_freqMclk->setMaximum(device.getDriverFeatures().mclkTable.count() - 1);
-                ui->slider_freqMclk->setValue(0);
-            } else {
+            else {
                 ui->slider_freqMclk->setEnabled(false);
                 ui->label_memFreq->setEnabled(device.getDriverFeatures().freqMemAvailable);
                 ui->l_freqMclk->setEnabled(device.getDriverFeatures().freqMemAvailable);

@@ -42,7 +42,7 @@ public:
 
     DriverFeatures features;
     GPUConstParams params;
-    DeviceFilePaths deviceFiles;
+    DeviceFilePaths driverFiles;
 
     GPUClocks getClocksFromPmFile();
     GPUClocks getClocksFromIoctl();
@@ -69,6 +69,7 @@ public:
     void setupRegex(const QString &data);
     void setOverclockValue(const QString &file, const int percentage);
     void setPowerPlayFreq(const QString &file, const int tableIndex);
+    int getCurrentPowerPlayTableId(const QString &file);
 
 private:
     QChar gpuSysIndex;

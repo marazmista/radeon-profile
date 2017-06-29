@@ -183,6 +183,7 @@ struct DeviceSysFs {
 
     DeviceSysFs() { }
 
+
     DeviceSysFs(const QString &devicePath) {
         power_method = devicePath + "power_method";
         power_profile = devicePath + "power_profile";
@@ -190,8 +191,9 @@ struct DeviceSysFs {
         power_dpm_force_performance_level = devicePath + "power_dpm_force_performance_level";
         pp_sclk_od = devicePath + "pp_sclk_od";
         pp_mclk_od = devicePath + "pp_mclk_od";
-        pp_dpm_sclk = "/mnt/stuff/ttt/pp_dpm_sclk";
-        pp_dpm_mclk = "/mnt/stuff/ttt/pp_dpm_mclk";
+        pp_dpm_sclk = devicePath + "pp_dpm_sclk";
+        pp_dpm_mclk = devicePath + "pp_dpm_mclk";
+
 
         if (!QFile::exists(power_method))
             power_method = "";

@@ -85,6 +85,9 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 }
 
 void radeon_profile::setPowerLevelFromCombo() {
+    if (ui->group_freq->isChecked() && (ForcePowerLevels)ui->combo_pLevel->currentIndex() != ForcePowerLevels::F_MANUAL)
+        ui->group_freq->setChecked(false);
+
     device.setForcePowerLevel((ForcePowerLevels)ui->combo_pLevel->currentIndex());
 }
 
@@ -321,9 +324,13 @@ void radeon_profile::on_group_freq_toggled(bool arg1)
     if (!device.isInitialized())
         return;
 
-    if (arg1)
+    if (arg1) {
         device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
-    else
+
+        ui->slider_freqSclk->setValue(device.getCurrentPowerPlayTableId(device.getDriverFiles().sysFs.pp_dpm_sclk));
+        if (device.getDriverFeatures().freqMemAvailable)
+            ui->slider_freqMclk->setValue(device.getCurrentPowerPlayTableId(device.getDriverFiles().sysFs.pp_dpm_mclk));
+    } else
         device.setForcePowerLevel(ForcePowerLevels::F_AUTO);
 }
 

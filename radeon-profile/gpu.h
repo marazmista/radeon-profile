@@ -61,6 +61,7 @@ public:
     const DeviceFilePaths& getDriverFiles();
     void finalize();
     bool isInitialized();
+    int getCurrentPowerPlayTableId(const QString &file);
 
 private slots:
     void handleGpuUsageResult() {
