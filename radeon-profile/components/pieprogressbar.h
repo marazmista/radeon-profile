@@ -67,8 +67,10 @@ protected:
 
         chartView = new QChartView(this);
 
-        data.setPieStartAngle(-210);
-        data.setPieEndAngle(130);
+        data.setPieStartAngle(-250);
+        data.setPieEndAngle(90);
+//        data.setPieStartAngle(-210);
+//        data.setPieEndAngle(130);
         data.setHoleSize(0.32);
 
         data.append("",maxValue / 3);
@@ -90,15 +92,16 @@ protected:
         chart.setBackgroundVisible(false);
 
         chart.setMargins(QMargins(-18,-18,-18,-18));
+        chart.setContentsMargins(0,0,0,0);
         chart.setMinimumSize(0,0);
 
         chartView->setChart(&chart);
         chartView->setMinimumSize(0,0);
         chartView->setRenderHint(QPainter::Antialiasing);
 
+        label.setContentsMargins(QMargins(0,18,7,0));
         ui->grid->addWidget(chartView,0,0,Qt::AlignCenter);
-        ui->grid->addWidget(&label,0,0,Qt::AlignBottom | Qt::AlignHCenter);
-//        label.setGeometry(label.geometry().top()-50, label.geometry().left(), label.width(), label.height());
+        ui->grid->addWidget(&label,0,0,Qt::AlignRight);
     }
 
 };
