@@ -285,7 +285,8 @@ void gpu::finalize() {
     if (gpuData.contains(ValueID::FAN_SPEED_PERCENT))
         setPwmManualControl(false);
 
-    resetOverclock();
+    if (getDriverFeatures().ocCoreAvailable)
+        resetOverclock();
 
     if (futureGpuUsage.isRunning())
         futureGpuUsage.waitForFinished();
