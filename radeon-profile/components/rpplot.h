@@ -68,6 +68,12 @@ class RPPlot : public QChartView
 
 public:
     QString name;
+    QChart plotArea;
+    YAxis *axisLeft = nullptr,  *axisRight = nullptr;
+    QValueAxis timeAxis;
+
+    QMap<ValueID, DataSeries*> series;
+
 
     explicit RPPlot() : QChartView() {
         plotArea.setMargins(QMargins(-5,-8,-5,-10));
@@ -155,11 +161,14 @@ public:
         }
     }
 
-    QChart plotArea;
-    YAxis *axisLeft = nullptr,  *axisRight = nullptr;
-    QValueAxis timeAxis;
+    void showLegend(bool show) {
+        if (show)
+            plotArea.legend()->setLabelColor(timeAxis.gridLineColor());
 
-    QMap<ValueID, DataSeries*> series;
+        plotArea.legend()->setVisible(show);
+
+    }
+
 };
 
 class PlotManager {

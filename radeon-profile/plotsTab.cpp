@@ -19,6 +19,9 @@ void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
 {
     plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
 
+    for (const QString &pk : plotManager.plots.keys())
+        plotManager.plots[pk]->showLegend(ui->cb_showLegends->isChecked());
+
     ui->stack_plots->setCurrentIndex(0);
 }
 
@@ -77,6 +80,14 @@ void radeon_profile::on_btn_removePlotDefinition_clicked()
     delete ui->list_plotDefinitions->currentItem();
 }
 
+void radeon_profile::setupPlot(const PlotDefinitionSchema &pds)
+{
+    plotManager.createPlotFromSchema(pds.name, figureOutInitialScale(pds));
+    plotManager.plots[pds.name]->showLegend(ui->cb_showLegends->isChecked());
+
+    ui->pagePlots->layout()->addWidget(plotManager.plots.value(pds.name));
+}
+
 void radeon_profile::modifyPlotSchema(const QString &name) {
     PlotDefinitionSchema pds = plotManager.schemas[name];
 
@@ -96,8 +107,7 @@ void radeon_profile::modifyPlotSchema(const QString &name) {
             plotManager.removePlot(pds.name);
 
         plotManager.addSchema(pds);
-        plotManager.createPlotFromSchema(pds.name, figureOutInitialScale(pds));
-        ui->pagePlots->layout()->addWidget(plotManager.plots.value(pds.name));
+        setupPlot(pds);
     }
 
     delete d;
@@ -125,12 +135,9 @@ void radeon_profile::on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, 
         case Qt::Unchecked:
             plotManager.removePlot(item->text(0));
             return;
-        case Qt::Checked: {
-            PlotDefinitionSchema pds = plotManager.schemas.value(item->text(0));
-            plotManager.createPlotFromSchema(item->text(0), figureOutInitialScale(pds));
-            ui->pagePlots->layout()->addWidget(plotManager.plots.value(item->text(0)));
+        case Qt::Checked:
+            setupPlot(plotManager.schemas.value(item->text(0)));
             return;
-        }
         default:
             return;
     }

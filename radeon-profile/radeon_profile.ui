@@ -525,7 +525,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -1042,6 +1042,13 @@
                   <widget class="QCheckBox" name="cb_plotsRightGap">
                    <property name="text">
                     <string>Gap on the right side of plot</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="cb_showLegends">
+                   <property name="text">
+                    <string>Show legend on plots</string>
                    </property>
                   </widget>
                  </item>

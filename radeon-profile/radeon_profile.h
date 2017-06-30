@@ -228,6 +228,7 @@ private:
     void createGeneralMenu();
     PlotInitialValues figureOutInitialScale(const PlotDefinitionSchema &pds);
     void applyOc();
+    void setupPlot(const PlotDefinitionSchema &pds);
 };
 
 #endif // RADEON_PROFILE_H
