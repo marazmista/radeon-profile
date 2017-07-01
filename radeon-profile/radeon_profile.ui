@@ -525,13 +525,13 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
         <string>GPU Summary</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_4">
+       <layout class="QGridLayout" name="gridLayout_4" rowstretch="1,2">
         <property name="leftMargin">
          <number>4</number>
         </property>

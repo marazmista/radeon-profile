@@ -32,7 +32,7 @@ void radeon_profile::saveConfig() {
 
     settings.setValue("graphOffset", ui->cb_plotsRightGap->isChecked());
     settings.setValue("graphRange",ui->slider_timeRange->value());
-    settings.setValue("showPlotsLegends",ui->cb_showLegends->isChecked());
+    settings.setValue("showLegend",ui->cb_showLegends->isChecked());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
     settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
@@ -193,7 +193,7 @@ void radeon_profile::loadConfig() {
 
     ui->cb_plotsRightGap->setChecked(settings.value("graphOffset",true).toBool());
     ui->slider_timeRange->setValue(settings.value("graphRange",600).toInt());
-    ui->cb_showLegends->setChecked(settings.value("showPlotsLegends",false).toBool());
+    ui->cb_showLegends->setChecked(settings.value("showLegend",false).toBool());
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
     ui->cb_eventsTracking->setChecked(settings.value("eventsTracking", false).toBool());
 
