@@ -170,8 +170,9 @@ void radeon_profile::createTopBar()
         topBarItems.insert(topBarItems.count(), pie);
     }
 
-    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
+    if (device.gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
         TopBarItem *pie = new PieItem(100, ValueID::GPU_VRAM_USAGE_PERCENT, Qt::yellow, this);
+        static_cast<PieProgressBar*>(pie->itemWidget)->setSecondLabelSource(ValueID::GPU_VRAM_USAGE_MB);
         ui->grid_topbar->addWidget(pie->itemWidget,0,5,2,1,Qt::AlignLeft);
         topBarItems.insert(topBarItems.count(), pie);
     }

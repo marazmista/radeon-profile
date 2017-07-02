@@ -42,6 +42,9 @@ public:
         data.slices().at(1)->setValue(gpuData.value(dataId).value);
         data.slices().at(2)->setValue(maxValue - gpuData.value(dataId).value);
         label.setText(gpuData.value(dataId).strValue);
+
+        if (secondLabelEnabled)
+            secondLabel.setText(gpuData.value(secondDataId).strValue);
     }
 
     void setFillColor(const QColor &c) {
@@ -49,15 +52,21 @@ public:
         data.slices().at(1)->setBrush(fill);
     }
 
+    void setSecondLabelSource(const ValueID id) {
+        secondLabelEnabled = true;
+        secondDataId = id;
+    }
+
 protected:
     Ui::PieProgressBar *ui;
     int maxValue = 100;
-    ValueID dataId;
+    bool secondLabelEnabled = false;
+    ValueID dataId, secondDataId;
 
     QPieSeries data;
     QChart chart;
     QChartView *chartView;
-    QLabel label;
+    QLabel label, secondLabel;
     QColor fill, bg;
 
     void init() {
@@ -65,6 +74,7 @@ protected:
         f.setFamily("Monospace");
         f.setPointSize(8);
         label.setFont(f);
+        secondLabel.setFont(f);
 
         QPalette p = this->palette();
         setAutoFillBackground(true);
@@ -104,9 +114,11 @@ protected:
         chartView->setMinimumSize(0,0);
         chartView->setRenderHint(QPainter::Antialiasing);
 
-        label.setContentsMargins(QMargins(0,18,7,0));
+        label.setContentsMargins(QMargins(0,18,5,0));
+        secondLabel.setContentsMargins(QMargins(0,43,5,0));
         ui->grid->addWidget(chartView,0,0,Qt::AlignCenter);
         ui->grid->addWidget(&label,0,0,Qt::AlignRight);
+        ui->grid->addWidget(&secondLabel,0,0,Qt::AlignRight);
     }
 
 };
