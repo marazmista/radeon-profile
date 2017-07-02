@@ -1,9 +1,9 @@
 #ifndef TOPBARCOMPONENTS_H
 #define TOPBARCOMPONENTS_H
 
-//#include "globalStuff.h"
-//#include "pieprogressbar.h"
-//#include <QWidget>
+#include "globalStuff.h"
+#include "pieprogressbar.h"
+#include <QWidget>
 
 
 //enum class TopBarItemType {
@@ -12,74 +12,60 @@
 //    PIE
 //};
 
-//struct TopBarItem {
-//    TopBarItem item;
-//    QColor fill, backgrund;
-//    ValueID dataSource;
-//    TopBarItemType type;
-//};
-
-//class TopBarItem : public QWidget {
-//public:
-
-//    virtual void updateValue(const GPUDataContainer &data) = 0;
-    //void setToolTip(const QString &tip);
-//    void setForegroundColor(const QColor &c);
-//    void setBackgroundColor (const QColor &c);
-//    virtual void setSuffix(const QString &s) {
-//        suffix = s;
-//    }
-
-//    QColor getForegroundColor() = 0;
-//    QColor getBackgroundColor() = 0;
-
+class TopBarItem {
+public:
+    QWidget *itemWidget;
 //    TopBarItemType itemType;
-//    ValueID dataSource;
-//    QString suffix;
-//};
+    ValueID dataSource;
 
-//class LabelItem : public QLabel, public TopBarItem {
-//public:
-//    LabelItem(const QString &s, ValueID id, QWidget *parent = 0) : QLabel(parent) {
+    virtual void updateItemValue(const GPUDataContainer &data) = 0;
+    virtual void setForegroundColor(const QColor &c) = 0;
+};
+
+class LabelItem : public QLabel, public TopBarItem {
+public:
+    LabelItem(ValueID id, QWidget *parent = 0) : QLabel(parent) {
 //        itemType = TopBarItemType::LABLEL;
-//        suffix = s;
-//        dataSource = id;
-//    }
+        itemWidget = this;
 
-//    void updateValue(const GPUDataContainer &data) {
-//        this->setText(data.value(dataSource).strValue);
-//    }
+        QFont f;
+        f.setFamily("Monospace");
+        f.setPointSize(10);
+        itemWidget->setFont(f);
 
-//    void setForegroundColor(const QColor &c) {
-//        QPalette p = this->palette();
-//        palette.setColor(ui->pLabel->foregroundRole(), c);
-//         this->setPalette(palette);
-//    }
-//};
+        dataSource = id;
+        itemWidget->setToolTip(globalStuff::getNameOfValueID(id));
+    }
 
-//class PieItem : public PieProgressBar, public TopBarItem {
-//public:
-//    PieItem(QWidget *parent = 0) : PieProgressBar(parent) {
+    void updateItemValue(const GPUDataContainer &data) {
+        this->setText(data.value(dataSource).strValue);
+    }
+
+    void setForegroundColor(const QColor &c) {
+        QPalette p = this->palette();
+        p.setColor(this->foregroundRole(), c);
+        this->QLabel::setPalette(p);
+    }
+};
+
+class PieItem : public PieProgressBar, public TopBarItem {
+public:
+    PieItem(const int max, ValueID id, QColor fillColor, QWidget *parent = 0) : PieProgressBar(max, id, fillColor, parent) {
 //        itemType = TopBarItemType::PIE;
-//    }
+        itemWidget = this;
 
-//    PieItem(const int max, const QString &s, ValueID id, QWidget *parent = 0) : PieProgressBar(max, s, parent) {
-//        itemType = TopBarItemType::PIE;
-//        this->maxValue = max;
-//        this->suffix = s;
-//        this->dataSource = id;
-//    }
+        setMinimumSize(60,60);
+        this->maxValue = max;
+        this->dataSource = id;
+        itemWidget->setToolTip(globalStuff::getNameOfValueID(id));
+    }
 
-//    void updateValue(const GPUDataContainer &data) {
-//        this->setValue(data.value(dataSource).value);
-//    }
+    void updateItemValue(const GPUDataContainer &data) {
+        this->updateValue(data);
+    }
 
-//    void setForegroundColor(const QColor &c) {
-
-//    }
-
-//    void setBackgroundColor(const QColor &c) {
-
-//    }
-//};
+    void setForegroundColor(const QColor &c) {
+        this->PieProgressBar::setFillColor(c);
+    }
+};
 #endif // TOPBARCOMPONENTS_H

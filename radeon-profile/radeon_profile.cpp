@@ -18,6 +18,7 @@
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
 #include "dialog_defineplot.h"
+#include "components/topbarcomponents.h"
 
 #include <QTimer>
 #include <QTextStream>
@@ -127,28 +128,52 @@ void radeon_profile::setupUiElements()
 
 void radeon_profile::createTopBar()
 {
+    if (device.gpuData.contains(ValueID::CLK_CORE)) {
+        TopBarItem *l = new LabelItem(ValueID::CLK_CORE, this);
+        ui->grid_topbar->addWidget(l->itemWidget,0,0,1,1,Qt::AlignLeft);
+        topBarItems.insert(topBarItems.count(), l);
+    }
+
+    if (device.gpuData.contains(ValueID::CLK_MEM)) {
+        TopBarItem *l = new LabelItem(ValueID::CLK_MEM, this);
+        ui->grid_topbar->addWidget(l->itemWidget,1,0,1,1,Qt::AlignLeft);
+        topBarItems.insert(topBarItems.count(), l);
+    }
+
+    if (device.gpuData.contains(ValueID::VOLT_CORE)) {
+        TopBarItem *l = new LabelItem(ValueID::VOLT_CORE, this);
+        ui->grid_topbar->addWidget(l->itemWidget,0,1,1,1,Qt::AlignLeft);
+        topBarItems.insert(topBarItems.count(), l);
+    }
+
+    if (device.gpuData.contains(ValueID::VOLT_MEM)) {
+        TopBarItem *l = new LabelItem(ValueID::VOLT_MEM, this);
+        ui->grid_topbar->addWidget(l->itemWidget,1,1,1,1,Qt::AlignLeft);
+        topBarItems.insert(topBarItems.count(), l);
+    }
+
+    if (device.gpuData.contains(ValueID::TEMPERATURE_CURRENT)) {
+        TopBarItem *l = new LabelItem(ValueID::TEMPERATURE_CURRENT, this);
+        ui->grid_topbar->addWidget(l->itemWidget,0,2,2,1,Qt::AlignLeft);
+        topBarItems.insert(topBarItems.count(), l);
+    }
+
     if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
-        PieProgressBar *fanPie = new PieProgressBar(100, ValueID::FAN_SPEED_PERCENT, Qt::blue, this);
-        fanPie->setToolTip(tr("Fan speed"));
-        fanPie->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        topBarPies.insert(1, fanPie);
-        ui->grid_topbar->addWidget(fanPie,0,3,2,1,Qt::AlignLeft);
+        TopBarItem *pie = new PieItem(100, ValueID::FAN_SPEED_PERCENT, Qt::blue, this);
+        ui->grid_topbar->addWidget(pie->itemWidget,0,3,2,1,Qt::AlignLeft);
+        topBarItems.insert(topBarItems.count(), pie);
     }
 
     if (device.gpuData.contains(ValueID::GPU_USAGE_PERCENT)) {
-        PieProgressBar *gpuUsagePie = new PieProgressBar(100, ValueID::GPU_USAGE_PERCENT, Qt::red, this);
-        gpuUsagePie->setToolTip(tr("GPU usage"));
-        gpuUsagePie->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        topBarPies.insert(2, gpuUsagePie);
-        ui->grid_topbar->addWidget(gpuUsagePie,0,4,2,1,Qt::AlignLeft);
+        TopBarItem *pie = new PieItem(100, ValueID::GPU_USAGE_PERCENT, Qt::red, this);
+        ui->grid_topbar->addWidget(pie->itemWidget,0,4,2,1,Qt::AlignLeft);
+        topBarItems.insert(topBarItems.count(), pie);
     }
 
-    if (device.gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
-        PieProgressBar *gpuVramUsagePie = new PieProgressBar(100, ValueID::GPU_VRAM_USAGE_PERCENT, Qt::yellow, this);
-        gpuVramUsagePie->setToolTip(tr("GPU VRAM usage"));
-        gpuVramUsagePie->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        topBarPies.insert(3, gpuVramUsagePie);
-        ui->grid_topbar->addWidget(gpuVramUsagePie,0,5,2,1,Qt::AlignLeft);
+    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
+        TopBarItem *pie = new PieItem(100, ValueID::GPU_VRAM_USAGE_PERCENT, Qt::yellow, this);
+        ui->grid_topbar->addWidget(pie->itemWidget,0,5,2,1,Qt::AlignLeft);
+        topBarItems.insert(topBarItems.count(), pie);
     }
 
     ui->grid_topbar->setColumnStretch(ui->grid_topbar->columnCount()-1, 1);
@@ -244,22 +269,8 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
     ui->tabs_systemInfo->setTabEnabled(3,data.contains(ValueID::CLK_CORE));
 
-    if (!device.gpuData.contains(ValueID::TEMPERATURE_CURRENT)) {
-        ui->l_temp->setVisible(false);
-    }
-
     if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::TEMPERATURE_CURRENT) && !device.gpuData.contains(ValueID::VOLT_CORE))
         ui->mainTabs->setTabEnabled(1,false);
-
-    if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::CLK_MEM)) {
-        ui->l_cClk->setVisible(false);
-        ui->l_mClk->setVisible(false);
-    }
-
-    if (!device.gpuData.contains(ValueID::VOLT_CORE) && !data.contains(ValueID::VOLT_MEM)) {
-        ui->l_cVolt->setVisible(false);
-        ui->l_mVolt->setVisible(false);
-    }
 
     if (data.contains(ValueID::FAN_SPEED_PERCENT) && features.canChangeProfile) {
         qDebug() << "Fan control is available , configuring the fan control tab";
@@ -337,17 +348,9 @@ void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, c
 }
 
 void radeon_profile::refreshUI() {
-    ui->l_cClk->setText(device.gpuData.value(ValueID::CLK_CORE).strValue);
-    ui->l_mClk->setText(device.gpuData.value(ValueID::CLK_MEM).strValue);
-    ui->l_mVolt->setText(device.gpuData.value(ValueID::VOLT_CORE).strValue);
-    ui->l_cVolt->setText(device.gpuData.value(ValueID::VOLT_MEM).strValue);
-
-    // Header - Temperature
-    ui->l_temp->setText(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).strValue);
-
-    // refresh pies
-    for (const int &k : topBarPies.keys())
-        topBarPies[k]->updateValue(device.gpuData);
+    // refresh top bar
+    for (const int &k : topBarItems.keys())
+        topBarItems[k]->updateItemValue(device.gpuData);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
@@ -416,7 +419,7 @@ void radeon_profile::timerEvent() {
     if (!refreshWhenHidden->isChecked() && this->isHidden()) {
 
         // even if in tray, keep the fan control active (if enabled)
-        if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && ui->btn_pwmProfile->isChecked()) {
+        if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && device.getDriverFeatures().canChangeProfile && ui->btn_pwmProfile->isChecked()) {
             device.getTemperature();
             adjustFanSpeed();
         }
@@ -425,7 +428,7 @@ void radeon_profile::timerEvent() {
 
     refreshGpuData();
 
-    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && ui->btn_pwmProfile->isChecked())
+    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && device.getDriverFeatures().canChangeProfile && ui->btn_pwmProfile->isChecked())
         adjustFanSpeed();
 
     if (Q_LIKELY(ui->cb_graphs->isChecked()))
@@ -449,7 +452,7 @@ void radeon_profile::timerEvent() {
 }
 
 void radeon_profile::adjustFanSpeed() {
-    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value != device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value ) {
+    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value != device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value) {
         if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {  // Exact match
             device.setPwmValue(currentFanProfile.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));
             return;

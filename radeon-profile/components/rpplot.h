@@ -166,9 +166,7 @@ public:
             plotArea.legend()->setLabelColor(timeAxis.gridLineColor());
 
         plotArea.legend()->setVisible(show);
-
     }
-
 };
 
 class PlotManager {

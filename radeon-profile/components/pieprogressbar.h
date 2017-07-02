@@ -26,7 +26,7 @@ public:
         init();
     }
 
-    explicit PieProgressBar(const int max, ValueID id, QColor fillColor = Qt::yellow, QWidget *parent = 0) : QWidget(parent), ui(new Ui::PieProgressBar) {
+    explicit PieProgressBar(const int max, ValueID id, QColor fillColor, QWidget *parent = 0) : QWidget(parent), ui(new Ui::PieProgressBar) {
         ui->setupUi(this);
 
         maxValue = max;
@@ -42,6 +42,11 @@ public:
         data.slices().at(1)->setValue(gpuData.value(dataId).value);
         data.slices().at(2)->setValue(maxValue - gpuData.value(dataId).value);
         label.setText(gpuData.value(dataId).strValue);
+    }
+
+    void setFillColor(const QColor &c) {
+        fill = c;
+        data.slices().at(1)->setBrush(fill);
     }
 
 protected:

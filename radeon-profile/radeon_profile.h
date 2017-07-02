@@ -7,7 +7,7 @@
 #include "rpevent.h"
 #include "components/rpplot.h"
 #include "components/pieprogressbar.h"
-//#include "components/topbarcomponents.h"
+#include "components/topbarcomponents.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -165,7 +165,7 @@ private:
     PlotManager plotManager;
     QChartView *fanProfileChart;
     QLineSeries *fanSeries;
-    QMap<int, PieProgressBar*> topBarPies;
+    QMap<int, TopBarItem*> topBarItems;
     QMap<int, ValueID> keysInCurrentGpuList;
 
     Ui::radeon_profile *ui;
