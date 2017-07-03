@@ -5,6 +5,8 @@
         <file>symbols/arrow2.png</file>
         <file>symbols/arrow3.png</file>
         <file>symbols/refresh.png</file>
+        <file>symbols/fan.png</file>
+        <file>symbols/pause.png</file>
     </qresource>
     <qresource prefix="/var">
         <file>variables/envVars</file>

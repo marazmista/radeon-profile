@@ -17,25 +17,20 @@ void radeon_profile::createDefaultFanProfile() {
 }
 
 void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {
-    ui->plotFanProfile->graph(0)->clearData();
+    fanSeries->clear();
     ui->list_fanSteps->clear();
 
     for (int temperature : profile.keys()) {
-        ui->plotFanProfile->graph(0)->addData(temperature, profile.value(temperature));
+        fanSeries->append(temperature, profile.value(temperature));
         ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.value(temperature))));
     }
-
-    ui->plotFanProfile->replot();
 }
 
 void radeon_profile::makeFanProfilePlot() {
-    ui->plotFanProfile->graph(0)->clearData();
-
-    for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i)
-        ui->plotFanProfile->graph(0)->addData(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(),
-                                              ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
-
-    ui->plotFanProfile->replot();
+    fanSeries->clear();
+    for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i) {
+        fanSeries->append(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(), ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
+    }
 }
 
 bool radeon_profile::isFanStepValid(const unsigned int temperature, const unsigned int fanSpeed) {
@@ -134,7 +129,7 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
 
     fanProfiles.insert(name, stepsListToMap());
     ui->combo_fanProfiles->addItem(name);
-    ui->combo_fanProfiles->setCurrentIndex(ui->combo_fanProfiles->findText(name));
+    ui->combo_fanProfiles->setCurrentText(name);
     setupFanProfilesMenu(true);
     fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
 }
@@ -154,6 +149,7 @@ void radeon_profile::on_btn_activateFanProfile_clicked()
 
 void radeon_profile::setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile) {
     ui->l_currentFanProfile->setText(profileName);
+    ui->btn_fanControl->setText(profileName);
     fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
 
     currentFanProfile = profile;
@@ -223,8 +219,6 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 
     // Remove the step from the list and from the graph
     delete current;
-    ui->plotFanProfile->graph(0)->removeData(temperature);
-    ui->plotFanProfile->replot();
 }
 
 

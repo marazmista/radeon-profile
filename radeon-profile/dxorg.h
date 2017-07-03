@@ -7,102 +7,95 @@
 
 #include "globalStuff.h"
 #include "daemonComm.h"
+#include "ioctlHandler.h"
 
 #include <QString>
 #include <QList>
 #include <QTreeWidgetItem>
 #include <QSharedMemory>
-#include <QThread>
+#include <QFile>
 
-#define SHARED_MEM_SIZE 128 // When changin this, consider changing SHARED_MEM_SIZE in radeon-profile-daemon/rpdthread.h
+
+#define SHARED_MEM_SIZE 128
 
 class dXorg
 {
+    struct RxPatterns {
+        QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
+    };
+
 public:
     dXorg() { }
+    dXorg(const GPUSysInfo &si);
 
-    ~dXorg() {
-        delete dcomm;
+    void cleanup() {
+        delete ioctlHnd;
 
+        if (sharedMem.isAttached()){
+            // In case the closing signal interrupts a sharedMem lock+read+unlock phase, sharedmem is unlocked
+            sharedMem.unlock();
+            sharedMem.detach();
+        }
         // Before being deleted, the class deletes the sharedMem
         sharedMem.deleteLater();
     }
 
-    static globalStuff::gpuClocksStruct getClocks(const QString &data);
-    static QString getClocksRawData(bool forFeatures = false);
-    static float getTemperature();
-    static QStringList getGLXInfo(QProcessEnvironment env);
-    static QList<QTreeWidgetItem *> getModuleInfo();
-    static QString getCurrentPowerLevel();
-    static QString getCurrentPowerProfile();
-    static int getPwmSpeed();
+    DriverFeatures features;
+    GPUConstParams params;
+    DeviceFilePaths driverFiles;
 
-    static void setPowerProfile(globalStuff::powerProfiles _newPowerProfile);
-    static void setForcePowerLevel(globalStuff::forcePowerLevels);
-    static void setPwmManuaControl(bool manual);
-    static void setPwmValue(unsigned int value);
+    GPUClocks getClocksFromPmFile();
+    GPUClocks getClocksFromIoctl();
+    GPUClocks getClocks();
 
-    static QStringList detectCards();
-    static void figureOutGpuDataFilePaths(const QString &gpuName);
-    static void configure(const QString &gpuName);
-    static globalStuff::driverFeatures figureOutDriverFeatures();
-    static void reconfigureDaemon();
-    static bool daemonConnected();
-    static globalStuff::gpuClocksStruct getFeaturesFallback();
-    static void setupDriverModule(const QString &gpuName);
-    static void setupRegex(const QString &data);
+    float getTemperature();
+    GPUUsage getGPUUsage();
+    GPUPwm getPwmSpeed();
 
-    /**
-     * @brief overClock Overclocks the GPU
-     * @param percent Overclock percentage [0-20]
-     * @return Success
-     */
-    static bool overClock(int percentage);
+    QList<QTreeWidgetItem *> getModuleInfo();
+    QString getCurrentPowerLevel();
+    QString getCurrentPowerProfile();
 
-    static void resetOverClock();
+    void setPowerProfile(PowerProfiles newPowerProfile);
+    void setForcePowerLevel(ForcePowerLevels newForcePowerLevel);
+    void setPwmManualControl(bool manual);
+    void setPwmValue(unsigned int value);
+
+    void figureOutGpuDataFilePaths(const QString &gpuName);
+    void configure();
+    void reconfigureDaemon();
+    bool daemonConnected();
+    GPUClocks getFeaturesFallback();
+    void setupRegex(const QString &data);
+    void setOverclockValue(const QString &file, const int percentage);
+    void setPowerPlayFreq(const QString &file, const int tableIndex);
+    int getCurrentPowerPlayTableId(const QString &file);
 
 private:
-    enum tempSensor {
-        SYSFS_HWMON = 0, // try to read temp from /sys/class/hwmonX/device/tempX_input
-        CARD_HWMON, // try to read temp from /sys/class/drm/cardX/device/hwmon/hwmonX/temp1_input
-        PCI_SENSOR,  // PCI Card, 'radeon-pci' label on sensors output
-        MB_SENSOR,  // Card in motherboard, 'VGA' label on sensors output
-        TS_UNKNOWN
-    };
+    QChar gpuSysIndex;
+    QSharedMemory sharedMem;
+    int sensorsGPUtempIndex;
+    short rxMatchIndex, clocksValueDivider;
+    RxPatterns rxPatterns;
+    HwmonAttributes hwmonAttributes;
 
-    static QChar gpuSysIndex;
-    static QSharedMemory sharedMem;
-    static QString driverModuleName;
-    static daemonComm *dcomm;
+    daemonComm dcomm;
+    ioctlHandler *ioctlHnd = nullptr;
 
-    static struct rxPatternsStruct {
-        QString powerLevel, sclk, mclk, vclk, dclk, vddc, vddci;
-    } rxPatterns;
-
-    static struct driverFilePaths {
-        QString powerMethodFilePath,
-            profilePath,
-            dpmStateFilePath,
-            clocksPath,
-            forcePowerLevelFilePath,
-            sysfsHwmonTempPath,
-            moduleParamsPath,
-            pwmEnablePath,
-            pwmSpeedPath,
-            pwmMaxSpeedPath,
-            overDrivePath;
-    } filePaths;
-
-    static int sensorsGPUtempIndex;
-    static short rxMatchIndex, clocksValueDivider;
-    static dXorg::tempSensor currentTempSensor;
-    static globalStuff::powerMethod currentPowerMethod;
-
-    static QString findSysfsHwmonForGPU();
-    static globalStuff::powerMethod getPowerMethod();
-    static tempSensor testSensor();
-    static void setNewValue(const QString &filePath, const QString &newValue);
-    static QString findSysFsHwmonForGpu();
+    QString getClocksRawData(bool forFeatures = false);
+    QString findSysfsHwmonForGPU();
+    PowerMethod getPowerMethod();
+    TemperatureSensor getTemperatureSensor();
+    void setNewValue(const QString &filePath, const QString &newValue);
+    QString findSysFsHwmonForGpu();
+    bool getIoctlAvailability();
+    void figureOutDriverFeatures();
+    void figureOutConstParams();
+    void setupIoctl();
+    void setupSharedMem();
+    void setupDaemon();
+    PowerPlayTable loadPowerPlayTable(const QString &file);
+    QString createDaemonSetCmd(const QString &file, const QString &tableIndex);
 };
 
 #endif // DXORG_H

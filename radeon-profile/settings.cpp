@@ -24,19 +24,15 @@ void radeon_profile::saveConfig() {
     settings.setValue("minimizeToTray",ui->cb_minimizeTray->isChecked());
     settings.setValue("closeToTray",ui->cb_closeTray->isChecked());
     settings.setValue("updateInterval",ui->spin_timerInterval->value());
-    settings.setValue("updateGPUData",ui->cb_gpuData->isChecked());
     settings.setValue("updateGraphs",ui->cb_graphs->isChecked());
-    settings.setValue("updateGLXInfo",ui->cb_glxInfo->isChecked());
-    settings.setValue("updateConnectors",ui->cb_connectors->isChecked());
-    settings.setValue("updateModParams",ui->cb_modParams->isChecked());
     settings.setValue("saveWindowGeometry",ui->cb_saveWindowGeometry->isChecked());
     settings.setValue("windowGeometry",this->geometry());
     settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
     settings.setValue("aleternateRowColors",ui->cb_alternateRow->isChecked());
 
-    settings.setValue("showLegend",optionsMenu->actions().at(0)->isChecked());
-    settings.setValue("graphOffset",optionsMenu->actions().at(1)->isChecked());
-    settings.setValue("graphRange",ui->timeSlider->value());
+    settings.setValue("graphOffset", ui->cb_plotsRightGap->isChecked());
+    settings.setValue("graphRange",ui->slider_timeRange->value());
+    settings.setValue("showLegend",ui->cb_showLegends->isChecked());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
     settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
@@ -44,30 +40,16 @@ void radeon_profile::saveConfig() {
     settings.setValue("fanProfileName",ui->l_currentFanProfile->text());
     settings.setValue("enableZeroPercentFanSpeed", ui->cb_zeroPercentFanSpeed->isChecked());
 
-    settings.setValue("overclockEnabled", ui->cb_enableOverclock->isChecked());
-    settings.setValue("overclockAtLaunch", ui->cb_overclockAtLaunch->isChecked());
-    settings.setValue("overclockValue", ui->slider_overclock->value());
+    settings.setValue("overclockEnabled", ui->group_oc->isChecked());
+    settings.setValue("manualFreqEnabled", ui->group_freq->isChecked());
+    settings.setValue("overclockValue", ui->slider_ocSclk->value());
+    settings.setValue("overclockMemValue", ui->slider_ocMclk->value());
 
-    // Graph settings
-    settings.setValue("graphLineThickness",ui->spin_lineThick->value());
-    settings.setValue("graphTempBackground",ui->graphColorsList->topLevelItem(TEMP_BG)->backgroundColor(1));
-    settings.setValue("graphClocksBackground",ui->graphColorsList->topLevelItem(CLOCKS_BG)->backgroundColor(1));
-    settings.setValue("graphVoltsBackground",ui->graphColorsList->topLevelItem(VOLTS_BG)->backgroundColor(1));
-    settings.setValue("graphTempLine",ui->graphColorsList->topLevelItem(TEMP_LINE)->backgroundColor(1));
-    settings.setValue("graphGPUClockLine",ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->backgroundColor(1));
-    settings.setValue("graphMemClockLine",ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->backgroundColor(1));
-    settings.setValue("graphUVDVideoLine",ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->backgroundColor(1));
-    settings.setValue("graphUVDDecoderLine",ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->backgroundColor(1));
-    settings.setValue("graphVoltsLine",ui->graphColorsList->topLevelItem(CORE_VOLTS_LINE)->backgroundColor(1));
-    settings.setValue("graphMemVoltsLine",ui->graphColorsList->topLevelItem(MEM_VOLTS_LINE)->backgroundColor(1));
-
-    settings.setValue("showTempGraphOnStart",ui->cb_showTempsGraph->isChecked());
-    settings.setValue("showFreqGraphOnStart",ui->cb_showFreqGraph->isChecked());
-    settings.setValue("showVoltsGraphOnStart",ui->cb_showVoltsGraph->isChecked());
     settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
     settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
     settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
 
+    settings.setValue("daemonData", ui->cb_daemonData->isChecked());
 
     QString xmlString;
     QXmlStreamWriter xml(&xmlString);
@@ -78,6 +60,7 @@ void radeon_profile::saveConfig() {
     saveRpevents(xml);
     saveExecProfiles(xml);
     saveFanProfiles(xml);
+    savePlotSchemas(xml);
 
     xml.writeEndElement();
     xml.writeEndDocument();
@@ -147,6 +130,45 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
     xml.writeEndElement();
 }
 
+void radeon_profile::writePlotAxisSchemaToXml(QXmlStreamWriter &xml, const QString side, const PlotAxisSchema &pas) {
+    xml.writeStartElement("axis");
+    xml.writeAttribute("align", side);
+    xml.writeAttribute("enabled", QString::number(pas.enabled));
+    xml.writeAttribute("unit", QString::number(pas.unit));
+    xml.writeAttribute("ticks", QString::number(pas.ticks));
+    xml.writeAttribute("penStyle", QString::number(pas.penGrid.style()));
+    xml.writeAttribute("penWidth", QString::number(pas.penGrid.width()));
+    xml.writeAttribute("penColor", pas.penGrid.color().name());
+    xml.writeEndElement();
+
+    for (const ValueID &sk : pas.dataList.keys()) {
+        xml.writeStartElement("serie");
+        xml.writeAttribute("align", side);
+        xml.writeAttribute("id", QString::number(sk));
+        xml.writeAttribute("color", pas.dataList.value(sk).name());
+        xml.writeEndElement();
+    }
+}
+
+void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
+    xml.writeStartElement("Plots");
+
+    for (const QString &k : plotManager.schemas.keys()) {
+        PlotDefinitionSchema pds = plotManager.schemas.value(k);
+
+        xml.writeStartElement("plot");
+        xml.writeAttribute("name", k);
+        xml.writeAttribute("enabled", QString::number(pds.enabled));
+        xml.writeAttribute("background", pds.background.name());
+
+        writePlotAxisSchemaToXml(xml, "left", pds.left);
+        writePlotAxisSchemaToXml(xml, "right", pds.right);
+
+        xml.writeEndElement();
+    }
+
+    xml.writeEndElement();
+}
 
 
 void radeon_profile::loadConfig() {
@@ -156,11 +178,7 @@ void radeon_profile::loadConfig() {
     ui->cb_minimizeTray->setChecked(settings.value("minimizeToTray",false).toBool());
     ui->cb_closeTray->setChecked(settings.value("closeToTray",false).toBool());
     ui->spin_timerInterval->setValue(settings.value("updateInterval",1).toDouble());
-    ui->cb_gpuData->setChecked(settings.value("updateGPUData",true).toBool());
     ui->cb_graphs->setChecked(settings.value("updateGraphs",true).toBool());
-    ui->cb_glxInfo->setChecked(settings.value("updateGLXInfo",false).toBool());
-    ui->cb_connectors->setChecked(settings.value("updateConnectors",false).toBool());
-    ui->cb_modParams->setChecked(settings.value("updateModParams",false).toBool());
     ui->cb_saveWindowGeometry->setChecked(settings.value("saveWindowGeometry").toBool());
     ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
@@ -173,34 +191,22 @@ void radeon_profile::loadConfig() {
     if (ui->cb_saveFanMode->isChecked())
         ui->fanModesTabs->setCurrentIndex(settings.value("fanMode",0).toInt());
 
-    optionsMenu->actions().at(0)->setChecked(settings.value("showLegend",true).toBool());
-    optionsMenu->actions().at(1)->setChecked(settings.value("graphOffset",true).toBool());
-    ui->timeSlider->setValue(settings.value("graphRange",180).toInt());
-    // Graphs settings
-    ui->spin_lineThick->setValue(settings.value("graphLineThickness",2).toInt());
-    // detalis: http://qt-project.org/doc/qt-4.8/qvariant.html#a-note-on-gui-types
-    //ok, color is saved as QVariant, and read and convertsion it to QColor is below
-    ui->graphColorsList->topLevelItem(TEMP_BG)->setBackgroundColor(1,settings.value("graphTempBackground",QColor(Qt::darkGray)).value<QColor>());
-    ui->graphColorsList->topLevelItem(CLOCKS_BG)->setBackgroundColor(1,settings.value("graphClocksBackground",QColor(Qt::darkGray)).value<QColor>());
-    ui->graphColorsList->topLevelItem(VOLTS_BG)->setBackgroundColor(1,settings.value("graphVoltsBackground",QColor(Qt::darkGray)).value<QColor>());
-    ui->graphColorsList->topLevelItem(TEMP_LINE)->setBackgroundColor(1,settings.value("graphTempLine",QColor(Qt::yellow)).value<QColor>());
-    ui->graphColorsList->topLevelItem(GPU_CLOCK_LINE)->setBackgroundColor(1,settings.value("graphGPUClockLine",QColor(Qt::black)).value<QColor>());
-    ui->graphColorsList->topLevelItem(MEM_CLOCK_LINE)->setBackgroundColor(1,settings.value("graphMemClockLine",QColor(Qt::cyan)).value<QColor>());
-    ui->graphColorsList->topLevelItem(UVD_VIDEO_LINE)->setBackgroundColor(1,settings.value("graphUVDVideoLine",QColor(Qt::red)).value<QColor>());
-    ui->graphColorsList->topLevelItem(UVD_DECODER_LINE)->setBackgroundColor(1,settings.value("graphUVDDecoderLine",QColor(Qt::green)).value<QColor>());
-    ui->graphColorsList->topLevelItem(CORE_VOLTS_LINE)->setBackgroundColor(1,settings.value("graphVoltsLine",QColor(Qt::blue)).value<QColor>());
-    ui->graphColorsList->topLevelItem(MEM_VOLTS_LINE)->setBackgroundColor(1,settings.value("graphMemVoltsLine",QColor(Qt::cyan)).value<QColor>());
-    setupGraphsStyle();
-
-    ui->cb_showTempsGraph->setChecked(settings.value("showTempGraphOnStart",true).toBool());
-    ui->cb_showFreqGraph->setChecked(settings.value("showFreqGraphOnStart",true).toBool());
-    ui->cb_showVoltsGraph->setChecked(settings.value("showVoltsGraphOnStart",false).toBool());
+    ui->cb_plotsRightGap->setChecked(settings.value("graphOffset",true).toBool());
+    ui->slider_timeRange->setValue(settings.value("graphRange",600).toInt());
+    ui->cb_showLegends->setChecked(settings.value("showLegend",false).toBool());
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
     ui->cb_eventsTracking->setChecked(settings.value("eventsTracking", false).toBool());
 
-    ui->cb_enableOverclock->setChecked(settings.value("overclockEnabled",false).toBool());
-    ui->cb_overclockAtLaunch->setChecked(settings.value("overclockAtLaunch",false).toBool());
-    ui->slider_overclock->setValue(settings.value("overclockValue",0).toInt());
+    ui->group_oc->setChecked(settings.value("overclockEnabled",false).toBool());
+    ui->group_freq->setChecked(settings.value("manualFreqEnabled",false).toBool());
+    ui->slider_ocSclk->setValue(settings.value("overclockValue",0).toInt());
+    ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
+
+    ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
+
+    globalStuff::globalConfig.daemonData = ui->cb_daemonData->isChecked();
+    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
+    globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
@@ -214,21 +220,10 @@ void radeon_profile::loadConfig() {
                          desktopSize.height() / 2); // Height
     }
 
-    ui->cb_graphs->setEnabled(ui->cb_gpuData->isChecked());
-    ui->cb_stats->setEnabled(ui->cb_gpuData->isChecked());
-
-    if (ui->cb_gpuData->isChecked()) {
-        if (ui->cb_stats->isChecked())
-            ui->tabs_systemInfo->setTabEnabled(3,true);
-        else
-            ui->tabs_systemInfo->setTabEnabled(3,false);
-    } else
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << "GPU data is disabled."));
-
-    if (ui->cb_graphs->isChecked() && ui->cb_graphs->isEnabled())
-        ui->mainTabs->setTabEnabled(1,true);
+    if (ui->cb_stats->isChecked())
+        ui->tabs_systemInfo->setTabEnabled(3,true);
     else
-        ui->mainTabs->setTabEnabled(1,false);
+        ui->tabs_systemInfo->setTabEnabled(3,false);
 
     if (ui->cb_zeroPercentFanSpeed->isChecked())
         setupMinFanSpeedSetting(0);
@@ -242,18 +237,8 @@ void radeon_profile::loadConfig() {
     ui->list_variables->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_vaules->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
 
-    showLegend(optionsMenu->actions().at(0)->isChecked());
-    changeTimeRange();
-    on_cb_showTempsGraph_clicked(ui->cb_showTempsGraph->isChecked());
-    on_cb_showFreqGraph_clicked(ui->cb_showFreqGraph->isChecked());
-    on_cb_showVoltsGraph_clicked(ui->cb_showVoltsGraph->isChecked());
-
+    plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
     hideEventControls(true);
-
-    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
-    globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
-    globalStuff::globalConfig.graphOffset = ((optionsMenu->actions().at(1)->isChecked()) ? 20 : 0);
-
 
     QFile f(auxStuffPath);
     if (f.open(QIODevice::ReadOnly)) {
@@ -275,6 +260,11 @@ void radeon_profile::loadConfig() {
                     loadFanProfile(xml);
                     continue;
                 }
+
+                if (xml.name().toString() == "plot") {
+                    loadPlotSchemas(xml);
+                    continue;
+                }
             }
         }
         f.close();
@@ -286,10 +276,13 @@ void radeon_profile::loadConfig() {
     // legacy load
     loadFanProfiles();
 
-
     // create default if empty
     if (ui->combo_fanProfiles->count() == 0)
         createDefaultFanProfile();
+
+    // create plots from xml config
+    if (plotManager.schemas.count() == 0)
+        ui->stack_plots->setCurrentIndex(1);
 
     makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));
 }
@@ -298,14 +291,14 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     RPEvent rpe;
     rpe.name = xml.attributes().value("name").toString();
     rpe.enabled = (xml.attributes().value("enabled") == "1");
-    rpe.type = static_cast<rpeventType>(xml.attributes().value("tiggerType").toString().toInt());
+    rpe.type = static_cast<rpeventType>(xml.attributes().value("tiggerType").toInt());
     rpe.activationBinary = xml.attributes().value("activationBinary").toString();
-    rpe.activationTemperature = xml.attributes().value("activationTemperature").toString().toInt();
-    rpe.dpmProfileChange = static_cast<globalStuff::powerProfiles>(xml.attributes().value("dpmProfileChange").toString().toInt());
-    rpe.powerLevelChange = static_cast<globalStuff::forcePowerLevels>(xml.attributes().value("powerLevelChange").toString().toInt());
-    rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toString().toInt();
+    rpe.activationTemperature = xml.attributes().value("activationTemperature").toInt();
+    rpe.dpmProfileChange = static_cast<PowerProfiles>(xml.attributes().value("dpmProfileChange").toInt());
+    rpe.powerLevelChange = static_cast<ForcePowerLevels>(xml.attributes().value("powerLevelChange").toInt());
+    rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toInt();
     rpe.fanProfileNameChange = xml.attributes().value("fanProfileNameChange").toString();
-    rpe.fanComboIndex = xml.attributes().value("fanComboIndex").toString().toInt();
+    rpe.fanComboIndex = xml.attributes().value("fanComboIndex").toInt();
 
     events.insert(rpe.name, rpe);
 
@@ -313,6 +306,53 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     item->setText(1, rpe.name);
     item->setCheckState(0,(rpe.enabled) ? Qt::Checked : Qt::Unchecked);
     ui->list_events->addTopLevelItem(item);
+}
+
+void radeon_profile::loadPlotAxisSchema(const QXmlStreamReader &xml, PlotAxisSchema &pas) {
+    pas.unit = static_cast<ValueUnit>(xml.attributes().value("unit").toInt());
+    pas.ticks = xml.attributes().value("ticks").toInt();
+    pas.enabled = xml.attributes().value("enabled").toInt();
+
+    pas.penGrid = QPen(QColor(xml.attributes().value("penColor").toString()),
+                      xml.attributes().value("penWidth").toInt(),
+                      static_cast<Qt::PenStyle>(xml.attributes().value("penStyle").toInt()));
+}
+
+void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
+    PlotDefinitionSchema pds;
+    pds.name = xml.attributes().value("name").toString();
+    pds.enabled = xml.attributes().value("enabled").toInt();
+    pds.background = QColor(xml.attributes().value("background").toString());
+
+    while (xml.readNext()) {
+        if (xml.name().toString() == "axis") {
+
+            if (xml.attributes().value("align") == "left")
+                loadPlotAxisSchema(xml, pds.left);
+            else if (xml.attributes().value("align") == "right")
+                loadPlotAxisSchema(xml, pds.right);
+
+        }
+
+        if (xml.name().toString() == "serie") {
+            if (xml.attributes().value("align").toString() == "left")
+                pds.left.dataList.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+            else if (xml.attributes().value("align").toString() == "right")
+                pds.right.dataList.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+
+        }
+
+        if (xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "plot") {
+            break;
+        }
+    }
+
+    plotManager.addSchema(pds);
+
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    item->setText(0, pds.name);
+    item->setCheckState(0,(pds.enabled) ? Qt::Checked : Qt::Unchecked);
+    ui->list_plotDefinitions->addTopLevelItem(item);
 }
 
 void radeon_profile::loadExecProfile(const QXmlStreamReader &xml) {

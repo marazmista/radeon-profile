@@ -8,39 +8,67 @@
 #include <QTime>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QString>
+#include <QStringList>
 
-// define static members //
-dXorg::tempSensor dXorg::currentTempSensor = dXorg::TS_UNKNOWN;
-globalStuff::powerMethod dXorg::currentPowerMethod;
-int dXorg::sensorsGPUtempIndex;
-short dXorg::rxMatchIndex;
-short dXorg::clocksValueDivider;
-QString dXorg::driverModuleName;
-QChar dXorg::gpuSysIndex;
-QSharedMemory dXorg::sharedMem;
-dXorg::driverFilePaths dXorg::filePaths;
-dXorg::rxPatternsStruct dXorg::rxPatterns;
-daemonComm *dXorg::dcomm = new daemonComm();
-// end //
+dXorg::dXorg(const GPUSysInfo &si) {
+    features.sysInfo = si;
+    configure();
+    figureOutConstParams();
+}
 
-void dXorg::configure(const QString &gpuName) {
-    setupDriverModule(gpuName);
-    figureOutGpuDataFilePaths(gpuName);
-    currentTempSensor = testSensor();
-    currentPowerMethod = getPowerMethod();
+void dXorg::configure() {
+    figureOutGpuDataFilePaths(features.sysInfo.sysName);
+    setupIoctl();
 
-    if (globalStuff::globalConfig.rootMode)
+    if (globalStuff::globalConfig.rootMode) {
+        figureOutDriverFeatures();
         return;
+    }
 
-    qDebug() << "Running in non-root mode, connecting and configuring the daemon";
+    if (globalStuff::globalConfig.daemonData)
+        setupSharedMem();
+
+    dcomm.connectToDaemon();
+
+    if (daemonConnected())
+        setupDaemon();
+    else
+        qCritical() << "Daemon is not connected, therefore it can't be configured";
+
+    figureOutDriverFeatures();
+}
+
+void dXorg::setupIoctl() {
+    if (features.sysInfo.module == DriverModule::RADEON)
+        ioctlHnd = new radeonIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
+    else if (features.sysInfo.module == DriverModule::AMDGPU)
+        ioctlHnd = new amdgpuIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
+}
+
+//https://stackoverflow.com/a/18866593
+QString getRandomString()
+{
+   const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+
+   QString randomString;
+   for (int i = 0; i < 10; ++i)
+       randomString.append(possibleCharacters.at(qrand() % possibleCharacters.length()));
+
+   return randomString;
+}
+
+void dXorg::setupSharedMem() {
+    qDebug() << "Configure shared mem";
+
     // create the shared mem block. The if comes from that configure method
     // is called on every change gpu, so later, shared mem already exists
     if (!sharedMem.isAttached()) {
         qDebug() << "Shared memory is not attached, creating it";
-        sharedMem.setKey("radeon-profile");
+        sharedMem.setKey(getRandomString());
 
         if (!sharedMem.create(SHARED_MEM_SIZE)) {
-            if (sharedMem.error() == QSharedMemory::AlreadyExists){
+            if (sharedMem.error() == QSharedMemory::AlreadyExists) {
                 qDebug() << "Shared memory already exists, attaching to it";
 
                 if (!sharedMem.attach())
@@ -49,102 +77,55 @@ void dXorg::configure(const QString &gpuName) {
             } else
                 qCritical() << "Unable to create the shared memory: " << sharedMem.errorString();
         }
-        // If QSharedMemory::create() returns true, it has already automatically attached
     }
+}
 
-    dcomm->connectToDaemon();
-    if (daemonConnected()) {
-        qDebug() << "Daemon is connected, configuring it";
-        //  Configure the daemon to read the data
-        QString command; // SIGNAL_CONFIG + SEPARATOR + CLOCKS_PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR); // Configuration flag
-        command.append(filePaths.clocksPath).append(SEPARATOR); // Path where the daemon will read clocks
+void dXorg::setupDaemon() {
+    qDebug() << "Daemon is connected, configuring it";
+    QString command;
 
+    if (!globalStuff::globalConfig.daemonData) {
+        command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append('_').append(SEPARATOR);
         qDebug() << "Sending daemon config command: " << command;
-        dcomm->sendCommand(command);
-
-        reconfigureDaemon(); // Set up timer
-    } else
-        qCritical() << "Daemon is not connected, therefore it can't be configured";
-}
-
-void dXorg::setupDriverModule(const QString &gpuName) {
-    QFile f("/sys/class/drm/"+gpuName+"/device/uevent");
-    if (f.open(QIODevice::ReadOnly)) {
-        QString line = f.readLine(50).trimmed();
-        f.close();
-
-        if (line == "DRIVER=radeon") {
-            dXorg::driverModuleName = "radeon";
-            return;
-        }
-
-
-        if (line == "DRIVER=amdgpu") {
-            dXorg::driverModuleName = "amdgpu";
-            return;
-        }
+        dcomm.sendCommand(command);
+        return;
     }
-}
 
-void dXorg::reconfigureDaemon() { // Set up the timer
-    if (daemonConnected()) {
-        qDebug() << "Configuring daemon timer";
-        QString command;
+    command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR);
+    command.append(driverFiles.debugfs_pm_info).append(SEPARATOR);
+    command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append(sharedMem.key()).append(SEPARATOR);
 
-        if (globalStuff::globalConfig.daemonAutoRefresh){ // SIGNAL_TIMER_ON + SEPARATOR + INTERVAL + SEPARATOR
-            command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR); // Enable timer
-            command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR); // Set timer interval
-        }
-        else // SIGNAL_TIMER_OFF + SEPARATOR
-            command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR); // Disable timer
+    if (globalStuff::globalConfig.daemonAutoRefresh) {
+        command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR);
+        command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR);
+    }
+    else
+        command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR);
 
-        qDebug() << "Sending daemon reconfig signal: " << command;
-        dcomm->sendCommand(command);
-    } else
-        qWarning() << "Daemon is not connected, therefore it's timer can't be reconfigured";
+    qDebug() << "Sending daemon config command: " << command;
+    dcomm.sendCommand(command);
 }
 
 bool dXorg::daemonConnected() {
-    return dcomm->connected();
+    return dcomm.connected();
 }
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
-    gpuSysIndex = gpuName.at(gpuName.length()-1);
-    QString devicePath = "/sys/class/drm/"+gpuName+"/device/";
-
-    filePaths.powerMethodFilePath = devicePath + file_PowerMethod;
-    filePaths.profilePath = devicePath + file_powerProfile;
-    filePaths.dpmStateFilePath = devicePath + file_powerDpmState;
-    filePaths.forcePowerLevelFilePath = devicePath + file_powerDpmForcePerformanceLevel;
-    filePaths.moduleParamsPath = devicePath + "driver/module/holders/"+dXorg::driverModuleName+"/parameters/";
-    filePaths.clocksPath = "/sys/kernel/debug/dri/"+QString(gpuSysIndex)+"/"+dXorg::driverModuleName+"_pm_info"; // this path contains only index
-    filePaths.overDrivePath = devicePath + file_overclockLevel;
-
+    QString devicePath = "/sys/class/drm/" + gpuName + "/device/";
+    driverFiles.moduleParams = devicePath + "driver/module/holders/" + features.sysInfo.driverModuleString + "/parameters/";
+    driverFiles.debugfs_pm_info = "/sys/kernel/debug/dri/" + gpuName.right(1) + "/"+features.sysInfo.driverModuleString + "_pm_info"; // this path contains only index
+    driverFiles.sysFs = DeviceSysFs(devicePath);
 
     QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
+
     hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0" : hwmonDevicePath));
 
-    filePaths.sysfsHwmonTempPath = hwmonDevicePath  + "/temp1_input";
-
-    if (QFile::exists(hwmonDevicePath + "/pwm1_enable")) {
-        filePaths.pwmEnablePath = hwmonDevicePath + "/pwm1_enable";
-
-        if (QFile::exists(hwmonDevicePath + "/pwm1"))
-            filePaths.pwmSpeedPath = hwmonDevicePath + "/pwm1";
-
-        if (QFile::exists(hwmonDevicePath + "/pwm1_max"))
-            filePaths.pwmMaxSpeedPath = hwmonDevicePath + "/pwm1_max";
-    } else {
-        filePaths.pwmEnablePath = "";
-        filePaths.pwmSpeedPath = "";
-        filePaths.pwmMaxSpeedPath = "";
-    }
+    hwmonAttributes = HwmonAttributes(hwmonDevicePath);
 }
 
 // method for gather info about clocks from deamon or from debugfs if root
 QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
-    QFile clocksFile(filePaths.clocksPath);
+    QFile clocksFile(driverFiles.debugfs_pm_info);
     QString data;
 
     if (clocksFile.open(QIODevice::ReadOnly)) {
@@ -156,7 +137,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh){
             qDebug() << "Asking the daemon to read clocks";
-            dcomm->sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR)); // SIGNAL_READ_CLOCKS + SEPARATOR
+            dcomm.sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR)); // SIGNAL_READ_CLOCKS + SEPARATOR
         }
 
         // fist call, so notihing is in sharedmem and we need to wait for data
@@ -189,121 +170,145 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     return data;
 }
 
-globalStuff::gpuClocksStruct dXorg::getClocks(const QString &data) {
-    globalStuff::gpuClocksStruct tData(-1); // empty struct
+GPUClocks dXorg::getClocks() {
+    switch (features.clocksDataSource) {
+        case ClocksDataSource::IOCTL:
+            return getClocksFromIoctl();
+        case ClocksDataSource::PM_FILE:
+            return getClocksFromPmFile();
+        case ClocksDataSource::SOURCE_UNKNOWN:
+            break;
+    }
+
+    return GPUClocks();
+}
+
+GPUClocks dXorg::getClocksFromIoctl() {
+    GPUClocks clocksData;
+
+    ioctlHnd->getCoreClock(&clocksData.coreClk);
+    ioctlHnd->getMemoryClock(&clocksData.memClk);
+
+    return clocksData;
+}
+
+
+GPUClocks dXorg::getClocksFromPmFile() {
+    GPUClocks clocksData;
+    QString data = dXorg::getClocksRawData();
 
     // if nothing is there returns empty (-1) struct
     if (data.isEmpty()){
         qDebug() << "Can't get clocks, no data available";
-        return tData;
+        return clocksData;
     }
 
-    switch (currentPowerMethod) {
-    case globalStuff::DPM: {
+    switch (features.currentPowerMethod) {
+    case PowerMethod::DPM: {
         QRegExp rx;
 
         rx.setPattern(rxPatterns.powerLevel);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
-            tData.powerLevel = rx.cap(0).split(' ')[2].toShort();
+            clocksData.powerLevel = rx.cap(0).split(' ')[2].toShort();
 
         rx.setPattern(rxPatterns.sclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
-            tData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+            clocksData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
 
         rx.setPattern(rxPatterns.mclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
-            tData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+            clocksData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
 
         rx.setPattern(rxPatterns.vclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
-            tData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
-            tData.uvdCClk  = (tData.uvdCClk  == 0) ? -1 :  tData.uvdCClk;
+            clocksData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+            clocksData.uvdCClk  = (clocksData.uvdCClk  == 0) ? -1 :  clocksData.uvdCClk;
         }
 
         rx.setPattern(rxPatterns.dclk);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty()) {
-            tData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
-            tData.uvdDClk = (tData.uvdDClk == 0) ? -1 : tData.uvdDClk;
+            clocksData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+            clocksData.uvdDClk = (clocksData.uvdDClk == 0) ? -1 : clocksData.uvdDClk;
         }
 
         rx.setPattern(rxPatterns.vddc);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
-            tData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
+            clocksData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
 
         rx.setPattern(rxPatterns.vddci);
         rx.indexIn(data);
         if (!rx.cap(0).isEmpty())
-            tData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
+            clocksData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
 
-        return tData;
+        return clocksData;
         break;
     }
-    case globalStuff::PROFILE: {
-        QStringList clocksData = data.split("\n");
-        for (int i=0; i< clocksData.count(); i++) {
+    case PowerMethod::PROFILE: {
+        QStringList dataStr = data.split("\n");
+        for (int i=0; i< dataStr.count(); i++) {
             switch (i) {
             case 1: {
-                if (clocksData[i].contains("current engine clock")) {
-                    tData.coreClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
+                if (dataStr[i].contains("current engine clock")) {
+                    clocksData.coreClk = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
                     break;
                 }
             };
             case 3: {
-                if (clocksData[i].contains("current memory clock")) {
-                    tData.memClk = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
+                if (dataStr[i].contains("current memory clock")) {
+                    clocksData.memClk = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
                     break;
                 }
             }
             case 4: {
-                if (clocksData[i].contains("voltage")) {
-                    tData.coreVolt = QString().setNum(clocksData[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toFloat();
+                if (dataStr[i].contains("voltage")) {
+                    clocksData.coreVolt = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toFloat();
                     break;
                 }
             }
             }
         }
-        return tData;
+        return clocksData;
         break;
     }
-    case globalStuff::PM_UNKNOWN: {
+    case PowerMethod::PM_UNKNOWN: {
         qWarning() << "Unknown power method, can't get clocks";
-        return tData;
+        return clocksData;
         break;
     }
     }
-    return tData;
+    return clocksData;
 }
 
 float dXorg::getTemperature() {
     QString temp;
 
-    switch (currentTempSensor) {
-    case SYSFS_HWMON:
-    case CARD_HWMON: {
-        QFile hwmon(filePaths.sysfsHwmonTempPath);
+    switch (features.currentTemperatureSensor) {
+    case TemperatureSensor::SYSFS_HWMON:
+    case TemperatureSensor::CARD_HWMON: {
+        QFile hwmon(hwmonAttributes.temp1);
         hwmon.open(QIODevice::ReadOnly);
         temp = hwmon.readLine(20);
         hwmon.close();
         return temp.toFloat() / 1000;
         break;
     }
-    case PCI_SENSOR: {
+    case TemperatureSensor::PCI_SENSOR: {
         QStringList out = globalStuff::grabSystemInfo("sensors");
         temp = out[sensorsGPUtempIndex+2].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
         break;
     }
-    case MB_SENSOR: {
+    case TemperatureSensor::MB_SENSOR: {
         QStringList out = globalStuff::grabSystemInfo("sensors");
         temp = out[sensorsGPUtempIndex].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
         break;
     }
-    case TS_UNKNOWN: {
+    case TemperatureSensor::TS_UNKNOWN: {
         temp = "-1";
         break;
     }
@@ -311,50 +316,62 @@ float dXorg::getTemperature() {
     return temp.toFloat();
 }
 
-globalStuff::powerMethod dXorg::getPowerMethod() {
-    if (QFile::exists(filePaths.dpmStateFilePath))
-        return globalStuff::DPM;
+GPUUsage dXorg::getGPUUsage() {
+    GPUUsage data;
 
-    QFile powerMethodFile(filePaths.powerMethodFilePath);
+    ioctlHnd->getGpuUsage(&data.gpuUsage);
+    ioctlHnd->getVramUsage(&data.gpuVramUsage);
+
+    data.gpuVramUsage /= 1048576; // 1024 * 1024
+    data.gpuVramUsagePercent = (100 * data.gpuVramUsage) / params.VRAMSize;
+
+    return data;
+}
+
+PowerMethod dXorg::getPowerMethod() {
+    if (QFile::exists(driverFiles.sysFs.power_dpm_state))
+        return PowerMethod::DPM;
+
+    QFile powerMethodFile(driverFiles.sysFs.power_method);
     if (powerMethodFile.open(QIODevice::ReadOnly)) {
         QString s = powerMethodFile.readLine(20);
 
         if (s.contains("dpm",Qt::CaseInsensitive))
-            return globalStuff::DPM;
+            return PowerMethod::DPM;
         else if (s.contains("profile",Qt::CaseInsensitive))
-            return globalStuff::PROFILE;
+            return PowerMethod::PROFILE;
         else
-            return globalStuff::PM_UNKNOWN;
+            return PowerMethod::PM_UNKNOWN;
     }
 
-    return globalStuff::PM_UNKNOWN;
+    return PowerMethod::PM_UNKNOWN;
 }
 
-dXorg::tempSensor dXorg::testSensor() {
-    QFile hwmon(filePaths.sysfsHwmonTempPath);
+TemperatureSensor dXorg::getTemperatureSensor() {
+    QFile hwmon(hwmonAttributes.temp1);
 
     // first method, try read temp from sysfs in card dir (path from figureOutGPUDataPaths())
     if (hwmon.open(QIODevice::ReadOnly)) {
         if (!QString(hwmon.readLine(20)).isEmpty())
-            return CARD_HWMON;
+            return TemperatureSensor::CARD_HWMON;
     } else {
         // second method, try find in system hwmon dir for file labeled VGA_TEMP
-        filePaths.sysfsHwmonTempPath = findSysfsHwmonForGPU();
-        if (!filePaths.sysfsHwmonTempPath.isEmpty())
-            return SYSFS_HWMON;
+        hwmonAttributes.temp1 = findSysfsHwmonForGPU();
+        if (!hwmonAttributes.temp1.isEmpty())
+            return TemperatureSensor::SYSFS_HWMON;
 
         // if above fails, use lm_sensors
         QStringList out = globalStuff::grabSystemInfo("sensors");
-        if (out.indexOf(QRegExp(dXorg::driverModuleName+"-pci.+")) != -1) {
-            sensorsGPUtempIndex = out.indexOf(QRegExp(dXorg::driverModuleName+"-pci.+"));  // in order to not search for it again in timer loop
-            return PCI_SENSOR;
+        if (out.indexOf(QRegExp(features.sysInfo.driverModuleString+"-pci.+")) != -1) {
+            sensorsGPUtempIndex = out.indexOf(QRegExp(features.sysInfo.driverModuleString+"-pci.+"));  // in order to not search for it again in timer loop
+            return TemperatureSensor::PCI_SENSOR;
         }
         else if (out.indexOf(QRegExp("VGA_TEMP.+")) != -1) {
             sensorsGPUtempIndex = out.indexOf(QRegExp("VGA_TEMP.+"));
-            return MB_SENSOR;
+            return TemperatureSensor::MB_SENSOR;
         }
     }
-    return TS_UNKNOWN;
+    return TemperatureSensor::TS_UNKNOWN;
 }
 
 QString dXorg::findSysfsHwmonForGPU() {
@@ -374,13 +391,9 @@ QString dXorg::findSysfsHwmonForGPU() {
     return "";
 }
 
-QStringList dXorg::getGLXInfo(QProcessEnvironment env) {
-    return globalStuff::grabSystemInfo("glxinfo -B",env).filter(QRegExp(".+"));
-}
-
 QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
     QList<QTreeWidgetItem *> data;
-    QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p "+dXorg::driverModuleName);
+    QStringList modInfo = globalStuff::grabSystemInfo("modinfo -p "+features.sysInfo.driverModuleString);
     modInfo.sort();
 
     for (int i =0; i < modInfo.count(); i++) {
@@ -395,7 +408,7 @@ QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
                     modValue;
 
             // read current param values
-            QFile mp(filePaths.moduleParamsPath+modName);
+            QFile mp(driverFiles.moduleParams+modName);
             modValue = (mp.open(QIODevice::ReadOnly)) ?  modValue = mp.readLine(20) : "unknown";
 
             QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << modName.left(modName.indexOf('\n')) << modValue.left(modValue.indexOf('\n')) << modDesc.left(modDesc.indexOf('\n')));
@@ -406,46 +419,31 @@ QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
     return data;
 }
 
-QStringList dXorg::detectCards() {
-    QStringList data;
-    QStringList out = globalStuff::grabSystemInfo("ls /sys/class/drm/").filter("card");
-    for (char i = 0; i < out.count(); i++) {
-        QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
-        if (f.open(QIODevice::ReadOnly)) {
-            QString line = f.readLine(50).trimmed();
-
-            if (line == "DRIVER=radeon" || line == "DRIVER=amdgpu")
-                data.append(f.fileName().split('/')[4]);
-        }
-    }
-    return data;
-}
-
 QString dXorg::getCurrentPowerProfile() {
-    switch (currentPowerMethod) {
-    case globalStuff::DPM: {
-        QFile dpmProfile(filePaths.dpmStateFilePath);
-        if (dpmProfile.open(QIODevice::ReadOnly))
-           return QString(dpmProfile.readLine(13));
-        else
-            return "err";
-        break;
-    }
-    case globalStuff::PROFILE: {
-        QFile profile(filePaths.profilePath);
-        if (profile.open(QIODevice::ReadOnly))
-            return QString(profile.readLine(13));
-        break;
-    }
-    case globalStuff::PM_UNKNOWN:
-        break;
+    QFile f;
+
+    switch (features.currentPowerMethod) {
+        case PowerMethod::DPM:
+            f.setFileName(driverFiles.sysFs.power_dpm_state);
+            break;
+
+        case PowerMethod::PROFILE:
+            f.setFileName(driverFiles.sysFs.power_profile);
+            break;
+
+        case PowerMethod::PM_UNKNOWN:
+            return "err";;
     }
 
-    return "err";
+    if (f.open(QIODevice::ReadOnly))
+        return QString(f.readLine(13));
+    else
+        return "err";
+
 }
 
 QString dXorg::getCurrentPowerLevel() {
-    QFile forceProfile(filePaths.forcePowerLevelFilePath);
+    QFile forceProfile(driverFiles.sysFs.power_dpm_force_performance_level);
     if (forceProfile.open(QIODevice::ReadOnly))
         return QString(forceProfile.readLine(13));
 
@@ -464,275 +462,333 @@ void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
         qWarning() << "Unable to open " << filePath << " to write " << newValue;
 }
 
-void dXorg::setPowerProfile(globalStuff::powerProfiles _newPowerProfile) {
+void dXorg::setPowerProfile(PowerProfiles newPowerProfile) {
     QString newValue;
-    switch (_newPowerProfile) {
-    case globalStuff::BATTERY:
+    switch (newPowerProfile) {
+    case PowerProfiles::BATTERY:
         newValue = dpm_battery;
         break;
-    case globalStuff::BALANCED:
+    case PowerProfiles::BALANCED:
         newValue = dpm_balanced;
         break;
-    case globalStuff::PERFORMANCE:
+    case PowerProfiles::PERFORMANCE:
         newValue = dpm_performance;
         break;
-    case globalStuff::AUTO:
+    case PowerProfiles::AUTO:
         newValue = profile_auto;
         break;
-    case globalStuff::DEFAULT:
+    case PowerProfiles::DEFAULT:
         newValue = profile_default;
         break;
-    case globalStuff::HIGH:
+    case PowerProfiles::HIGH:
         newValue = profile_high;
         break;
-    case globalStuff::MID:
+    case PowerProfiles::MID:
         newValue = profile_mid;
         break;
-    case globalStuff::LOW:
+    case PowerProfiles::LOW:
         newValue = profile_low;
         break;
     default: break;
     }
 
-    if (daemonConnected()) {
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(newValue).append(SEPARATOR); // Power profile to be set
-        command.append(filePaths.dpmStateFilePath).append(SEPARATOR); // The path where the power profile should be written in
-
-        qDebug() << "Sending daemon power profile signal: " << command;
-        dcomm->sendCommand(command);
-    } else {
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(driverFiles.sysFs.power_dpm_state, newValue));
+    else {
         // enum is int, so first three values are dpm, rest are profile
-        if (_newPowerProfile <= globalStuff::PERFORMANCE)
-            setNewValue(filePaths.dpmStateFilePath,newValue);
+        if (newPowerProfile <= PowerProfiles::PERFORMANCE)
+            setNewValue(driverFiles.sysFs.power_dpm_state, newValue);
         else
-            setNewValue(filePaths.profilePath,newValue);
+            setNewValue(driverFiles.sysFs.power_profile, newValue);
     }
 }
 
-void dXorg::setForcePowerLevel(globalStuff::forcePowerLevels _newForcePowerLevel) {
+void dXorg::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
     QString newValue;
-    switch (_newForcePowerLevel) {
-    case globalStuff::F_AUTO:
-        newValue = dpm_auto;
-        break;
-    case globalStuff::F_HIGH:
-        newValue = dpm_high;
-        break;
-    case globalStuff::F_LOW:
-        newValue = dpm_low;
-    default:
-        break;
+    switch (newForcePowerLevel) {
+        case ForcePowerLevels::F_AUTO:
+            newValue = dpm_auto;
+            break;
+        case ForcePowerLevels::F_HIGH:
+            newValue = dpm_high;
+            break;
+        case ForcePowerLevels::F_LOW:
+            newValue = dpm_low;
+            break;
+        case ForcePowerLevels::F_MANUAL:
+            newValue = dpm_manual;
+            break;
+        case  ForcePowerLevels::F_PROFILE_STANDARD:
+            newValue = dpm_profile_standard;
+            break;
+        case  ForcePowerLevels::F_PROFILE_MIN_SCLK:
+            newValue = dpm_profile_min_sclk;
+            break;
+        case ForcePowerLevels::F_PROFILE_MIN_MCLK:
+            newValue = dpm_profile_min_mclk;
+            break;
+        case ForcePowerLevels::F_PROFILE_PEAK:
+            newValue = dpm_profile_peak;
+            break;
+        default:
+            return;
     }
 
-    if (daemonConnected()) {
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(newValue).append(SEPARATOR); // Power profile to be forcibly set
-        command.append(filePaths.forcePowerLevelFilePath).append(SEPARATOR); // The path where the power profile should be written in
-
-        qDebug() << "Sending daemon forced power profile signal: " << command;
-        dcomm->sendCommand(command);
-    } else
-        setNewValue(filePaths.forcePowerLevelFilePath, newValue);
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(driverFiles.sysFs.power_dpm_force_performance_level, newValue));
+    else
+        setNewValue(driverFiles.sysFs.power_dpm_force_performance_level, newValue);
 }
 
 void dXorg::setPwmValue(unsigned int value) {
-    if (daemonConnected()) {
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(QString::number(value)).append(SEPARATOR); // PWM value to be set
-        command.append(filePaths.pwmSpeedPath).append(SEPARATOR); // The path where the PWM value should be written in
+    value = params.pwmMaxSpeed * value / 100;
 
-        qDebug() << "Sending daemon fan pwm speed signal: " << command;
-        dcomm->sendCommand(command);
-    } else
-        setNewValue(filePaths.pwmSpeedPath,QString().setNum(value));
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(hwmonAttributes.pwm1, QString::number(value)));
+    else
+        setNewValue(hwmonAttributes.pwm1,QString().setNum(value));
 }
 
-void dXorg::setPwmManuaControl(bool manual) {
-    char mode = manual ? pwm_manual : pwm_auto;
+void dXorg::setPwmManualControl(bool manual) {
+    QString mode = QString(manual ? pwm_manual : pwm_auto);
 
-    if (daemonConnected()) {
-        //  Tell the daemon to set the pwm mode into the right file
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(mode).append(SEPARATOR); // The PWM mode to set
-        command.append(filePaths.pwmEnablePath).append(SEPARATOR); // The path where the PWM mode should be written in
-
-        qDebug() << "Sending daemon fan pwm enable signal: " << command;
-        dcomm->sendCommand(command);
-    } else  //  No daemon available
-        setNewValue(filePaths.pwmEnablePath, QString(mode));
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(hwmonAttributes.pwm1_enable, mode));
+    else
+        setNewValue(hwmonAttributes.pwm1_enable, mode);
 }
 
-int dXorg::getPwmSpeed() {
-    QFile f(filePaths.pwmSpeedPath);
+GPUPwm dXorg::getPwmSpeed() {
+    GPUPwm tmp;
 
-    int val = 0;
+    if (hwmonAttributes.pwm1.isEmpty())
+        return tmp;
+
+    QFile f(hwmonAttributes.pwm1);
+
     if (f.open(QIODevice::ReadOnly)) {
-       val = QString(f.readLine(4)).toInt();
+       tmp.pwmSpeed = (QString(f.readLine(4)).toFloat() / params.pwmMaxSpeed) * 100;
        f.close();
     }
 
-    return val;
+    if (!hwmonAttributes.fan1_input.isEmpty()) {
+        f.setFileName(hwmonAttributes.fan1_input);
+        if (f.open(QIODevice::ReadOnly)) {
+            tmp.pwmSpeedRpm = QString(f.readLine(6)).toInt();
+            f.close();
+        }
+    }
+
+    return tmp;
 }
 
 void dXorg::setupRegex(const QString &data) {
     QRegExp rx;
 
-    rx.setPattern("sclk:\\s\\d+");
-    rx.indexIn(data);
-    if (!rx.cap(0).isEmpty()) {
-        dXorg::rxPatterns.powerLevel = "power\\slevel\\s\\d",
-                dXorg::rxPatterns.sclk = "sclk:\\s\\d+",
-                dXorg::rxPatterns.mclk = "mclk:\\s\\d+",
-                dXorg::rxPatterns.vclk = "vclk:\\s\\d+",
-                dXorg::rxPatterns.dclk = "dclk:\\s\\d+",
-                dXorg::rxPatterns.vddc = "vddc:\\s\\d+",
-                dXorg::rxPatterns.vddci = "vddci:\\s\\d+";
+    switch (features.sysInfo.module) {
+        case DriverModule::RADEON:
+            rx.setPattern("sclk:\\s\\d+");
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty()) {
+                dXorg::rxPatterns.powerLevel = "power\\slevel\\s\\d",
+                        dXorg::rxPatterns.sclk = "sclk:\\s\\d+",
+                        dXorg::rxPatterns.mclk = "mclk:\\s\\d+",
+                        dXorg::rxPatterns.vclk = "vclk:\\s\\d+",
+                        dXorg::rxPatterns.dclk = "dclk:\\s\\d+",
+                        dXorg::rxPatterns.vddc = "vddc:\\s\\d+",
+                        dXorg::rxPatterns.vddci = "vddci:\\s\\d+";
 
-        rxMatchIndex = 1;
-        clocksValueDivider = 100;
+                rxMatchIndex = 1;
+                clocksValueDivider = 100;
 
-        return;
-    }
+                return;
+            }
 
-    rx.setPattern("\\[\\s+sclk\\s+\\]:\\s\\d+");
-    rx.indexIn(data);
-    if (!rx.cap(0).isEmpty()) {
-        dXorg::rxPatterns.sclk = "\\[\\s+sclk\\s+\\]:\\s\\d+",
-                dXorg::rxPatterns.mclk = "\\[\\s+mclk\\s+\\]:\\s\\d+";
+        case DriverModule::AMDGPU:
+            rx.setPattern("\\[\\s+sclk\\s+\\]:\\s\\d+");
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty()) {
+                dXorg::rxPatterns.sclk = "\\[\\s+sclk\\s+\\]:\\s\\d+",
+                        dXorg::rxPatterns.mclk = "\\[\\s+mclk\\s+\\]:\\s\\d+";
 
-        rxMatchIndex = 3;
-        clocksValueDivider = 1;
-        return;
-    }
+                rxMatchIndex = 3;
+                clocksValueDivider = 1;
+                return;
+            }
 
 
-    rx.setPattern("\\d+\\s\\w+\\s\\(SCLK\\)");
-    rx.indexIn(data);
-    if (!rx.cap(0).isEmpty()) {
-        dXorg::rxPatterns.sclk = "\\d+\\s\\w+\\s\\(SCLK\\)",
-                dXorg::rxPatterns.mclk = "\\d+\\s\\w+\\s\\(MCLK\\)";
+            rx.setPattern("\\d+\\s\\w+\\s\\(SCLK\\)");
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty()) {
+                dXorg::rxPatterns.sclk = "\\d+\\s\\w+\\s\\(SCLK\\)",
+                        dXorg::rxPatterns.mclk = "\\d+\\s\\w+\\s\\(MCLK\\)";
 
-        rxMatchIndex = 0;
-        clocksValueDivider = 1;
-        return;
+                rxMatchIndex = 0;
+                clocksValueDivider = 1;
+                return;
+            }
+        case DriverModule::MODULE_UNKNOWN:
+            return;
     }
 }
 
-globalStuff::driverFeatures dXorg::figureOutDriverFeatures() {
-    globalStuff::driverFeatures features;
-    features.temperatureAvailable =  (currentTempSensor == dXorg::TS_UNKNOWN) ? false : true;
+void dXorg::figureOutDriverFeatures() {
+    features.currentPowerMethod = getPowerMethod();
 
-    QString data = getClocksRawData(true);
-    setupRegex(data);
-    globalStuff::gpuClocksStruct test = dXorg::getClocks(data);
+    if (getIoctlAvailability() && !globalStuff::globalConfig.daemonData)
+        features.clocksDataSource = ClocksDataSource::IOCTL;
+    else {
+        features.clocksDataSource = ClocksDataSource::PM_FILE;
+        QString data = getClocksRawData(true);
+        setupRegex(data);
+        GPUClocks test = getClocks();
 
-    // still, sometimes there is miscomunication between daemon,
-    // but vales are there, so look again in the file which daemon has
-    // copied to /tmp/
-    if (test.coreClk == -1)
-        test = getFeaturesFallback();
+        // still, sometimes there is miscomunication between daemon,
+        // but vales are there, so look again in the file which daemon has
+        // copied to /tmp/
+        if (test.coreClk == -1)
+            test = getFeaturesFallback();
+    }
 
-    features.coreClockAvailable = !(test.coreClk == -1);
-    features.memClockAvailable = !(test.memClk == -1);
-    features.coreVoltAvailable = !(test.coreVolt == -1);
-    features.memVoltAvailable = !(test.memVolt == -1);
+    features.currentTemperatureSensor = getTemperatureSensor();
 
-    features.pm = currentPowerMethod;
-
-    switch (currentPowerMethod) {
-    case globalStuff::DPM: {
-        if (daemonConnected())
+    switch (features.currentPowerMethod) {
+    case PowerMethod::DPM: {
+        if (globalStuff::globalConfig.rootMode || daemonConnected())
             features.canChangeProfile = true;
         else {
-            QFile f(filePaths.dpmStateFilePath);
-            if (f.open(QIODevice::WriteOnly)){
+            QFile f(driverFiles.sysFs.power_dpm_state);
+            if (f.open(QIODevice::WriteOnly)) {
                 features.canChangeProfile = true;
                 f.close();
             }
         }
         break;
     }
-    case globalStuff::PROFILE: {
-        QFile f(filePaths.profilePath);
+    case PowerMethod::PROFILE: {
+        QFile f(driverFiles.sysFs.power_profile);
         if (f.open(QIODevice::WriteOnly)) {
             features.canChangeProfile = true;
             f.close();
         }
     }
-    case globalStuff::PM_UNKNOWN:
+    case PowerMethod::PM_UNKNOWN:
         break;
     }
 
-    if (!filePaths.pwmEnablePath.isEmpty()) {
-        QFile f(filePaths.pwmEnablePath);
-        f.open(QIODevice::ReadOnly);
+    features.ocCoreAvailable = !driverFiles.sysFs.pp_sclk_od.isEmpty();
+    features.ocMemAvailable = !driverFiles.sysFs.pp_mclk_od.isEmpty();
 
-        if (QString(f.readLine(2))[0] != pwm_disabled) {
-            features.pwmAvailable = true;
-
-            QFile fPwmMax(filePaths.pwmMaxSpeedPath);
-            if (fPwmMax.open(QIODevice::ReadOnly)) {
-                features.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
-                fPwmMax.close();
-            }
-        }
-        f.close();
+    if (!driverFiles.sysFs.pp_dpm_sclk.isEmpty()) {
+        features.sclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_sclk);
+        features.freqCoreAvailable = features.sclkTable.count() > 0;
     }
 
-    features.overClockAvailable = QFile::exists(filePaths.overDrivePath);
-
-    return features;
+    if (!driverFiles.sysFs.pp_dpm_mclk.isEmpty()) {
+        features.mclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_mclk);
+        features.freqMemAvailable = features.mclkTable.count() > 0;
+    }
 }
 
-globalStuff::gpuClocksStruct dXorg::getFeaturesFallback() {
-    globalStuff::gpuClocksStruct fallbackFeatures(-1);
-    QFile f("/tmp/"+dXorg::driverModuleName+"_pm_info");
+bool dXorg::getIoctlAvailability() {
+    if (ioctlHnd == nullptr || !ioctlHnd->isValid())
+        return false;
+
+    return true;
+}
+
+void dXorg::figureOutConstParams() {
+    if (ioctlHnd != nullptr && ioctlHnd->isValid()) {
+        ioctlHnd->getMaxCoreClock(&params.maxCoreClock);
+        ioctlHnd->getMaxMemoryClock(&params.maxMemClock);
+        ioctlHnd->getVramSize(&params.VRAMSize);
+        params.VRAMSize /= 1048576;
+    }
+
+    if (hwmonAttributes.pwm1_max.isEmpty())
+        return;
+
+    QFile fPwmMax(hwmonAttributes.pwm1_max);
+    if (fPwmMax.open(QIODevice::ReadOnly)) {
+        params.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
+        fPwmMax.close();
+    }
+}
+
+GPUClocks dXorg::getFeaturesFallback() {
+    GPUClocks fallbackfeatures;
+    QFile f("/tmp/"+features.sysInfo.driverModuleString+"_pm_info");
     if (f.open(QIODevice::ReadOnly)) {
         QString s = QString(f.readAll());
 
         // just look for it, if it is, the value is not important at this point
         if (s.contains("sclk"))
-            fallbackFeatures.coreClk = 0;
+            fallbackfeatures.coreClk = 0;
         if (s.contains("mclk"))
-            fallbackFeatures.memClk = 0;
+            fallbackfeatures.memClk = 0;
         if (s.contains("vddc"))
-            fallbackFeatures.coreVolt = 0;
+            fallbackfeatures.coreVolt = 0;
         if (s.contains("vddci"))
-            fallbackFeatures.memVolt = 0;
+            fallbackfeatures.memVolt = 0;
 
         f.close();
     }
 
-    return fallbackFeatures;
+    return fallbackfeatures;
 }
 
-bool dXorg::overClock(const int percentage){
-    if((percentage > 20) || (percentage < 0))
-        qWarning() << "Error overclocking: invalid percentage passed: " << percentage;
-    else if (daemonConnected()){ // Signal the daemon to set the overclock value
-        QString command; // SIGNAL_SET_VALUE + SEPARATOR + VALUE + SEPARATOR + PATH + SEPARATOR
-        command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR); // Set value flag
-        command.append(QString::number(percentage)).append(SEPARATOR); // The overclock level
-        command.append(filePaths.overDrivePath).append(SEPARATOR); // The path where the overclock level should be written in
+QString dXorg::createDaemonSetCmd(const QString &file, const QString &value)
+{
+    QString command;
+    command.append(DAEMON_SIGNAL_SET_VALUE).append(SEPARATOR);
+    command.append(value).append(SEPARATOR);
+    command.append(file).append(SEPARATOR);
 
-        qDebug() << "Sending overclock signal: " << command;
-        dcomm->sendCommand(command);
-        return true;
-    } else if(globalStuff::globalConfig.rootMode){ // Root mode, set it directly
-        setNewValue(filePaths.overDrivePath, QString::number(percentage));
+    qDebug() << "Daemon command: " << command;
 
-        return true;
-    } else // Overclock requires root access to sysfs
-        qWarning() << "Error overclocking: daemon is not connected and no root access is available";
-
-    return false;
+    return command;
 }
 
-void dXorg::resetOverClock(){
-    overClock(0);
+void dXorg::setOverclockValue(const QString &file, const int percentage) {
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(file, QString::number(percentage)));
+    else
+        setNewValue(file, QString::number(percentage));
+}
+
+PowerPlayTable dXorg::loadPowerPlayTable(const QString &file) {
+    QFile f(file);
+    PowerPlayTable ppt;
+
+    if (!f.open(QIODevice::ReadOnly))
+        return ppt;
+
+    QStringList sl = QString(f.readAll()).split('\n', QString::SkipEmptyParts);
+
+    for (const QString &s : sl) {
+        QStringList tmp = s.split(":");
+        ppt.insert(tmp[0].toInt(), tmp[1].split(" ")[1]);
+    }
+
+    return ppt;
+}
+
+void dXorg::setPowerPlayFreq(const QString &file, const int tableIndex) {
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(file, QString::number(tableIndex)));
+    else
+        setNewValue(file, QString::number(tableIndex));
+}
+
+int dXorg::getCurrentPowerPlayTableId(const QString &file) {
+    QFile f(file);
+
+    if (f.open(QIODevice::ReadOnly)) {
+        QStringList sl = QString(f.readAll()).split("\n");
+
+        for (int i = 0; i < sl.count(); ++i) {
+            if (sl[i][sl[i].length() - 1] == "*")
+                return i;
+        }
+    }
 }

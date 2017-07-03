@@ -19,36 +19,32 @@ bool closeFromTrayMenu;
 // === GUI events === //
 // == menu forcePowerLevel
 void radeon_profile::forceAuto() {
-    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_auto));
+    ui->combo_pLevel->setCurrentText(dpm_auto);
 
     // device.setForcePowerLevel(globalStuff::F_AUTO);
 }
 
 void radeon_profile::forceLow() {
-    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_low));
+    ui->combo_pLevel->setCurrentText(dpm_low);
 
     //  device.setForcePowerLevel(globalStuff::F_LOW);
 }
 
 void radeon_profile::forceHigh() {
-    ui->combo_pLevel->setCurrentIndex(ui->combo_pLevel->findText(dpm_high));
+    ui->combo_pLevel->setCurrentText(dpm_high);
     //    device.setForcePowerLevel(globalStuff::F_HIGH);
 }
 
-// == buttons for forcePowerLevel
-void radeon_profile::on_btn_forceAuto_clicked()
-{
-    forceAuto();
+void radeon_profile::setBattery() {
+    setPowerLevel(0);
 }
 
-void radeon_profile::on_btn_forceHigh_clicked()
-{
-    forceHigh();
+void radeon_profile::setBalanced() {
+    setPowerLevel(1);
 }
 
-void radeon_profile::on_btn_forceLow_clicked()
-{
-    forceLow();
+void radeon_profile::setPerformance() {
+    setPowerLevel(2);
 }
 
 // == fan control
@@ -56,12 +52,14 @@ void radeon_profile::on_btn_pwmFixedApply_clicked()
 {
     device.setPwmValue(ui->fanSpeedSlider->value());
     fanProfilesMenu->actions()[1]->setText(tr("Fixed ") + ui->labelFixedSpeed->text());
+    ui->btn_fanControl->setText(fanProfilesMenu->actions()[1]->text());
 }
 
 void radeon_profile::on_btn_pwmFixed_clicked()
 {
     ui->btn_pwmFixed->setChecked(true);
     fanProfilesMenu->actions()[1]->setChecked(true);
+    ui->btn_fanControl->setText(fanProfilesMenu->actions()[1]->text());
     ui->fanModesTabs->setCurrentIndex(1);
 
     device.setPwmManualControl(true);
@@ -72,6 +70,7 @@ void radeon_profile::on_btn_pwmAuto_clicked()
 {
     ui->btn_pwmAuto->setChecked(true);
     fanProfilesMenu->actions()[0]->setChecked(true);
+    ui->btn_fanControl->setText(fanProfilesMenu->actions()[0]->text());
     device.setPwmManualControl(false);
     ui->fanModesTabs->setCurrentIndex(0);
 }
@@ -85,71 +84,22 @@ void radeon_profile::on_btn_pwmProfile_clicked()
     setCurrentFanProfile(ui->l_currentFanProfile->text(), fanProfiles.value(ui->l_currentFanProfile->text()));
 }
 
-void radeon_profile::changeProfileFromCombo() {
-    device.setPowerProfile(static_cast<globalStuff::powerProfiles>((device.features.pm == globalStuff::DPM) ?
-                                                                       ui->combo_pProfile->currentIndex() :
-                                                                       ui->combo_pProfile->currentIndex() + 3)); // frist three in enum is dpm so we need to increase
+void radeon_profile::setPowerLevelFromCombo() {
+    if (ui->group_freq->isChecked() && (ForcePowerLevels)ui->combo_pLevel->currentIndex() != ForcePowerLevels::F_MANUAL)
+        ui->group_freq->setChecked(false);
+
+    device.setForcePowerLevel((ForcePowerLevels)ui->combo_pLevel->currentIndex());
 }
 
-void radeon_profile::changePowerLevelFromCombo() {
-    device.setForcePowerLevel((globalStuff::forcePowerLevels)ui->combo_pLevel->currentIndex());
+void radeon_profile::resetMinMax() {
+    device.gpuData[ValueID::TEMPERATURE_MIN].setValue(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+    device.gpuData[ValueID::TEMPERATURE_MAX].setValue(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
 }
 
-// == others
-void radeon_profile::on_btn_dpmBattery_clicked() {
-    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_battery));
-
-    // device.setPowerProfile(globalStuff::BATTERY);
-}
-
-void radeon_profile::on_btn_dpmBalanced_clicked() {
-    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_balanced));
-
-    //    device.setPowerProfile(globalStuff::BALANCED);
-}
-
-void radeon_profile::on_btn_dpmPerformance_clicked() {
-    ui->combo_pProfile->setCurrentIndex(ui->combo_pProfile->findText(dpm_performance));
-
-    //    device.setPowerProfile(globalStuff::PERFORMANCE);
-}
-
-void radeon_profile::resetMinMax() { device.gpuTemeperatureData.min = 0; device.gpuTemeperatureData.max = 0; }
-
-void radeon_profile::changeTimeRange() {
-    rangeX = ui->timeSlider->value();
-}
-
-void radeon_profile::on_cb_showFreqGraph_clicked(const bool &checked)
-{
-    ui->plotClocks->setVisible(checked);
-}
-
-void radeon_profile::on_cb_showTempsGraph_clicked(const bool &checked)
-{
-    ui->plotTemp->setVisible(checked);
-}
-
-void radeon_profile::on_cb_showVoltsGraph_clicked(const bool &checked)
-{
-    ui->plotVolts->setVisible(checked);
-}
-
-void radeon_profile::resetGraphs() {
-    ui->plotClocks->yAxis->setRange(startClocksScaleL,startClocksScaleH);
-    ui->plotVolts->yAxis->setRange(startVoltsScaleL,startVoltsScaleH);
-    ui->plotTemp->yAxis->setRange(10,20);
-}
-
-void radeon_profile::showLegend(const bool &checked) {
-    ui->plotClocks->legend->setVisible(checked);
-    ui->plotVolts->legend->setVisible(checked);
-    ui->plotClocks->replot();
-    ui->plotVolts->replot();
-}
-
-void radeon_profile::setGraphOffset(const bool &checked) {
-    globalStuff::globalConfig.graphOffset = (checked) ? 20 : 0;
+void radeon_profile::setPowerLevel(int level) {
+            device.setPowerProfile(static_cast<PowerProfiles>((device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) ?
+                                                                               level :
+                                                                               level + 3));
 }
 
 void radeon_profile::changeEvent(QEvent *event)
@@ -165,10 +115,13 @@ void radeon_profile::changeEvent(QEvent *event)
 
 void radeon_profile::gpuChanged()
 {
+    timer->stop();
     device.changeGpu(ui->combo_gpus->currentIndex());
-    setupUiEnabledFeatures(device.features);
+    refreshGpuData();
+    setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
     timerEvent();
     refreshBtnClicked();
+    timer->start();
 }
 
 void radeon_profile::iconActivated(QSystemTrayIcon::ActivationReason reason) {
@@ -192,21 +145,23 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     }
 
     //Check if a process is still running
-    for(execBin * process : execsRunning) {
-        if(process->getExecState() == QProcess::Running
-                && ! askConfirmation(tr("Quit"), process->name + tr(" is still running, exit anyway?"))) {
+    for (execBin * process : execsRunning) {
+        if (process->getExecState() == QProcess::Running
+                && !askConfirmation(tr("Quit"), process->name + tr(" is still running, exit anyway?"))) {
             e->ignore();
             return;
         }
     }
 
-    timer->stop();
-    delete timer;
+    // means app was initialized ok
+    if (timer != nullptr) {
+        timer->stop();
+        delete timer;
 
-    saveConfig();
+        device.finalize();
 
-    if (device.features.pwmAvailable)
-        device.setPwmManualControl(false);
+        saveConfig();
+    }
 
     QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
     QApplication::quit();
@@ -217,20 +172,9 @@ void radeon_profile::closeFromTray() {
     this->close();
 }
 
-void radeon_profile::on_spin_lineThick_valueChanged(int arg1)
-{
-    Q_UNUSED(arg1)
-    setupGraphsStyle();
-}
-
 void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
 {
     timer->setInterval(arg1*1000);
-}
-
-void radeon_profile::on_cb_graphs_clicked(bool checked)
-{
-    ui->mainTabs->setTabEnabled(1,checked);
 }
 
 void radeon_profile::on_cb_gpuData_clicked(bool checked)
@@ -240,9 +184,6 @@ void radeon_profile::on_cb_gpuData_clicked(bool checked)
 
     if (ui->cb_stats->isChecked())
         ui->tabs_systemInfo->setTabEnabled(3,checked);
-
-    if (ui->cb_graphs->isChecked())
-        ui->mainTabs->setTabEnabled(1,checked);
 
     if (!checked) {
         ui->list_currentGPUData->clear();
@@ -257,17 +198,6 @@ void radeon_profile::refreshBtnClicked() {
     fillConnectors();
 
     fillModInfo();
-}
-
-void radeon_profile::on_graphColorsList_itemDoubleClicked(QTreeWidgetItem *item, int column)
-{
-    Q_UNUSED(column)
-    QColor c = QColorDialog::getColor(item->backgroundColor(1));
-    if (c.isValid()) {
-        item->setBackgroundColor(1,c);
-        // apply colors
-        setupGraphsStyle();
-    }
 }
 
 void radeon_profile::on_cb_stats_clicked(bool checked)
@@ -326,21 +256,16 @@ void radeon_profile::on_chProfile_clicked()
 
     if (ok) {
         if (selection == profile_default)
-            device.setPowerProfile(globalStuff::DEFAULT);
+            device.setPowerProfile(PowerProfiles::DEFAULT);
         else if (selection == profile_auto)
-            device.setPowerProfile(globalStuff::AUTO);
+            device.setPowerProfile(PowerProfiles::AUTO);
         else if (selection == profile_high)
-            device.setPowerProfile(globalStuff::HIGH);
+            device.setPowerProfile(PowerProfiles::HIGH);
         else if (selection == profile_mid)
-            device.setPowerProfile(globalStuff::MID);
+            device.setPowerProfile(PowerProfiles::MID);
         else if (selection == profile_low)
-            device.setPowerProfile(globalStuff::LOW);
+            device.setPowerProfile(PowerProfiles::LOW);
     }
-}
-
-void radeon_profile::on_btn_reconfigureDaemon_clicked()
-{
-    configureDaemonAutoRefresh(ui->cb_daemonAutoRefresh->isChecked(), ui->spin_timerInterval->value());
 }
 
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
@@ -368,41 +293,103 @@ int radeon_profile::askNumber(const int value, const int min, const int max, con
     return number;
 }
 
-void radeon_profile::on_cb_enableOverclock_toggled(const bool enable){
-    ui->slider_overclock->setEnabled(enable);
-    ui->btn_applyOverclock->setEnabled(enable);
-    ui->cb_overclockAtLaunch->setEnabled(enable);
+void radeon_profile::applyOc()
+{
+    device.setOverclockValue(device.getDriverFiles().sysFs.pp_sclk_od, ui->slider_ocSclk->value());
+    device.setOverclockValue(device.getDriverFiles().sysFs.pp_mclk_od, ui->slider_ocMclk->value());
+}
 
-    if(enable)
-        qDebug() << "Enabling overclock";
-    else {
-        qDebug() << "Disabling overclock";
+void radeon_profile::on_btn_applyOverclock_clicked() {
+    if (ui->group_oc->isChecked())
+        applyOc();
+
+    if (ui->group_freq->isChecked()) {
+
+    }
+}
+
+void radeon_profile::on_group_oc_toggled(bool arg1)
+{
+    if (!device.isInitialized())
+        return;
+
+    if (arg1)
+        applyOc();
+    else
         device.resetOverclock();
+}
+
+void radeon_profile::on_group_freq_toggled(bool arg1)
+{
+    if (!device.isInitialized())
+        return;
+
+    if (arg1) {
+        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+
+        ui->slider_freqSclk->setValue(device.getCurrentPowerPlayTableId(device.getDriverFiles().sysFs.pp_dpm_sclk));
+        if (device.getDriverFeatures().freqMemAvailable)
+            ui->slider_freqMclk->setValue(device.getCurrentPowerPlayTableId(device.getDriverFiles().sysFs.pp_dpm_mclk));
+    } else
+        device.setForcePowerLevel(ForcePowerLevels::F_AUTO);
+}
+
+void radeon_profile::on_slider_ocSclk_valueChanged(const int value)
+{
+    ui->l_ocSclk->setText(QString::number(value) + "%");
+}
+
+void radeon_profile::on_slider_ocMclk_valueChanged(const int value)
+{
+    ui->l_ocMclk->setText(QString::number(value) + "%");
+}
+
+void radeon_profile::on_slider_freqSclk_valueChanged(int value)
+{
+    ui->l_freqSclk->setText(device.getDriverFeatures().sclkTable.value(value));
+}
+
+void radeon_profile::on_slider_freqMclk_valueChanged(int value)
+{
+    ui->l_freqMclk->setText(device.getDriverFeatures().mclkTable.value(value));
+
+}
+
+void radeon_profile::on_btn_saveAll_clicked()
+{
+    saveConfig();
+}
+
+void radeon_profile::on_slider_timeRange_valueChanged(int value)
+{
+    plotManager.setTimeRange(value);
+}
+
+void radeon_profile::on_cb_daemonData_clicked(bool checked)
+{
+    if (!checked)
+        return;
+
+    if (device.gpuList[ui->combo_gpus->currentIndex()].module == DriverModule::RADEON)
+        return;
+
+    if (checked && !askConfirmation(tr("Question"), tr("Kernel: ") + QSysInfo::kernelVersion()+ "\n" + tr("Module used: ") +
+            device.gpuList[ui->combo_gpus->currentIndex()].driverModuleString + "\n\n" +
+            tr("Checking this option may cause problems and is not recommended when you use Linux 4.12<= and amdgpu module.\n\nDo you want to check it anyway?"))) {
+
+        ui->cb_daemonData->setChecked(false);
     }
 }
 
-void radeon_profile::on_btn_applyOverclock_clicked(){
-    if( ! device.overclock(ui->slider_overclock->value()))
-        QMessageBox::warning(this, tr("Error"), tr("An error occurred, overclock failed"));
+void radeon_profile::pauseRefresh(bool checked)
+{
+    if (checked)
+        timer->stop();
+    else
+        timer->start();
 }
 
-void radeon_profile::on_slider_overclock_valueChanged(const int value){
-    ui->label_overclockPercentage->setText(QString::number(value));
-}
-
-void radeon_profile::on_btn_export_clicked(){
-    QString folder = QFileDialog::getExistingDirectory(this, tr("Export destination directory"));
-
-    if (!folder.isEmpty()) {
-        qDebug() << "Exporting graphs into " << folder;
-
-        if (ui->cb_showTempsGraph->isChecked())
-            ui->plotTemp->savePng(folder + "/temperature.png");
-
-        if (ui->cb_showFreqGraph->isChecked())
-            ui->plotClocks->savePng(folder + "/clocks.png");
-
-        if (ui->cb_showVoltsGraph->isChecked())
-            ui->plotVolts->savePng(folder + "/voltages.png");
-    }
+void radeon_profile::on_btn_general_clicked()
+{
+    ui->btn_general->showMenu();
 }
