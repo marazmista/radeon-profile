@@ -36,4 +36,8 @@ make
 * Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 
 # Screenshot
-[Gallery](https://imgur.com/a/vWEIl)
+
+Main screen
+![Main screen](https://i.imgur.com/Z880p47.png)
+
+[More screenshots](http://imgur.com/a/DMRr9)
