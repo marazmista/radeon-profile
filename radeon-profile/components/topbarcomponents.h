@@ -1,3 +1,6 @@
+
+// copyright marazmista @ 11.06.2017
+
 #ifndef TOPBARCOMPONENTS_H
 #define TOPBARCOMPONENTS_H
 
@@ -5,17 +8,16 @@
 #include "pieprogressbar.h"
 #include <QWidget>
 
-
-//enum class TopBarItemType {
-//    DISABLED,
-//    LABLEL,
-//    PIE
-//};
+enum class TopBarItemType {
+    LABLEL,
+    LARGE_LABEL,
+    PIE
+};
 
 class TopBarItem {
 public:
     QWidget *itemWidget;
-//    TopBarItemType itemType;
+    TopBarItemType itemType;
     ValueID dataSource;
 
     virtual void updateItemValue(const GPUDataContainer &data) = 0;
@@ -24,13 +26,13 @@ public:
 
 class LabelItem : public QLabel, public TopBarItem {
 public:
-    LabelItem(ValueID id, QWidget *parent = 0) : QLabel(parent) {
-//        itemType = TopBarItemType::LABLEL;
+    LabelItem(ValueID id, TopBarItemType type = TopBarItemType::LABLEL, QWidget *parent = 0) : QLabel(parent) {
+        itemType = type;
         itemWidget = this;
 
         QFont f;
         f.setFamily("Monospace");
-        f.setPointSize(10);
+        f.setPointSize((type == TopBarItemType::LABLEL ? 10 : 20));
         itemWidget->setFont(f);
 
         dataSource = id;
@@ -51,7 +53,7 @@ public:
 class PieItem : public PieProgressBar, public TopBarItem {
 public:
     PieItem(const int max, ValueID id, QColor fillColor, QWidget *parent = 0) : PieProgressBar(max, id, fillColor, parent) {
-//        itemType = TopBarItemType::PIE;
+        itemType = TopBarItemType::PIE;
         itemWidget = this;
 
         setMinimumSize(60,60);

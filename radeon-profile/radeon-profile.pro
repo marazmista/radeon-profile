@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     eventsTab.cpp \
     fanControlTab.cpp \
     dialog_defineplot.cpp \
-    plotsTab.cpp
+    plotsTab.cpp \
+    dialog_topbarcfg.cpp
 
 HEADERS  += radeon_profile.h \
     gpu.h \
@@ -54,12 +55,14 @@ HEADERS  += radeon_profile.h \
     components/rpplot.h \
     dialog_defineplot.h \
     components/pieprogressbar.h \
-    components/topbarcomponents.h
+    components/topbarcomponents.h \
+    dialog_topbarcfg.h
 
 FORMS    += radeon_profile.ui \
     dialog_rpevent.ui \
     dialog_defineplot.ui \
-    components/pieprogressbar.ui
+    components/pieprogressbar.ui \
+    dialog_topbarcfg.ui
 
 RESOURCES += \
     radeon-resource.qrc

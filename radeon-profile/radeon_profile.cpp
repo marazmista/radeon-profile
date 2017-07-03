@@ -19,6 +19,7 @@
 #include "ui_radeon_profile.h"
 #include "dialog_defineplot.h"
 #include "components/topbarcomponents.h"
+#include "dialog_topbarcfg.h"
 
 #include <QTimer>
 #include <QTextStream>
@@ -129,52 +130,53 @@ void radeon_profile::setupUiElements()
 void radeon_profile::createTopBar()
 {
     if (device.gpuData.contains(ValueID::CLK_CORE)) {
-        TopBarItem *l = new LabelItem(ValueID::CLK_CORE, this);
+        TopBarItem *l = new LabelItem(ValueID::CLK_CORE, TopBarItemType::LABLEL, this);
         ui->grid_topbar->addWidget(l->itemWidget,0,0,1,1,Qt::AlignLeft);
-        topBarItems.insert(topBarItems.count(), l);
+        topBarItems.append(l);
     }
 
     if (device.gpuData.contains(ValueID::CLK_MEM)) {
-        TopBarItem *l = new LabelItem(ValueID::CLK_MEM, this);
+        TopBarItem *l = new LabelItem(ValueID::CLK_MEM, TopBarItemType::LABLEL, this);
         ui->grid_topbar->addWidget(l->itemWidget,1,0,1,1,Qt::AlignLeft);
-        topBarItems.insert(topBarItems.count(), l);
+        topBarItems.append(l);
     }
 
     if (device.gpuData.contains(ValueID::VOLT_CORE)) {
-        TopBarItem *l = new LabelItem(ValueID::VOLT_CORE, this);
+        TopBarItem *l = new LabelItem(ValueID::VOLT_CORE, TopBarItemType::LABLEL, this);
         ui->grid_topbar->addWidget(l->itemWidget,0,1,1,1,Qt::AlignLeft);
-        topBarItems.insert(topBarItems.count(), l);
+        topBarItems.append(l);
     }
 
     if (device.gpuData.contains(ValueID::VOLT_MEM)) {
-        TopBarItem *l = new LabelItem(ValueID::VOLT_MEM, this);
+        TopBarItem *l = new LabelItem(ValueID::VOLT_MEM, TopBarItemType::LABLEL, this);
         ui->grid_topbar->addWidget(l->itemWidget,1,1,1,1,Qt::AlignLeft);
-        topBarItems.insert(topBarItems.count(), l);
+        topBarItems.append(l);
     }
 
     if (device.gpuData.contains(ValueID::TEMPERATURE_CURRENT)) {
-        TopBarItem *l = new LabelItem(ValueID::TEMPERATURE_CURRENT, this);
+        TopBarItem *l = new LabelItem(ValueID::TEMPERATURE_CURRENT, TopBarItemType::LARGE_LABEL, this);
+
         ui->grid_topbar->addWidget(l->itemWidget,0,2,2,1,Qt::AlignLeft);
-        topBarItems.insert(topBarItems.count(), l);
+        topBarItems.append(l);
     }
 
     if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
         TopBarItem *pie = new PieItem(100, ValueID::FAN_SPEED_PERCENT, Qt::blue, this);
         ui->grid_topbar->addWidget(pie->itemWidget,0,3,2,1,Qt::AlignLeft);
-        topBarItems.insert(topBarItems.count(), pie);
+        topBarItems.append(pie);
     }
 
     if (device.gpuData.contains(ValueID::GPU_USAGE_PERCENT)) {
         TopBarItem *pie = new PieItem(100, ValueID::GPU_USAGE_PERCENT, Qt::red, this);
         ui->grid_topbar->addWidget(pie->itemWidget,0,4,2,1,Qt::AlignLeft);
-        topBarItems.insert(topBarItems.count(), pie);
+        topBarItems.append(pie);
     }
 
     if (device.gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
         TopBarItem *pie = new PieItem(100, ValueID::GPU_VRAM_USAGE_PERCENT, Qt::yellow, this);
         static_cast<PieProgressBar*>(pie->itemWidget)->setSecondLabelSource(ValueID::GPU_VRAM_USAGE_MB);
         ui->grid_topbar->addWidget(pie->itemWidget,0,5,2,1,Qt::AlignLeft);
-        topBarItems.insert(topBarItems.count(), pie);
+        topBarItems.append(pie);
     }
 
     ui->grid_topbar->setColumnStretch(ui->grid_topbar->columnCount()-1, 1);
@@ -350,8 +352,8 @@ void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, c
 
 void radeon_profile::refreshUI() {
     // refresh top bar
-    for (const int &k : topBarItems.keys())
-        topBarItems[k]->updateItemValue(device.gpuData);
+    for (TopBarItem *tbi : topBarItems)
+        tbi->updateItemValue(device.gpuData);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
@@ -492,9 +494,7 @@ void radeon_profile::refreshGraphs() {
     if (ui->stack_plots->currentIndex() != 0 || plotManager.plots.count() == 0)
         return;
 
-    // count the tick to move timescale on plots
-    ticksCounter++;
-    plotManager.updateSeries(ticksCounter, device.gpuData);
+    plotManager.updateSeries(++ticksCounter, device.gpuData);
 }
 
 void radeon_profile::doTheStats() {
@@ -543,4 +543,16 @@ void radeon_profile::showWindow() {
         this->showMinimized();
     else
         this->showNormal();
+}
+
+void radeon_profile::on_btn_configureTopbar_clicked()
+{
+    Dialog_topbarCfg *d = new Dialog_topbarCfg(this);
+
+    if (d->exec()) {
+
+
+
+    }
+    delete d;
 }

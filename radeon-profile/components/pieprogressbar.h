@@ -41,10 +41,10 @@ public:
     void updateValue(const GPUDataContainer &gpuData) {
         data.slices().at(1)->setValue(gpuData.value(dataId).value);
         data.slices().at(2)->setValue(maxValue - gpuData.value(dataId).value);
-        label.setText(gpuData.value(dataId).strValue);
+        primaryLabel.setText(gpuData.value(dataId).strValue);
 
-        if (secondLabelEnabled)
-            secondLabel.setText(gpuData.value(secondDataId).strValue);
+        if (secondaryLabelEnabled)
+            secondaryLabel.setText(gpuData.value(secondaryDataId).strValue);
     }
 
     void setFillColor(const QColor &c) {
@@ -53,28 +53,28 @@ public:
     }
 
     void setSecondLabelSource(const ValueID id) {
-        secondLabelEnabled = true;
-        secondDataId = id;
+        secondaryLabelEnabled = true;
+        secondaryDataId = id;
     }
 
 protected:
     Ui::PieProgressBar *ui;
     int maxValue = 100;
-    bool secondLabelEnabled = false;
-    ValueID dataId, secondDataId;
+    bool secondaryLabelEnabled = false;
+    ValueID dataId, secondaryDataId;
 
     QPieSeries data;
     QChart chart;
     QChartView *chartView;
-    QLabel label, secondLabel;
+    QLabel primaryLabel, secondaryLabel;
     QColor fill, bg;
 
     void init() {
         QFont f;
         f.setFamily("Monospace");
         f.setPointSize(8);
-        label.setFont(f);
-        secondLabel.setFont(f);
+        primaryLabel.setFont(f);
+        secondaryLabel.setFont(f);
 
         QPalette p = this->palette();
         setAutoFillBackground(true);
@@ -114,11 +114,11 @@ protected:
         chartView->setMinimumSize(0,0);
         chartView->setRenderHint(QPainter::Antialiasing);
 
-        label.setContentsMargins(QMargins(0,18,5,0));
-        secondLabel.setContentsMargins(QMargins(0,43,5,0));
+        primaryLabel.setContentsMargins(QMargins(0,18,5,0));
+        secondaryLabel.setContentsMargins(QMargins(0,43,5,0));
         ui->grid->addWidget(chartView,0,0,Qt::AlignCenter);
-        ui->grid->addWidget(&label,0,0,Qt::AlignRight);
-        ui->grid->addWidget(&secondLabel,0,0,Qt::AlignRight);
+        ui->grid->addWidget(&primaryLabel,0,0,Qt::AlignRight);
+        ui->grid->addWidget(&secondaryLabel,0,0,Qt::AlignRight);
     }
 
 };

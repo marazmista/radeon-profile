@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20170629
+#define appVersion 20170703
 
 namespace Ui {
 class radeon_profile;
@@ -142,6 +142,7 @@ private slots:
     void on_slider_freqSclk_valueChanged(int value);
     void on_slider_freqMclk_valueChanged(int value);
     void on_group_freq_toggled(bool arg1);
+    void on_btn_configureTopbar_clicked();
 
 private:
     struct currentStateInfo {
@@ -165,7 +166,7 @@ private:
     PlotManager plotManager;
     QChartView *fanProfileChart;
     QLineSeries *fanSeries;
-    QMap<int, TopBarItem*> topBarItems;
+    QList<TopBarItem*> topBarItems;
     QMap<int, ValueID> keysInCurrentGpuList;
 
     Ui::radeon_profile *ui;
