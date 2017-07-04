@@ -198,90 +198,85 @@ GPUClocks dXorg::getClocksFromPmFile() {
     QString data = dXorg::getClocksRawData();
 
     // if nothing is there returns empty (-1) struct
-    if (data.isEmpty()){
+    if (data.isEmpty()) {
         qDebug() << "Can't get clocks, no data available";
         return clocksData;
     }
 
     switch (features.currentPowerMethod) {
-    case PowerMethod::DPM: {
-        QRegExp rx;
+        case PowerMethod::DPM: {
+            QRegExp rx;
 
-        rx.setPattern(rxPatterns.powerLevel);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
-            clocksData.powerLevel = rx.cap(0).split(' ')[2].toShort();
+            rx.setPattern(rxPatterns.powerLevel);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                clocksData.powerLevel = rx.cap(0).split(' ')[2].toShort();
 
-        rx.setPattern(rxPatterns.sclk);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
-            clocksData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+            rx.setPattern(rxPatterns.sclk);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                clocksData.coreClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
 
-        rx.setPattern(rxPatterns.mclk);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
-            clocksData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+            rx.setPattern(rxPatterns.mclk);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                clocksData.memClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
 
-        rx.setPattern(rxPatterns.vclk);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty()) {
-            clocksData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
-            clocksData.uvdCClk  = (clocksData.uvdCClk  == 0) ? -1 :  clocksData.uvdCClk;
+            rx.setPattern(rxPatterns.vclk);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty()) {
+                clocksData.uvdCClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+                clocksData.uvdCClk  = (clocksData.uvdCClk  == 0) ? -1 :  clocksData.uvdCClk;
+            }
+
+            rx.setPattern(rxPatterns.dclk);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty()) {
+                clocksData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
+                clocksData.uvdDClk = (clocksData.uvdDClk == 0) ? -1 : clocksData.uvdDClk;
+            }
+
+            rx.setPattern(rxPatterns.vddc);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                clocksData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
+
+            rx.setPattern(rxPatterns.vddci);
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty())
+                clocksData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
+
+            return clocksData;
         }
 
-        rx.setPattern(rxPatterns.dclk);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty()) {
-            clocksData.uvdDClk = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat() / dXorg::clocksValueDivider;
-            clocksData.uvdDClk = (clocksData.uvdDClk == 0) ? -1 : clocksData.uvdDClk;
+        case PowerMethod::PROFILE: {
+            QStringList dataStr = data.split("\n");
+            for (int i = 0; i < dataStr.count(); ++i) {
+                switch (i) {
+                    case 1:
+                        if (dataStr[i].contains("current engine clock"))
+                            clocksData.coreClk = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
+                        break;
+
+                    case 3:
+                        if (dataStr[i].contains("current memory clock"))
+                            clocksData.memClk = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
+                        break;
+
+                    case 4:
+                        if (dataStr[i].contains("voltage"))
+                            clocksData.coreVolt = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toFloat();
+                        break;
+                }
+            }
+            return clocksData;
         }
 
-        rx.setPattern(rxPatterns.vddc);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
-            clocksData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
+        case PowerMethod::PM_UNKNOWN:
+            qWarning() << "Unknown power method, can't get clocks";
+            return clocksData;
+    }
 
-        rx.setPattern(rxPatterns.vddci);
-        rx.indexIn(data);
-        if (!rx.cap(0).isEmpty())
-            clocksData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
-
-        return clocksData;
-        break;
-    }
-    case PowerMethod::PROFILE: {
-        QStringList dataStr = data.split("\n");
-        for (int i=0; i< dataStr.count(); i++) {
-            switch (i) {
-            case 1: {
-                if (dataStr[i].contains("current engine clock")) {
-                    clocksData.coreClk = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
-                    break;
-                }
-            };
-            case 3: {
-                if (dataStr[i].contains("current memory clock")) {
-                    clocksData.memClk = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
-                    break;
-                }
-            }
-            case 4: {
-                if (dataStr[i].contains("voltage")) {
-                    clocksData.coreVolt = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toFloat();
-                    break;
-                }
-            }
-            }
-        }
-        return clocksData;
-        break;
-    }
-    case PowerMethod::PM_UNKNOWN: {
-        qWarning() << "Unknown power method, can't get clocks";
-        return clocksData;
-        break;
-    }
-    }
     return clocksData;
 }
 
@@ -601,8 +596,9 @@ void dXorg::setupRegex(const QString &data) {
                 rxMatchIndex = 1;
                 clocksValueDivider = 100;
 
-                return;
+
             }
+            return;
 
         case DriverModule::AMDGPU:
             rx.setPattern("\\[\\s+sclk\\s+\\]:\\s\\d+");
@@ -627,6 +623,7 @@ void dXorg::setupRegex(const QString &data) {
                 clocksValueDivider = 1;
                 return;
             }
+
         case DriverModule::MODULE_UNKNOWN:
             return;
     }
@@ -783,12 +780,15 @@ void dXorg::setPowerPlayFreq(const QString &file, const int tableIndex) {
 int dXorg::getCurrentPowerPlayTableId(const QString &file) {
     QFile f(file);
 
-    if (f.open(QIODevice::ReadOnly)) {
-        QStringList sl = QString(f.readAll()).split("\n");
+    if (!f.open(QIODevice::ReadOnly))
+        return 0;
 
-        for (int i = 0; i < sl.count(); ++i) {
-            if (sl[i][sl[i].length() - 1] == "*")
-                return i;
-        }
+    QStringList sl = QString(f.readAll()).split("\n");
+
+    for (int i = 0; i < sl.count(); ++i) {
+        if (sl[i].endsWith("*"))
+            return i;
     }
+
+    return 0;
 }

@@ -1566,11 +1566,6 @@
            <zorder>fanSpeedSlider</zorder>
            <zorder>l_minFanSpeed</zorder>
            <zorder>labelFixedSpeed</zorder>
-           <zorder>fanSpeedSlider</zorder>
-           <zorder>l_minFanSpeed</zorder>
-           <zorder>labelFixedSpeed</zorder>
-           <zorder>verticalSpacer_12</zorder>
-           <zorder>verticalSpacer_2</zorder>
           </widget>
           <widget class="QWidget" name="page_profile">
            <layout class="QGridLayout" name="gridLayout_13">
