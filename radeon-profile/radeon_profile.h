@@ -164,9 +164,10 @@ private:
 	currentStateInfo *savedState;
     QFutureWatcher<void> initFuture;
     PlotManager plotManager;
+    TopbarManager topbarManager;
     QChartView *fanProfileChart;
     QLineSeries *fanSeries;
-    QList<TopBarItem*> topBarItems;
+    QList<TopbarItem*> topBarItems;
     QMap<int, ValueID> keysInCurrentGpuList;
 
     Ui::radeon_profile *ui;
@@ -222,7 +223,7 @@ private:
     void fillConnectors();
     void fillModInfo();
     bool askConfirmation(const QString title, const QString question);
-    void createTopBar();
+    void createDefaultTopbar();
     void showWindow();
     bool isFanStepValid(unsigned int temperature, unsigned int fanSpeed);
     void addFanStep (int temperature, int fanSpeed);

@@ -57,6 +57,10 @@ public:
         secondaryDataId = id;
     }
 
+    QColor getFillColor() {
+        return fill;
+    }
+
 protected:
     Ui::PieProgressBar *ui;
     int maxValue = 100;

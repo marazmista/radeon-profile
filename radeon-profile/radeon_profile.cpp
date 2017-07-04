@@ -94,7 +94,7 @@ void radeon_profile::initFutureHandler() {
     setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
     ui->centralWidget->setEnabled(true);
 
-    createTopBar();
+    createDefaultTopbar();
     plotManager.createPlotsFromSchemas(device.gpuData);
     addPlotsToLayout();
 
@@ -127,58 +127,45 @@ void radeon_profile::setupUiElements()
 }
 
 
-void radeon_profile::createTopBar()
+void radeon_profile::createDefaultTopbar()
 {
     if (device.gpuData.contains(ValueID::CLK_CORE)) {
-        TopBarItem *l = new LabelItem(ValueID::CLK_CORE, TopBarItemType::LABLEL, this);
-        ui->grid_topbar->addWidget(l->itemWidget,0,0,1,1,Qt::AlignLeft);
-        topBarItems.append(l);
+        TopbarItemDefinitionSchema tis(ValueID::CLK_CORE, TopbarItemType::LABEL, this->palette().foreground().color());
+        tis.setPosition(0);
+        topbarManager.addSchema(tis);
     }
 
     if (device.gpuData.contains(ValueID::CLK_MEM)) {
-        TopBarItem *l = new LabelItem(ValueID::CLK_MEM, TopBarItemType::LABLEL, this);
-        ui->grid_topbar->addWidget(l->itemWidget,1,0,1,1,Qt::AlignLeft);
-        topBarItems.append(l);
-    }
-
-    if (device.gpuData.contains(ValueID::VOLT_CORE)) {
-        TopBarItem *l = new LabelItem(ValueID::VOLT_CORE, TopBarItemType::LABLEL, this);
-        ui->grid_topbar->addWidget(l->itemWidget,0,1,1,1,Qt::AlignLeft);
-        topBarItems.append(l);
-    }
-
-    if (device.gpuData.contains(ValueID::VOLT_MEM)) {
-        TopBarItem *l = new LabelItem(ValueID::VOLT_MEM, TopBarItemType::LABLEL, this);
-        ui->grid_topbar->addWidget(l->itemWidget,1,1,1,1,Qt::AlignLeft);
-        topBarItems.append(l);
+        TopbarItemDefinitionSchema tis(ValueID::CLK_MEM, TopbarItemType::LABEL, this->palette().foreground().color());
+        tis.setPosition(0, 1);
+        topbarManager.addSchema(tis);
     }
 
     if (device.gpuData.contains(ValueID::TEMPERATURE_CURRENT)) {
-        TopBarItem *l = new LabelItem(ValueID::TEMPERATURE_CURRENT, TopBarItemType::LARGE_LABEL, this);
-
-        ui->grid_topbar->addWidget(l->itemWidget,0,2,2,1,Qt::AlignLeft);
-        topBarItems.append(l);
+        TopbarItemDefinitionSchema tis(ValueID::TEMPERATURE_CURRENT, TopbarItemType::LARGE_LABEL, this->palette().foreground().color());
+        tis.setPosition(1);
+        topbarManager.addSchema(tis);
     }
 
     if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
-        TopBarItem *pie = new PieItem(100, ValueID::FAN_SPEED_PERCENT, Qt::blue, this);
-        ui->grid_topbar->addWidget(pie->itemWidget,0,3,2,1,Qt::AlignLeft);
-        topBarItems.append(pie);
+        TopbarItemDefinitionSchema tis(ValueID::FAN_SPEED_PERCENT, TopbarItemType::PIE, Qt::blue);
+        tis.setPosition(2);
+        topbarManager.addSchema(tis);
     }
 
     if (device.gpuData.contains(ValueID::GPU_USAGE_PERCENT)) {
-        TopBarItem *pie = new PieItem(100, ValueID::GPU_USAGE_PERCENT, Qt::red, this);
-        ui->grid_topbar->addWidget(pie->itemWidget,0,4,2,1,Qt::AlignLeft);
-        topBarItems.append(pie);
+        TopbarItemDefinitionSchema tis(ValueID::GPU_USAGE_PERCENT, TopbarItemType::PIE, Qt::red);
+        tis.setPosition(3);
+        topbarManager.addSchema(tis);
     }
 
     if (device.gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
-        TopBarItem *pie = new PieItem(100, ValueID::GPU_VRAM_USAGE_PERCENT, Qt::yellow, this);
-        static_cast<PieProgressBar*>(pie->itemWidget)->setSecondLabelSource(ValueID::GPU_VRAM_USAGE_MB);
-        ui->grid_topbar->addWidget(pie->itemWidget,0,5,2,1,Qt::AlignLeft);
-        topBarItems.append(pie);
+        TopbarItemDefinitionSchema tis(ValueID::GPU_VRAM_USAGE_PERCENT, TopbarItemType::PIE, Qt::yellow);
+        tis.setPosition(4);
+        topbarManager.addSchema(tis);
     }
 
+    topbarManager.createTopbar(ui->grid_topbar);
     ui->grid_topbar->setColumnStretch(ui->grid_topbar->columnCount()-1, 1);
 }
 
@@ -352,8 +339,9 @@ void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, c
 
 void radeon_profile::refreshUI() {
     // refresh top bar
-    for (TopBarItem *tbi : topBarItems)
-        tbi->updateItemValue(device.gpuData);
+    topbarManager.updateItems(device.gpuData);
+//    for (TopbarItem *tbi : topBarItems)
+//        tbi->updateItemValue(device.gpuData);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
