@@ -162,9 +162,6 @@ public:
     }
 
     void showLegend(bool show) {
-        if (show)
-            plotArea.legend()->setLabelColor(timeAxis.gridLineColor());
-
         plotArea.legend()->setVisible(show);
     }
 };
@@ -288,7 +285,13 @@ public:
         plots.insert(name,rpp);
     }
 
+    QColor invertColor(const QColor &c) {
+        return QColor::fromRgb(255 - c.red(), 255 - c.green(),255 - c.blue());
+    }
+
     void setPlotBackground(const QString &name, const QColor &color) {
+        plots[name]->timeAxis.setGridLineColor(invertColor(color));
+        plots[name]->plotArea.legend()->setLabelColor(invertColor(color));
         plots[name]->plotArea.setBackgroundBrush(QBrush(color));
         plots[name]->setBackgroundBrush(QBrush(color));
     }
