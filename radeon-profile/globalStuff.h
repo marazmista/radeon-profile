@@ -65,6 +65,9 @@ enum ValueUnit {
     NONE
 };
 
+Q_DECLARE_METATYPE(ValueID)
+Q_DECLARE_METATYPE(ValueUnit)
+
 enum PowerProfiles {
     BATTERY, BALANCED, PERFORMANCE, AUTO, DEFAULT, LOW, MID, HIGH
 };
@@ -352,6 +355,28 @@ public:
     }
 
     static QString getNameOfValueID(ValueID id) {
+        switch (id) {
+            case ValueID::CLK_CORE: return QObject::tr("Core clock");
+            case ValueID::CLK_MEM:  return QObject::tr("Memory clock");
+            case ValueID::VOLT_CORE:  return QObject::tr("Core volt");
+            case ValueID::VOLT_MEM:  return QObject::tr("Memory volt");
+            case ValueID::FAN_SPEED_PERCENT:  return QObject::tr("Fan speed");
+            case ValueID::GPU_USAGE_PERCENT:  return QObject::tr("GPU usage");
+            case ValueID::GPU_VRAM_USAGE_PERCENT:  return QObject::tr("GPU Vram usage");
+            case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed RPM");
+            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature");
+            case ValueID::TEMPERATURE_MAX: return QObject::tr("Temperature (max)");
+            case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min)");
+            case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram megabyte usage");
+            case ValueID::POWER_LEVEL: return QObject::tr("Power level");
+            default:
+                break;
+        }
+
+        return "";
+    }
+
+    static QString getNameOfValueIDWithUnit(ValueID id) {
         switch (id) {
             case ValueID::CLK_CORE: return QObject::tr("Core clock [MHz]");
             case ValueID::CLK_MEM:  return QObject::tr("Memory clock [MHz]");

@@ -212,12 +212,14 @@ private:
     void loadFanProfile(QXmlStreamReader &xml);
     void savePlotSchemas(QXmlStreamWriter &xml);
     void loadPlotSchemas(QXmlStreamReader &xml);
+    void saveTopbarItemsSchemas(QXmlStreamWriter &xml);
+    void loadTopbarItemsSchemas(QXmlStreamReader &xml);
     void writePlotAxisSchemaToXml(QXmlStreamWriter &xml, const QString side, const PlotAxisSchema &pas);
     void loadPlotAxisSchema(const QXmlStreamReader &xml, PlotAxisSchema &pas);
     void createDefaultFanProfile();
     void loadExecProfiles();
     void setupUiElements();
-    void addPlotsToLayout();
+    void createPlots();
     void modifyPlotSchema(const QString &name);
     void createCurrentGpuDataListItems();
     void fillConnectors();

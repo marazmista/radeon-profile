@@ -36,12 +36,13 @@ SOURCES += main.cpp\
     ioctl_amdgpu.cpp \
     execTab.cpp \
     execbin.cpp \
-    dialog_rpevent.cpp \
     eventsTab.cpp \
     fanControlTab.cpp \
-    dialog_defineplot.cpp \
     plotsTab.cpp \
-    dialog_topbarcfg.cpp
+    dialogs/dialog_defineplot.cpp \
+    dialogs/dialog_rpevent.cpp \
+    dialogs/dialog_topbarcfg.cpp \
+    dialogs/dialog_deinetopbaritem.cpp
 
 HEADERS  += radeon_profile.h \
     gpu.h \
@@ -49,20 +50,22 @@ HEADERS  += radeon_profile.h \
     globalStuff.h \
     daemonComm.h \
     execbin.h \
-    dialog_rpevent.h \
     rpevent.h \
     ioctlHandler.h \
     components/rpplot.h \
-    dialog_defineplot.h \
     components/pieprogressbar.h \
     components/topbarcomponents.h \
-    dialog_topbarcfg.h
+    dialogs/dialog_defineplot.h \
+    dialogs/dialog_rpevent.h \
+    dialogs/dialog_topbarcfg.h \
+    dialogs/dialog_deinetopbaritem.h
 
 FORMS    += radeon_profile.ui \
-    dialog_rpevent.ui \
-    dialog_defineplot.ui \
     components/pieprogressbar.ui \
-    dialog_topbarcfg.ui
+    dialogs/dialog_defineplot.ui \
+    dialogs/dialog_rpevent.ui \
+    dialogs/dialog_topbarcfg.ui \
+    dialogs/dialog_deinetopbaritem.ui
 
 RESOURCES += \
     radeon-resource.qrc

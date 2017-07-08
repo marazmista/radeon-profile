@@ -58,7 +58,7 @@ public:
 
     DataSeries(ValueID t, QWidget *parent = 0) : QLineSeries(parent) {
         id = t;
-        setName(globalStuff::getNameOfValueID(id));
+        setName(globalStuff::getNameOfValueIDWithUnit(id));
     }
 };
 
@@ -177,9 +177,7 @@ public:
     QMap<QString, RPPlot*> plots;
     QMap<QString, PlotDefinitionSchema> schemas;
 
-
-    PlotManager() {
-    }
+    PlotManager() { }
 
     void setRightGap(bool enabled) {
         rightGap = (enabled) ? 10 : 0;

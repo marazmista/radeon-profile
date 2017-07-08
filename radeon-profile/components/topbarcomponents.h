@@ -8,141 +8,235 @@
 #include "pieprogressbar.h"
 #include <QWidget>
 
-enum class TopbarItemType {
-    LABEL,
+enum TopbarItemType {
+    LABEL_PAIR,
     LARGE_LABEL,
     PIE
 };
 
 class TopbarItem {
 public:
+    virtual void updateItemValue(const GPUDataContainer &data) = 0;
+    virtual void setPrimaryColor(const QColor &c) = 0;
+    virtual void setSecondaryColor(const QColor &c) { }
+    virtual void setSecondaryValueId(const ValueID vId) {
+        secondaryValueId = vId;
+        secondaryValueIdEnabled = true;
+    }
+
+    QWidget* getItemWidget() {
+        return itemWidget;
+    }
+
+protected:
     QWidget *itemWidget;
     TopbarItemType itemType;
-    ValueID itemDataId;
-
-    virtual void updateItemValue(const GPUDataContainer &data) = 0;
-    virtual void setForegroundColor(const QColor &c) = 0;
-    virtual QColor getForegroundColor() = 0;
+    ValueID primaryValueId, secondaryValueId;
+    bool secondaryValueIdEnabled = false;
 };
 
-class LabelItem : public QLabel, public TopbarItem {
+class LabelPairItem : public QWidget, public TopbarItem {
+    QLabel labelTop, labelBottom;
+
 public:
-    LabelItem(ValueID id, TopbarItemType type, QWidget *parent = 0) : QLabel(parent) {
-        itemType = type;
+    LabelPairItem(const ValueID vId, const QColor &c, QWidget *parent = 0) : QWidget(parent) {
+        itemType = TopbarItemType::LABEL_PAIR;
+        primaryValueId = vId;
+
+        QFont f;
+        f.setFamily("Monospace");
+        f.setPointSize(11);
+        labelTop.setFont(f);
+        labelBottom.setFont(f);
+
+        setPrimaryColor(c);
+
+        labelTop.setToolTip(globalStuff::getNameOfValueID(primaryValueId));
+
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->setSpacing(10);
+        layout->addWidget(&labelTop);
+        layout->addWidget(&labelBottom);
+
+        this->setLayout(layout);
+        this->setMinimumHeight(60);
+        itemWidget = this;
+    }
+
+    void init() {
+
+    }
+
+    void updateItemValue(const GPUDataContainer &data) {
+        labelTop.setText(data.value(primaryValueId).strValue);
+
+        if (secondaryValueIdEnabled)
+            labelBottom.setText(data.value(secondaryValueId).strValue);
+    }
+
+    void setPrimaryColor(const QColor &c) {
+        QPalette p = this->palette();
+        p.setColor(this->foregroundRole(), c);
+        labelTop.setPalette(p);
+    }
+
+    void setSecondaryColor(const QColor &c) {
+        QPalette p = this->palette();
+        p.setColor(this->foregroundRole(), c);
+        labelBottom.setPalette(p);
+    }
+
+    void setSecondaryValueId(const ValueID vId) {
+        TopbarItem::setSecondaryValueId(vId);
+        labelBottom.setToolTip(globalStuff::getNameOfValueID(secondaryValueId));
+    }
+};
+
+class LargeLabelItem : public QLabel, public TopbarItem {
+public:
+    LargeLabelItem(const ValueID vId, const QColor &c, QWidget *parent = 0) : QLabel(parent) {
+        itemType = TopbarItemType::LARGE_LABEL;
         itemWidget = this;
 
         QFont f;
         f.setFamily("Monospace");
-        f.setPointSize((type == TopbarItemType::LABEL ? 10 : 20));
+        f.setPointSize(24);
         itemWidget->setFont(f);
 
-        itemDataId = id;
-        itemWidget->setToolTip(globalStuff::getNameOfValueID(id));
+        setPrimaryColor(c);
+
+        primaryValueId = vId;
+        itemWidget->setToolTip(globalStuff::getNameOfValueID(vId));
     }
 
     void updateItemValue(const GPUDataContainer &data) {
-        this->setText(data.value(itemDataId).strValue);
+        this->setText(data.value(primaryValueId).strValue);
     }
 
-    void setForegroundColor(const QColor &c) {
+    void setPrimaryColor(const QColor &c) {
         QPalette p = this->palette();
         p.setColor(this->foregroundRole(), c);
         this->QLabel::setPalette(p);
-    }
-
-    QColor getForegroundColor() {
-        return this->palette().color(QPalette::Foreground);
     }
 };
 
 class PieItem : public PieProgressBar, public TopbarItem {
 public:
-    PieItem(const int max, ValueID id, QColor fillColor, QWidget *parent = 0) : PieProgressBar(max, id, fillColor, parent) {
+    PieItem(const int max, ValueID vId, QColor fillColor, QWidget *parent = 0) : PieProgressBar(max, vId, fillColor, parent) {
         itemType = TopbarItemType::PIE;
         itemWidget = this;
 
-        setMinimumSize(60,60);
+        setMinimumHeight(60);
         this->maxValue = max;
-        this->itemDataId = id;
-        itemWidget->setToolTip(globalStuff::getNameOfValueID(id));
+        this->primaryValueId = vId;
+        itemWidget->setToolTip(globalStuff::getNameOfValueID(vId));
     }
 
     void updateItemValue(const GPUDataContainer &data) {
         this->updateValue(data);
     }
 
-    void setForegroundColor(const QColor &c) {
+    void setPrimaryColor(const QColor &c) {
         this->PieProgressBar::setFillColor(c);
     }
 
-    QColor getForegroundColor() {
-        return this->PieProgressBar::getFillColor();
+    void setSecondaryValueId(const ValueID vId) {
+        TopbarItem::setSecondaryValueId(vId);
+        PieProgressBar::setSecondaryDataId(vId);
     }
 };
 
 struct TopbarItemDefinitionSchema {
     TopbarItemType type;
-    QColor foregroundColor;
-    ValueID dataId;
-    int row = -1, column = -1;
+    QColor primaryColor, secondaryColor;
+    ValueID primaryValueId, secondaryValueId;
+    QString name;
+    bool secondaryValueIdEnabled = false;
 
-    TopbarItemDefinitionSchema(ValueID id, TopbarItemType t, QColor color) {
-        dataId = id;
+    TopbarItemDefinitionSchema() { }
+
+    TopbarItemDefinitionSchema(ValueID vId, TopbarItemType t, QColor color) {
+        primaryValueId = vId;
         type = t;
-        foregroundColor = color;
+        primaryColor = color;
+
+        switch (type) {
+            case TopbarItemType::LABEL_PAIR:
+                name.append("[Pair]\n");
+                break;
+            case TopbarItemType::LARGE_LABEL:
+                name.append("[Large label]\n");
+                break;
+            case TopbarItemType::PIE:
+                name.append("[Pie]\n");
+                break;
+            default:
+                break;
+        }
+        name.append(globalStuff::getNameOfValueID(vId));
     }
 
-    void setPosition(int c, int r = 0) {
-        row = r;
-        column = c;
+    void setSecondaryValueId(ValueID vId) {
+        secondaryValueId = vId;
+        secondaryValueIdEnabled = true;
+        name.append("\n" + globalStuff::getNameOfValueID(vId));
+    }
+
+    void setSecondaryColor(const QColor &c) {
+        secondaryColor = c;
     }
 };
 
 class TopbarManager {
+public:
     QList<TopbarItemDefinitionSchema> schemas;
     QList<TopbarItem*> items;
-public:
 
-    void createTopbar(QGridLayout *grid) {
-        for (const TopbarItemDefinitionSchema &tis : schemas) {
-            if (tis.row == -1 || tis.column == -1)
-                continue;
+    void createTopbar(QHBoxLayout *layout) {
+        items.clear();
 
-            addToGrid(grid, tis);
+        QLayoutItem *item;
+        while ((item = layout->takeAt(0)) != 0) {
+            delete item->widget();
+            delete item;
         }
+
+        for (const TopbarItemDefinitionSchema &tis : schemas)
+            addToLayout(layout, tis);
+
+        layout->setStretch(layout->count()-1,1);
     }
 
-    void removeSchema(int i) {
-        schemas.removeAt(i);
-        items.removeAt(i);
+    void removeSchema(const int id) {
+        schemas.removeAt(id);
     }
 
     void addSchema(const TopbarItemDefinitionSchema &tis) {
         schemas.append(tis);
     }
 
-    void setItemPosition(int itemIndex, int c, int r) {
-        schemas[itemIndex].setPosition(c, r);
-    }
-
-    void addToGrid(QGridLayout *grid, const TopbarItemDefinitionSchema &tis) {
+    void addToLayout(QHBoxLayout *layout, const TopbarItemDefinitionSchema &tis) {
         TopbarItem *item;
-        int rowStretch = 1;
 
         switch (tis.type) {
             case TopbarItemType::LARGE_LABEL:
-                rowStretch = 2;
-            case TopbarItemType::LABEL:
-                item = new LabelItem(tis.dataId, tis.type, grid->widget());
+                item = new LargeLabelItem(tis.primaryValueId, tis.primaryColor, layout->widget());
                 break;
-
+            case TopbarItemType::LABEL_PAIR:
+                item = new LabelPairItem(tis.primaryValueId, tis.primaryColor, layout->widget());
+                break;
             case TopbarItemType::PIE:
-                rowStretch = 2;
-                item = new PieItem(100, tis.dataId, tis.foregroundColor, grid->widget());
+                item = new PieItem(100, tis.primaryValueId, tis.primaryColor, layout->widget());
                 break;
         }
-        grid->addWidget(item->itemWidget, tis.row, tis.column, rowStretch, 1, Qt::AlignLeft);
+
+        if (tis.secondaryValueIdEnabled) {
+            item->setSecondaryValueId(tis.secondaryValueId);
+            item->setSecondaryColor(tis.secondaryColor);
+        }
+
         items.append(item);
+        layout->addWidget(item->getItemWidget(), 0, Qt::AlignLeft);
     }
 
     void updateItems(const GPUDataContainer &data) {

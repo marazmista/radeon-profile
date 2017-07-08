@@ -3,11 +3,11 @@
 
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
-#include "dialog_defineplot.h"
+#include "dialogs/dialog_defineplot.h"
 
-void radeon_profile::addPlotsToLayout() {
-    for (const QString &name : plotManager.plots.keys())
-        ui->pagePlots->layout()->addWidget(plotManager.plots.value(name));
+void radeon_profile::createPlots() {
+    for (const QString &name : plotManager.schemas.keys())
+        setupPlot(plotManager.schemas.value(name));
 }
 
 void radeon_profile::on_btn_configurePlots_clicked()

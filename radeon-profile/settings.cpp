@@ -61,6 +61,7 @@ void radeon_profile::saveConfig() {
     saveExecProfiles(xml);
     saveFanProfiles(xml);
     savePlotSchemas(xml);
+    saveTopbarItemsSchemas(xml);
 
     xml.writeEndElement();
     xml.writeEndDocument();
@@ -170,6 +171,23 @@ void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
     xml.writeEndElement();
 }
 
+void radeon_profile::saveTopbarItemsSchemas(QXmlStreamWriter &xml) {
+    xml.writeStartElement("TopbarItems");
+
+    for (const TopbarItemDefinitionSchema &tis : topbarManager.schemas) {
+        xml.writeStartElement("topbarItem");
+
+        xml.writeAttribute("type", QString::number(tis.type));
+        xml.writeAttribute("primaryValueId", QString::number(tis.primaryValueId));
+        xml.writeAttribute("primaryColor", tis.primaryColor.name());
+        xml.writeAttribute("secondaryValueIdEnabled", QString::number(tis.secondaryValueIdEnabled));
+        xml.writeAttribute("secondaryValueId", QString::number(tis.secondaryValueId));
+        xml.writeAttribute("secondaryColor", tis.secondaryColor.name());
+
+        xml.writeEndElement();
+    }
+    xml.writeEndElement();
+}
 
 void radeon_profile::loadConfig() {
     QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
@@ -265,8 +283,14 @@ void radeon_profile::loadConfig() {
                     loadPlotSchemas(xml);
                     continue;
                 }
+
+                if (xml.name().toString() == "topbarItem") {
+                    loadTopbarItemsSchemas(xml);
+                    continue;
+                }
             }
         }
+
         f.close();
     }
 
@@ -283,6 +307,9 @@ void radeon_profile::loadConfig() {
     // create plots from xml config
     if (plotManager.schemas.count() == 0)
         ui->stack_plots->setCurrentIndex(1);
+
+    if (topbarManager.schemas.count() == 0)
+        createDefaultTopbar();
 
     makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));
 }
@@ -353,6 +380,19 @@ void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
     item->setText(0, pds.name);
     item->setCheckState(0,(pds.enabled) ? Qt::Checked : Qt::Unchecked);
     ui->list_plotDefinitions->addTopLevelItem(item);
+}
+
+void radeon_profile::loadTopbarItemsSchemas(QXmlStreamReader &xml) {
+    TopbarItemDefinitionSchema tis(static_cast<ValueID>(xml.attributes().value("primaryValueId").toInt()),
+                                   static_cast<TopbarItemType>(xml.attributes().value("type").toInt()),
+                                   QColor(xml.attributes().value("primaryColor").toString()));
+
+    if (xml.attributes().value("secondaryValueIdEnabled").toInt() == 1) {
+        tis.setSecondaryColor(QColor(xml.attributes().value("secondaryColor").toString()));
+        tis.setSecondaryValueId(static_cast<ValueID>(xml.attributes().value("secondaryValueId").toInt()));
+    }
+
+    topbarManager.addSchema(tis);
 }
 
 void radeon_profile::loadExecProfile(const QXmlStreamReader &xml) {

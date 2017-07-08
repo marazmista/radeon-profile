@@ -2,7 +2,7 @@
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
 
-#include "dialog_rpevent.h"
+#include "dialogs/dialog_rpevent.h"
 #include "globalStuff.h"
 
 #include <QMessageBox>
