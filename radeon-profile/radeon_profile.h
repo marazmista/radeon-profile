@@ -195,7 +195,7 @@ private:
     void setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile);
     void adjustFanSpeed();
     fanProfileSteps stepsListToMap();
-    void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
+    void addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
     void setupFanProfilesMenu(const bool rebuildMode = false);
     int findCurrentFanProfileMenuIndex();
     void setupMinFanSpeedSetting(unsigned int speed);

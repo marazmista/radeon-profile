@@ -19,7 +19,6 @@
 #include "ui_radeon_profile.h"
 #include "dialogs/dialog_defineplot.h"
 #include "components/topbarcomponents.h"
-#include "dialogs/dialog_topbarcfg.h"
 
 #include <QTimer>
 #include <QTextStream>
@@ -79,7 +78,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     // timer init
     timer = new QTimer(this);
-    timer->setInterval(ui->spin_timerInterval->value()*1000);
+    timer->setInterval(ui->spin_timerInterval->value() * 1000);
     timer->start();
 
     showWindow();
@@ -320,15 +319,13 @@ void radeon_profile::refreshGpuData() {
     device.getPwmSpeed();
 }
 
-void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
+void radeon_profile::addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
     parent->addTopLevelItem(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
 }
 
 void radeon_profile::refreshUI() {
     // refresh top bar
     topbarManager.updateItems(device.gpuData);
-//    for (TopbarItem *tbi : topBarItems)
-//        tbi->updateItemValue(device.gpuData);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
@@ -370,7 +367,7 @@ void radeon_profile::createCurrentGpuDataListItems()
                 device.gpuData.keys().at(i) == ValueID::TEMPERATURE_MIN)
             continue;
 
-        addChild(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
+        addTreeWidgetItem(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
         keysInCurrentGpuList.insert(ui->list_currentGPUData->topLevelItemCount() - 1, device.gpuData.keys().at(i));
     }
 }
@@ -517,16 +514,4 @@ void radeon_profile::showWindow() {
         this->showMinimized();
     else
         this->showNormal();
-}
-
-void radeon_profile::on_btn_configureTopbar_clicked()
-{
-    Dialog_topbarCfg *d = new Dialog_topbarCfg(topbarManager.schemas, &device.gpuData, this);
-
-    if (d->exec() == QDialog::Accepted) {
-        topbarManager.schemas = d->getCreatedSchemas();
-        topbarManager.createTopbar(ui->topbar_layout);
-    }
-
-    delete d;
 }

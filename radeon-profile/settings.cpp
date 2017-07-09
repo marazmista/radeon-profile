@@ -183,6 +183,7 @@ void radeon_profile::saveTopbarItemsSchemas(QXmlStreamWriter &xml) {
         xml.writeAttribute("secondaryValueIdEnabled", QString::number(tis.secondaryValueIdEnabled));
         xml.writeAttribute("secondaryValueId", QString::number(tis.secondaryValueId));
         xml.writeAttribute("secondaryColor", tis.secondaryColor.name());
+        xml.writeAttribute("pieMaxValue", QString::number(tis.pieMaxValue));
 
         xml.writeEndElement();
     }
@@ -380,6 +381,8 @@ void radeon_profile::loadTopbarItemsSchemas(QXmlStreamReader &xml) {
     TopbarItemDefinitionSchema tis(static_cast<ValueID>(xml.attributes().value("primaryValueId").toInt()),
                                    static_cast<TopbarItemType>(xml.attributes().value("type").toInt()),
                                    QColor(xml.attributes().value("primaryColor").toString()));
+
+    tis.setPieMaxValue(xml.attributes().value("pieMaxValue").toInt());
 
     if (xml.attributes().value("secondaryValueIdEnabled").toInt() == 1) {
         tis.setSecondaryColor(QColor(xml.attributes().value("secondaryColor").toString()));

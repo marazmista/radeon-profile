@@ -54,12 +54,14 @@ public:
         labelTop.setToolTip(globalStuff::getNameOfValueID(primaryValueId));
 
         QVBoxLayout *layout = new QVBoxLayout();
+        layout->setContentsMargins(15,0,0,0);
         layout->setSpacing(10);
         layout->addWidget(&labelTop);
         layout->addWidget(&labelBottom);
 
         this->setLayout(layout);
         this->setMinimumHeight(60);
+
         itemWidget = this;
     }
 
@@ -96,17 +98,19 @@ class LargeLabelItem : public QLabel, public TopbarItem {
 public:
     LargeLabelItem(const ValueID vId, const QColor &c, QWidget *parent = 0) : QLabel(parent) {
         itemType = TopbarItemType::LARGE_LABEL;
-        itemWidget = this;
 
         QFont f;
         f.setFamily("Monospace");
         f.setPointSize(24);
-        itemWidget->setFont(f);
+        this->setFont(f);
+        setContentsMargins(15,0,0,0);
 
         setPrimaryColor(c);
 
         primaryValueId = vId;
-        itemWidget->setToolTip(globalStuff::getNameOfValueID(vId));
+        this->setToolTip(globalStuff::getNameOfValueID(vId));
+
+        itemWidget = this;
     }
 
     void updateItemValue(const GPUDataContainer &data) {
@@ -124,12 +128,13 @@ class PieItem : public PieProgressBar, public TopbarItem {
 public:
     PieItem(const int max, ValueID vId, QColor fillColor, QWidget *parent = 0) : PieProgressBar(max, vId, fillColor, parent) {
         itemType = TopbarItemType::PIE;
-        itemWidget = this;
 
         setMinimumHeight(60);
         this->maxValue = max;
         this->primaryValueId = vId;
-        itemWidget->setToolTip(globalStuff::getNameOfValueID(vId));
+        this->setToolTip(globalStuff::getNameOfValueID(vId));
+
+        itemWidget = this;
     }
 
     void updateItemValue(const GPUDataContainer &data) {
@@ -152,6 +157,7 @@ struct TopbarItemDefinitionSchema {
     ValueID primaryValueId, secondaryValueId;
     QString name;
     bool secondaryValueIdEnabled = false;
+    int pieMaxValue = 100;
 
     TopbarItemDefinitionSchema() { }
 
@@ -174,6 +180,10 @@ struct TopbarItemDefinitionSchema {
                 break;
         }
         name.append(globalStuff::getNameOfValueID(vId));
+    }
+
+    void setPieMaxValue(int max) {
+        pieMaxValue = max;
     }
 
     void setSecondaryValueId(ValueID vId) {
@@ -226,7 +236,7 @@ public:
                 item = new LabelPairItem(tis.primaryValueId, tis.primaryColor, layout->widget());
                 break;
             case TopbarItemType::PIE:
-                item = new PieItem(100, tis.primaryValueId, tis.primaryColor, layout->widget());
+                item = new PieItem(tis.pieMaxValue, tis.primaryValueId, tis.primaryColor, layout->widget());
                 break;
         }
 

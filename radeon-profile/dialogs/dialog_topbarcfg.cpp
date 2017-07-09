@@ -4,13 +4,14 @@
 #include "dialog_topbarcfg.h"
 #include "ui_dialog_topbarcfg.h"
 
-Dialog_topbarCfg::Dialog_topbarCfg(QList<TopbarItemDefinitionSchema> s, GPUDataContainer *data, QWidget *parent) :
+Dialog_topbarCfg::Dialog_topbarCfg(QList<TopbarItemDefinitionSchema> s, QList<ValueID> data, const GPUConstParams *params, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog_topbarCfg)
 {
     ui->setupUi(this);
     schemas = s;
-    referenceData = data;
+    availableGpuData = data;
+    gpuParams = params;
 
     for (const TopbarItemDefinitionSchema &tis : schemas)
         ui->listWidget->addItem(tis.name);
@@ -61,8 +62,7 @@ void Dialog_topbarCfg::on_btn_moveRight_clicked()
 
 void Dialog_topbarCfg::on_btn_add_clicked()
 {
-    Dialog_deineTopbarItem *d = new Dialog_deineTopbarItem(this);
-    d->setReferenceGpuData(referenceData);
+    Dialog_deineTopbarItem *d = new Dialog_deineTopbarItem(&availableGpuData, gpuParams, this);
 
     if (d->exec() == QDialog::Accepted) {
         schemas.append(d->getCreatedSchema());
@@ -77,8 +77,7 @@ void Dialog_topbarCfg::on_btn_modify_clicked()
     if (!ui->listWidget->currentItem())
         return;
 
-    Dialog_deineTopbarItem *d = new Dialog_deineTopbarItem(this);
-    d->setReferenceGpuData(referenceData);
+    Dialog_deineTopbarItem *d = new Dialog_deineTopbarItem(&availableGpuData, gpuParams, this);
     d->setEditedSchema(schemas[ui->listWidget->currentRow()]);
 
     if (d->exec() == QDialog::Accepted) {

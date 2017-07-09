@@ -1,24 +1,30 @@
+
+// copyright marazmista @ 8.07.2017
+
 #include "dialog_deinetopbaritem.h"
 #include "ui_dialog_deinetopbaritem.h"
 
-Dialog_deineTopbarItem::Dialog_deineTopbarItem(QWidget *parent) :
+Dialog_deineTopbarItem::Dialog_deineTopbarItem(QList<ValueID> *data, const GPUConstParams *params, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog_deineTopbarItem)
 {
     ui->setupUi(this);
 
+    availableGpuData = data;
+    gpuParams = params;
+
+    on_radio_labelPair_toggled(true);
+
     ui->widget_primaryColor->setAutoFillBackground(true);
     ui->widget_secondaryColor->setAutoFillBackground(true);
+
+    ui->widget_primaryColor->setPalette(QPalette(this->palette().foreground().color()));
+    ui->widget_secondaryColor->setPalette(QPalette(this->palette().foreground().color()));
 }
 
 Dialog_deineTopbarItem::~Dialog_deineTopbarItem()
 {
     delete ui;
-}
-
-void Dialog_deineTopbarItem::setReferenceGpuData(GPUDataContainer *data) {
-    referenceData = data;
-    on_radio_labelPair_toggled(true);
 }
 
 void Dialog_deineTopbarItem::setEditedSchema(TopbarItemDefinitionSchema tis) {
@@ -43,7 +49,6 @@ void Dialog_deineTopbarItem::setEditedSchema(TopbarItemDefinitionSchema tis) {
     ui->combo_secondaryData->setCurrentIndex(ui->combo_secondaryData->findData(QVariant::fromValue(tis.secondaryValueId)));
     ui->widget_primaryColor->setPalette(QPalette(tis.primaryColor));
     ui->widget_secondaryColor->setPalette(QPalette(tis.secondaryColor));
-
 }
 
 void Dialog_deineTopbarItem::createCombo(QComboBox *combo, const TopbarItemType type, bool emptyFirst) {
@@ -55,24 +60,25 @@ void Dialog_deineTopbarItem::createCombo(QComboBox *combo, const TopbarItemType 
     switch (type) {
         case TopbarItemType::LABEL_PAIR:
         case TopbarItemType::LARGE_LABEL:
-            for (const ValueID &id : referenceData->keys()) {
-                if (id == ValueID::TEMPERATURE_BEFORE_CURRENT)
+            for (int i = 0; i < availableGpuData->count(); ++i) {
+                if (availableGpuData->at(i) == ValueID::TEMPERATURE_BEFORE_CURRENT)
                     continue;
 
-                combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
+                combo->addItem(globalStuff::getNameOfValueID(availableGpuData->at(i)), QVariant::fromValue(availableGpuData->at(i)));
             }
             break;
 
-        case TopbarItemType::PIE: {
-            for (const ValueID &id : referenceData->keys()) {
+        case TopbarItemType::PIE:
+            for (int i = 0; i < availableGpuData->count(); ++i) {
+                if (globalStuff::getUnitFomValueId(availableGpuData->at(i)) == ValueUnit::PERCENT)
+                    combo->addItem(globalStuff::getNameOfValueID(availableGpuData->at(i)), QVariant::fromValue(availableGpuData->at(i)));
 
-                ValueUnit unit = globalStuff::getUnitFomValueId(id);
-                if (unit == ValueUnit::CELSIUS || unit == ValueUnit::MEGABYTE || unit == ValueUnit::NONE)
-                    continue;
+                if (availableGpuData->at(i) == ValueID::CLK_CORE && gpuParams->maxCoreClock != -1)
+                    combo->addItem(globalStuff::getNameOfValueID(ValueID::CLK_CORE), QVariant::fromValue(ValueID::CLK_CORE));
 
-                combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
+                if (availableGpuData->at(i) == ValueID::CLK_MEM && gpuParams->maxMemClock != -1)
+                    combo->addItem(globalStuff::getNameOfValueID(ValueID::CLK_MEM), QVariant::fromValue(ValueID::CLK_MEM));
             }
-        }
             break;
     }
 }
@@ -156,12 +162,12 @@ void Dialog_deineTopbarItem::on_combo_primaryData_currentIndexChanged(int index)
 
     switch (static_cast<ValueID>(ui->combo_primaryData->currentData().toInt())) {
         case ValueID::FAN_SPEED_PERCENT:
-            if (referenceData->contains(ValueID::FAN_SPEED_RPM))
+            if (availableGpuData->contains(ValueID::FAN_SPEED_RPM))
                 ui->combo_secondaryData->addItem(globalStuff::getNameOfValueID(ValueID::FAN_SPEED_RPM), QVariant::fromValue(ValueID::FAN_SPEED_RPM));
 
             break;
         case ValueID::GPU_VRAM_USAGE_PERCENT:
-            if (referenceData->contains(ValueID::GPU_VRAM_USAGE_MB))
+            if (availableGpuData->contains(ValueID::GPU_VRAM_USAGE_MB))
                 ui->combo_secondaryData->addItem(globalStuff::getNameOfValueID(ValueID::GPU_VRAM_USAGE_MB), QVariant::fromValue(ValueID::GPU_VRAM_USAGE_MB));
 
             break;
@@ -187,6 +193,19 @@ void Dialog_deineTopbarItem::on_btn_save_clicked()
         editedSchema.setSecondaryColor(ui->widget_secondaryColor->palette().background().color());
     }
 
+    if (ui->radio_pie->isChecked()) {
+        switch (static_cast<ValueID>(ui->combo_primaryData->currentData().toInt())) {
+            case ValueID::CLK_CORE:
+                editedSchema.pieMaxValue = gpuParams->maxCoreClock;
+                break;
+            case ValueID::CLK_MEM:
+                editedSchema.pieMaxValue = gpuParams->maxMemClock;
+                break;
+            default:
+                editedSchema.pieMaxValue = 100;
+                break;
+        }
+    }
 
     this->setResult(QDialog::Accepted);
     this->accept();

@@ -84,10 +84,10 @@
       </property>
       <layout class="QHBoxLayout" name="topbar_layout">
        <property name="spacing">
-        <number>10</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
         <number>0</number>

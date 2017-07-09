@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>687</width>
-    <height>130</height>
+    <height>135</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>0</width>
-    <height>130</height>
+    <height>135</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Topbar configuration</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">

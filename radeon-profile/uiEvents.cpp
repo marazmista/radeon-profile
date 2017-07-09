@@ -4,6 +4,7 @@
 
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
+#include "dialogs/dialog_topbarcfg.h"
 
 #include <QTimer>
 #include <QColorDialog>
@@ -392,4 +393,16 @@ void radeon_profile::pauseRefresh(bool checked)
 void radeon_profile::on_btn_general_clicked()
 {
     ui->btn_general->showMenu();
+}
+
+void radeon_profile::on_btn_configureTopbar_clicked()
+{
+    Dialog_topbarCfg *d = new Dialog_topbarCfg(topbarManager.schemas, device.gpuData.keys(), &device.getGpuConstParams(), this);
+
+    if (d->exec() == QDialog::Accepted) {
+        topbarManager.schemas = d->getCreatedSchemas();
+        topbarManager.createTopbar(ui->topbar_layout);
+    }
+
+    delete d;
 }

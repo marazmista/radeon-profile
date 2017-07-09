@@ -118,8 +118,8 @@ protected:
         chartView->setMinimumSize(0,0);
         chartView->setRenderHint(QPainter::Antialiasing);
 
-        primaryLabel.setContentsMargins(QMargins(0,18,5,0));
-        secondaryLabel.setContentsMargins(QMargins(0,43,5,0));
+        primaryLabel.setContentsMargins(QMargins(0,18,0,0));
+        secondaryLabel.setContentsMargins(QMargins(0,43,0,0));
         ui->grid->addWidget(chartView,0,0,Qt::AlignCenter);
         ui->grid->addWidget(&primaryLabel,0,0,Qt::AlignRight);
         ui->grid->addWidget(&secondaryLabel,0,0,Qt::AlignRight);

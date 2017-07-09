@@ -171,7 +171,7 @@ private:
     int timeRange = 150,
         rightGap = 10;
 
-    const int maxRange = 1800;
+    constexpr static int maxRange = 1800;
 
 public:
     QMap<QString, RPPlot*> plots;

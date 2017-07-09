@@ -697,9 +697,11 @@ bool dXorg::getIoctlAvailability() {
 
 void dXorg::figureOutConstParams() {
     if (ioctlHnd != nullptr && ioctlHnd->isValid()) {
-        ioctlHnd->getMaxCoreClock(&params.maxCoreClock);
-        ioctlHnd->getMaxMemoryClock(&params.maxMemClock);
+        ioctlHnd->getMaxClocks(&params.maxCoreClock, &params.maxMemClock);
         ioctlHnd->getVramSize(&params.VRAMSize);
+
+        params.maxCoreClock /= 1000;
+        params.maxMemClock = (params.maxMemClock == -1) ? -1 : params.maxMemClock / 1000;
         params.VRAMSize /= 1048576;
     }
 

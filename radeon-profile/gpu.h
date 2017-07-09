@@ -43,7 +43,6 @@ public:
     void getTemperature();
     void getPwmSpeed();
     void getGpuUsage();
-    void getConstParams();
 
     void changeGpu(int index);
     void setPowerProfile(PowerProfiles _newPowerProfile);

@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Topbar item</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
