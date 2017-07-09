@@ -378,7 +378,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="infoTab">
        <attribute name="title">
@@ -709,7 +709,7 @@
            <enum>QFrame::Raised</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="pagePlots">
            <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -902,6 +902,13 @@
                   <widget class="QCheckBox" name="cb_showLegends">
                    <property name="text">
                     <string>Show legend on plots</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkBox">
+                   <property name="text">
+                    <string>CheckBox</string>
                    </property>
                   </widget>
                  </item>

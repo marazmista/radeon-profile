@@ -178,20 +178,6 @@ void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
     timer->setInterval(arg1*1000);
 }
 
-void radeon_profile::on_cb_gpuData_clicked(bool checked)
-{
-    ui->cb_graphs->setEnabled(checked);
-    ui->cb_stats->setEnabled(checked);
-
-    if (ui->cb_stats->isChecked())
-        ui->tabs_systemInfo->setTabEnabled(3,checked);
-
-    if (!checked) {
-        ui->list_currentGPUData->clear();
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << tr("GPU data is disabled")));
-    }
-}
-
 void radeon_profile::refreshBtnClicked() {
     ui->list_glxinfo->clear();
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));

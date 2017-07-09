@@ -303,8 +303,7 @@ void radeon_profile::loadConfig() {
     if (plotManager.schemas.count() == 0)
         ui->stack_plots->setCurrentIndex(1);
 
-    if (topbarManager.schemas.count() == 0)
-        createDefaultTopbar();
+    topbarManager.setDefaultForeground(QWidget::palette().foreground().color());
 
     makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));
 }

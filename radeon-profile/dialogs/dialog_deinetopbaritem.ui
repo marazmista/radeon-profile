@@ -104,6 +104,8 @@
         <property name="font">
          <font>
           <pointsize>7</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="text">
@@ -119,6 +121,8 @@
         <property name="font">
          <font>
           <pointsize>7</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="text">
@@ -131,6 +135,8 @@
         <property name="font">
          <font>
           <pointsize>7</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="text">

@@ -75,7 +75,6 @@ private slots:
     void closeEvent(QCloseEvent *e);
     void closeFromTray();
     void on_spin_timerInterval_valueChanged(double arg1);
-    void on_cb_gpuData_clicked(bool checked);
     void refreshBtnClicked();
     void on_cb_stats_clicked(bool checked);
     void copyGlxInfoToClipboard();

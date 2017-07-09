@@ -94,10 +94,14 @@ void radeon_profile::initFutureHandler() {
     ui->centralWidget->setEnabled(true);
 
     createPlots();
+
+    if (topbarManager.schemas.count() == 0)
+        topbarManager.createDefaultTopbarSchema(device.gpuData.keys());
+
     topbarManager.createTopbar(ui->topbar_layout);
 
-    connectSignals();
     refreshUI();
+    connectSignals();
 }
 
 void radeon_profile::connectSignals()
@@ -122,37 +126,6 @@ void radeon_profile::setupUiElements()
     createGeneralMenu();
 
     ui->centralWidget->setEnabled(false);
-}
-
-
-void radeon_profile::createDefaultTopbar()
-{
-    if (device.gpuData.contains(ValueID::CLK_CORE)) {
-        TopbarItemDefinitionSchema tis(ValueID::CLK_CORE, TopbarItemType::LABEL_PAIR, this->palette().foreground().color());
-        tis.setSecondaryValueId(ValueID::CLK_MEM);
-        tis.setSecondaryColor(this->palette().foreground().color());
-        topbarManager.addSchema(tis);
-    }
-
-    if (device.gpuData.contains(ValueID::TEMPERATURE_CURRENT)) {
-        TopbarItemDefinitionSchema tis(ValueID::TEMPERATURE_CURRENT, TopbarItemType::LARGE_LABEL, this->palette().foreground().color());
-        topbarManager.addSchema(tis);
-    }
-
-    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
-        TopbarItemDefinitionSchema tis(ValueID::FAN_SPEED_PERCENT, TopbarItemType::PIE, Qt::blue);
-        topbarManager.addSchema(tis);
-    }
-
-    if (device.gpuData.contains(ValueID::GPU_USAGE_PERCENT)) {
-        TopbarItemDefinitionSchema tis(ValueID::GPU_USAGE_PERCENT, TopbarItemType::PIE, Qt::red);
-        topbarManager.addSchema(tis);
-    }
-
-    if (device.gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
-        TopbarItemDefinitionSchema tis(ValueID::GPU_VRAM_USAGE_PERCENT, TopbarItemType::PIE, Qt::yellow);
-        topbarManager.addSchema(tis);
-    }
 }
 
 void radeon_profile::addRuntimeWidgets() {

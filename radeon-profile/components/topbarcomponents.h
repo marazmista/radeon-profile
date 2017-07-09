@@ -55,7 +55,6 @@ public:
 
         QVBoxLayout *layout = new QVBoxLayout();
         layout->setContentsMargins(15,0,0,0);
-        layout->setSpacing(10);
         layout->addWidget(&labelTop);
         layout->addWidget(&labelBottom);
 
@@ -63,10 +62,6 @@ public:
         this->setMinimumHeight(60);
 
         itemWidget = this;
-    }
-
-    void init() {
-
     }
 
     void updateItemValue(const GPUDataContainer &data) {
@@ -198,9 +193,16 @@ struct TopbarItemDefinitionSchema {
 };
 
 class TopbarManager {
+private:
+    QColor defaultForeground;
+
 public:
     QList<TopbarItemDefinitionSchema> schemas;
     QList<TopbarItem*> items;
+
+    void setDefaultForeground(const QColor &c) {
+        defaultForeground = c;
+    }
 
     void createTopbar(QHBoxLayout *layout) {
         items.clear();
@@ -254,6 +256,34 @@ public:
             ti->updateItemValue(data);
     }
 
+    void createDefaultTopbarSchema(const QList<ValueID> &availableData) {
+        if (availableData.contains(ValueID::CLK_CORE)) {
+            TopbarItemDefinitionSchema tis(ValueID::CLK_CORE, TopbarItemType::LABEL_PAIR, defaultForeground);
+            tis.setSecondaryValueId(ValueID::CLK_MEM);
+            tis.setSecondaryColor(defaultForeground);
+            addSchema(tis);
+        }
+
+        if (availableData.contains(ValueID::TEMPERATURE_CURRENT)) {
+            TopbarItemDefinitionSchema tis(ValueID::TEMPERATURE_CURRENT, TopbarItemType::LARGE_LABEL, defaultForeground);
+            addSchema(tis);
+        }
+
+        if (availableData.contains(ValueID::FAN_SPEED_PERCENT)) {
+            TopbarItemDefinitionSchema tis(ValueID::FAN_SPEED_PERCENT, TopbarItemType::PIE, Qt::blue);
+            addSchema(tis);
+        }
+
+        if (availableData.contains(ValueID::GPU_USAGE_PERCENT)) {
+            TopbarItemDefinitionSchema tis(ValueID::GPU_USAGE_PERCENT, TopbarItemType::PIE, Qt::red);
+            addSchema(tis);
+        }
+
+        if (availableData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
+            TopbarItemDefinitionSchema tis(ValueID::GPU_VRAM_USAGE_PERCENT, TopbarItemType::PIE, Qt::yellow);
+            addSchema(tis);
+        }
+    }
 };
 
 
