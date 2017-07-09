@@ -33,6 +33,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("graphOffset", ui->cb_plotsRightGap->isChecked());
     settings.setValue("graphRange",ui->slider_timeRange->value());
     settings.setValue("showLegend",ui->cb_showLegends->isChecked());
+    settings.setValue("plotsBackgroundColor", ui->frame_plotsBackground->palette().background().color().name());
+    settings.setValue("setCommonPlotsBg", ui->cb_overridePlotsBg->isChecked());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
     settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
@@ -223,6 +225,12 @@ void radeon_profile::loadConfig() {
 
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
 
+    ui->frame_plotsBackground->setAutoFillBackground(true);
+    ui->frame_plotsBackground->setPalette(QPalette(QColor(settings.value("plotsBackgroundColor","#808080").toString())));
+    ui->cb_overridePlotsBg->setChecked(settings.value("setCommonPlotsBg", false).toBool());
+    ui->btn_setPlotsBackground->setEnabled(ui->cb_overridePlotsBg->isChecked());
+    ui->frame_plotsBackground->setVisible(ui->cb_overridePlotsBg->isChecked());
+
     globalStuff::globalConfig.daemonData = ui->cb_daemonData->isChecked();
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
@@ -376,7 +384,7 @@ void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
     ui->list_plotDefinitions->addTopLevelItem(item);
 }
 
-void radeon_profile::loadTopbarItemsSchemas(QXmlStreamReader &xml) {
+void radeon_profile::loadTopbarItemsSchemas(const QXmlStreamReader &xml) {
     TopbarItemDefinitionSchema tis(static_cast<ValueID>(xml.attributes().value("primaryValueId").toInt()),
                                    static_cast<TopbarItemType>(xml.attributes().value("type").toInt()),
                                    QColor(xml.attributes().value("primaryColor").toString()));

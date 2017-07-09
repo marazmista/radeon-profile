@@ -19,8 +19,14 @@ void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
 {
     plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
 
-    for (const QString &pk : plotManager.plots.keys())
+    for (const QString &pk : plotManager.plots.keys()) {
         plotManager.plots[pk]->showLegend(ui->cb_showLegends->isChecked());
+
+        if (ui->cb_overridePlotsBg->isChecked())
+            plotManager.setPlotBackground(pk, ui->frame_plotsBackground->palette().background().color());
+        else
+            plotManager.setPlotBackground(pk, plotManager.schemas.value(pk).background);
+    }
 
     ui->stack_plots->setCurrentIndex(0);
 }
@@ -61,8 +67,7 @@ void radeon_profile::on_btn_addPlotDefinition_clicked()
 
 
         plotManager.addSchema(pds);
-        plotManager.createPlotFromSchema(pds.name, figureOutInitialScale(pds));
-        ui->pagePlots->layout()->addWidget(plotManager.plots.value(pds.name));
+        setupPlot(pds);
     }
 
     delete d;
@@ -84,6 +89,9 @@ void radeon_profile::setupPlot(const PlotDefinitionSchema &pds)
 {
     plotManager.createPlotFromSchema(pds.name, figureOutInitialScale(pds));
     plotManager.plots[pds.name]->showLegend(ui->cb_showLegends->isChecked());
+
+    if (ui->cb_overridePlotsBg->isChecked())
+        plotManager.setPlotBackground(pds.name, ui->frame_plotsBackground->palette().background().color());
 
     ui->pagePlots->layout()->addWidget(plotManager.plots.value(pds.name));
 }
@@ -141,4 +149,17 @@ void radeon_profile::on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, 
         default:
             return;
     }
+}
+
+QColor getColor(const QColor &c) {
+    QColor color = QColorDialog::getColor(c);
+    if (color.isValid())
+        return color;
+
+    return c;
+}
+
+void radeon_profile::on_btn_setPlotsBackground_clicked()
+{
+    ui->frame_plotsBackground->setPalette(QPalette(getColor(ui->frame_plotsBackground->palette().background().color())));
 }

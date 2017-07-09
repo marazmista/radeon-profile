@@ -62,9 +62,6 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
-    <widget class="QWidget" name="widget_primaryColor" native="true"/>
-   </item>
    <item row="4" column="0" colspan="4">
     <widget class="Line" name="line">
      <property name="orientation">
@@ -147,9 +144,6 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="3">
-    <widget class="QWidget" name="widget_secondaryColor" native="true"/>
-   </item>
    <item row="2" column="2">
     <widget class="QLabel" name="label_2">
      <property name="font">
@@ -196,6 +190,26 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="1" column="3">
+    <widget class="QFrame" name="frame_primaryColor">
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="QFrame" name="frame_secondaryColor">
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

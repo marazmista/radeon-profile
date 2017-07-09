@@ -142,6 +142,7 @@ private slots:
     void on_slider_freqMclk_valueChanged(int value);
     void on_group_freq_toggled(bool arg1);
     void on_btn_configureTopbar_clicked();
+    void on_btn_setPlotsBackground_clicked();
 
 private:
     struct currentStateInfo {
@@ -212,7 +213,7 @@ private:
     void savePlotSchemas(QXmlStreamWriter &xml);
     void loadPlotSchemas(QXmlStreamReader &xml);
     void saveTopbarItemsSchemas(QXmlStreamWriter &xml);
-    void loadTopbarItemsSchemas(QXmlStreamReader &xml);
+    void loadTopbarItemsSchemas(const QXmlStreamReader &xml);
     void writePlotAxisSchemaToXml(QXmlStreamWriter &xml, const QString side, const PlotAxisSchema &pas);
     void loadPlotAxisSchema(const QXmlStreamReader &xml, PlotAxisSchema &pas);
     void createDefaultFanProfile();

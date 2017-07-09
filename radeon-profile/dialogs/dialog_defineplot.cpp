@@ -28,10 +28,10 @@ void Dialog_definePlot::setEditedPlotSchema(const PlotDefinitionSchema &pds) {
     on_cb_enableLeftScale_clicked(schema.left.enabled);
     on_cb_enableRightScale_clicked(schema.right.enabled);
 
-    ui->widget_background->setPalette(QPalette(schema.background));
-    ui->widget_leftGridColor->setPalette(QPalette(schema.left.penGrid.color()));
+    ui->frame_background->setPalette(QPalette(schema.background));
+    ui->frame_leftGridColor->setPalette(QPalette(schema.left.penGrid.color()));
     ui->slider_thickLeft->setValue(schema.left.penGrid.width());
-    ui->widget_rightGridColor->setPalette(QPalette(schema.right.penGrid.color()));
+    ui->frame_rightGridColor->setPalette(QPalette(schema.right.penGrid.color()));
     ui->slider_thickRight->setValue(schema.right.penGrid.width());
 
     ui->slider_ticksLeft->setValue(schema.left.ticks);
@@ -70,9 +70,9 @@ void Dialog_definePlot::init() {
     ui->list_rightData->header()->resizeSection(0, 180);
     ui->list_leftData->header()->resizeSection(1, 20);
     ui->list_rightData->header()->resizeSection(1, 20);
-    ui->widget_rightGridColor->setAutoFillBackground(true);
-    ui->widget_leftGridColor->setAutoFillBackground(true);
-    ui->widget_background->setAutoFillBackground(true);
+    ui->frame_rightGridColor->setAutoFillBackground(true);
+    ui->frame_leftGridColor->setAutoFillBackground(true);
+    ui->frame_background->setAutoFillBackground(true);
 }
 
 void Dialog_definePlot::createStyleCombo(QComboBox *combo) {
@@ -115,18 +115,18 @@ void Dialog_definePlot::on_list_leftData_itemDoubleClicked(QTreeWidgetItem *item
 
 void Dialog_definePlot::on_btn_setBackground_clicked()
 {
-    ui->widget_background->setPalette(QPalette(getColor(ui->widget_background->palette().background().color())));
+    ui->frame_background->setPalette(QPalette(getColor(ui->frame_background->palette().background().color())));
 
 }
 
 void Dialog_definePlot::on_btn_leftScaleColor_clicked()
 {
-    ui->widget_leftGridColor->setPalette(QPalette(getColor(ui->widget_leftGridColor->palette().background().color())));
+    ui->frame_leftGridColor->setPalette(QPalette(getColor(ui->frame_leftGridColor->palette().background().color())));
 }
 
 void Dialog_definePlot::on_btn_rightScaleColor_clicked()
 {
-    ui->widget_rightGridColor->setPalette(QPalette(getColor(ui->widget_rightGridColor->palette().background().color())));
+    ui->frame_rightGridColor->setPalette(QPalette(getColor(ui->frame_rightGridColor->palette().background().color())));
 }
 
 void Dialog_definePlot::on_list_rightData_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -191,7 +191,7 @@ void Dialog_definePlot::on_btn_save_clicked()
         return;
     }
 
-    schema.background = ui->widget_background->palette().background().color();
+    schema.background = ui->frame_background->palette().background().color();
     schema.name = ui->line_name->text();
     schema.left.enabled = ui->cb_enableLeftScale->isChecked();
     schema.right.enabled = ui->cb_enableRightScale->isChecked();
@@ -209,11 +209,11 @@ void Dialog_definePlot::on_btn_save_clicked()
     else
         schema.right.enabled = false;
 
-    schema.left.penGrid = QPen(ui->widget_leftGridColor->palette().background().color(),
+    schema.left.penGrid = QPen(ui->frame_leftGridColor->palette().background().color(),
                               ui->slider_thickLeft->value(),
                               static_cast<Qt::PenStyle>(ui->combo_leftScaleStyle->currentData().toInt()));
 
-    schema.right.penGrid = QPen(ui->widget_rightGridColor->palette().background().color(),
+    schema.right.penGrid = QPen(ui->frame_rightGridColor->palette().background().color(),
                               ui->slider_thickRight->value(),
                               static_cast<Qt::PenStyle>(ui->combo_rightScaleStyle->currentData().toInt()));
 

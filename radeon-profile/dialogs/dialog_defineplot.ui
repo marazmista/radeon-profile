@@ -73,9 +73,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QWidget" name="widget_rightGridColor" native="true"/>
-    </item>
     <item row="3" column="1">
      <widget class="QSlider" name="slider_ticksRight">
       <property name="minimum">
@@ -160,11 +157,21 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="1">
+     <widget class="QFrame" name="frame_rightGridColor">
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
    <zorder>list_rightData</zorder>
    <zorder>label_5</zorder>
    <zorder>btn_rightScaleColor</zorder>
-   <zorder>widget_rightGridColor</zorder>
+   <zorder>frame_rightGridColor</zorder>
    <zorder>combo_rightScaleStyle</zorder>
    <zorder>slider_thickRight</zorder>
    <zorder>slider_ticksRight</zorder>
@@ -234,9 +241,6 @@
     </item>
     <item row="1" column="0">
      <widget class="QComboBox" name="combo_leftScaleStyle"/>
-    </item>
-    <item row="0" column="1">
-     <widget class="QWidget" name="widget_leftGridColor" native="true"/>
     </item>
     <item row="2" column="1">
      <widget class="QLabel" name="label_6">
@@ -309,6 +313,16 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="1">
+     <widget class="QFrame" name="frame_leftGridColor">
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QCheckBox" name="cb_enableLeftScale">
@@ -363,7 +377,7 @@
     <string>Plot name:</string>
    </property>
   </widget>
-  <widget class="QWidget" name="widget_background" native="true">
+  <widget class="QFrame" name="frame_background">
    <property name="geometry">
     <rect>
      <x>490</x>
@@ -372,7 +386,12 @@
      <height>20</height>
     </rect>
    </property>
-   <layout class="QGridLayout" name="gridLayout_2"/>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
   </widget>
   <widget class="QLineEdit" name="line_name">
    <property name="geometry">
