@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20170703
+#define appVersion 20170709
 
 namespace Ui {
 class radeon_profile;

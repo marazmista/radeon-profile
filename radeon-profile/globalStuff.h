@@ -230,12 +230,13 @@ struct DeviceFilePaths {
 };
 
 struct HwmonAttributes {
-    QString temp1, pwm1, pwm1_enable, pwm1_max, fan1_input;
+    QString temp1, temp1_crit, pwm1, pwm1_enable, pwm1_max, fan1_input;
 
     HwmonAttributes() { }
 
     HwmonAttributes(const QString &hwmonPath) {
         temp1 = hwmonPath + "/temp1_input";
+        temp1_crit = hwmonPath + "/temp1_crit";
         pwm1 = hwmonPath + "/pwm1";
         pwm1_enable = hwmonPath + "/pwm1_enable";
         pwm1_max = hwmonPath + "/pwm1_max";
@@ -243,6 +244,9 @@ struct HwmonAttributes {
 
         if (!QFile::exists(temp1))
             temp1 = "";
+
+        if (!QFile::exists(temp1_crit))
+            temp1_crit = "";
 
         if (!QFile::exists(pwm1_enable))
             pwm1 = pwm1_enable = pwm1_max = "";
@@ -266,7 +270,7 @@ struct GPUUsage {
 };
 
 struct GPUConstParams {
-     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1;
+     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1, temp1_crit = -1;
      long VRAMSize = -1;
 };
 

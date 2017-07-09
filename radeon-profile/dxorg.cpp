@@ -705,13 +705,23 @@ void dXorg::figureOutConstParams() {
         params.VRAMSize /= 1048576;
     }
 
-    if (hwmonAttributes.pwm1_max.isEmpty())
-        return;
+    if (!hwmonAttributes.temp1_crit.isEmpty()) {
 
-    QFile fPwmMax(hwmonAttributes.pwm1_max);
-    if (fPwmMax.open(QIODevice::ReadOnly)) {
-        params.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
-        fPwmMax.close();
+        QFile f(hwmonAttributes.temp1_crit);
+        if (f.open(QIODevice::ReadOnly)) {
+            params.temp1_crit = f.readLine(7).toInt() / 1000;
+            f.close();
+        }
+    }
+
+
+    if (!hwmonAttributes.pwm1_max.isEmpty()) {
+
+        QFile f(hwmonAttributes.pwm1_max);
+        if (f.open(QIODevice::ReadOnly)) {
+            params.pwmMaxSpeed = f.readLine(4).toInt();
+            f.close();
+        }
     }
 }
 
