@@ -33,6 +33,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("graphOffset", ui->cb_plotsRightGap->isChecked());
     settings.setValue("graphRange",ui->slider_timeRange->value());
     settings.setValue("showLegend",ui->cb_showLegends->isChecked());
+    settings.setValue("plotsBackgroundColor", ui->frame_plotsBackground->palette().background().color().name());
+    settings.setValue("setCommonPlotsBg", ui->cb_overridePlotsBg->isChecked());
     settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
     settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
     settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
@@ -61,6 +63,7 @@ void radeon_profile::saveConfig() {
     saveExecProfiles(xml);
     saveFanProfiles(xml);
     savePlotSchemas(xml);
+    saveTopbarItemsSchemas(xml);
 
     xml.writeEndElement();
     xml.writeEndDocument();
@@ -170,6 +173,24 @@ void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
     xml.writeEndElement();
 }
 
+void radeon_profile::saveTopbarItemsSchemas(QXmlStreamWriter &xml) {
+    xml.writeStartElement("TopbarItems");
+
+    for (const TopbarItemDefinitionSchema &tis : topbarManager.schemas) {
+        xml.writeStartElement("topbarItem");
+
+        xml.writeAttribute("type", QString::number(tis.type));
+        xml.writeAttribute("primaryValueId", QString::number(tis.primaryValueId));
+        xml.writeAttribute("primaryColor", tis.primaryColor.name());
+        xml.writeAttribute("secondaryValueIdEnabled", QString::number(tis.secondaryValueIdEnabled));
+        xml.writeAttribute("secondaryValueId", QString::number(tis.secondaryValueId));
+        xml.writeAttribute("secondaryColor", tis.secondaryColor.name());
+        xml.writeAttribute("pieMaxValue", QString::number(tis.pieMaxValue));
+
+        xml.writeEndElement();
+    }
+    xml.writeEndElement();
+}
 
 void radeon_profile::loadConfig() {
     QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
@@ -203,6 +224,12 @@ void radeon_profile::loadConfig() {
     ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
 
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
+
+    ui->frame_plotsBackground->setAutoFillBackground(true);
+    ui->frame_plotsBackground->setPalette(QPalette(QColor(settings.value("plotsBackgroundColor","#808080").toString())));
+    ui->cb_overridePlotsBg->setChecked(settings.value("setCommonPlotsBg", false).toBool());
+    ui->btn_setPlotsBackground->setEnabled(ui->cb_overridePlotsBg->isChecked());
+    ui->frame_plotsBackground->setVisible(ui->cb_overridePlotsBg->isChecked());
 
     globalStuff::globalConfig.daemonData = ui->cb_daemonData->isChecked();
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
@@ -265,16 +292,16 @@ void radeon_profile::loadConfig() {
                     loadPlotSchemas(xml);
                     continue;
                 }
+
+                if (xml.name().toString() == "topbarItem") {
+                    loadTopbarItemsSchemas(xml);
+                    continue;
+                }
             }
         }
+
         f.close();
     }
-
-    // legacy load
-    loadExecProfiles();
-
-    // legacy load
-    loadFanProfiles();
 
     // create default if empty
     if (ui->combo_fanProfiles->count() == 0)
@@ -283,6 +310,8 @@ void radeon_profile::loadConfig() {
     // create plots from xml config
     if (plotManager.schemas.count() == 0)
         ui->stack_plots->setCurrentIndex(1);
+
+    topbarManager.setDefaultForeground(QWidget::palette().foreground().color());
 
     makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));
 }
@@ -355,6 +384,21 @@ void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
     ui->list_plotDefinitions->addTopLevelItem(item);
 }
 
+void radeon_profile::loadTopbarItemsSchemas(const QXmlStreamReader &xml) {
+    TopbarItemDefinitionSchema tis(static_cast<ValueID>(xml.attributes().value("primaryValueId").toInt()),
+                                   static_cast<TopbarItemType>(xml.attributes().value("type").toInt()),
+                                   QColor(xml.attributes().value("primaryColor").toString()));
+
+    tis.setPieMaxValue(xml.attributes().value("pieMaxValue").toInt());
+
+    if (xml.attributes().value("secondaryValueIdEnabled").toInt() == 1) {
+        tis.setSecondaryColor(QColor(xml.attributes().value("secondaryColor").toString()));
+        tis.setSecondaryValueId(static_cast<ValueID>(xml.attributes().value("secondaryValueId").toInt()));
+    }
+
+    topbarManager.addSchema(tis);
+}
+
 void radeon_profile::loadExecProfile(const QXmlStreamReader &xml) {
     QTreeWidgetItem *item = new QTreeWidgetItem();
 
@@ -382,50 +426,6 @@ void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
             ui->combo_fanProfiles->addItem(fpName);
             return;
         }
-    }
-}
-
-// legacy load fan profiles
-void radeon_profile::loadFanProfiles() {
-    QFile fsPath(QDir::homePath() + "/.radeon-profile-fanSteps");
-
-    if (fsPath.open(QIODevice::ReadOnly) && ui->combo_fanProfiles->count() == 0) {
-        QStringList profiles = QString(fsPath.readAll()).trimmed().split('\n',QString::SkipEmptyParts);
-
-        for (QString profileLine : profiles) {
-            QStringList profileData = profileLine.split("|",QString::SkipEmptyParts);
-
-            fanProfileSteps p;
-
-            for (int i = 1; i < profileData.count(); ++i) {
-                QStringList pair = profileData[i].split("#");
-                p.insert(pair[0].toInt(),pair[1].toInt());
-            }
-
-
-            ui->combo_fanProfiles->addItem(profileData[0]);
-            fanProfiles.insert(profileData[0], p);
-        }
-        // remove old file
-        fsPath.remove();
-        fsPath.close();
-    }
-}
-
-// legacy load
-void radeon_profile::loadExecProfiles()
-{
-    QFile ef(QDir::homePath() + "/.radeon-profile-execProfiles");
-    if (ef.open(QIODevice::ReadOnly) && ui->list_execProfiles->topLevelItemCount() == 0) {
-        QStringList profiles = QString(ef.readAll()).split('\n');
-
-        for (int i=0;i < profiles.count(); i++) {
-            if (!profiles[i].isEmpty())
-                ui->list_execProfiles->addTopLevelItem(new QTreeWidgetItem(QStringList() << profiles[i].split("###")));
-        }
-        // remove old file
-        ef.remove();
-        ef.close();
     }
 }
 

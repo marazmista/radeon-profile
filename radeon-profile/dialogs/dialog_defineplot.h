@@ -23,28 +23,17 @@ public:
     ~Dialog_definePlot();
 
 private slots:
-
-    void on_buttonBox_accepted();
-
     void on_list_leftData_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
     void on_btn_setBackground_clicked();
-
     void on_btn_leftScaleColor_clicked();
-
     void on_btn_rightScaleColor_clicked();
-
     void on_list_rightData_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
-    void on_buttonBox_rejected();
-
     void on_cb_enableLeftScale_clicked(bool checked);
-
     void on_cb_enableRightScale_clicked(bool checked);
-
     void on_list_leftData_itemChanged(QTreeWidgetItem *item, int column);
-
     void on_list_rightData_itemChanged(QTreeWidgetItem *item, int column);
+    void on_btn_save_clicked();
+    void on_btn_cancel_clicked();
 
 private:
     Ui::Dialog_definePlot *ui;

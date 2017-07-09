@@ -71,7 +71,8 @@ bool radeonIoctlHandler::getMaxMemoryClock(int *data) const {
 
 
 bool radeonIoctlHandler::getMaxClocks(int *core, int *memory) const {
-    return ((memory == NULL) || getMaxMemoryClock(memory)) && ((core == NULL) || getMaxCoreClock(core));
+    *memory = -1;
+    return getMaxCoreClock(core);
 }
 
 
@@ -83,12 +84,6 @@ bool radeonIoctlHandler::getMemoryClock(int *data) const {
     Q_UNUSED(data);
 #endif
 }
-
-
-bool radeonIoctlHandler::getClocks(int *core, int *memory) const {
-    return ((core == NULL) || getCoreClock(core)) && ((memory == NULL) || getMemoryClock(memory));
-}
-
 
 bool radeonIoctlHandler::getVramUsage(long *data) const {
 #ifdef RADEON_INFO_VRAM_USAGE

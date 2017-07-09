@@ -17,9 +17,8 @@
 
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
-#include "dialog_defineplot.h"
+#include "dialogs/dialog_defineplot.h"
 #include "components/topbarcomponents.h"
-#include "dialog_topbarcfg.h"
 
 #include <QTimer>
 #include <QTextStream>
@@ -79,7 +78,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     // timer init
     timer = new QTimer(this);
-    timer->setInterval(ui->spin_timerInterval->value()*1000);
+    timer->setInterval(ui->spin_timerInterval->value() * 1000);
     timer->start();
 
     showWindow();
@@ -94,12 +93,15 @@ void radeon_profile::initFutureHandler() {
     setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
     ui->centralWidget->setEnabled(true);
 
-    createTopBar();
-    plotManager.createPlotsFromSchemas(device.gpuData);
-    addPlotsToLayout();
+    createPlots();
 
-    connectSignals();
+    if (topbarManager.schemas.count() == 0)
+        topbarManager.createDefaultTopbarSchema(device.gpuData.keys());
+
+    topbarManager.createTopbar(ui->topbar_layout);
+
     refreshUI();
+    connectSignals();
 }
 
 void radeon_profile::connectSignals()
@@ -124,62 +126,6 @@ void radeon_profile::setupUiElements()
     createGeneralMenu();
 
     ui->centralWidget->setEnabled(false);
-}
-
-
-void radeon_profile::createTopBar()
-{
-    if (device.gpuData.contains(ValueID::CLK_CORE)) {
-        TopBarItem *l = new LabelItem(ValueID::CLK_CORE, TopBarItemType::LABLEL, this);
-        ui->grid_topbar->addWidget(l->itemWidget,0,0,1,1,Qt::AlignLeft);
-        topBarItems.append(l);
-    }
-
-    if (device.gpuData.contains(ValueID::CLK_MEM)) {
-        TopBarItem *l = new LabelItem(ValueID::CLK_MEM, TopBarItemType::LABLEL, this);
-        ui->grid_topbar->addWidget(l->itemWidget,1,0,1,1,Qt::AlignLeft);
-        topBarItems.append(l);
-    }
-
-    if (device.gpuData.contains(ValueID::VOLT_CORE)) {
-        TopBarItem *l = new LabelItem(ValueID::VOLT_CORE, TopBarItemType::LABLEL, this);
-        ui->grid_topbar->addWidget(l->itemWidget,0,1,1,1,Qt::AlignLeft);
-        topBarItems.append(l);
-    }
-
-    if (device.gpuData.contains(ValueID::VOLT_MEM)) {
-        TopBarItem *l = new LabelItem(ValueID::VOLT_MEM, TopBarItemType::LABLEL, this);
-        ui->grid_topbar->addWidget(l->itemWidget,1,1,1,1,Qt::AlignLeft);
-        topBarItems.append(l);
-    }
-
-    if (device.gpuData.contains(ValueID::TEMPERATURE_CURRENT)) {
-        TopBarItem *l = new LabelItem(ValueID::TEMPERATURE_CURRENT, TopBarItemType::LARGE_LABEL, this);
-
-        ui->grid_topbar->addWidget(l->itemWidget,0,2,2,1,Qt::AlignLeft);
-        topBarItems.append(l);
-    }
-
-    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
-        TopBarItem *pie = new PieItem(100, ValueID::FAN_SPEED_PERCENT, Qt::blue, this);
-        ui->grid_topbar->addWidget(pie->itemWidget,0,3,2,1,Qt::AlignLeft);
-        topBarItems.append(pie);
-    }
-
-    if (device.gpuData.contains(ValueID::GPU_USAGE_PERCENT)) {
-        TopBarItem *pie = new PieItem(100, ValueID::GPU_USAGE_PERCENT, Qt::red, this);
-        ui->grid_topbar->addWidget(pie->itemWidget,0,4,2,1,Qt::AlignLeft);
-        topBarItems.append(pie);
-    }
-
-    if (device.gpuData.contains(ValueID::GPU_VRAM_USAGE_PERCENT)) {
-        TopBarItem *pie = new PieItem(100, ValueID::GPU_VRAM_USAGE_PERCENT, Qt::yellow, this);
-        static_cast<PieProgressBar*>(pie->itemWidget)->setSecondLabelSource(ValueID::GPU_VRAM_USAGE_MB);
-        ui->grid_topbar->addWidget(pie->itemWidget,0,5,2,1,Qt::AlignLeft);
-        topBarItems.append(pie);
-    }
-
-    ui->grid_topbar->setColumnStretch(ui->grid_topbar->columnCount()-1, 1);
 }
 
 void radeon_profile::addRuntimeWidgets() {
@@ -346,14 +292,13 @@ void radeon_profile::refreshGpuData() {
     device.getPwmSpeed();
 }
 
-void radeon_profile::addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
+void radeon_profile::addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
     parent->addTopLevelItem(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
 }
 
 void radeon_profile::refreshUI() {
     // refresh top bar
-    for (TopBarItem *tbi : topBarItems)
-        tbi->updateItemValue(device.gpuData);
+    topbarManager.updateItems(device.gpuData);
 
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
@@ -395,8 +340,7 @@ void radeon_profile::createCurrentGpuDataListItems()
                 device.gpuData.keys().at(i) == ValueID::TEMPERATURE_MIN)
             continue;
 
-        QString name = globalStuff::getNameOfValueID(device.gpuData.keys().at(i));
-        addChild(ui->list_currentGPUData, name.left(name.lastIndexOf(" ")), "");
+        addTreeWidgetItem(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
         keysInCurrentGpuList.insert(ui->list_currentGPUData->topLevelItemCount() - 1, device.gpuData.keys().at(i));
     }
 }
@@ -504,9 +448,9 @@ void radeon_profile::doTheStats() {
     // figure out pm level based on data provided
     QString pmLevelName = "Core: " + device.gpuData.value(ValueID::CLK_CORE).strValue + "  Mem: " + device.gpuData.value(ValueID::CLK_MEM).strValue;
 
-    if (pmStats.contains(pmLevelName)) // This power level already exists, increment its count
+    if (pmStats.contains(pmLevelName))
         pmStats[pmLevelName]++;
-    else { // This power level does not exist, create it
+    else {
         pmStats.insert(pmLevelName, 1);
         ui->list_stats->addTopLevelItem(new QTreeWidgetItem(QStringList() << pmLevelName));
         ui->list_stats->header()->resizeSections(QHeaderView::ResizeToContents);
@@ -515,8 +459,8 @@ void radeon_profile::doTheStats() {
 
 void radeon_profile::updateStatsTable() {
     // do the math with percents
-    for (QTreeWidgetItemIterator item(ui->list_stats); *item; item++) // For each item in list_stats
-        (*item)->setText(1,QString::number(pmStats.value((*item)->text(0))*100.0/statsTickCounter)+"%");
+    for (QTreeWidgetItemIterator item(ui->list_stats); *item; item++)
+        (*item)->setText(1,QString::number(pmStats.value((*item)->text(0)) * 100.0 / statsTickCounter) + "%");
 }
 
 void radeon_profile::refreshTooltip()
@@ -543,16 +487,4 @@ void radeon_profile::showWindow() {
         this->showMinimized();
     else
         this->showNormal();
-}
-
-void radeon_profile::on_btn_configureTopbar_clicked()
-{
-    Dialog_topbarCfg *d = new Dialog_topbarCfg(this);
-
-    if (d->exec()) {
-
-
-
-    }
-    delete d;
 }

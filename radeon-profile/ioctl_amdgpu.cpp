@@ -121,7 +121,7 @@ bool amdgpuIoctlHandler::getMemoryClock(int *data) const {
 }
 
 
-bool amdgpuIoctlHandler::getClocks(int *core, int *memory) const {
+bool amdgpuIoctlHandler::getVceClocks(int *core, int *memory) const {
 #ifdef AMDGPU_INFO_VCE_CLOCK_TABLE // Linux >= 4.10
     struct drm_amdgpu_info_vce_clock_table table = {};
     bool success = getValue(&table, sizeof(table), AMDGPU_INFO_VCE_CLOCK_TABLE) && (table.num_valid_entries > 0);

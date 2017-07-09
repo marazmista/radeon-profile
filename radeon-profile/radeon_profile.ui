@@ -82,9 +82,12 @@
         <height>60</height>
        </size>
       </property>
-      <layout class="QGridLayout" name="grid_topbar">
+      <layout class="QHBoxLayout" name="topbar_layout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
         <number>0</number>
@@ -94,12 +97,6 @@
        </property>
        <property name="bottomMargin">
         <number>0</number>
-       </property>
-       <property name="horizontalSpacing">
-        <number>10</number>
-       </property>
-       <property name="verticalSpacing">
-        <number>2</number>
        </property>
       </layout>
      </widget>
@@ -860,55 +857,60 @@
                 </column>
                </widget>
               </item>
-              <item row="5" column="2">
-               <spacer name="horizontalSpacer_8">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="1" column="2" rowspan="3">
+              <item row="1" column="2" rowspan="4">
                <widget class="QGroupBox" name="groupBox">
                 <property name="title">
                  <string>General plots settings</string>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_24">
-                 <property name="spacing">
+                <layout class="QGridLayout" name="gridLayout_18">
+                 <property name="leftMargin">
                   <number>5</number>
                  </property>
-                 <property name="leftMargin">
-                  <number>3</number>
-                 </property>
                  <property name="topMargin">
-                  <number>3</number>
+                  <number>5</number>
                  </property>
                  <property name="rightMargin">
-                  <number>3</number>
+                  <number>5</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>3</number>
+                  <number>5</number>
                  </property>
-                 <item>
-                  <widget class="QCheckBox" name="cb_plotsRightGap">
+                 <property name="horizontalSpacing">
+                  <number>5</number>
+                 </property>
+                 <item row="3" column="1">
+                  <widget class="QPushButton" name="btn_setPlotsBackground">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="text">
-                    <string>Gap on the right side of plot</string>
+                    <string>Set color</string>
                    </property>
                   </widget>
                  </item>
-                 <item>
-                  <widget class="QCheckBox" name="cb_showLegends">
-                   <property name="text">
-                    <string>Show legend on plots</string>
+                 <item row="3" column="2">
+                  <widget class="QFrame" name="frame_plotsBackground">
+                   <property name="minimumSize">
+                    <size>
+                     <width>50</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>50</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::Box</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
                    </property>
                   </widget>
                  </item>
-                 <item>
+                 <item row="4" column="1">
                   <spacer name="verticalSpacer_7">
                    <property name="orientation">
                     <enum>Qt::Vertical</enum>
@@ -920,6 +922,43 @@
                     </size>
                    </property>
                   </spacer>
+                 </item>
+                 <item row="3" column="0">
+                  <spacer name="horizontalSpacer_5">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Expanding</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="2" column="0" colspan="3">
+                  <widget class="QCheckBox" name="cb_overridePlotsBg">
+                   <property name="text">
+                    <string>Override individual plots background</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0" colspan="3">
+                  <widget class="QCheckBox" name="cb_showLegends">
+                   <property name="text">
+                    <string>Show legend on plots</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0" colspan="3">
+                  <widget class="QCheckBox" name="cb_plotsRightGap">
+                   <property name="text">
+                    <string>Gap on the right side of plot</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -3404,7 +3443,7 @@
                   <item>
                    <widget class="QPushButton" name="btn_configureTopbar">
                     <property name="enabled">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                     <property name="minimumSize">
                      <size>
@@ -3414,12 +3453,12 @@
                     </property>
                     <property name="maximumSize">
                      <size>
-                      <width>250</width>
+                      <width>200</width>
                       <height>16777215</height>
                      </size>
                     </property>
                     <property name="text">
-                     <string>Configure top bar (not available yet)</string>
+                     <string>Configure top bar</string>
                     </property>
                    </widget>
                   </item>
@@ -4048,5 +4087,38 @@
  <resources>
   <include location="radeon-resource.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cb_overridePlotsBg</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btn_setPlotsBackground</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>606</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>766</x>
+     <y>227</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_overridePlotsBg</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frame_plotsBackground</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>708</x>
+     <y>195</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>866</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

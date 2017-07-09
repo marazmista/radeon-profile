@@ -50,30 +50,33 @@ void gpu::detectCards() {
     for (char i = 0; i < out.count(); i++) {
         QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
 
-        if (f.open(QIODevice::ReadOnly)) {
-            QString line = f.readLine(50).trimmed();
+        if (!f.open(QIODevice::ReadOnly))
+            continue;
 
-            if (line == "DRIVER=radeon") {
-                GPUSysInfo gsi;
-                gsi.driverModuleString = "radeon";
-                gsi.module = DriverModule::RADEON;
-                gsi.sysName = out[i];
 
-                gpuList.append(gsi);
+        QString line = f.readLine(50).trimmed();
 
-                continue;
-            }
+        if (line == "DRIVER=radeon") {
+            GPUSysInfo gsi;
+            gsi.driverModuleString = "radeon";
+            gsi.module = DriverModule::RADEON;
+            gsi.sysName = out[i];
 
-            if (line == "DRIVER=amdgpu") {
-                GPUSysInfo gsi;
-                gsi.driverModuleString = "amdgpu";
-                gsi.module = DriverModule::AMDGPU;
-                gsi.sysName = out[i];
+            gpuList.append(gsi);
 
-                gpuList.append(gsi);
+            continue;
+        }
 
-                continue;
-            }
+        if (line == "DRIVER=amdgpu") {
+            GPUSysInfo gsi;
+            gsi.driverModuleString = "amdgpu";
+            gsi.module = DriverModule::AMDGPU;
+            gsi.sysName = out[i];
+
+            gpuList.append(gsi);
+
+            continue;
+
         }
     }
 }
@@ -277,7 +280,7 @@ const GPUConstParams& gpu::getGpuConstParams() {
     return driverHandler->params;
 }
 
-const DeviceFilePaths &gpu::getDriverFiles() {
+const DeviceFilePaths& gpu::getDriverFiles() {
     return driverHandler->driverFiles;
 }
 

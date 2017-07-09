@@ -116,7 +116,8 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     driverFiles.debugfs_pm_info = "/sys/kernel/debug/dri/" + gpuName.right(1) + "/"+features.sysInfo.driverModuleString + "_pm_info"; // this path contains only index
     driverFiles.sysFs = DeviceSysFs(devicePath);
 
-    QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0]; // look for hwmon devices in card dir
+    // look for hwmon devices in card dir
+    QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0];
 
     hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0" : hwmonDevicePath));
 
@@ -696,19 +697,31 @@ bool dXorg::getIoctlAvailability() {
 
 void dXorg::figureOutConstParams() {
     if (ioctlHnd != nullptr && ioctlHnd->isValid()) {
-        ioctlHnd->getMaxCoreClock(&params.maxCoreClock);
-        ioctlHnd->getMaxMemoryClock(&params.maxMemClock);
+        ioctlHnd->getMaxClocks(&params.maxCoreClock, &params.maxMemClock);
         ioctlHnd->getVramSize(&params.VRAMSize);
+
+        params.maxCoreClock /= 1000;
+        params.maxMemClock = (params.maxMemClock == -1) ? -1 : params.maxMemClock / 1000;
         params.VRAMSize /= 1048576;
     }
 
-    if (hwmonAttributes.pwm1_max.isEmpty())
-        return;
+    if (!hwmonAttributes.temp1_crit.isEmpty()) {
 
-    QFile fPwmMax(hwmonAttributes.pwm1_max);
-    if (fPwmMax.open(QIODevice::ReadOnly)) {
-        params.pwmMaxSpeed = fPwmMax.readLine(4).toInt();
-        fPwmMax.close();
+        QFile f(hwmonAttributes.temp1_crit);
+        if (f.open(QIODevice::ReadOnly)) {
+            params.temp1_crit = f.readLine(7).toInt() / 1000;
+            f.close();
+        }
+    }
+
+
+    if (!hwmonAttributes.pwm1_max.isEmpty()) {
+
+        QFile f(hwmonAttributes.pwm1_max);
+        if (f.open(QIODevice::ReadOnly)) {
+            params.pwmMaxSpeed = f.readLine(4).toInt();
+            f.close();
+        }
     }
 }
 

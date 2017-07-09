@@ -4,6 +4,7 @@
 
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
+#include "dialogs/dialog_topbarcfg.h"
 
 #include <QTimer>
 #include <QColorDialog>
@@ -175,20 +176,6 @@ void radeon_profile::closeFromTray() {
 void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
 {
     timer->setInterval(arg1*1000);
-}
-
-void radeon_profile::on_cb_gpuData_clicked(bool checked)
-{
-    ui->cb_graphs->setEnabled(checked);
-    ui->cb_stats->setEnabled(checked);
-
-    if (ui->cb_stats->isChecked())
-        ui->tabs_systemInfo->setTabEnabled(3,checked);
-
-    if (!checked) {
-        ui->list_currentGPUData->clear();
-        ui->list_currentGPUData->addTopLevelItem(new QTreeWidgetItem(QStringList() << tr("GPU data is disabled")));
-    }
 }
 
 void radeon_profile::refreshBtnClicked() {
@@ -392,4 +379,16 @@ void radeon_profile::pauseRefresh(bool checked)
 void radeon_profile::on_btn_general_clicked()
 {
     ui->btn_general->showMenu();
+}
+
+void radeon_profile::on_btn_configureTopbar_clicked()
+{
+    Dialog_topbarCfg *d = new Dialog_topbarCfg(topbarManager.schemas, device.gpuData.keys(), &device.getGpuConstParams(), this);
+
+    if (d->exec() == QDialog::Accepted) {
+        topbarManager.schemas = d->getCreatedSchemas();
+        topbarManager.createTopbar(ui->topbar_layout);
+    }
+
+    delete d;
 }

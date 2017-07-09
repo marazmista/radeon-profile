@@ -43,7 +43,7 @@ public:
         data.slices().at(2)->setValue(maxValue - gpuData.value(dataId).value);
         primaryLabel.setText(gpuData.value(dataId).strValue);
 
-        if (secondaryLabelEnabled)
+        if (secondaryDataIdEnabled)
             secondaryLabel.setText(gpuData.value(secondaryDataId).strValue);
     }
 
@@ -52,15 +52,19 @@ public:
         data.slices().at(1)->setBrush(fill);
     }
 
-    void setSecondLabelSource(const ValueID id) {
-        secondaryLabelEnabled = true;
+    void setSecondaryDataId(const ValueID id) {
+        secondaryDataIdEnabled = true;
         secondaryDataId = id;
+    }
+
+    QColor getFillColor() {
+        return fill;
     }
 
 protected:
     Ui::PieProgressBar *ui;
     int maxValue = 100;
-    bool secondaryLabelEnabled = false;
+    bool secondaryDataIdEnabled = false;
     ValueID dataId, secondaryDataId;
 
     QPieSeries data;
@@ -114,8 +118,8 @@ protected:
         chartView->setMinimumSize(0,0);
         chartView->setRenderHint(QPainter::Antialiasing);
 
-        primaryLabel.setContentsMargins(QMargins(0,18,5,0));
-        secondaryLabel.setContentsMargins(QMargins(0,43,5,0));
+        primaryLabel.setContentsMargins(QMargins(0,18,0,0));
+        secondaryLabel.setContentsMargins(QMargins(0,43,0,0));
         ui->grid->addWidget(chartView,0,0,Qt::AlignCenter);
         ui->grid->addWidget(&primaryLabel,0,0,Qt::AlignRight);
         ui->grid->addWidget(&secondaryLabel,0,0,Qt::AlignRight);

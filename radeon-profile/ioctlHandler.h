@@ -126,15 +126,6 @@ public:
     virtual bool getMemoryClock(int *data) const = 0;
 
     /**
-     * @brief Get both core and memory clock
-     * @param core On success is filled with the core clock, in MHz.
-     * @param memory On success is filled with the memory clock, in MHz.
-     * @note If one parameter is NULL it will not be filled.
-     * @return Success.
-     */
-    virtual bool getClocks(int *core, int *memory) const = 0;
-
-    /**
      * @brief Get VRAM memory current usage.
      * @param data On success is filled with the value, in bytes.
      * @return Success.
@@ -188,7 +179,6 @@ public:
     bool getMaxMemoryClock(int *data) const;
     bool getMaxClocks(int *core, int *memory) const;
     bool getMemoryClock(int *data) const;
-    bool getClocks(int *core, int *memory) const;
     bool getTemperature(int *data) const;
     bool getVramSize(long *data) const;
     bool getVramUsage(long *data) const;
@@ -224,7 +214,7 @@ public:
     bool getMaxMemoryClock(int *data) const;
     bool getMaxClocks(int *core, int *memory) const;
     bool getMemoryClock(int *data) const;
-    bool getClocks(int *core, int *memory) const;
+    bool getVceClocks(int *core, int *memory) const;
     bool getTemperature(int *data) const;
     bool getVramSize(long *data) const;
     bool getVramUsage(long *data) const;

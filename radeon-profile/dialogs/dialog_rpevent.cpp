@@ -121,7 +121,8 @@ void Dialog_RPEvent::setEditedEvent(const RPEvent &rpe) {
 }
 
 void Dialog_RPEvent::setFixedFanSpeedVisibility(bool visibility) {
-    ui->widget_fixedFanSpeed->setVisible(visibility);
+    ui->spin_fixedFanSpeed->setVisible(visibility);
+    ui->l_percent->setVisible(visibility);
 }
 
 void Dialog_RPEvent::on_combo_fanChange_currentIndexChanged(int index)

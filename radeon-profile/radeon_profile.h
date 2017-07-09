@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20170703
+#define appVersion 20170709
 
 namespace Ui {
 class radeon_profile;
@@ -75,7 +75,6 @@ private slots:
     void closeEvent(QCloseEvent *e);
     void closeFromTray();
     void on_spin_timerInterval_valueChanged(double arg1);
-    void on_cb_gpuData_clicked(bool checked);
     void refreshBtnClicked();
     void on_cb_stats_clicked(bool checked);
     void copyGlxInfoToClipboard();
@@ -143,6 +142,7 @@ private slots:
     void on_slider_freqMclk_valueChanged(int value);
     void on_group_freq_toggled(bool arg1);
     void on_btn_configureTopbar_clicked();
+    void on_btn_setPlotsBackground_clicked();
 
 private:
     struct currentStateInfo {
@@ -164,9 +164,10 @@ private:
 	currentStateInfo *savedState;
     QFutureWatcher<void> initFuture;
     PlotManager plotManager;
+    TopbarManager topbarManager;
     QChartView *fanProfileChart;
     QLineSeries *fanSeries;
-    QList<TopBarItem*> topBarItems;
+    QList<TopbarItem*> topBarItems;
     QMap<int, ValueID> keysInCurrentGpuList;
 
     Ui::radeon_profile *ui;
@@ -194,7 +195,7 @@ private:
     void setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile);
     void adjustFanSpeed();
     fanProfileSteps stepsListToMap();
-    void addChild(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
+    void addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
     void setupFanProfilesMenu(const bool rebuildMode = false);
     int findCurrentFanProfileMenuIndex();
     void setupMinFanSpeedSetting(unsigned int speed);
@@ -211,18 +212,20 @@ private:
     void loadFanProfile(QXmlStreamReader &xml);
     void savePlotSchemas(QXmlStreamWriter &xml);
     void loadPlotSchemas(QXmlStreamReader &xml);
+    void saveTopbarItemsSchemas(QXmlStreamWriter &xml);
+    void loadTopbarItemsSchemas(const QXmlStreamReader &xml);
     void writePlotAxisSchemaToXml(QXmlStreamWriter &xml, const QString side, const PlotAxisSchema &pas);
     void loadPlotAxisSchema(const QXmlStreamReader &xml, PlotAxisSchema &pas);
     void createDefaultFanProfile();
     void loadExecProfiles();
     void setupUiElements();
-    void addPlotsToLayout();
+    void createPlots();
     void modifyPlotSchema(const QString &name);
     void createCurrentGpuDataListItems();
     void fillConnectors();
     void fillModInfo();
     bool askConfirmation(const QString title, const QString question);
-    void createTopBar();
+    void createDefaultTopbar();
     void showWindow();
     bool isFanStepValid(unsigned int temperature, unsigned int fanSpeed);
     void addFanStep (int temperature, int fanSpeed);
