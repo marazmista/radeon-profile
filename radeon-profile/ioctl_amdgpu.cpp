@@ -14,7 +14,7 @@
 amdgpuIoctlHandler::amdgpuIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIndex) { }
 
 bool amdgpuIoctlHandler::getSensorValue(void *data, unsigned dataSize, unsigned sensor) const {
-#ifdef DRM_IOCTL_AMDGPU_INFO
+#if defined(DRM_IOCTL_AMDGPU_INFO) && defined(AMDGPU_INFO_SENSOR)
     struct drm_amdgpu_info buffer = {};
     buffer.query = AMDGPU_INFO_SENSOR;
     buffer.return_pointer = reinterpret_cast<uint64_t>(data);
