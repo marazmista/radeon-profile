@@ -146,7 +146,7 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     }
 
     //Check if a process is still running
-    for (execBin * process : execsRunning) {
+    for (ExecBin * process : execsRunning) {
         if (process->getExecState() == QProcess::Running
                 && !askConfirmation(tr("Quit"), process->name + tr(" is still running, exit anyway?"))) {
             e->ignore();

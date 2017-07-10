@@ -59,7 +59,7 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
 
     qDebug() << "Activating event: " + rpe.name;
 
-    savedState = new currentStateInfo();
+    savedState = new CurrentStateInfo();
     savedState->profile = static_cast<PowerProfiles>(dpmGroup.checkedId());
     savedState->powerLevel = static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex());
 

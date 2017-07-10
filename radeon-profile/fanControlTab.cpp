@@ -6,7 +6,7 @@
 #include <QInputDialog>
 
 void radeon_profile::createDefaultFanProfile() {
-    fanProfileSteps p;
+    FanProfileSteps p;
     p.insert(0,minFanStepsSpeed);
     p.insert(65,maxFanStepsSpeed);
     p.insert(90,maxFanStepsSpeed);
@@ -16,7 +16,7 @@ void radeon_profile::createDefaultFanProfile() {
     ui->l_currentFanProfile->setText("default");
 }
 
-void radeon_profile::makeFanProfileListaAndGraph(const fanProfileSteps &profile) {
+void radeon_profile::makeFanProfileListaAndGraph(const FanProfileSteps &profile) {
     fanSeries->clear();
     ui->list_fanSteps->clear();
 
@@ -147,7 +147,7 @@ void radeon_profile::on_btn_activateFanProfile_clicked()
     fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
 }
 
-void radeon_profile::setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile) {
+void radeon_profile::setCurrentFanProfile(const QString &profileName, const FanProfileSteps &profile) {
     ui->l_currentFanProfile->setText(profileName);
     ui->btn_fanControl->setText(profileName);
     fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
@@ -156,8 +156,8 @@ void radeon_profile::setCurrentFanProfile(const QString &profileName, const fanP
     adjustFanSpeed();
 }
 
-radeon_profile::fanProfileSteps radeon_profile::stepsListToMap() {
-    fanProfileSteps steps;
+FanProfileSteps radeon_profile::stepsListToMap() {
+    FanProfileSteps steps;
     for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++ i)
         steps.insert(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(),ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
 

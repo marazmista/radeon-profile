@@ -16,11 +16,11 @@
 #include <QString>
 #include <QLabel>
 
-class execBin : public QObject {
+class ExecBin : public QObject {
     Q_OBJECT
 public:
-    execBin();
-    ~execBin() {
+    ExecBin();
+    ~ExecBin() {
         delete p;
         delete output;
         delete cmd;

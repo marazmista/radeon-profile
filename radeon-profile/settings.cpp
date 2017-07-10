@@ -120,7 +120,7 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
         xml.writeStartElement("fanProfile");
         xml.writeAttribute("name", k);
 
-        fanProfileSteps fps = fanProfiles.value(k);
+        FanProfileSteps fps = fanProfiles.value(k);
 
         for (auto ks : fps.keys()) {
             xml.writeStartElement("step");
@@ -415,7 +415,7 @@ void radeon_profile::loadExecProfile(const QXmlStreamReader &xml) {
 void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
     QString fpName = xml.attributes().value("name").toString();
 
-    fanProfileSteps fps;
+    FanProfileSteps fps;
     while (xml.readNext()) {
         if (xml.name().toString() == "step")
             fps.insert(xml.attributes().value("temperature").toString().toInt(),

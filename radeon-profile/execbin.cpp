@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QFileDialog>
 
-execBin::execBin() : QObject() {
+ExecBin::ExecBin() : QObject() {
     p = new QProcess();
     mainLay = new QVBoxLayout();
     btnLay = new QHBoxLayout();
@@ -25,7 +25,7 @@ execBin::execBin() : QObject() {
     connect(btnSave,SIGNAL(clicked()),this,SLOT(saveToFile()));
 }
 
-void execBin::setupTab() {
+void ExecBin::setupTab() {
     output->setReadOnly(true);
     cmd->setReadOnly(true);
     cmd->setMaximumHeight(60);
@@ -57,27 +57,27 @@ void execBin::setupTab() {
     tab->setLayout(mainLay);
 }
 
-void execBin::runBin(const QString &cmd) {
+void ExecBin::runBin(const QString &cmd) {
     p->start(cmd);
     this->cmd->setPlainText(p->processEnvironment().toStringList().join(" ") +" "+ cmd);
 }
 
-void execBin::setEnv(const QProcessEnvironment &env) {
+void ExecBin::setEnv(const QProcessEnvironment &env) {
     this->p->setProcessEnvironment(env);
 }
 
-void execBin::execProcessReadOutput() {
+void ExecBin::execProcessReadOutput() {
     QString o = this->p->readAllStandardOutput();
 
     if (!o.isEmpty())
         this->output->appendPlainText(o);
 }
 
-void execBin::execProcesStart() {
+void ExecBin::execProcesStart() {
     this->lStatus->setText(tr("Process state: running"));
 }
 
-void execBin::execProcesFinished() {
+void ExecBin::execProcesFinished() {
     if (!this->logData.logFilename.isEmpty() && this->logData.log.count() > 0) {
         QFile f(logData.logFilename);
         f.open(QIODevice::WriteOnly);
@@ -89,7 +89,7 @@ void execBin::execProcesFinished() {
     this->lStatus->setText(tr("Process state: not running"));
 }
 
-void execBin::saveToFile() {
+void ExecBin::saveToFile() {
         QString filename = QFileDialog::getSaveFileName(0, tr("Save"), QDir::homePath()+"/output_"+this->name);
         if (!filename.isEmpty()) {
             QFile f(filename);
@@ -99,14 +99,14 @@ void execBin::saveToFile() {
         }
 }
 
-QProcess::ProcessState execBin::getExecState() {
+QProcess::ProcessState ExecBin::getExecState() {
     return this->p->state();
 }
 
-void execBin::appendToLog(const QString &data) {
+void ExecBin::appendToLog(const QString &data) {
     this->logData.log.append(data);
 }
 
-void execBin::setLogFilename(const QString &name) {
+void ExecBin::setLogFilename(const QString &name) {
     this->logData.logFilename = name;
 }

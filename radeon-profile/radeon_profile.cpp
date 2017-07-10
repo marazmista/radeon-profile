@@ -400,7 +400,7 @@ void radeon_profile::timerEvent() {
 
 void radeon_profile::adjustFanSpeed() {
     if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value != device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value) {
-        if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {  // Exact match
+        if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {
             device.setPwmValue(currentFanProfile.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));
             return;
         }

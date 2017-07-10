@@ -47,18 +47,10 @@ class radeon_profile : public QMainWindow
     };
 
 public:
-    explicit radeon_profile(QWidget *parent = 0);
-    ~radeon_profile();
-    QString appHomePath;
-
-    QSystemTrayIcon *trayIcon;
-    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
-    QMenu *dpmMenu, *trayMenu, *generalMenu, *forcePowerMenu, *fanProfilesMenu;
-    QTimer *timer = nullptr;
     static unsigned int minFanStepsSpeed;
 
-    typedef QMap<int, unsigned int> fanProfileSteps;
-    
+    explicit radeon_profile(QWidget *parent = 0);
+    ~radeon_profile();
     
 private slots:
     void timerEvent();
@@ -145,23 +137,28 @@ private slots:
     void on_btn_setPlotsBackground_clicked();
 
 private:
-    struct currentStateInfo {
+    struct CurrentStateInfo {
         PowerProfiles profile;
         ForcePowerLevels powerLevel;
         short fanIndex;
         QString fanProfileName;
     };
 
+    QSystemTrayIcon *trayIcon;
+    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
+    QMenu *dpmMenu, *trayMenu, *generalMenu, *forcePowerMenu, *fanProfilesMenu;
+    QTimer *timer = nullptr;
+
     gpu device;
     static const QString settingsPath;
-    QList<execBin*> execsRunning;
-    fanProfileSteps currentFanProfile;
-    QMap<QString, fanProfileSteps> fanProfiles;
+    QList<ExecBin*> execsRunning;
+    FanProfileSteps currentFanProfile;
+    QMap<QString, FanProfileSteps> fanProfiles;
     QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
     unsigned int ticksCounter, statsTickCounter;
     QButtonGroup pwmGroup, dpmGroup;
-	currentStateInfo *savedState;
+    CurrentStateInfo *savedState;
     QFutureWatcher<void> initFuture;
     PlotManager plotManager;
     TopbarManager topbarManager;
@@ -188,13 +185,13 @@ private:
     void addRuntimeWidgets();
     void loadFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
-    void makeFanProfileListaAndGraph(const fanProfileSteps &profile);
+    void makeFanProfileListaAndGraph(const FanProfileSteps &profile);
     void makeFanProfilePlot();
     void refreshUI();
     void connectSignals();
-    void setCurrentFanProfile(const QString &profileName, const fanProfileSteps &profile);
+    void setCurrentFanProfile(const QString &profileName, const FanProfileSteps &profile);
     void adjustFanSpeed();
-    fanProfileSteps stepsListToMap();
+    FanProfileSteps stepsListToMap();
     void addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
     void setupFanProfilesMenu(const bool rebuildMode = false);
     int findCurrentFanProfileMenuIndex();

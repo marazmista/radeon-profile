@@ -264,7 +264,7 @@ void radeon_profile::on_btn_runExecProfile_clicked()
             }
     }
 
-    execBin *exe = new execBin();
+    ExecBin *exe = new ExecBin();
     exe->name = item->text((PROFILE_NAME));
     ui->tabs_execOutputs->addTab(exe->tab,exe->name);
 

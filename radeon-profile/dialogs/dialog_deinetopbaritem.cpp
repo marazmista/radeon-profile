@@ -94,6 +94,8 @@ TopbarItemType Dialog_deineTopbarItem::getItemType() {
         return TopbarItemType::LARGE_LABEL;
     else if (ui->radio_pie->isChecked())
         return TopbarItemType::PIE;
+
+    return TopbarItemType::LARGE_LABEL;
 }
 
 QColor Dialog_deineTopbarItem::getColor(const QColor &c) {

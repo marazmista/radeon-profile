@@ -150,6 +150,7 @@ struct RPValue {
 
 typedef QMap<ValueID, RPValue> GPUDataContainer;
 typedef QMap<int, QString> PowerPlayTable;
+typedef QMap<int, unsigned int> FanProfileSteps;
 
 // structure which holds what can be display on ui and on its base
 // we enable ui elements
