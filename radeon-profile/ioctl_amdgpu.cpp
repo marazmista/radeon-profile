@@ -150,7 +150,7 @@ bool amdgpuIoctlHandler::getVramUsage(long *data) const {
 }
 
 
-bool amdgpuIoctlHandler::getVramSize(long *data) const {
+bool amdgpuIoctlHandler::getVramSize(float *data) const {
 #ifdef AMDGPU_INFO_VRAM_GTT
     struct drm_amdgpu_info_vram_gtt info = {};
     bool success = getValue(&info, sizeof(info), AMDGPU_INFO_VRAM_GTT);

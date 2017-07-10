@@ -50,7 +50,7 @@ public:
 
     float getTemperature();
     GPUUsage getGPUUsage();
-    GPUPwm getPwmSpeed();
+    GPUFanSpeed getFanSpeed();
 
     QList<QTreeWidgetItem *> getModuleInfo();
     QString getCurrentPowerLevel();

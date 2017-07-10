@@ -144,7 +144,7 @@ public:
      * @param data On success is filled with the value, in bytes.
      * @return Success.
      */
-    virtual bool getVramSize(long *data) const = 0;
+    virtual bool getVramSize(float *data) const = 0;
 
     /**
      * @brief Get the name of driver
@@ -180,7 +180,7 @@ public:
     bool getMaxClocks(int *core, int *memory) const;
     bool getMemoryClock(int *data) const;
     bool getTemperature(int *data) const;
-    bool getVramSize(long *data) const;
+    bool getVramSize(float *data) const;
     bool getVramUsage(long *data) const;
     bool getGpuUsage(float *data) const;
 };
@@ -216,7 +216,7 @@ public:
     bool getMemoryClock(int *data) const;
     bool getVceClocks(int *core, int *memory) const;
     bool getTemperature(int *data) const;
-    bool getVramSize(long *data) const;
+    bool getVramSize(float *data) const;
     bool getVramUsage(long *data) const;
     bool getGpuUsage(float *data) const;
 };

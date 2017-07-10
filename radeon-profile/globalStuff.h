@@ -261,18 +261,19 @@ struct GPUClocks {
     int coreClk = -1, memClk = -1, coreVolt = -1, memVolt = -1, uvdCClk = -1, uvdDClk = -1, powerLevel = -1;
 };
 
-struct GPUPwm {
-    int pwmSpeed = -1, pwmSpeedRpm = -1;
+struct GPUFanSpeed {
+    float fanSpeedPercent = -1;
+    int fanSpeedRpm = -1;
 };
 
 struct GPUUsage {
-    float gpuUsage = -1;
-    long gpuVramUsagePercent = -1, gpuVramUsage = -1;
+    float gpuUsage = -1, gpuVramUsagePercent = -1;
+    long gpuVramUsage = -1;
 };
 
 struct GPUConstParams {
      int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1, temp1_crit = -1;
-     long VRAMSize = -1;
+     float VRAMSize = -1;
 };
 
 class globalStuff {

@@ -289,7 +289,7 @@ void radeon_profile::refreshGpuData() {
     device.getClocks();
     device.getTemperature();
     device.getGpuUsage();
-    device.getPwmSpeed();
+    device.getFanSpeed();
 }
 
 void radeon_profile::addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
@@ -399,38 +399,46 @@ void radeon_profile::timerEvent() {
 }
 
 void radeon_profile::adjustFanSpeed() {
-    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value != device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value) {
-        if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {
-            device.setPwmValue(currentFanProfile.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));
-            return;
-        }
+    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value == device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value)
+        return;
 
-        // find bounds of current temperature
-        QMap<int,unsigned int>::const_iterator high = currentFanProfile.upperBound(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
-        QMap<int,unsigned int>::const_iterator low = (currentFanProfile.size() > 1 ? high - 1 : high);
+    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value < device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value &&
+            ui->spin_hysteresis->value() > (hysteresisRelativeTepmerature - device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value))
+        return;
+    else
+        hysteresisRelativeTepmerature = device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value;
 
-        int hSpeed = high.value(),
-			lSpeed = low.value();
-
-        if (high == currentFanProfile.constBegin()) {
-            device.setPwmValue(hSpeed);
-            return;
-        }
-
-        if (low == currentFanProfile.constEnd()) {
-            device.setPwmValue(lSpeed);
-            return;
-        }
-
-        // calculate two point stright line equation based on boundaries of current temperature
-        // y = mx + b = (y2-y1)/(x2-x1)*(x-x1)+y1
-        int hTemperature = high.key(),
-                lTemperature = low.key();
-
-        float speed = (float)(hSpeed - lSpeed) / (float)(hTemperature - lTemperature)  * (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value - lTemperature)  + lSpeed;
-
-        device.setPwmValue((speed < minFanStepsSpeed) ? minFanStepsSpeed : speed);
+    if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {
+        device.setPwmValue(currentFanProfile.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));
+        return;
     }
+
+    // find bounds of current temperature
+    QMap<int,unsigned int>::const_iterator high = currentFanProfile.upperBound(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+    QMap<int,unsigned int>::const_iterator low = (currentFanProfile.size() > 1 ? high - 1 : high);
+
+    int hSpeed = high.value(),
+            lSpeed = low.value();
+
+    if (high == currentFanProfile.constBegin()) {
+        device.setPwmValue(hSpeed);
+        return;
+    }
+
+    if (low == currentFanProfile.constEnd()) {
+        device.setPwmValue(lSpeed);
+        return;
+    }
+
+    // calculate two point stright line equation based on boundaries of current temperature
+    // y = mx + b = (y2-y1)/(x2-x1)*(x-x1)+y1
+    int hTemperature = high.key(),
+            lTemperature = low.key();
+
+    float speed = (float)(hSpeed - lSpeed) / (float)(hTemperature - lTemperature)  * (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value - lTemperature)  + lSpeed;
+
+    device.setPwmValue((speed < minFanStepsSpeed) ? minFanStepsSpeed : speed);
+
 }
 
 

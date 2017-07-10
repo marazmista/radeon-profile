@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20170709
+#define appVersion 20170711
 
 namespace Ui {
 class radeon_profile;
@@ -157,6 +157,7 @@ private:
     QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
     unsigned int ticksCounter, statsTickCounter;
+    short hysteresisRelativeTepmerature = 0;
     QButtonGroup pwmGroup, dpmGroup;
     CurrentStateInfo *savedState;
     QFutureWatcher<void> initFuture;

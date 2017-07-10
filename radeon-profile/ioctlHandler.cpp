@@ -115,7 +115,8 @@ bool ioctlHandler::getGpuUsage(float *data, int time, int frequency) const {
 
 
 bool ioctlHandler::getVramUsagePercentage(long *data) const {
-    long usage=0, total=0;
+    float total = 0;
+    long usage = 0;
     bool success = getVramUsage(&usage) && getVramSize(&total);
     if(Q_LIKELY(success))
         *data = (100.0f * usage) / total;

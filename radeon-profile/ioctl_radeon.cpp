@@ -98,7 +98,7 @@ bool radeonIoctlHandler::getGpuUsage(float *data) const {
     return ioctlHandler::getGpuUsage(data, 500000, 150);
 }
 
-bool radeonIoctlHandler::getVramSize(long *data) const {
+bool radeonIoctlHandler::getVramSize(float *data) const {
 #ifdef DRM_IOCTL_RADEON_GEM_INFO
     struct drm_radeon_gem_info buffer = {};
     const bool success = !ioctl(fd, DRM_IOCTL_RADEON_GEM_INFO, &buffer);

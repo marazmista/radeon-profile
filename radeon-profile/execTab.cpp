@@ -49,6 +49,7 @@ void radeon_profile::on_btn_modifyExecProfile_clicked()
 
     if (!ui->txt_summary->text().isEmpty())
         selectedVariableVaules = ui->txt_summary->text().split(" ");
+
     ui->execPages->setCurrentIndex(1);
 }
 

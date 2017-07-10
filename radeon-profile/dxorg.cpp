@@ -554,8 +554,8 @@ void dXorg::setPwmManualControl(bool manual) {
         setNewValue(hwmonAttributes.pwm1_enable, mode);
 }
 
-GPUPwm dXorg::getPwmSpeed() {
-    GPUPwm tmp;
+GPUFanSpeed dXorg::getFanSpeed() {
+    GPUFanSpeed tmp;
 
     if (hwmonAttributes.pwm1.isEmpty())
         return tmp;
@@ -563,14 +563,14 @@ GPUPwm dXorg::getPwmSpeed() {
     QFile f(hwmonAttributes.pwm1);
 
     if (f.open(QIODevice::ReadOnly)) {
-       tmp.pwmSpeed = (QString(f.readLine(4)).toFloat() / params.pwmMaxSpeed) * 100;
+       tmp.fanSpeedPercent = (QString(f.readLine(4)).toFloat() / params.pwmMaxSpeed) * 100;
        f.close();
     }
 
     if (!hwmonAttributes.fan1_input.isEmpty()) {
         f.setFileName(hwmonAttributes.fan1_input);
         if (f.open(QIODevice::ReadOnly)) {
-            tmp.pwmSpeedRpm = QString(f.readLine(6)).toInt();
+            tmp.fanSpeedRpm = QString(f.readLine(6)).toInt();
             f.close();
         }
     }

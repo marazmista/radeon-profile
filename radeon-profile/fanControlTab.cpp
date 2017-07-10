@@ -28,6 +28,7 @@ void radeon_profile::makeFanProfileListaAndGraph(const FanProfileSteps &profile)
 
 void radeon_profile::makeFanProfilePlot() {
     fanSeries->clear();
+
     for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i) {
         fanSeries->append(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(), ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
     }
@@ -88,7 +89,6 @@ void radeon_profile::on_btn_removeFanProfile_clicked()
 
     if (!askConfirmation("", tr("Remove profile: ")+ui->combo_fanProfiles->currentText()+"?"))
         return;
-
 
     fanProfiles.remove(ui->combo_fanProfiles->currentText());
     ui->combo_fanProfiles->removeItem(ui->combo_fanProfiles->currentIndex());
@@ -199,6 +199,9 @@ void radeon_profile::on_btn_addFanStep_clicked()
 
         addFanStep(temperature,fanSpeed);
     }
+
+    markFanProfileUnsaved(true);
+    makeFanProfilePlot();
 }
 
 void radeon_profile::on_btn_removeFanStep_clicked()
@@ -219,6 +222,9 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 
     // Remove the step from the list and from the graph
     delete current;
+
+    markFanProfileUnsaved(true);
+    makeFanProfilePlot();
 }
 
 

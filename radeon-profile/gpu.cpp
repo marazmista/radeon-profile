@@ -130,13 +130,13 @@ void gpu::defineAvailableDataContainer() {
         gpuData.insert(ValueID::POWER_LEVEL, RPValue(ValueUnit::NONE, tmpClk.powerLevel));
 
 
-    GPUPwm tmpPwm = driverHandler->getPwmSpeed();
+    GPUFanSpeed tmpPwm = driverHandler->getFanSpeed();
 
-    if (tmpPwm.pwmSpeed != -1)
-        gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, tmpPwm.pwmSpeed));
+    if (tmpPwm.fanSpeedPercent != -1)
+        gpuData.insert(ValueID::FAN_SPEED_PERCENT, RPValue(ValueUnit::PERCENT, tmpPwm.fanSpeedPercent));
 
-    if (tmpPwm.pwmSpeedRpm != -1)
-        gpuData.insert(ValueID::FAN_SPEED_RPM, RPValue(ValueUnit::RPM, tmpPwm.pwmSpeedRpm));
+    if (tmpPwm.fanSpeedRpm != -1)
+        gpuData.insert(ValueID::FAN_SPEED_RPM, RPValue(ValueUnit::RPM, tmpPwm.fanSpeedRpm));
 
 
     float tmpTemp = driverHandler->getTemperature();
@@ -260,16 +260,16 @@ void gpu::setPwmManualControl(bool manual) {
     driverHandler->setPwmManualControl(manual);
 }
 
-void gpu::getPwmSpeed() {
+void gpu::getFanSpeed() {
     if (!gpuData.contains(ValueID::FAN_SPEED_PERCENT))
         return;
 
-    GPUPwm tmp = driverHandler->getPwmSpeed();
+    GPUFanSpeed tmp = driverHandler->getFanSpeed();
 
-    gpuData[ValueID::FAN_SPEED_PERCENT].setValue(tmp.pwmSpeed);
+    gpuData[ValueID::FAN_SPEED_PERCENT].setValue(tmp.fanSpeedPercent);
 
     if (gpuData.contains(ValueID::FAN_SPEED_RPM))
-        gpuData[ValueID::FAN_SPEED_RPM].setValue(tmp.pwmSpeedRpm);
+        gpuData[ValueID::FAN_SPEED_RPM].setValue(tmp.fanSpeedRpm);
 }
 
 const DriverFeatures& gpu::getDriverFeatures() {

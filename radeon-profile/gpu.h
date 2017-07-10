@@ -41,7 +41,7 @@ public:
 
     void getClocks();
     void getTemperature();
-    void getPwmSpeed();
+    void getFanSpeed();
     void getGpuUsage();
 
     void changeGpu(int index);

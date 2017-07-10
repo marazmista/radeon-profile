@@ -50,8 +50,8 @@ void radeon_profile::saveConfig() {
     settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
     settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
     settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
-
     settings.setValue("daemonData", ui->cb_daemonData->isChecked());
+    settings.setValue("temperatureHysteresis", ui->spin_hysteresis->value());
 
     QString xmlString;
     QXmlStreamWriter xml(&xmlString);
@@ -222,8 +222,8 @@ void radeon_profile::loadConfig() {
     ui->group_freq->setChecked(settings.value("manualFreqEnabled",false).toBool());
     ui->slider_ocSclk->setValue(settings.value("overclockValue",0).toInt());
     ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
-
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
+    ui->spin_hysteresis->setValue(settings.value("temperatureHysteresis", 0).toInt());
 
     ui->frame_plotsBackground->setAutoFillBackground(true);
     ui->frame_plotsBackground->setPalette(QPalette(QColor(settings.value("plotsBackgroundColor","#808080").toString())));
