@@ -18,7 +18,7 @@ class TopbarItem {
 public:
     virtual void updateItemValue(const GPUDataContainer &data) = 0;
     virtual void setPrimaryColor(const QColor &c) = 0;
-    virtual void setSecondaryColor(const QColor &c) { }
+    virtual void setSecondaryColor(const QColor &c) { Q_UNUSED(c); }
     virtual void setSecondaryValueId(const ValueID vId) {
         secondaryValueId = vId;
         secondaryValueIdEnabled = true;
