@@ -26,7 +26,7 @@ bool amdgpuIoctlHandler::getSensorValue(void *data, unsigned dataSize, unsigned 
     return success;
 #else
     Q_UNUSED(data);
-    Q_UNUSED(command);
+    Q_UNUSED(sensor);
     Q_UNUSED(dataSize);
     return false;
 #endif
