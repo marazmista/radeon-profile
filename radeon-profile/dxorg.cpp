@@ -47,8 +47,7 @@ void dXorg::setupIoctl() {
 }
 
 //https://stackoverflow.com/a/18866593
-QString getRandomString()
-{
+QString getRandomString() {
    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
 
    QString randomString;
@@ -81,7 +80,7 @@ void dXorg::setupSharedMem() {
 }
 
 void dXorg::setupDaemon() {
-    qDebug() << "Daemon is connected, configuring it";
+    qDebug() << "Daemon connected";
     QString command;
 
     if (!globalStuff::globalConfig.daemonData) {
@@ -122,6 +121,8 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0" : hwmonDevicePath));
 
     hwmonAttributes = HwmonAttributes(hwmonDevicePath);
+
+    qDebug() << "hwmon path: " << hwmonDevicePath;
 }
 
 // method for gather info about clocks from deamon or from debugfs if root
@@ -651,27 +652,32 @@ void dXorg::figureOutDriverFeatures() {
     features.currentTemperatureSensor = getTemperatureSensor();
 
     switch (features.currentPowerMethod) {
-    case PowerMethod::DPM: {
-        if (globalStuff::globalConfig.rootMode || daemonConnected())
-            features.canChangeProfile = true;
-        else {
-            QFile f(driverFiles.sysFs.power_dpm_state);
+        case PowerMethod::DPM: {
+            qDebug() << "Power method: DPM";
+
+            if (globalStuff::globalConfig.rootMode || daemonConnected())
+                features.canChangeProfile = true;
+            else {
+                QFile f(driverFiles.sysFs.power_dpm_state);
+                if (f.open(QIODevice::WriteOnly)) {
+                    features.canChangeProfile = true;
+                    f.close();
+                }
+            }
+            break;
+        }
+        case PowerMethod::PROFILE: {
+            qDebug() << "Power method: Profile";
+
+            QFile f(driverFiles.sysFs.power_profile);
             if (f.open(QIODevice::WriteOnly)) {
                 features.canChangeProfile = true;
                 f.close();
             }
         }
-        break;
-    }
-    case PowerMethod::PROFILE: {
-        QFile f(driverFiles.sysFs.power_profile);
-        if (f.open(QIODevice::WriteOnly)) {
-            features.canChangeProfile = true;
-            f.close();
-        }
-    }
-    case PowerMethod::PM_UNKNOWN:
-        break;
+        case PowerMethod::PM_UNKNOWN:
+            qDebug() << "Power method unknown";
+            break;
     }
 
     features.ocCoreAvailable = !driverFiles.sysFs.pp_sclk_od.isEmpty();
@@ -689,8 +695,10 @@ void dXorg::figureOutDriverFeatures() {
 }
 
 bool dXorg::getIoctlAvailability() {
-    if (ioctlHnd == nullptr || !ioctlHnd->isValid())
+    if (ioctlHnd == nullptr || !ioctlHnd->isValid()) {
+        qDebug() << "IOCTL not available";
         return false;
+    }
 
     return true;
 }
@@ -703,6 +711,10 @@ void dXorg::figureOutConstParams() {
         params.maxCoreClock /= 1000;
         params.maxMemClock = (params.maxMemClock == -1) ? -1 : params.maxMemClock / 1000;
         params.VRAMSize /= 1048576;
+
+        qDebug() << "GPU max core clk: " << params.maxCoreClock
+                 << "\n max mem clk: " << params.maxMemClock
+                 << "\n vram size: " << params.VRAMSize;
     }
 
     if (!hwmonAttributes.temp1_crit.isEmpty()) {

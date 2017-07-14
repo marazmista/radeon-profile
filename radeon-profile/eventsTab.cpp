@@ -27,7 +27,7 @@ void radeon_profile::on_btn_addEvent_clicked()
 }
 
 void radeon_profile::checkEvents() {
-    checkInfoStruct data;
+    CheckInfoStruct data;
     data.checkTemperature = device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value;
 
     if (savedState != nullptr)  {

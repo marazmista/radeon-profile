@@ -67,9 +67,10 @@ radeon_profile::radeon_profile(QWidget *parent) :
     for (int i = 0; i < device.gpuList.count(); ++i)
         ui->combo_gpus->addItem(device.gpuList.at(i).sysName);
 
-    // start is heavy, delegated to another thread to show ui smoothly
-    connect(&initFuture, SIGNAL(finished()), this,  SLOT(initFutureHandler()));
-    initFuture.setFuture(QtConcurrent::run(this, &radeon_profile::refreshGpuData));
+    // start is heavy, delegated to another thread to show ui smoothly, deleted after init
+    initFuture = new QFutureWatcher<void>();
+    connect(initFuture, SIGNAL(finished()), this,  SLOT(initFutureHandler()));
+    initFuture->setFuture(QtConcurrent::run(this, &radeon_profile::refreshGpuData));
 
     // fill tables with data at the start //
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
@@ -102,6 +103,7 @@ void radeon_profile::initFutureHandler() {
 
     refreshUI();
     connectSignals();
+    delete initFuture;
 }
 
 void radeon_profile::connectSignals()
@@ -115,6 +117,8 @@ void radeon_profile::connectSignals()
 
 void radeon_profile::setupUiElements()
 {
+    qDebug() << "Creating ui elements";
+
     ui->mainTabs->setCurrentIndex(0);
     ui->tabs_systemInfo->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
@@ -201,6 +205,8 @@ void radeon_profile::addRuntimeWidgets() {
 
 // based on driverFeatures structure returned by gpu class, adjust ui elements
 void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data) {
+    qDebug() << "Handling found device features";
+
     if (features.canChangeProfile && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
         ui->stack_pm->setCurrentIndex(features.currentPowerMethod);
 
@@ -222,7 +228,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         ui->mainTabs->setTabEnabled(1,false);
 
     if (data.contains(ValueID::FAN_SPEED_PERCENT) && features.canChangeProfile) {
-        qDebug() << "Fan control is available , configuring the fan control tab";
+        qDebug() << "Fan control available";
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
         ui->l_fanProfileUnsavedIndicator->setVisible(false);
 
@@ -240,7 +246,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
             }
         }
     } else {
-        qDebug() << "Fan control is not available";
+        qDebug() << "Fan control not available";
         ui->mainTabs->setTabEnabled(3,false);
         ui->btn_fanControl->setVisible(false);
         ui->group_cfgFan->setEnabled(false);
@@ -405,8 +411,8 @@ void radeon_profile::adjustFanSpeed() {
     if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value < device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value &&
             ui->spin_hysteresis->value() > (hysteresisRelativeTepmerature - device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value))
         return;
-    else
-        hysteresisRelativeTepmerature = device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value;
+
+    hysteresisRelativeTepmerature = device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value;
 
     if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {
         device.setPwmValue(currentFanProfile.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));

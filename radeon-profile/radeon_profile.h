@@ -27,7 +27,7 @@
 
 #define maxFanStepsSpeed 100
 
-#define appVersion 20170711
+#define appVersion 20170714
 
 namespace Ui {
 class radeon_profile;
@@ -37,7 +37,7 @@ class radeon_profile : public QMainWindow
 {
     Q_OBJECT
 
-    enum itemValues {
+    enum ItemValues {
         PROFILE_NAME,
         BINARY,
         BINARY_PARAMS,
@@ -160,7 +160,7 @@ private:
     short hysteresisRelativeTepmerature = 0;
     QButtonGroup pwmGroup, dpmGroup;
     CurrentStateInfo *savedState;
-    QFutureWatcher<void> initFuture;
+    QFutureWatcher<void> *initFuture;
     PlotManager plotManager;
     TopbarManager topbarManager;
     QChartView *fanProfileChart;

@@ -67,10 +67,10 @@ void Dialog_RPEvent::on_btn_save_clicked()
 
     switch (ui->combo_eventTrigger->currentIndex()) {
         case 0:
-            createdEvent.type = rpeventType::TEMPEREATURE;
+            createdEvent.type = RPEventType::TEMPERATURE;
             break;
         case 1:
-            createdEvent.type = rpeventType::BIANRY;
+            createdEvent.type = RPEventType::BINARY;
 
             if (ui->edt_binary->text().isEmpty()) {
                 QMessageBox::information(this, "", tr("Selected trigger type is Binary, so the binary field cannot be empty."),QMessageBox::Ok);

@@ -193,6 +193,8 @@ void radeon_profile::saveTopbarItemsSchemas(QXmlStreamWriter &xml) {
 }
 
 void radeon_profile::loadConfig() {
+    qDebug() << "Loading configuration";
+
     QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
 
     ui->cb_startMinimized->setChecked(settings.value("startMinimized",false).toBool());
@@ -320,7 +322,7 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     RPEvent rpe;
     rpe.name = xml.attributes().value("name").toString();
     rpe.enabled = (xml.attributes().value("enabled") == "1");
-    rpe.type = static_cast<rpeventType>(xml.attributes().value("tiggerType").toInt());
+    rpe.type = static_cast<RPEventType>(xml.attributes().value("tiggerType").toInt());
     rpe.activationBinary = xml.attributes().value("activationBinary").toString();
     rpe.activationTemperature = xml.attributes().value("activationTemperature").toInt();
     rpe.dpmProfileChange = static_cast<PowerProfiles>(xml.attributes().value("dpmProfileChange").toInt());

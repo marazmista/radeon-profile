@@ -64,6 +64,8 @@ void gpu::detectCards() {
 
             gpuList.append(gsi);
 
+            qDebug() << "Card detected (radeon): " << gsi.sysName;
+
             continue;
         }
 
@@ -75,6 +77,8 @@ void gpu::detectCards() {
 
             gpuList.append(gsi);
 
+            qDebug() << "Card detected (amdgpu): " << gsi.sysName;
+
             continue;
 
         }
@@ -82,10 +86,14 @@ void gpu::detectCards() {
 }
 
 bool gpu::initialize() {
+    qDebug() << "Initializing device";
+
     detectCards();
 
-    if (gpuList.size() == 0)
+    if (gpuList.size() == 0) {
+        qWarning() << "No cards found!";
         return false;
+    }
 
     driverHandler = new dXorg(gpuList.at(0));
     defineAvailableDataContainer();

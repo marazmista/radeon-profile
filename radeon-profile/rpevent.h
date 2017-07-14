@@ -3,11 +3,11 @@
 
 #include "globalStuff.h"
 
-enum rpeventType {
-    TEMPEREATURE, BIANRY
+enum RPEventType {
+    TEMPERATURE, BINARY
 };
 
-struct checkInfoStruct {
+struct CheckInfoStruct {
     unsigned short checkTemperature;
 };
 
@@ -21,14 +21,14 @@ public:
     PowerProfiles dpmProfileChange;
     ForcePowerLevels powerLevelChange;
     unsigned short fixedFanSpeedChange, activationTemperature, fanComboIndex;
-    rpeventType type;
+    RPEventType type;
 
-    bool isActivationConditonFulfilled(const checkInfoStruct &check) {
+    bool isActivationConditonFulfilled(const CheckInfoStruct &check) {
         switch (type) {
-            case rpeventType::TEMPEREATURE:
+            case RPEventType::TEMPERATURE:
                 return activationTemperature < check.checkTemperature;
                 break;
-            case rpeventType::BIANRY:
+            case RPEventType::BINARY:
                 return !globalStuff::grabSystemInfo("pidof \""+activationBinary+"\"")[0].isEmpty();
                 break;
         }

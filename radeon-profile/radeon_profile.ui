@@ -24,7 +24,7 @@
     <normaloff>:/icon/extra/radeon-profile.png</normaloff>:/icon/extra/radeon-profile.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_15">
+   <layout class="QGridLayout" name="gridLayout_15" rowstretch="0,0,1" columnstretch="0,1">
     <property name="leftMargin">
      <number>3</number>
     </property>

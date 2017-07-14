@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network widgets charts printsupport
+QT       += core gui network widgets charts
 
 TARGET = radeon-profile
 TEMPLATE = app
