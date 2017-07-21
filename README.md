@@ -7,7 +7,7 @@ Fan control is available only on Radeon HD 7000 series and above.
 
 # Dependencies
 
-* Qt 5.6<= (qt5-base and qt5-charts)
+* Qt 5.6<= (qt5-base and qt5-charts) (qt5-defaults for Ubuntu/debian)
 * libxrandr
 * libdrm (for amdgpu, 2.4.79<=, more recent, the better)
 * recent kernel (for amdgpu 4.12<=, more recent, the better)
@@ -21,10 +21,9 @@ For full functionality:
 # Build
 
 ```
-git clone https://github.com/marazmista/radeon-profile.git &&
+git clone https://github.com/marazmista/radeon-profile.git
 cd radeon-profile/radeon-profile
-qmake &&
-make 
+qmake && make 
 ```
 
 # Links
