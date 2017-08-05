@@ -18,12 +18,24 @@ For full functionality:
 * xdriinfo - driver info
 * xrandr - connected displays
 
+For 17.04, qt5-charts isn't available:
+* Use `qtchooser -l` to list available profiles
+* Use `qmake -qt=[profile from qtchooser]` to specify Qt root or ..
+* Download and install a Qt bundle from https://www.qt.io/download-open-source/#section-2
+* Make a `qt5opt.conf` in `/usr/lib/x86_64-linux-gnu/qtchooser/` containing:
+
+```
+/opt/Qt5.9.1/5.9.1/gcc_64/bin
+/opt/Qt5.9.1/5.9.1
+```
+
 # Build
 
 ```
 git clone https://github.com/marazmista/radeon-profile.git
 cd radeon-profile/radeon-profile
-qmake && make 
+qmake
+make 
 ```
 
 # Links
