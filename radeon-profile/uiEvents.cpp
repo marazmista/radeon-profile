@@ -175,7 +175,11 @@ void radeon_profile::closeFromTray() {
 
 void radeon_profile::on_spin_timerInterval_valueChanged(double arg1)
 {
-    timer->setInterval(arg1*1000);
+    if(timer != nullptr){
+        qDebug() << "Setting timer interval to " << arg1;
+        timer->setInterval(arg1*1000);
+    } else
+        qCritical() << "on_spin_timerInterval_valueChanged: timer is not initialized";
 }
 
 void radeon_profile::refreshBtnClicked() {

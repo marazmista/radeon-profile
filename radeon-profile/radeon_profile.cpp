@@ -53,6 +53,11 @@ radeon_profile::radeon_profile(QWidget *parent) :
     // create runtime stuff, setup rest of ui
     setupUiElements();
 
+    // timer init
+    timer = new QTimer(this);
+    timer->setInterval(ui->spin_timerInterval->value() * 1000);
+
+    // load settings from configuration file
     loadConfig();
 
     if (!device.initialize()) {
@@ -77,9 +82,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     fillConnectors();
     fillModInfo();
 
-    // timer init
-    timer = new QTimer(this);
-    timer->setInterval(ui->spin_timerInterval->value() * 1000);
     timer->start();
 
     showWindow();
