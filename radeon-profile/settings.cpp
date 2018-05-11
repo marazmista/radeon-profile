@@ -249,6 +249,8 @@ void radeon_profile::loadConfig() {
                          desktopSize.height() / 2); // Height
     }
 
+    timer->setInterval(ui->spin_timerInterval->value() * 1000);
+
     if (ui->cb_stats->isChecked())
         ui->tabs_systemInfo->setTabEnabled(3,true);
     else

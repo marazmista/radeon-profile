@@ -241,12 +241,12 @@ GPUClocks dXorg::getClocksFromPmFile() {
             rx.setPattern(rxPatterns.vddc);
             rx.indexIn(data);
             if (!rx.cap(0).isEmpty())
-                clocksData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
+                clocksData.coreVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toInt();
 
             rx.setPattern(rxPatterns.vddci);
             rx.indexIn(data);
             if (!rx.cap(0).isEmpty())
-                clocksData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toFloat();
+                clocksData.memVolt = rx.cap(0).split(' ',QString::SkipEmptyParts)[rxMatchIndex].toInt();
 
             return clocksData;
         }
@@ -293,7 +293,6 @@ float dXorg::getTemperature() {
         temp = hwmon.readLine(20);
         hwmon.close();
         return temp.toFloat() / 1000;
-        break;
     }
     case TemperatureSensor::PCI_SENSOR: {
         QStringList out = globalStuff::grabSystemInfo("sensors");

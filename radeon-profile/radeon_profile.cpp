@@ -49,6 +49,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     ticksCounter = 0;
     statsTickCounter = 0;
 	savedState = nullptr;
+    timer = new QTimer(this);
 
     // create runtime stuff, setup rest of ui
     setupUiElements();
@@ -77,9 +78,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     fillConnectors();
     fillModInfo();
 
-    // timer init
-    timer = new QTimer(this);
-    timer->setInterval(ui->spin_timerInterval->value() * 1000);
     timer->start();
 
     showWindow();
