@@ -336,6 +336,7 @@ void radeon_profile::refreshUI() {
 
 void radeon_profile::createCurrentGpuDataListItems()
 {
+    ui->list_currentGPUData->clear();
     for (int i = 0; i < device.gpuData.keys().count(); ++i) {
 
         // exclude before current from list
