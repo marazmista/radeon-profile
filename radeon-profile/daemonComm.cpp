@@ -16,7 +16,7 @@ daemonComm::~daemonComm() {
 void daemonComm::connectToDaemon() {
     qDebug() << "Connecting to daemon";
     signalSender->abort();
-    signalSender->connectToServer("radeon-profile-daemon-server");
+    signalSender->connectToServer("/tmp/radeon-profile-daemon-server");
 }
 
 void daemonComm::sendCommand(const QString command) {
