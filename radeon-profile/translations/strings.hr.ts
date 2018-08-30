@@ -4,147 +4,548 @@
 <context>
     <name>Dialog_RPEvent</name>
     <message>
-        <location filename="../dialog_rpevent.ui" line="20"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="20"/>
         <source>Event definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Određivanje događaja</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="35"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="35"/>
         <source>Save</source>
-        <translation type="unfinished">Spremi</translation>
+        <translation>Spremi</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="48"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="48"/>
         <source>Cancel</source>
-        <translation type="unfinished">Odustani</translation>
+        <translation>Odustani</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="61"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="272"/>
         <source>Event trigger</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokretač događaja</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="74"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="238"/>
         <source>Event name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naziv događaja</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="98"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="259"/>
         <source>Temperature</source>
-        <translation type="unfinished">Temperatura</translation>
+        <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="103"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="264"/>
         <source>Binary</source>
-        <translation type="unfinished">Binarna datoteka</translation>
+        <translation>Binarna datoteka</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="117"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="61"/>
         <source>Modify:</source>
-        <translation type="unfinished"></translation>
+        <translation>Prilagodba:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="132"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="130"/>
         <source>Set power level:</source>
-        <translation type="unfinished"></translation>
+        <translation>Postavi razinu energije:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="140"/>
-        <location filename="../dialog_rpevent.ui" line="149"/>
-        <location filename="../dialog_rpevent.ui" line="165"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="83"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="92"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="101"/>
         <source>No change</source>
-        <translation type="unfinished"></translation>
+        <translation>Bez promjene</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="157"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="123"/>
         <source>Set fan:</source>
-        <translation type="unfinished"></translation>
+        <translation>Postavi ventilator:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="173"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="137"/>
         <source>Set DPM to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Postavi DPM na:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="189"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="116"/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>%</translatorcomment>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="233"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="166"/>
         <source>Activate above this temperature:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviraj iznad ove temperature:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="261"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="194"/>
         <source>Binary (executing this binary will trigger event):</source>
-        <translation type="unfinished"></translation>
+        <translation>Binarna datoteka (Pokretanje ove binarne datoteke će pokrenuti događaj):</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="284"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="217"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.ui" line="302"/>
+        <location filename="../dialogs/dialog_rpevent.ui" line="248"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Omogućeno</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="31"/>
+        <location filename="../dialogs/dialog_rpevent.cpp" line="33"/>
         <source>Set Profile to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Postavi profil na:</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="37"/>
+        <location filename="../dialogs/dialog_rpevent.cpp" line="39"/>
         <source>Auto</source>
-        <translation type="unfinished">Automatski</translation>
+        <translation>Automatski</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="38"/>
+        <location filename="../dialogs/dialog_rpevent.cpp" line="40"/>
         <source>Fixed speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Nepromjenjiva brzina</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="74"/>
+        <location filename="../dialogs/dialog_rpevent.cpp" line="76"/>
         <source>Selected trigger type is Binary, so the binary field cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Odabrana vrsta pokretanja je binarna datoteka, stoga polje binarne datoteke ne može biti prazno.</translation>
     </message>
     <message>
-        <location filename="../dialog_rpevent.cpp" line="135"/>
+        <location filename="../dialogs/dialog_rpevent.cpp" line="138"/>
         <source>Select binary</source>
-        <translation type="unfinished">Odaberi binarnu datoteku</translation>
+        <translation>Odaberi binarnu datoteku</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_definePlot</name>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="26"/>
+        <source>Plot definition</source>
+        <translation>Definiranje grafikona</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="72"/>
+        <source>Grid thickness</source>
+        <translation>Debljina mreže</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="107"/>
+        <location filename="../dialogs/dialog_defineplot.ui" line="238"/>
+        <source>Set grid color</source>
+        <translation>Boja mreže</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="114"/>
+        <location filename="../dialogs/dialog_defineplot.ui" line="248"/>
+        <source>Ticks</source>
+        <translation>Gustoća mreže</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="143"/>
+        <location filename="../dialogs/dialog_defineplot.ui" line="299"/>
+        <source>Data</source>
+        <translation>Podaci</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="148"/>
+        <location filename="../dialogs/dialog_defineplot.ui" line="304"/>
+        <source>Color</source>
+        <translation>Boja</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="156"/>
+        <location filename="../dialogs/dialog_defineplot.ui" line="312"/>
+        <source>Grid style</source>
+        <translation>Izgled mreže</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="206"/>
+        <source>Gird thickness</source>
+        <translation>Debljina mreže</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="338"/>
+        <source>Enable left scale</source>
+        <translation>Omogući lijevu skalu</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="351"/>
+        <source>Enable right scale</source>
+        <translation>Omogući desnu skalu</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="364"/>
+        <source>Set background color</source>
+        <translation>Postavi boju pozadine</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="377"/>
+        <source>Plot name:</source>
+        <translation>Naziv grafikona:</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="422"/>
+        <source>Save</source>
+        <translation>Spremi</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.ui" line="435"/>
+        <source>Cancel</source>
+        <translation>Odustani</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.cpp" line="79"/>
+        <source>Solid line</source>
+        <translation>Puna linija</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.cpp" line="80"/>
+        <source>Dash line</source>
+        <translation>Iscrtana linija</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.cpp" line="81"/>
+        <source>Dot Line</source>
+        <translation>Točkasta linija</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.cpp" line="162"/>
+        <source>Values with different units cannot be selected for the same scale</source>
+        <translation>Vrijednosti drugačije mjerne jedinice se ne mogu odabrati na istoj skali</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.cpp" line="184"/>
+        <location filename="../dialogs/dialog_defineplot.cpp" line="190"/>
+        <source>Info</source>
+        <translation>Informacije</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.cpp" line="184"/>
+        <source>Name cannot be empty.</source>
+        <translation>Naziv ne može biti prazan.</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_defineplot.cpp" line="190"/>
+        <source>Cannot create empty plot.</source>
+        <translation>Ne može se stvoriti prazan grafikon.</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_deineTopbarItem</name>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="26"/>
+        <source>Topbar item</source>
+        <translation>Stavke gornje trake</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="47"/>
+        <source>Cancel</source>
+        <translation>Odustani</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="54"/>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="61"/>
+        <source>Set color</source>
+        <translation>Postavi boju</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="81"/>
+        <source>Type</source>
+        <translation>Vrsta</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="109"/>
+        <source>Label pair</source>
+        <translation>Natpis u paru</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="126"/>
+        <source>Large label</source>
+        <translation>Veliki natpis</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="140"/>
+        <source>Pie</source>
+        <translation>Kružni brojač</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="155"/>
+        <source>Secondary data</source>
+        <translation>Pomoćni podaci</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="167"/>
+        <source>Primary data</source>
+        <translation>Glavni podaci</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_deinetopbaritem.ui" line="174"/>
+        <source>Save</source>
+        <translation>Spremi</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_topbarCfg</name>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.ui" line="26"/>
+        <source>Topbar configuration</source>
+        <translation>Prilagodba gornje trake</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.ui" line="47"/>
+        <source>Add</source>
+        <translation>Dodaj</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.ui" line="54"/>
+        <source>Modify</source>
+        <translation>Prilagodi</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.ui" line="67"/>
+        <source>&lt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.ui" line="87"/>
+        <source>OK</source>
+        <translation>U redu</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.ui" line="100"/>
+        <source>&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.ui" line="120"/>
+        <source>Cancel</source>
+        <translation>Odustani</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.ui" line="137"/>
+        <source>Remove</source>
+        <translation>Ukloni</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.cpp" line="103"/>
+        <source>Question</source>
+        <translation>Pitanje</translation>
+    </message>
+    <message>
+        <location filename="../dialogs/dialog_topbarcfg.cpp" line="103"/>
+        <source>Remove selected item?</source>
+        <translation>Ukloni odabranu stavku?</translation>
+    </message>
+</context>
+<context>
+    <name>ExecBin</name>
+    <message>
+        <location filename="../execbin.cpp" line="41"/>
+        <source>Save output to file</source>
+        <translation>Spremi izlaz u datoteku</translation>
+    </message>
+    <message>
+        <location filename="../execbin.cpp" line="45"/>
+        <source>Command</source>
+        <translation>Naredba</translation>
+    </message>
+    <message>
+        <location filename="../execbin.cpp" line="47"/>
+        <source>Output</source>
+        <translation>Izlaz</translation>
+    </message>
+    <message>
+        <location filename="../execbin.cpp" line="77"/>
+        <source>Process state: running</source>
+        <translation>Stanje procesa: pokrenuto</translation>
+    </message>
+    <message>
+        <location filename="../execbin.cpp" line="89"/>
+        <source>Process state: not running</source>
+        <translation>Stanje procesa: nije pokrenuto</translation>
+    </message>
+    <message>
+        <location filename="../execbin.cpp" line="93"/>
+        <source>Save</source>
+        <translation>Spremi</translation>
+    </message>
+</context>
+<context>
+    <name>PieProgressBar</name>
+    <message>
+        <location filename="../components/pieprogressbar.ui" line="32"/>
+        <source>PieProgressBar</source>
+        <translation>Traka napredka kružnog brojača</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../gpu.cpp" line="458"/>
-        <location filename="../gpu.cpp" line="527"/>
+        <location filename="../gpu.cpp" line="580"/>
+        <location filename="../gpu.cpp" line="649"/>
         <source>Resolution</source>
-        <translation type="unfinished">Razlučivost</translation>
+        <translation>Razlučivost</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="466"/>
+        <location filename="../gpu.cpp" line="588"/>
         <source>Minimum resolution</source>
-        <translation type="unfinished">Najmanja razlučivost</translation>
+        <translation>Najmanja razlučivost</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="469"/>
+        <location filename="../gpu.cpp" line="591"/>
         <source>Maximum resolution</source>
-        <translation type="unfinished">Najveća razlučivost</translation>
+        <translation>Najveća razlučivost</translation>
     </message>
     <message>
+        <location filename="../globalStuff.h" line="365"/>
+        <source>Core clock</source>
+        <translation>Frekvencija jezgre</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="367"/>
+        <source>Core volt</source>
+        <translation>Napon jezgre</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="368"/>
+        <source>Memory volt</source>
+        <translation>Napon memorije</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="370"/>
+        <source>GPU usage</source>
+        <translation>GPU upotreba</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="371"/>
+        <source>GPU Vram usage</source>
+        <translation>GPU vram upotreba</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="372"/>
+        <source>Fan speed RPM</source>
+        <translation>Brzina ventilatora (okr/min)</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="374"/>
+        <source>Temperature (max)</source>
+        <translation>Temperatura (maks)</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="375"/>
+        <source>Temperature (min)</source>
+        <translation>Temperatura (min)</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="376"/>
+        <source>GPU Vram megabyte usage</source>
+        <translation>GPU vram upotreba u megabajtima</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="377"/>
         <source>Power level</source>
-        <translation type="obsolete">Razina energije</translation>
+        <translation>Razina energije</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="387"/>
+        <source>Core clock [MHz]</source>
+        <translation>Frekvencija jezgre [MHz]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="388"/>
+        <source>Memory clock [MHz]</source>
+        <translation>Frekvencija memorije [MHz]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="389"/>
+        <source>Core volt [mV]</source>
+        <translation>Napon jezgre [mV]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="390"/>
+        <source>Memory volt [mV]</source>
+        <translation>Napon memorije [mV]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="391"/>
+        <source>Fan speed [%]</source>
+        <translation>Brzina ventilatora [%]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="392"/>
+        <source>GPU usage [%]</source>
+        <translation>GPU upotreba [%]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="393"/>
+        <source>GPU Vram usage [%]</source>
+        <translation>GPU vram upotreba [%]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="394"/>
+        <source>Fan speed [rpm]</source>
+        <translation>Brzina ventilatora (okr/min)</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="395"/>
+        <location filename="../globalStuff.h" line="413"/>
+        <source>Temperature [</source>
+        <translation>Temperatura [</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="396"/>
+        <source>Temperature (max) [</source>
+        <translation>Temperatura (maks) [</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="397"/>
+        <source>Temperature (min) [</source>
+        <translation>Temperatura (min) [</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="398"/>
+        <source>GPU Vram usage [MB]</source>
+        <translation>GPU vram upotreba [MB]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="399"/>
+        <source>Power level </source>
+        <translation>Razina energije </translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="409"/>
+        <source>Megahertz [MHz]</source>
+        <translation>Megaherci [MHz]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="410"/>
+        <source>Megabyte [MB]</source>
+        <translation>Megabajti [MB]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="411"/>
+        <source>Percent [%]</source>
+        <translation>Postoci [%]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="412"/>
+        <source>Milivolt [mV]</source>
+        <translation>Milivolti [mV]</translation>
+    </message>
+    <message>
+        <location filename="../globalStuff.h" line="414"/>
+        <source>Speed [RPM]</source>
+        <translation>Brzina okretaja (okr/min)</translation>
     </message>
     <message>
         <source>GPU clock</source>
         <translation type="obsolete">GPU frekvencija</translation>
     </message>
     <message>
+        <location filename="../globalStuff.h" line="366"/>
         <source>Memory clock</source>
-        <translation type="obsolete">Frekvencija memorije</translation>
+        <translation>Frekvencija memorije</translation>
     </message>
     <message>
         <source>UVD core clock (cclk)</source>
@@ -167,9 +568,8 @@
         <translation type="obsolete">GPU temperatura</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="763"/>
         <source>No info</source>
-        <translation type="unfinished">Nema informacija</translation>
+        <translation type="vanished">Nema informacija</translation>
     </message>
     <message>
         <source>Back to profiles</source>
@@ -244,117 +644,118 @@
         <translation type="obsolete">&quot;?</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="89"/>
         <source>Unknown</source>
-        <translation type="unfinished">Nepoznato</translation>
-    </message>
-    <message>
-        <location filename="../gpu.cpp" line="472"/>
-        <source>Virtual size</source>
-        <translation type="unfinished">Virtualna dimenzija</translation>
-    </message>
-    <message>
-        <location filename="../gpu.cpp" line="482"/>
-        <source>Outputs</source>
-        <translation type="unfinished">Izlazi</translation>
-    </message>
-    <message>
-        <location filename="../gpu.cpp" line="516"/>
-        <location filename="../gpu.cpp" line="518"/>
-        <source>Active</source>
-        <translation type="unfinished">Aktivno</translation>
+        <translation type="vanished">Nepoznato</translation>
     </message>
     <message>
         <location filename="../gpu.cpp" line="594"/>
+        <source>Virtual size</source>
+        <translation>Virtualna dimenzija</translation>
+    </message>
+    <message>
+        <location filename="../gpu.cpp" line="604"/>
+        <source>Outputs</source>
+        <translation>Izlazi</translation>
+    </message>
+    <message>
+        <location filename="../gpu.cpp" line="638"/>
+        <location filename="../gpu.cpp" line="640"/>
+        <source>Active</source>
+        <translation>Aktivno</translation>
+    </message>
+    <message>
+        <location filename="../gpu.cpp" line="714"/>
         <source> Hz vertical, </source>
-        <translation type="unfinished"> Hz okomito, </translation>
+        <translation> Hz okomito, </translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="597"/>
+        <location filename="../gpu.cpp" line="717"/>
         <source> KHz horizontal, </source>
-        <translation type="unfinished">KHz vodoravno,</translation>
+        <translation> KHz vodoravno, </translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="600"/>
+        <location filename="../gpu.cpp" line="720"/>
         <source> MHz dot clock</source>
-        <translation type="unfinished"> MHz frekvenicja točke</translation>
+        <translation> MHz frekvenicja točke</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="518"/>
+        <location filename="../gpu.cpp" line="640"/>
         <source>Yes</source>
-        <translation type="unfinished">Da</translation>
+        <translation>Da</translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="452"/>
+        <location filename="../gpu.cpp" line="574"/>
         <source>Virtual screen n°%n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Virtualn zaslon %n</numerusform>
+            <numerusform>Virtualn zaslon %n</numerusform>
+            <numerusform>Virtualn zaslon %n</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="516"/>
+        <location filename="../gpu.cpp" line="638"/>
         <source>No</source>
-        <translation type="unfinished">Ne</translation>
+        <translation>Ne</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="533"/>
+        <location filename="../gpu.cpp" line="655"/>
         <source>Refresh rate</source>
-        <translation type="unfinished">Frekvencija osvježavanja</translation>
+        <translation>Frekvencija osvježavanja</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="539"/>
+        <location filename="../gpu.cpp" line="661"/>
         <source>Offset</source>
-        <translation type="unfinished">Pomak</translation>
+        <translation>Pomak</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="551"/>
+        <location filename="../gpu.cpp" line="673"/>
         <source>Brightness (software)</source>
-        <translation type="unfinished">Svjetlina (softver)</translation>
+        <translation>Svjetlina (softver)</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="566"/>
+        <location filename="../gpu.cpp" line="688"/>
         <source>Size</source>
-        <translation type="unfinished">Dimenzija</translation>
+        <translation>Dimenzija</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="569"/>
+        <location filename="../gpu.cpp" line="691"/>
         <source>Supported modes</source>
-        <translation type="unfinished">Podržani načini</translation>
+        <translation>Podržani načini</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="618"/>
+        <location filename="../gpu.cpp" line="738"/>
         <source>Properties</source>
-        <translation type="unfinished">Svojstva</translation>
+        <translation>Svojstva</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="686"/>
+        <location filename="../gpu.cpp" line="804"/>
         <source>Serial number</source>
-        <translation type="unfinished">Serijski broj</translation>
+        <translation>Serijski broj</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="685"/>
+        <location filename="../gpu.cpp" line="803"/>
         <source>Not available</source>
-        <translation type="unfinished">Nedostupno</translation>
+        <translation>Nedostupno</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="677"/>
+        <location filename="../gpu.cpp" line="795"/>
         <source>Connected with </source>
-        <translation type="unfinished">Povezano s </translation>
+        <translation>Povezano s </translation>
     </message>
     <message>
+        <location filename="../globalStuff.h" line="373"/>
         <source>Temperature</source>
-        <translation type="vanished">Temperatura</translation>
+        <translation>Temperatura</translation>
     </message>
     <message>
+        <location filename="../globalStuff.h" line="369"/>
         <source>Fan speed</source>
-        <translation type="obsolete">Brzina ventilatora</translation>
+        <translation>Brzina ventilatora</translation>
     </message>
     <message>
-        <location filename="../gpu.cpp" line="503"/>
+        <location filename="../gpu.cpp" line="625"/>
         <source>Disconnected</source>
-        <translation type="unfinished">Nije povezano</translation>
+        <translation>Nije povezano</translation>
     </message>
     <message>
         <source>Time (s)</source>
@@ -522,58 +923,58 @@ Zatvaranje aplikacije će vratiti automatsko upravljanje ventilatorom. Ako se ap
         <translation type="obsolete">Spremi</translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="472"/>
+        <location filename="../gpu.cpp" line="594"/>
         <source>%n mm</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n mm</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n mm</numerusform>
+            <numerusform>%n mm</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="566"/>
+        <location filename="../gpu.cpp" line="688"/>
         <source>%n mm </source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n mm </numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n mm </numerusform>
+            <numerusform>%n mm </numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="566"/>
+        <location filename="../gpu.cpp" line="688"/>
         <source>(%n inches)</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>(%n inč)</numerusform>
             <numerusform>(%n inča)</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>(%n inča)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="472"/>
-        <location filename="../gpu.cpp" line="566"/>
+        <location filename="../gpu.cpp" line="594"/>
+        <location filename="../gpu.cpp" line="688"/>
         <source>%n mm x </source>
-        <translation type="unfinished">
-            <numerusform>%n mm x</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n mm x </numerusform>
+            <numerusform>%n mm x </numerusform>
+            <numerusform>%n mm x </numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="747"/>
+        <location filename="../gpu.cpp" line="863"/>
         <source>%n connected, </source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n povezan, </numerusform>
             <numerusform>%n povezana, </numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n povezano, </numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../gpu.cpp" line="747"/>
+        <location filename="../gpu.cpp" line="863"/>
         <source>%n active</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n aktivan</numerusform>
             <numerusform>%n aktivna</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n aktivno</numerusform>
         </translation>
     </message>
     <message>
@@ -585,1141 +986,1251 @@ Zatvaranje aplikacije će vratiti automatsko upravljanje ventilatorom. Ako se ap
 <context>
     <name>execBin</name>
     <message>
-        <location filename="../execbin.cpp" line="41"/>
         <source>Save output to file</source>
-        <translation type="unfinished">Spremi izlaz u datoteku</translation>
+        <translation type="obsolete">Spremi izlaz u datoteku</translation>
     </message>
     <message>
-        <location filename="../execbin.cpp" line="45"/>
         <source>Command</source>
-        <translation type="unfinished">Naredba</translation>
+        <translation type="obsolete">Naredba</translation>
     </message>
     <message>
-        <location filename="../execbin.cpp" line="47"/>
         <source>Output</source>
-        <translation type="unfinished">Izlaz</translation>
+        <translation type="obsolete">Izlaz</translation>
     </message>
     <message>
-        <location filename="../execbin.cpp" line="77"/>
         <source>Process state: running</source>
-        <translation type="unfinished">Stanje procesa: pokrenuto</translation>
+        <translation type="obsolete">Stanje procesa: pokrenuto</translation>
     </message>
     <message>
-        <location filename="../execbin.cpp" line="89"/>
         <source>Process state: not running</source>
-        <translation type="unfinished">Stanje procesa: nije pokrenuto</translation>
+        <translation type="obsolete">Stanje procesa: nije pokrenuto</translation>
     </message>
     <message>
-        <location filename="../execbin.cpp" line="93"/>
         <source>Save</source>
-        <translation type="unfinished">Spremi</translation>
+        <translation type="obsolete">Spremi</translation>
     </message>
 </context>
 <context>
     <name>radeon_profile</name>
     <message>
         <location filename="../radeon_profile.ui" line="20"/>
-        <location filename="../radeon_profile.ui" line="3767"/>
+        <location filename="../radeon_profile.ui" line="3783"/>
         <source>Radeon Profile</source>
-        <translation type="unfinished">Radeon profil</translation>
+        <translation>Radeon profil</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="309"/>
-        <location filename="../radeon_profile.cpp" line="284"/>
         <source>GPU temperature</source>
-        <translation type="unfinished">GPU temperatura</translation>
+        <translation type="vanished">GPU temperatura</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="340"/>
-        <location filename="../radeon_profile.cpp" line="269"/>
-        <location filename="../uiElements.cpp" line="44"/>
         <source>GPU clock</source>
-        <translation type="unfinished">GPU frekvencija</translation>
+        <translation type="vanished">GPU frekvencija</translation>
+    </message>
+    <message>
+        <source>Time (s)</source>
+        <translation type="vanished">Vrijeme (s)</translation>
+    </message>
+    <message>
+        <source>Temperature (°C)</source>
+        <translation type="vanished">Temperatura (°C)</translation>
+    </message>
+    <message>
+        <source>Clock (MHz)</source>
+        <translation type="vanished">Frekvencija (MHz)</translation>
+    </message>
+    <message>
+        <source>Voltage (mV)</source>
+        <translation type="vanished">Napon (mV)</translation>
+    </message>
+    <message>
+        <source>Fan speed</source>
+        <translation type="vanished">Brzina ventilatora</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="17"/>
-        <location filename="../uiElements.cpp" line="19"/>
-        <location filename="../uiElements.cpp" line="21"/>
-        <source>Time (s)</source>
-        <translation type="unfinished">Vrijeme (s)</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="18"/>
-        <source>Temperature (°C)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="20"/>
-        <source>Clock (MHz)</source>
-        <translation type="unfinished">Frekvencija (MHz)</translation>
+        <location filename="../uiEvents.cpp" line="151"/>
+        <source>Quit</source>
+        <translation>Zatvori</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="22"/>
-        <source>Voltage (mV)</source>
-        <translation type="unfinished">Napon (mV)</translation>
+        <source>Change standard profile</source>
+        <translation>Promijeni standardni profil</translation>
     </message>
     <message>
+        <location filename="../uiElements.cpp" line="29"/>
+        <source>Keep refreshing when hidden</source>
+        <translation>Nastavi osvježavati dok je skriveno</translation>
+    </message>
+    <message>
+        <source>Reset min/max temperature</source>
+        <translation type="vanished">Vrati zadanu min/maks temperaturu</translation>
+    </message>
+    <message>
+        <source>Reset graphs vertical scale</source>
+        <translation type="vanished">Vrati zadane grafikone okomite promjene veličine</translation>
+    </message>
+    <message>
+        <source>Show legend</source>
+        <translation type="vanished">Prikaži legendu</translation>
+    </message>
+    <message>
+        <source>Graph offset on right</source>
+        <translation type="vanished">Pomak grafikona ulijevo</translation>
+    </message>
+    <message>
+        <location filename="../uiElements.cpp" line="78"/>
+        <source>Pause refresh temporairly</source>
+        <translation>Pauziraj privremeno osvježavanje</translation>
+    </message>
+    <message>
+        <location filename="../uiElements.cpp" line="83"/>
+        <source>Reset min and max temperatures</source>
+        <translation>Vrati izvornu min i maks temperaturu</translation>
+    </message>
+    <message>
+        <location filename="../uiElements.cpp" line="103"/>
+        <source>Force power level</source>
+        <translation>Profil energije</translation>
+    </message>
+    <message>
+        <location filename="../uiElements.cpp" line="116"/>
+        <location filename="../uiElements.cpp" line="122"/>
+        <source>Copy to clipboard</source>
+        <translation>Kopiraj u međuspremnik</translation>
+    </message>
+    <message>
+        <location filename="../uiElements.cpp" line="128"/>
+        <source>Reset statistics</source>
+        <translation>Vrati zadanu statistiku</translation>
+    </message>
+    <message>
+        <location filename="../uiElements.cpp" line="150"/>
+        <location filename="../uiEvents.cpp" line="55"/>
+        <source>Fixed </source>
+        <translation>Nepromjenjivo </translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="58"/>
+        <source>GPU</source>
+        <translation>GPU</translation>
+    </message>
+    <message>
+        <source>Memory clock</source>
+        <translation type="vanished">Frekvencija memorije</translation>
+    </message>
+    <message>
+        <source>GPU voltage</source>
+        <translation type="vanished">GPU napon</translation>
+    </message>
+    <message>
+        <source>I/O voltage</source>
+        <translation type="vanished">I/U napon</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="385"/>
+        <source>GPU Summary</source>
+        <translation>GPU sažetak</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="434"/>
+        <source>Property</source>
+        <translation>Svojstva</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="439"/>
+        <location filename="../radeon_profile.ui" line="583"/>
+        <source>Value</source>
+        <translation>Vrijednosti</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <translation type="vanished">Profili</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="339"/>
+        <source>Change profile</source>
+        <translation>Promijeni profil</translation>
+    </message>
+    <message>
+        <location filename="../uiElements.cpp" line="33"/>
+        <source>DPM</source>
+        <translation>DPM</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="303"/>
+        <location filename="../radeon_profile.ui" line="1420"/>
+        <location filename="../uiElements.cpp" line="95"/>
+        <location filename="../uiElements.cpp" line="143"/>
+        <source>Auto</source>
+        <translation>Automatski</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="172"/>
         <location filename="../uiElements.cpp" line="39"/>
-        <source>Fan speed</source>
-        <translation type="unfinished">Brzina ventilatora</translation>
+        <source>Battery</source>
+        <translation>Baterija</translation>
     </message>
     <message>
-        <location filename="../uiElements.cpp" line="93"/>
-        <location filename="../uiEvents.cpp" line="201"/>
-        <source>Quit</source>
-        <translation type="unfinished">Zatvori</translation>
+        <location filename="../radeon_profile.ui" line="201"/>
+        <location filename="../uiElements.cpp" line="41"/>
+        <source>Balanced</source>
+        <translation>Uravnoteženo</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="230"/>
+        <location filename="../uiElements.cpp" line="43"/>
+        <source>Performance</source>
+        <translation>Performanse</translation>
     </message>
     <message>
         <location filename="../uiElements.cpp" line="98"/>
-        <source>Change standard profile</source>
-        <translation type="unfinished">Promijeni standardni profil</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="105"/>
-        <source>Keep refreshing when hidden</source>
-        <translation type="unfinished">Nastavi osvježavati dok je skriveno</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="154"/>
-        <source>Reset min/max temperature</source>
-        <translation type="unfinished">Vrati zadanu min/maks temperaturu</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="157"/>
-        <source>Reset graphs vertical scale</source>
-        <translation type="unfinished">Vrati zadane grafikone okomite promjene veličine</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="160"/>
-        <source>Show legend</source>
-        <translation type="unfinished">Prikaži legendu</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="165"/>
-        <source>Graph offset on right</source>
-        <translation type="unfinished">Pomak grafikona ulijevo</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="193"/>
-        <source>Force power level</source>
-        <translation type="unfinished">Profil energije</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="206"/>
-        <location filename="../uiElements.cpp" line="212"/>
-        <source>Copy to clipboard</source>
-        <translation type="unfinished">Kopiraj u međuspremnik</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="218"/>
-        <source>Reset statistics</source>
-        <translation type="unfinished">Vrati zadanu statistiku</translation>
-    </message>
-    <message>
-        <location filename="../uiElements.cpp" line="240"/>
-        <location filename="../uiEvents.cpp" line="58"/>
-        <source>Fixed </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="67"/>
-        <source>GPU</source>
-        <translation type="unfinished">GPU</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="244"/>
-        <location filename="../radeon_profile.cpp" line="271"/>
-        <location filename="../uiElements.cpp" line="45"/>
-        <source>Memory clock</source>
-        <translation type="unfinished">Frekvencija memorije</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="275"/>
-        <source>GPU voltage</source>
-        <translation type="unfinished">GPU napon</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="213"/>
-        <source>I/O voltage</source>
-        <translation type="unfinished">I/O napon</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="386"/>
-        <source>GPU Summary</source>
-        <translation type="unfinished">GPU sažetak</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="480"/>
-        <location filename="../radeon_profile.ui" line="3622"/>
-        <source>Property</source>
-        <translation type="unfinished">Svojstva</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="485"/>
-        <location filename="../radeon_profile.ui" line="799"/>
-        <source>Value</source>
-        <translation type="unfinished">Vrijednosti</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="524"/>
-        <source>Profiles</source>
-        <translation>Profili</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="536"/>
-        <source>Change profile</source>
-        <translation type="unfinished">Promijeni profil</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="542"/>
-        <location filename="../uiElements.cpp" line="109"/>
-        <source>DPM</source>
-        <translation type="unfinished">DPM</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="569"/>
-        <location filename="../radeon_profile.ui" line="1354"/>
-        <location filename="../uiElements.cpp" line="185"/>
-        <location filename="../uiElements.cpp" line="233"/>
-        <source>Auto</source>
-        <translation type="unfinished">Automatski</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="582"/>
-        <location filename="../uiElements.cpp" line="115"/>
-        <source>Battery</source>
-        <translation type="unfinished">Baterija</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="602"/>
-        <location filename="../uiElements.cpp" line="117"/>
-        <source>Balanced</source>
-        <translation type="unfinished">Uravnoteženo</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="619"/>
-        <location filename="../uiElements.cpp" line="119"/>
-        <source>Performance</source>
-        <translation type="unfinished">Performanse</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="636"/>
-        <location filename="../uiElements.cpp" line="188"/>
         <source>Low</source>
-        <translation type="unfinished">Nisko</translation>
+        <translation>Nisko</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="649"/>
-        <location filename="../uiElements.cpp" line="191"/>
+        <location filename="../uiElements.cpp" line="101"/>
         <source>High</source>
-        <translation type="unfinished">Visoko</translation>
+        <translation>Visoko</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="667"/>
+        <location filename="../radeon_profile.ui" line="451"/>
         <source>GLX info</source>
-        <translation type="unfinished">GLX informacije</translation>
+        <translation>GLX informacije</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="704"/>
-        <location filename="../radeon_profile.ui" line="3465"/>
+        <location filename="../radeon_profile.ui" line="488"/>
         <source>Connectors</source>
-        <translation type="unfinished">Priključci</translation>
+        <translation>Priključci</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="741"/>
+        <location filename="../radeon_profile.ui" line="525"/>
         <source>Connector</source>
-        <translation type="unfinished">Priključak</translation>
+        <translation>Priključak</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="746"/>
+        <location filename="../radeon_profile.ui" line="530"/>
         <source>Status</source>
-        <translation type="unfinished">Stanje</translation>
+        <translation>Stanje</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="755"/>
+        <location filename="../radeon_profile.ui" line="539"/>
         <source>Module info</source>
-        <translation type="unfinished">Informacije modula</translation>
+        <translation>Informacije modula</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="794"/>
+        <location filename="../radeon_profile.ui" line="578"/>
         <source>Option</source>
-        <translation type="unfinished">Mogućnosti</translation>
+        <translation>Mogućnosti</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="804"/>
+        <location filename="../radeon_profile.ui" line="588"/>
         <source>Description</source>
-        <translation type="unfinished">Opis</translation>
+        <translation>Opis</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="813"/>
+        <location filename="../radeon_profile.ui" line="597"/>
         <source>Stats</source>
-        <translation type="unfinished">Statistika</translation>
+        <translation>Statistika</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="157"/>
-        <location filename="../radeon_profile.ui" line="853"/>
-        <location filename="../radeon_profile.cpp" line="267"/>
+        <location filename="../radeon_profile.ui" line="277"/>
+        <location filename="../radeon_profile.ui" line="637"/>
         <source>Power level</source>
-        <translation type="unfinished">Razine energije</translation>
+        <translation>Razine energije</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="95"/>
+        <location filename="../radeon_profile.ui" line="119"/>
         <source>Selected GPU</source>
-        <translation type="unfinished">Odabrani GPU</translation>
+        <translation>Odabrani GPU</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="126"/>
         <source>Power profile</source>
-        <translation type="unfinished">Profil energije</translation>
+        <translation type="vanished">Profil energije</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="185"/>
         <source>999%</source>
-        <translation type="unfinished">999%</translation>
+        <translation type="vanished">999%</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="312"/>
         <source>99.9°C</source>
-        <translation type="unfinished">99.9°C</translation>
+        <translation type="vanished">99.9°C</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="247"/>
-        <location filename="../radeon_profile.ui" line="343"/>
         <source>9999MHz</source>
-        <translation type="unfinished">9999MHz</translation>
+        <translation type="vanished">9999MHz</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="216"/>
-        <location filename="../radeon_profile.ui" line="281"/>
         <source>9999mV</source>
-        <translation type="unfinished">9999mV</translation>
+        <translation type="vanished">9999mV</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="858"/>
+        <location filename="../radeon_profile.ui" line="642"/>
         <source>Time</source>
-        <translation type="unfinished">Vrijeme</translation>
+        <translation>Vrijeme</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="871"/>
-        <location filename="../radeon_profile.ui" line="3408"/>
-        <location filename="../radeon_profile.ui" line="3565"/>
+        <location filename="../radeon_profile.ui" line="655"/>
+        <location filename="../radeon_profile.ui" line="3458"/>
         <source>Graphs</source>
-        <translation type="unfinished">Grafikoni</translation>
+        <translation>Grafikoni</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="943"/>
         <source>Reset min max temps and graphs scale</source>
-        <translation type="unfinished">Vrati na početno min/maks promjene temperatura i grafikona</translation>
+        <translation type="vanished">Vrati na početno min/maks promjene temperatura i grafikona</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="946"/>
         <source>Options</source>
-        <translation type="unfinished">Mogućnosti</translation>
+        <translation type="vanished">Mogućnosti</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="959"/>
         <source>Clocks graph</source>
-        <translation type="unfinished">Grafikon frekvencije</translation>
+        <translation type="vanished">Grafikon frekvencije</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="991"/>
         <source>Volts graph</source>
-        <translation type="unfinished">Grafikon napona</translation>
+        <translation type="vanished">Grafikon napona</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1004"/>
         <source>Temperature graph</source>
-        <translation type="unfinished">Grafikon temperature</translation>
+        <translation type="vanished">Grafikon temperature</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1085"/>
         <source>1h</source>
-        <translation type="unfinished">1h</translation>
+        <translation type="vanished">1h</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1092"/>
         <source>30s</source>
-        <translation type="unfinished">30s</translation>
+        <translation type="vanished">30s</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1111"/>
         <source>temps label</source>
-        <translation type="unfinished">Temperatura</translation>
+        <translation type="vanished">Temperatura</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1322"/>
+        <location filename="../radeon_profile.ui" line="1385"/>
         <source>Fan Control</source>
-        <translation type="unfinished">Upravljanje ventilatorom</translation>
+        <translation>Upravljanje ventilatorom</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1379"/>
+        <location filename="../radeon_profile.ui" line="1445"/>
         <source>Fixed</source>
-        <translation type="unfinished">Nepromjenjivo</translation>
+        <translation>Nepromjenjivo</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1401"/>
+        <location filename="../radeon_profile.ui" line="1467"/>
         <source>Custom curve</source>
-        <translation type="unfinished">Prilagođena krivulja</translation>
+        <translation>Prilagođena krivulja</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1424"/>
-        <location filename="../radeon_profile.ui" line="1931"/>
+        <location filename="../radeon_profile.ui" line="1490"/>
+        <location filename="../radeon_profile.ui" line="1970"/>
         <source>Info</source>
-        <translation type="unfinished">Informacije</translation>
+        <translation>Informacije</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1271"/>
-        <location filename="../radeon_profile.ui" line="1453"/>
+        <location filename="../radeon_profile.ui" line="822"/>
+        <location filename="../radeon_profile.ui" line="1377"/>
+        <location filename="../radeon_profile.ui" line="1585"/>
         <source>Apply</source>
-        <translation type="unfinished">Primijeni</translation>
+        <translation>Primijeni</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1122"/>
+        <location filename="../radeon_profile.ui" line="1056"/>
+        <location filename="../radeon_profile.ui" line="1081"/>
         <source>Overclock</source>
-        <translation type="unfinished">Overklokiranje</translation>
+        <translation>Overklokiranje</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1163"/>
+        <location filename="../radeon_profile.ui" line="1071"/>
         <source>Be careful! Overclock can harm your GPU, use it only if you know what you are doing!</source>
         <oldsource>Be careful! Overclock can harm your GPU, use it at your own risk!</oldsource>
-        <translation type="unfinished">Budite oprezni! Overklokiranje može oštetiti vaš GPU, koristite samo ako znate što radite!</translation>
+        <translation>Budite oprezni! Overklokiranje može oštetiti vaš GPU, koristite samo ako znate što radite!</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1188"/>
         <source>Enable overclock</source>
-        <translation type="unfinished">Omogući overklokiranje</translation>
+        <translation type="vanished">Omogući overklokiranje</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1198"/>
         <source>Apply at launch</source>
         <oldsource>Apply on startup</oldsource>
-        <translation type="unfinished">Primijeni pri pokretanju</translation>
+        <translation type="vanished">Primijeni pri pokretanju</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1513"/>
+        <location filename="../radeon_profile.ui" line="1572"/>
         <source>20%</source>
-        <translation type="unfinished">20%</translation>
+        <translation>20%</translation>
     </message>
     <message>
         <source> / 100%</source>
         <translation type="obsolete"> / 100%</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1774"/>
-        <location filename="../fanControlTab.cpp" line="190"/>
-        <location filename="../fanControlTab.cpp" line="243"/>
-        <location filename="../uiElements.cpp" line="38"/>
+        <location filename="../radeon_profile.ui" line="1775"/>
+        <location filename="../fanControlTab.cpp" line="189"/>
+        <location filename="../fanControlTab.cpp" line="246"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1779"/>
+        <location filename="../radeon_profile.ui" line="1780"/>
+        <location filename="../radeon_profile.cpp" line="193"/>
         <source>Fan Speed [%]</source>
-        <translation type="unfinished">Brzina ventilatora [%]</translation>
+        <translation>Brzina ventilatora [%]</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1744"/>
+        <location filename="../radeon_profile.ui" line="1801"/>
         <source>Add step</source>
-        <translation type="unfinished">Dodaj korak</translation>
+        <translation>Dodaj korak</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1763"/>
+        <location filename="../radeon_profile.ui" line="1721"/>
         <source>Remove step</source>
-        <translation type="unfinished">Ukloni korak</translation>
+        <translation>Ukloni korak</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1941"/>
+        <location filename="../radeon_profile.ui" line="1980"/>
         <source>Exec</source>
-        <translation type="unfinished">Binarna datoteka</translation>
+        <translation>Binarna datoteka</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2401"/>
+        <location filename="../radeon_profile.ui" line="2443"/>
         <source>Warning! Unrecommended root mode!</source>
-        <translation type="unfinished">Upozorenje! Nepreporučen korijenski način!</translation>
+        <translation>Upozorenje! Nepreporučen korijenski način!</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2423"/>
+        <location filename="../radeon_profile.ui" line="2465"/>
         <source>Name</source>
-        <translation type="unfinished">Naziv</translation>
+        <translation>Naziv</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2428"/>
+        <location filename="../radeon_profile.ui" line="2470"/>
         <source>Binary</source>
-        <translation type="unfinished">Binarna datoteka</translation>
+        <translation>Binarna datoteka</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2433"/>
+        <location filename="../radeon_profile.ui" line="2475"/>
         <source>Params</source>
         <translation>Parametri</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2438"/>
+        <location filename="../radeon_profile.ui" line="2480"/>
         <source>Setting</source>
-        <translation type="unfinished">Postavke</translation>
+        <translation>Postavke</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2443"/>
+        <location filename="../radeon_profile.ui" line="2485"/>
         <source>Log file</source>
-        <translation type="unfinished">Datoteka zapisa</translation>
+        <translation>Datoteka zapisa</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2448"/>
+        <location filename="../radeon_profile.ui" line="2490"/>
         <source>Append date-time</source>
-        <translation type="unfinished">Dodaj datum i vrijeme</translation>
+        <translation>Dodaj datum i vrijeme</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1897"/>
-        <location filename="../radeon_profile.ui" line="2458"/>
+        <location filename="../radeon_profile.ui" line="835"/>
+        <location filename="../radeon_profile.ui" line="1936"/>
+        <location filename="../radeon_profile.ui" line="2500"/>
         <source>Add</source>
-        <translation type="unfinished">Dodaj</translation>
+        <translation>Dodaj</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1014"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Izvoz</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1475"/>
+        <location filename="../radeon_profile.ui" line="1534"/>
         <source>10%</source>
-        <translation type="unfinished"></translation>
+        <translation>10%</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1571"/>
+        <location filename="../radeon_profile.ui" line="1741"/>
         <source>Activate</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviraj</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1584"/>
+        <location filename="../radeon_profile.ui" line="1644"/>
         <source>Current profile:</source>
-        <translation type="unfinished"></translation>
+        <translation>Trenutni profil:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1620"/>
+        <location filename="../radeon_profile.ui" line="1788"/>
         <source>Save</source>
-        <translation type="unfinished">Spremi</translation>
+        <translation>Spremi</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1633"/>
+        <location filename="../radeon_profile.ui" line="1734"/>
         <source>Save as</source>
-        <translation type="unfinished"></translation>
+        <translation>Spremi kao</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1646"/>
+        <location filename="../radeon_profile.ui" line="1705"/>
         <source>Remove profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukloni profil</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1703"/>
+        <location filename="../radeon_profile.ui" line="1695"/>
         <source>Unsaved</source>
-        <translation type="unfinished"></translation>
+        <translation>Nespremljeno</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1794"/>
+        <location filename="../radeon_profile.ui" line="1830"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Događaji</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1814"/>
+        <location filename="../radeon_profile.ui" line="1853"/>
         <source>Enable event tracking</source>
-        <translation type="unfinished"></translation>
+        <translation>Omogući praćenje događaja</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1834"/>
+        <location filename="../radeon_profile.ui" line="1873"/>
         <source>Current active event:</source>
-        <translation type="unfinished"></translation>
+        <translation>Trenutni aktivni događaj:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1854"/>
+        <location filename="../radeon_profile.ui" line="1893"/>
         <source>Revoke current event</source>
-        <translation type="unfinished"></translation>
+        <translation>Opozovi trenutni događaj</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1882"/>
+        <location filename="../radeon_profile.ui" line="1921"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Omogućeno</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1887"/>
+        <location filename="../radeon_profile.ui" line="1926"/>
         <source>Event name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naziv događaja</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1904"/>
-        <location filename="../radeon_profile.ui" line="2465"/>
+        <location filename="../radeon_profile.ui" line="796"/>
+        <location filename="../radeon_profile.ui" line="1943"/>
+        <location filename="../radeon_profile.ui" line="2507"/>
         <source>Modify</source>
-        <translation type="unfinished">Promijeni</translation>
+        <translation>Prilagodi</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="1911"/>
-        <location filename="../radeon_profile.ui" line="2472"/>
-        <location filename="../execTab.cpp" line="207"/>
+        <location filename="../radeon_profile.ui" line="770"/>
+        <location filename="../radeon_profile.ui" line="1950"/>
+        <location filename="../radeon_profile.ui" line="2514"/>
+        <location filename="../execTab.cpp" line="208"/>
         <source>Remove</source>
-        <translation type="unfinished">Ukloni</translation>
+        <translation>Ukloni</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2492"/>
+        <location filename="../radeon_profile.ui" line="803"/>
+        <source>Defined plots:</source>
+        <translation>Definirani grafikoni:</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="863"/>
+        <source>General plots settings</source>
+        <translation>Opće postavke grafikona</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="887"/>
+        <source>Set color</source>
+        <translation>Postavi boju</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="945"/>
+        <source>Override individual plots background</source>
+        <translation>Zaobiđi pozadine pojedinačnih grafikona</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="952"/>
+        <source>Show legend on plots</source>
+        <translation>Prikaži legendu na grafikonu</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="959"/>
+        <source>Gap on the right side of plot</source>
+        <translation>Pomak na lijevoj strani grafikona</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="996"/>
+        <source>Configure</source>
+        <translation>Prilagodi</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="1038"/>
+        <source>1m</source>
+        <translation>1m</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="1045"/>
+        <source>30m</source>
+        <translation>30m</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="1108"/>
+        <location filename="../radeon_profile.ui" line="1304"/>
+        <source>Memory</source>
+        <translation>Memorija</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="1171"/>
+        <location filename="../radeon_profile.ui" line="1253"/>
+        <source>Core</source>
+        <translation>Jezgra</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="1226"/>
+        <source>Manual frequency control</source>
+        <translation>Ručno upravljanje frekvencijom</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="1818"/>
+        <source>Temperature hysteresis</source>
+        <translation>Histereza temperature</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="2534"/>
         <source>View output</source>
-        <translation type="unfinished">Prikaz izlaza</translation>
+        <translation>Prikaz izlaza</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2505"/>
-        <location filename="../radeon_profile.ui" line="3498"/>
-        <location filename="../execTab.cpp" line="318"/>
+        <location filename="../radeon_profile.ui" line="2547"/>
+        <location filename="../radeon_profile.ui" line="3649"/>
+        <location filename="../execTab.cpp" line="319"/>
         <source>Run</source>
-        <translation type="unfinished">Pokretanje</translation>
+        <translation>Pokreni</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2535"/>
+        <location filename="../radeon_profile.ui" line="2577"/>
         <source>Name:</source>
-        <translation type="unfinished">Naziv:</translation>
+        <translation>Naziv:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2549"/>
+        <location filename="../radeon_profile.ui" line="2591"/>
         <source>Binary:</source>
-        <translation type="unfinished">Binarna datoteka:</translation>
+        <translation>Binarna datoteka:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2567"/>
-        <location filename="../radeon_profile.ui" line="2612"/>
+        <location filename="../radeon_profile.ui" line="2609"/>
+        <location filename="../radeon_profile.ui" line="2654"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2580"/>
+        <location filename="../radeon_profile.ui" line="2622"/>
         <source>Binary parameters:</source>
-        <translation type="unfinished">Parametri binarne datoteke:</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="2594"/>
-        <source>Log file: (leave empty if don&apos;t want it)</source>
-        <translation type="unfinished">Datoteka zapisa: (ostavite prazno ako vam nije potrebno)</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="2619"/>
-        <source>Append date and time</source>
-        <translation type="unfinished">Dodaj datum i vrijeme</translation>
+        <translation>Parametri binarne datoteke:</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="2636"/>
+        <source>Log file: (leave empty if don&apos;t want it)</source>
+        <translation>Datoteka zapisa: (ostavite prazno ako vam nije potrebno)</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="2661"/>
+        <source>Append date and time</source>
+        <translation>Dodaj datum i vrijeme</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="2678"/>
         <source>Variables:</source>
-        <translation type="unfinished">Varijable:</translation>
+        <translation>Varijable:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2660"/>
+        <location filename="../radeon_profile.ui" line="2702"/>
         <source>Values:</source>
-        <translation type="unfinished">Vrijednosti:</translation>
+        <translation>Vrijednosti:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2689"/>
+        <location filename="../radeon_profile.ui" line="2731"/>
         <source>Summary:</source>
-        <translation type="unfinished">Sažetak:</translation>
+        <translation>Sažetak:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2711"/>
+        <location filename="../radeon_profile.ui" line="2753"/>
         <source>Be careful, remember to save one space between variables.</source>
-        <translation type="unfinished">Budite oprezni, ostavljajte samo jedan razmak između varijabli.</translation>
+        <translation>Budite oprezni, ostavljajte samo jedan razmak između varijabli.</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="2714"/>
+        <location filename="../radeon_profile.ui" line="2756"/>
         <source>Tune variables manually</source>
-        <translation type="unfinished">Prilagodi varijable ručno</translation>
+        <translation>Prilagodi varijable ručno</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3141"/>
+        <location filename="../radeon_profile.ui" line="3183"/>
         <source>Proceed with caution now.</source>
-        <translation type="unfinished">Sada nastavite s oprezom.</translation>
+        <translation>Dalje nastavite s oprezom.</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3161"/>
+        <location filename="../radeon_profile.ui" line="3203"/>
         <source>Cancel</source>
-        <translation type="unfinished">Odustani</translation>
+        <translation>Odustani</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3168"/>
+        <location filename="../radeon_profile.ui" line="3210"/>
         <source>OK</source>
-        <translation type="unfinished">U redu</translation>
+        <translation>U redu</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3212"/>
+        <location filename="../radeon_profile.ui" line="3254"/>
         <source>Configuration</source>
-        <translation type="unfinished">Podešavanje</translation>
+        <translation>Podešavanje</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3237"/>
+        <location filename="../radeon_profile.ui" line="3573"/>
+        <source>Daemon (restart required)</source>
+        <translation>Pozadinski program (potrebno je ponovno pokretanje)</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3597"/>
+        <source>Use daemon as a data provider</source>
+        <translation>Koristi pozadinski program kao izvor podataka</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3620"/>
+        <source>Execs</source>
+        <translation>Pokretanja</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3641"/>
+        <source>Double click action on exec item:</source>
+        <translation>Dvostruki klik na izvršne datoteke za:</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3690"/>
+        <source>Save configuration, fan profiles, exec profiles, and defined events. All that goes to XML config file basically.</source>
+        <translation>Spremi podešavanje, profile ventilatora, profile pokretanja i određene događaje. U osnovi sve se to sprema u XML datoteku podešavanja.</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3696"/>
+        <source>Save all</source>
+        <translation>Spremi sve</translation>
+    </message>
+    <message>
         <source>Main</source>
-        <translation type="unfinished">Općenito</translation>
+        <translation type="vanished">Općenito</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3249"/>
+        <location filename="../radeon_profile.ui" line="3335"/>
         <source>Start minimized</source>
-        <translation type="unfinished">Pokreni smanjeno</translation>
+        <translation>Pokreni smanjeno</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3268"/>
+        <location filename="../radeon_profile.ui" line="3348"/>
         <source>Minimize to tray</source>
-        <translation type="unfinished">Smanji u traku sustava</translation>
+        <translation>Smanji u traku sustava</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3287"/>
+        <location filename="../radeon_profile.ui" line="3361"/>
         <source>On close hide to tray</source>
-        <translation type="unfinished">Pri zatvaranju sakrij u traku sustava</translation>
+        <translation>Pri zatvaranju sakrij u traku sustava</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3300"/>
+        <location filename="../radeon_profile.ui" line="3368"/>
         <source>Save window geometry</source>
-        <translation type="unfinished">Spremi geometriju prozora</translation>
+        <translation>Spremi geometriju prozora</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3313"/>
+        <location filename="../radeon_profile.ui" line="3375"/>
         <source>Alternate row colors on lists</source>
-        <translation type="unfinished">Dvobojne boje redaka na popisu</translation>
+        <translation>Dvobojne boje redaka na popisu</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3326"/>
+        <location filename="../radeon_profile.ui" line="3382"/>
+        <source>User interface</source>
+        <translation>Korisničko sučelje</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3418"/>
+        <source>Configure top bar</source>
+        <translation>Prilagodi gornju traku</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3431"/>
+        <source>Refresh</source>
+        <translation>Osvježavanje</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3525"/>
         <source>Refresh interval [s]</source>
-        <translation type="unfinished">Razdoblje osvježavanja [s]</translation>
+        <translation>Razdoblje osvježavanja [s]</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3367"/>
+        <location filename="../radeon_profile.ui" line="3512"/>
         <source>Update:</source>
-        <translation type="unfinished">Osvježavaj:</translation>
+        <translation>Osvježavaj:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3386"/>
         <source>GPU data, power profile, temperature</source>
-        <translation type="unfinished">GPU podatke, profile, temperature</translation>
+        <translation type="vanished">GPU podatke, profile energije, temperature</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3424"/>
+        <location filename="../radeon_profile.ui" line="3468"/>
         <source>Power levels statistics</source>
-        <translation type="unfinished">Statistiku profila energije</translation>
+        <translation>Statistiku profila energije</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3446"/>
         <source>GLX Info</source>
-        <translation type="unfinished">GLX informacije</translation>
+        <translation type="vanished">GLX informacije</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3484"/>
         <source>Module parameters</source>
-        <translation type="unfinished">Parametre modula</translation>
+        <translation type="vanished">Parametre modula</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3503"/>
+        <location filename="../radeon_profile.ui" line="3654"/>
         <source>Edit</source>
-        <translation type="unfinished">Uređivanje</translation>
+        <translation>Uređivanje</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3517"/>
         <source>Double click action on exec item</source>
-        <translation type="unfinished">Dvostruki klik na izvršne datoteke za</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3530"/>
-        <source>Explicit append system env to exec command</source>
-        <translation type="unfinished">Izričito dodaj env sustava exec naredbi</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3546"/>
-        <source>Save selected fan control mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3559"/>
-        <source>Enable 0% fan speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3577"/>
-        <source>Line thickness:</source>
-        <translation type="unfinished">Debljina linije:</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3627"/>
-        <source>Color</source>
-        <translation type="unfinished">Boja</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3632"/>
-        <source>Temperature background</source>
-        <translation type="unfinished">Pozadinska temperatura</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3637"/>
-        <source>Clocks background</source>
-        <translation type="unfinished">Pozadina frekvencije</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3642"/>
-        <source>Voltage background</source>
-        <translation type="unfinished">Pozadina napona</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3647"/>
-        <source>Temperature line</source>
-        <translation type="unfinished">Linija temperature</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3652"/>
-        <source>GPU clock line</source>
-        <translation type="unfinished">Linija GPU frekvencije</translation>
-    </message>
-    <message>
-        <location filename="../radeon_profile.ui" line="3657"/>
-        <source>Mem clock line</source>
-        <translation type="unfinished">Linija frekvencije memorije</translation>
+        <translation type="vanished">Dvostruki klik na izvršne datoteke za</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="3662"/>
+        <source>Explicit append system env to exec command</source>
+        <translation>Izričito dodaj env sustava exec naredbi</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3556"/>
+        <source>Save selected fan control mode</source>
+        <translation>Spremi odabrani način upravljanja ventilatorom</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3314"/>
+        <location filename="../radeon_profile.ui" line="3728"/>
+        <source>General</source>
+        <translation>Općenito</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3535"/>
+        <source>Fan</source>
+        <translation>Ventilator</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3563"/>
+        <source>Enable 0% fan speed</source>
+        <translation>Omogući brzinu ventilatora od 0%</translation>
+    </message>
+    <message>
+        <source>Line thickness:</source>
+        <translation type="vanished">Debljina linije:</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="vanished">Boja</translation>
+    </message>
+    <message>
+        <source>Temperature background</source>
+        <translation type="vanished">Pozadina temperature</translation>
+    </message>
+    <message>
+        <source>Clocks background</source>
+        <translation type="vanished">Pozadina frekvencije</translation>
+    </message>
+    <message>
+        <source>Voltage background</source>
+        <translation type="vanished">Pozadina napona</translation>
+    </message>
+    <message>
+        <source>Temperature line</source>
+        <translation type="vanished">Linija temperature</translation>
+    </message>
+    <message>
+        <source>GPU clock line</source>
+        <translation type="vanished">Linija GPU frekvencije</translation>
+    </message>
+    <message>
+        <source>Mem clock line</source>
+        <translation type="vanished">Linija frekvencije memorije</translation>
+    </message>
+    <message>
         <source>UVD video core line</source>
-        <translation type="unfinished">Linija UVD video jezgre</translation>
+        <translation type="vanished">Linija UVD video jezgre</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3667"/>
         <source>UVD decoder clock line</source>
-        <translation type="unfinished">Linija UVD frekvencije dekôdera</translation>
+        <translation type="vanished">Linija UVD frekvencije dekôdera</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3672"/>
         <source>Core voltage line</source>
-        <translation type="unfinished">Linija GPU napona</translation>
+        <translation type="vanished">Linija GPU napona</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3677"/>
         <source>Mem voltage line</source>
-        <translation type="unfinished">Linija napona memorije</translation>
+        <translation type="vanished">Linija napona memorije</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3684"/>
         <source>Daemon</source>
-        <translation type="unfinished">Pozadinski program</translation>
+        <translation type="vanished">Pozadinski program</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3699"/>
+        <location filename="../radeon_profile.ui" line="3607"/>
         <source>Good option to check. Causes that daemon gets data from system automaticly with interval when GUI is on instead of waiting for request to read this data. Interval is the same as GUI.</source>
-        <translation type="unfinished">Vrlo korisna mogućnost za odabir. Omogućava pozadinskom programu automatsko dobivanje podataka iz sustava u razdobljima kada GUI čeka zahtjeve za čitanje ovog podatka. Razdoblje je isto kao i u GUI-u.</translation>
+        <translation>Vrlo korisna mogućnost za odabir. Omogućava pozadinskom programu automatsko dobivanje podataka iz sustava u razdobljima kada GUI čeka zahtjeve za čitanje ovog podatka. Razdoblje je isto kao i u GUI-u.</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3702"/>
+        <location filename="../radeon_profile.ui" line="3610"/>
         <source>Refresh data without request</source>
-        <translation type="unfinished">Osvježi podatke  bez zahtjeva</translation>
+        <translation>Osvježi podatke  bez zahtjeva</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3718"/>
         <source>Apply new configuration and send it to daemon.</source>
-        <translation type="unfinished">Primijeni nove postavke i pošalji ih u pozadinski program.</translation>
+        <translation type="vanished">Primijeni nove postavke i pošalji ih u pozadinski program.</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3721"/>
         <source>Reconfigure daemon</source>
-        <translation type="unfinished">Ponovno podesi pozadinski program</translation>
+        <translation type="vanished">Ponovno podesi pozadinski program</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3731"/>
+        <location filename="../radeon_profile.ui" line="3744"/>
         <source>About</source>
-        <translation type="unfinished">O programu</translation>
+        <translation>O programu</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3813"/>
+        <location filename="../radeon_profile.ui" line="3823"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Go to GitHub repository&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Posjetite GitHub repozitorij&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Posjetite GitHub repozitorij&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3975"/>
+        <location filename="../radeon_profile.ui" line="3844"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile-daemon&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;radeon-profile daemon&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile-daemon&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;radeon-profile pozadinski program&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3900"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile/graphs/contributors&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Github contributors&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile/graphs/contributors&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Github doprinositelji&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.ui" line="3941"/>
         <source>External resources:</source>
-        <translation type="unfinished">Vanjski izvori:</translation>
+        <translation>Vanjski izvori:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3990"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.qcustomplot.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;QCustomPlot library&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.qcustomplot.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;QCustomPlot grafikoni&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.qcustomplot.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;QCustomPlot grafikoni&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="4011"/>
+        <location filename="../radeon_profile.ui" line="3956"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Icon&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Ikona&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Ikona&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3834"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile-daemon&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Radeon profile daemon&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile-daemon&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Radeon profil pozadinski program&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista/radeon-profile-daemon&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Radeon profil pozadinski program&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3872"/>
+        <location filename="../radeon_profile.ui" line="3885"/>
         <source>Contributors:</source>
-        <translation type="unfinished">Doprinositelji:</translation>
+        <translation>Doprinositelji:</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3887"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Marazmista&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Marazmista GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/marazmista&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Marazmista GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3908"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/Danysan1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Danysan1&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/Danysan1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Danysan1 GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/Danysan1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Danysan1 GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3929"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/V10lator&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;V10lator&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/V10lator&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;V10lator GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/V10lator&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;V10lator GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.ui" line="3950"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/pontostroy&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Pontostroy&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/pontostroy&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Pontostroy GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/pontostroy&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Pontostroy GitHub&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../eventsTab.cpp" line="154"/>
+        <location filename="../eventsTab.cpp" line="156"/>
         <source>Events info</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacije događaja</translation>
     </message>
     <message>
-        <location filename="../eventsTab.cpp" line="155"/>
+        <location filename="../eventsTab.cpp" line="157"/>
         <source>Here you can define events. Each event has a defined condition, and when this condition is fulfilled, event is activated. 
 
 After activation, defined power profile, power level and fan profile are applied. When one of events is activated, tracking is suspended.
 
 When active event condition is no longer true, event is revoked and power profile, power level and fan profile are restored to state before event was activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ovdje možete odrediti događaje. Svaki događaj ima određeno stanje i kada je to stanje zadovljeno događaj se aktivira. 
+
+Nakon aktivacije, određeni energetski profil, razina energije i profil ventilatora su primijenjeni. Kada se jedan od događaja aktivira, praćenje je suspendirano.
+
+Kada stanje aktivnog događaja nije više zadovljeno, događaj je opozvan i energetski profil, razina energije i profil ventilatora su vraćeni na stanje prije aktivacije događaja.</translation>
     </message>
     <message>
-        <location filename="../eventsTab.cpp" line="194"/>
+        <location filename="../eventsTab.cpp" line="196"/>
         <source>Cannot remove event that is currently active.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nemoguće uklanjanje događaja koji je trenutno aktivan.</translation>
     </message>
     <message>
-        <location filename="../eventsTab.cpp" line="198"/>
+        <location filename="../eventsTab.cpp" line="200"/>
         <source>Do you want to remove event: </source>
-        <translation type="unfinished"></translation>
+        <translation>Želite li ukloniti događaj: </translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="59"/>
-        <location filename="../execTab.cpp" line="64"/>
-        <location filename="../execTab.cpp" line="74"/>
-        <location filename="../execTab.cpp" line="289"/>
-        <location filename="../fanControlTab.cpp" line="195"/>
-        <location filename="../fanControlTab.cpp" line="211"/>
-        <location filename="../fanControlTab.cpp" line="232"/>
-        <location filename="../fanControlTab.cpp" line="237"/>
-        <location filename="../uiEvents.cpp" line="390"/>
+        <location filename="../execTab.cpp" line="60"/>
+        <location filename="../execTab.cpp" line="65"/>
+        <location filename="../execTab.cpp" line="75"/>
+        <location filename="../execTab.cpp" line="290"/>
+        <location filename="../fanControlTab.cpp" line="194"/>
+        <location filename="../fanControlTab.cpp" line="213"/>
+        <location filename="../fanControlTab.cpp" line="235"/>
+        <location filename="../fanControlTab.cpp" line="240"/>
+        <location filename="../radeon_profile.cpp" line="60"/>
         <source>Error</source>
-        <translation type="unfinished">Greška</translation>
+        <translation>Greška</translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="59"/>
+        <location filename="../execTab.cpp" line="60"/>
         <source>Profile name can&apos;t be empty!</source>
-        <translation type="unfinished">Naziv profila ne može biti prazan!</translation>
+        <translation>Naziv profila ne može biti prazan!</translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="64"/>
+        <location filename="../execTab.cpp" line="65"/>
         <source>No binary is selected!</source>
-        <translation type="unfinished">Nema odabrane binarne datoteke!</translation>
+        <translation>Nema odabrane binarne datoteke!</translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="74"/>
+        <location filename="../execTab.cpp" line="75"/>
         <source>Binary not found in /usr/bin: </source>
-        <translation type="unfinished">Binarna datoteka nije pronađena u /usr/bin: </translation>
+        <translation>Binarna datoteka nije pronađena u /usr/bin: </translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="131"/>
+        <location filename="../execTab.cpp" line="132"/>
         <source>Enter value</source>
-        <translation type="unfinished">Upiši vrijednost</translation>
+        <translation>Upiši vrijednost</translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="131"/>
+        <location filename="../execTab.cpp" line="132"/>
         <source>Enter valid value for </source>
-        <translation type="unfinished">Upiši valjanu vrijednost za </translation>
+        <translation>Upiši valjanu vrijednost za </translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="146"/>
-        <location filename="../fanControlTab.cpp" line="71"/>
+        <location filename="../execTab.cpp" line="147"/>
+        <location filename="../fanControlTab.cpp" line="70"/>
+        <location filename="../plotsTab.cpp" line="60"/>
+        <location filename="../uiEvents.cpp" line="363"/>
         <source>Question</source>
-        <translation type="unfinished">Pitanje</translation>
+        <translation>Pitanje</translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="146"/>
-        <location filename="../execTab.cpp" line="207"/>
+        <location filename="../execTab.cpp" line="147"/>
+        <location filename="../execTab.cpp" line="208"/>
         <source>Remove this item?</source>
-        <translation type="unfinished">Ukloni ovu stavku?</translation>
+        <translation>Ukloni ovu stavku?</translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="215"/>
+        <location filename="../execTab.cpp" line="216"/>
         <source>Select binary</source>
-        <translation type="unfinished">Odaberi binarnu datoteku</translation>
+        <translation>Odaberi binarnu datoteku</translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="223"/>
+        <location filename="../execTab.cpp" line="224"/>
         <source>Select log file</source>
-        <translation type="unfinished">Odaberi datoteku zapisa</translation>
+        <translation>Odaberi datoteku zapisa</translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="289"/>
+        <location filename="../execTab.cpp" line="290"/>
         <source>Can&apos;t run something that not exists!</source>
-        <translation type="unfinished">Ne mogu pokrenti nešto što ne postoji!</translation>
+        <translation>Ne mogu pokrenti nešto što ne postoji!</translation>
     </message>
     <message>
-        <location filename="../execTab.cpp" line="318"/>
+        <location filename="../execTab.cpp" line="319"/>
         <source>Run: &quot;</source>
-        <translation type="unfinished">Pokreni: &quot;</translation>
+        <translation>Pokreni: &quot;</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="71"/>
+        <location filename="../fanControlTab.cpp" line="70"/>
         <source>This option may cause overheat of your card and it is your responsibility if this happens. Do you want to enable it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ova mogućnost može uzrokovati prekomjerno zagrijavanje vaše grafičke kartice i vi ste odgovorni ako se to dogodi. Želite li ovo omogućiti?</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="87"/>
+        <location filename="../fanControlTab.cpp" line="86"/>
         <source>Cannot remove default profile.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nemoguće uklanjanje zadanog profila.</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="91"/>
+        <location filename="../fanControlTab.cpp" line="90"/>
         <source>Remove profile: </source>
-        <translation type="unfinished"></translation>
+        <translation>Ukloni profil: </translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="118"/>
+        <location filename="../fanControlTab.cpp" line="116"/>
         <source>Fan profile name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Naziv profila ventilatora:</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="121"/>
+        <location filename="../fanControlTab.cpp" line="119"/>
         <source>Profile name musn&apos;t contain &apos;|&apos; character.</source>
-        <translation type="unfinished"></translation>
+        <translation>Naziv profila ne može sadržavati &apos;|&apos; znak.</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="126"/>
+        <location filename="../fanControlTab.cpp" line="124"/>
         <source>Cannot add another profile with the same name that already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne može se dodati drugi profil sa već postojećim nazivom.</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="142"/>
+        <location filename="../fanControlTab.cpp" line="140"/>
         <source>Cannot activate unsaved profile. Do you want to save it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne može se aktivirati nespremljeni profil. Želite li ga spremiti?</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="185"/>
+        <location filename="../fanControlTab.cpp" line="184"/>
         <source>Fan control information</source>
-        <translation type="unfinished">Informacije upravljanja ventilatorom</translation>
+        <translation>Informacije upravljanja ventilatorom</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="185"/>
+        <location filename="../fanControlTab.cpp" line="184"/>
         <source>Don&apos;t overheat your card! Be careful! Don&apos;t use this if you don&apos;t know what you&apos;re doing! 
 
 Hovewer, looks like card won&apos;t apply too low values due its internal protection. 
 
 Closing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned!</source>
-        <translation type="unfinished"></translation>
+        <translation>Nemojte pregrijati svoju grafičku karticu! Ne koristite ovu mogućnost ako ne znate što radite! 
+
+Ipak, izgleda da grafička kartica neće primijeniti premale vrijednosti zato jer ima unutarnju zaštitu. 
+
+Zatvaranje aplikacije će postaviti upravljanje ventilatorom na Automatski. Ako se aplikacija sruši, posljednja vrijednost ventilatora će ostati, stoga ste upozoreni!</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="195"/>
+        <location filename="../fanControlTab.cpp" line="194"/>
         <source>This step already exists. Double click on it, to change its value</source>
-        <translation type="unfinished"></translation>
+        <translation>Ovaj korak već postoji. Dvostruko kliknite na njega za promjenu njegove vrijednosti</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="197"/>
-        <location filename="../fanControlTab.cpp" line="252"/>
+        <location filename="../fanControlTab.cpp" line="196"/>
+        <location filename="../fanControlTab.cpp" line="255"/>
         <source>Speed [%]</source>
-        <translation type="unfinished"></translation>
+        <translation>Brzina [%]</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="211"/>
+        <location filename="../fanControlTab.cpp" line="213"/>
         <source>You can&apos;t delete the first and the last item</source>
-        <translation type="unfinished">Ne možete obrisati prvu i zadnju stavku</translation>
+        <translation>Ne možete obrisati prvu i zadnju stavku</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="232"/>
+        <location filename="../fanControlTab.cpp" line="235"/>
         <source>You can&apos;t edit the last item</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne možete urediti zadnju stavku</translation>
     </message>
     <message>
-        <location filename="../fanControlTab.cpp" line="237"/>
+        <location filename="../fanControlTab.cpp" line="240"/>
         <source>You can&apos;t edit temperature of the first item</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne možete urediti temperaturu prve stavke</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.cpp" line="60"/>
+        <source>No Radeon cards have been found in the system.</source>
+        <translation>Nema pronađenih Radeon grafičkih kartica na ovom sustavu.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../radeon_profile.cpp" line="124"/>
+        <location filename="../radeon_profile.cpp" line="142"/>
         <source>version %n</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>inačica %n</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>inačica %n</numerusform>
+            <numerusform>inačica %n</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="138"/>
+        <location filename="../radeon_profile.cpp" line="156"/>
         <source>Back to profiles</source>
-        <translation type="unfinished">Natrag na profile</translation>
+        <translation>Natrag na profile</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="273"/>
-        <location filename="../uiElements.cpp" line="46"/>
+        <location filename="../radeon_profile.cpp" line="194"/>
+        <source>Temperature [°C]</source>
+        <translation>Temperatura [°C]</translation>
+    </message>
+    <message>
+        <location filename="../radeon_profile.cpp" line="481"/>
+        <source>Current profile: </source>
+        <translation>Trenutni profil: </translation>
+    </message>
+    <message>
         <source>UVD core clock (cclk)</source>
-        <translation type="unfinished">UVD frekvencija jezgre (cclk)</translation>
+        <translation type="vanished">UVD frekvencija jezgre (cclk)</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="275"/>
-        <location filename="../uiElements.cpp" line="47"/>
         <source>UVD decoder clock (dclk)</source>
-        <translation type="unfinished">UVD frekvencija dekôdera (dclk)</translation>
+        <translation type="vanished">UVD frekvencija dekôdera (dclk)</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="277"/>
-        <location filename="../uiElements.cpp" line="51"/>
         <source>GPU voltage (vddc)</source>
-        <translation type="unfinished">GPU napon (vddc)</translation>
+        <translation type="vanished">GPU napon (vddc)</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="279"/>
-        <location filename="../uiElements.cpp" line="52"/>
         <source>I/O voltage (vddci)</source>
-        <translation type="unfinished">I/O napon (vddci)</translation>
+        <translation type="vanished">I/U napon (vddci)</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="282"/>
         <source>Can&apos;t read data</source>
-        <translation type="unfinished">Nemoguće čitanje podataka</translation>
+        <translation type="vanished">Nemoguće čitanje podataka</translation>
     </message>
     <message>
-        <location filename="../radeon_profile.cpp" line="282"/>
         <source>You need debugfs mounted and either root rights or the daemon running</source>
-        <translation type="unfinished">Trebate imati debugfs montiran i ili korijenske ovlasti ili pokrenut pozadinski program</translation>
+        <translation type="vanished">Trebate imati debugfs montiran i ili korijenske ovlasti ili pokrenut pozadinski program</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="201"/>
+        <location filename="../uiEvents.cpp" line="151"/>
         <source> is still running, exit anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation> je još uvijek pokrenut, ipak zatvori?</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="253"/>
         <source>GPU data is disabled</source>
-        <translation type="unfinished">GPU podaci su onemogućeni</translation>
+        <translation type="vanished">GPU podaci su onemogućeni</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="329"/>
+        <location filename="../uiEvents.cpp" line="242"/>
         <source>Select new power profile</source>
-        <translation type="unfinished">Odaberi novi profil energije</translation>
+        <translation>Odaberi novi profil energije</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="329"/>
+        <location filename="../uiEvents.cpp" line="242"/>
         <source>Profile selection</source>
-        <translation type="unfinished">Odabir profila</translation>
+        <translation>Odabir profila</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="353"/>
+        <location filename="../uiEvents.cpp" line="261"/>
         <source>Process is still running. Close tab?</source>
-        <translation type="unfinished">Proces je još uvijek pokrenut. Zatvori karticu?</translation>
+        <translation>Proces je još uvijek pokrenut. Zatvori karticu?</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="390"/>
+        <location filename="../uiEvents.cpp" line="363"/>
+        <source>Kernel: </source>
+        <translation>Kernel: </translation>
+    </message>
+    <message>
+        <location filename="../uiEvents.cpp" line="363"/>
+        <source>Module used: </source>
+        <translation>Korišteni modul: </translation>
+    </message>
+    <message>
+        <location filename="../uiEvents.cpp" line="365"/>
+        <source>Checking this option may cause problems and is not recommended when you use Linux 4.12&lt;= and amdgpu module.
+
+Do you want to check it anyway?</source>
+        <translation>Odabir ove mogućnosti može prouzrokovati probleme i nije preporučljiva kada se koristi Linux 4.12&lt;= i amdgpu modul.
+
+Želite li ga ipak odabrati?</translation>
+    </message>
+    <message>
         <source>An error occurred, overclock failed</source>
-        <translation type="unfinished">Dogodila se greška, overklokiranje neuspjelo</translation>
+        <translation type="vanished">Dogodila se greška, overklokiranje neuspjelo</translation>
     </message>
     <message>
-        <location filename="../uiEvents.cpp" line="398"/>
         <source>Export destination directory</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Izvezi odredišni direktorij</translation>
+    </message>
+    <message>
+        <location filename="../plotsTab.cpp" line="60"/>
+        <source>Plot definition with that name already exists. Replace?</source>
+        <translation>Definicija grafikona pod tim nazivom već postoji. Želite li ju zamijeniti?</translation>
+    </message>
+    <message>
+        <location filename="../plotsTab.cpp" line="81"/>
+        <source>Remove selected plot definition?</source>
+        <translation>Ukloni odabranu definiciju grafikona?</translation>
     </message>
 </context>
 </TS>
