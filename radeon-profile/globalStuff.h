@@ -183,7 +183,8 @@ struct DeviceSysFs {
     pp_sclk_od,
     pp_mclk_od,
     pp_dpm_sclk,
-    pp_dpm_mclk;
+    pp_dpm_mclk,
+    gpu_busy_percent;
 
     DeviceSysFs() { }
 
@@ -197,7 +198,7 @@ struct DeviceSysFs {
         pp_mclk_od = devicePath + "pp_mclk_od";
         pp_dpm_sclk = devicePath + "pp_dpm_sclk";
         pp_dpm_mclk = devicePath + "pp_dpm_mclk";
-
+        gpu_busy_percent = devicePath + "gpu_busy_percent";
 
         if (!QFile::exists(power_method))
             power_method = "";
@@ -222,6 +223,9 @@ struct DeviceSysFs {
 
         if (!QFile::exists(pp_dpm_mclk))
             pp_dpm_mclk = "";
+
+        if (!QFile::exists(gpu_busy_percent))
+            gpu_busy_percent = "";
     }
 };
 
