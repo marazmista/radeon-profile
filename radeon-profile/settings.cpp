@@ -11,47 +11,60 @@
 #include <QDesktopWidget>
 #include <QRect>
 
-const QString radeon_profile::settingsPath = QDir::homePath() + "/.radeon-profile-settings";
-const QString auxStuffPath = QDir::homePath() + "/.radeon-profile-auxstuff";
+QString getConfigPath() {
+    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/radeon-profile";
+}
+
+static const QString legacySettingsPath = QDir::homePath() + "/.radeon-profile-settings";
+static const QString legacyAuxStuffPath = QDir::homePath() + "/.radeon-profile-auxstuff";
+
+static const QString settingsPath = getConfigPath() + "/radeon-profile-settings";
+static const QString auxStuffPath = getConfigPath() + "/radeon-profile-auxstuff";
+
+static bool loadedFromLegacy = false;
 
 // init of static struct with setting exposed to global scope
 globalStuff::globalCfgStruct globalStuff::globalConfig;
 
 void radeon_profile::saveConfig() {
-    QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
+    {
+        // If settingsPath doesn't exist yet, running QSetting's destructor will create it.
+        // It's important that happens before saving auxstuff later-on.
+        QSettings settings(settingsPath,QSettings::IniFormat);
 
-    settings.setValue("startMinimized",ui->cb_startMinimized->isChecked());
-    settings.setValue("minimizeToTray",ui->cb_minimizeTray->isChecked());
-    settings.setValue("closeToTray",ui->cb_closeTray->isChecked());
-    settings.setValue("updateInterval",ui->spin_timerInterval->value());
-    settings.setValue("updateGraphs",ui->cb_graphs->isChecked());
-    settings.setValue("saveWindowGeometry",ui->cb_saveWindowGeometry->isChecked());
-    settings.setValue("windowGeometry",this->geometry());
-    settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
-    settings.setValue("aleternateRowColors",ui->cb_alternateRow->isChecked());
+        settings.setValue("startMinimized",ui->cb_startMinimized->isChecked());
+        settings.setValue("minimizeToTray",ui->cb_minimizeTray->isChecked());
+        settings.setValue("closeToTray",ui->cb_closeTray->isChecked());
+        settings.setValue("updateInterval",ui->spin_timerInterval->value());
+        settings.setValue("updateGraphs",ui->cb_graphs->isChecked());
+        settings.setValue("saveWindowGeometry",ui->cb_saveWindowGeometry->isChecked());
+        settings.setValue("windowGeometry",this->geometry());
+        settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
+        settings.setValue("aleternateRowColors",ui->cb_alternateRow->isChecked());
 
-    settings.setValue("graphOffset", ui->cb_plotsRightGap->isChecked());
-    settings.setValue("graphRange",ui->slider_timeRange->value());
-    settings.setValue("showLegend",ui->cb_showLegends->isChecked());
-    settings.setValue("plotsBackgroundColor", ui->frame_plotsBackground->palette().background().color().name());
-    settings.setValue("setCommonPlotsBg", ui->cb_overridePlotsBg->isChecked());
-    settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
-    settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
-    settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
-    settings.setValue("fanMode",ui->fanModesTabs->currentIndex());
-    settings.setValue("fanProfileName",ui->l_currentFanProfile->text());
-    settings.setValue("enableZeroPercentFanSpeed", ui->cb_zeroPercentFanSpeed->isChecked());
+        settings.setValue("graphOffset", ui->cb_plotsRightGap->isChecked());
+        settings.setValue("graphRange",ui->slider_timeRange->value());
+        settings.setValue("showLegend",ui->cb_showLegends->isChecked());
+        settings.setValue("plotsBackgroundColor", ui->frame_plotsBackground->palette().background().color().name());
+        settings.setValue("setCommonPlotsBg", ui->cb_overridePlotsBg->isChecked());
+        settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
+        settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
+        settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
+        settings.setValue("fanMode",ui->fanModesTabs->currentIndex());
+        settings.setValue("fanProfileName",ui->l_currentFanProfile->text());
+        settings.setValue("enableZeroPercentFanSpeed", ui->cb_zeroPercentFanSpeed->isChecked());
 
-    settings.setValue("overclockEnabled", ui->group_oc->isChecked());
-    settings.setValue("manualFreqEnabled", ui->group_freq->isChecked());
-    settings.setValue("overclockValue", ui->slider_ocSclk->value());
-    settings.setValue("overclockMemValue", ui->slider_ocMclk->value());
+        settings.setValue("overclockEnabled", ui->group_oc->isChecked());
+        settings.setValue("manualFreqEnabled", ui->group_freq->isChecked());
+        settings.setValue("overclockValue", ui->slider_ocSclk->value());
+        settings.setValue("overclockMemValue", ui->slider_ocMclk->value());
 
-    settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
-    settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
-    settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
-    settings.setValue("daemonData", ui->cb_daemonData->isChecked());
-    settings.setValue("temperatureHysteresis", ui->spin_hysteresis->value());
+        settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
+        settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
+        settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
+        settings.setValue("daemonData", ui->cb_daemonData->isChecked());
+        settings.setValue("temperatureHysteresis", ui->spin_hysteresis->value());
+    }
 
     QString xmlString;
     QXmlStreamWriter xml(&xmlString);
@@ -72,6 +85,12 @@ void radeon_profile::saveConfig() {
     if (f.open(QIODevice::WriteOnly))  {
         f.write(xmlString.toLatin1());
         f.close();
+    }
+
+    if (loadedFromLegacy) {
+        QFile::remove(legacySettingsPath);
+        QFile::remove(legacyAuxStuffPath);
+        loadedFromLegacy = false;
     }
 }
 
@@ -195,7 +214,10 @@ void radeon_profile::saveTopbarItemsSchemas(QXmlStreamWriter &xml) {
 void radeon_profile::loadConfig() {
     qDebug() << "Loading configuration";
 
-    QSettings settings(radeon_profile::settingsPath,QSettings::IniFormat);
+    // Try to load from config first, fallback to old file path if not found.
+    loadedFromLegacy = !QFileInfo::exists(settingsPath);
+    const auto configPath = loadedFromLegacy ? legacySettingsPath : settingsPath;
+    QSettings settings(configPath,QSettings::IniFormat);
 
     ui->cb_startMinimized->setChecked(settings.value("startMinimized",false).toBool());
     ui->cb_minimizeTray->setChecked(settings.value("minimizeToTray",false).toBool());
@@ -271,7 +293,8 @@ void radeon_profile::loadConfig() {
     plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
     hideEventControls(true);
 
-    QFile f(auxStuffPath);
+    const auto auxFilePath = loadedFromLegacy ? legacyAuxStuffPath : auxStuffPath;
+    QFile f(auxFilePath);
     if (f.open(QIODevice::ReadOnly)) {
         QXmlStreamReader xml(&f);
         while (!xml.atEnd()) {
