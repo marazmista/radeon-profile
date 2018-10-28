@@ -46,6 +46,17 @@ void dXorg::setupIoctl() {
         ioctlHnd = new amdgpuIoctlHandler(features.sysInfo.sysName[4].toLatin1() - '0');
 }
 
+QString getValueFromSysFsFile(QString fileName) {
+    QFile f(fileName);
+    QString value;
+    if (f.open(QIODevice::ReadOnly))
+        value = QString(f.readAll()).trimmed();
+
+    f.close();
+    return (value.isEmpty()) ? "-1" : value;
+}
+
+
 //https://stackoverflow.com/a/18866593
 QString getRandomString() {
    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
@@ -316,6 +327,10 @@ GPUUsage dXorg::getGPUUsage() {
     GPUUsage data;
 
     ioctlHnd->getGpuUsage(&data.gpuUsage);
+
+    if (data.gpuUsage == -1 && !driverFiles.sysFs.gpu_busy_percent.isEmpty())
+        data.gpuUsage = getValueFromSysFsFile(driverFiles.sysFs.gpu_busy_percent).toFloat();
+
     ioctlHnd->getVramUsage(&data.gpuVramUsage);
 
     data.gpuVramUsage /= 1048576; // 1024 * 1024
@@ -485,7 +500,6 @@ void dXorg::setPowerProfile(PowerProfiles newPowerProfile) {
     case PowerProfiles::LOW:
         newValue = profile_low;
         break;
-    default: break;
     }
 
     if (daemonConnected())
@@ -526,8 +540,6 @@ void dXorg::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
         case ForcePowerLevels::F_PROFILE_PEAK:
             newValue = dpm_profile_peak;
             break;
-        default:
-            return;
     }
 
     if (daemonConnected())
