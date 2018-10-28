@@ -150,7 +150,6 @@ private:
     QTimer *timer = nullptr;
 
     gpu device;
-    static const QString settingsPath;
     QList<ExecBin*> execsRunning;
     FanProfileSteps currentFanProfile;
     QMap<QString, FanProfileSteps> fanProfiles;
