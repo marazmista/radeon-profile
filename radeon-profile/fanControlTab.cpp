@@ -94,12 +94,14 @@ void radeon_profile::on_btn_removeFanProfile_clicked()
     ui->combo_fanProfiles->removeItem(ui->combo_fanProfiles->currentIndex());
     setupFanProfilesMenu(true);
     setCurrentFanProfile("default", fanProfiles.value("default"));
+    saveConfig();
 }
 
 void radeon_profile::on_btn_saveFanProfile_clicked()
 {
     markFanProfileUnsaved(false);
     fanProfiles.insert(ui->combo_fanProfiles->currentText(), stepsListToMap());
+    saveConfig();
 }
 
 int radeon_profile::findCurrentFanProfileMenuIndex() {
@@ -132,6 +134,7 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
     ui->combo_fanProfiles->setCurrentText(name);
     setupFanProfilesMenu(true);
     fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
+    saveConfig();
 }
 
 void radeon_profile::on_btn_activateFanProfile_clicked()
