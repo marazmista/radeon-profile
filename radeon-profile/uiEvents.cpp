@@ -165,6 +165,8 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
     }
 
     QCoreApplication::processEvents(QEventLoop::AllEvents, 50); // Wait for the daemon to disable pwm
+
+    e->accept();
     QApplication::quit();
 }
 
