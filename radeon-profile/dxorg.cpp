@@ -122,7 +122,7 @@ bool dXorg::daemonConnected() {
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     QString devicePath = "/sys/class/drm/" + gpuName + "/device/";
-    driverFiles.moduleParams = devicePath + "driver/module/holders/" + features.sysInfo.driverModuleString + "/parameters/";
+    driverFiles.moduleParams = devicePath + "driver/module/parameters/";
     driverFiles.debugfs_pm_info = "/sys/kernel/debug/dri/" + gpuName.right(1) + "/"+features.sysInfo.driverModuleString + "_pm_info"; // this path contains only index
     driverFiles.sysFs = DeviceSysFs(devicePath);
 
