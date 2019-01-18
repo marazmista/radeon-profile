@@ -326,7 +326,7 @@ QString translateProperty(Display * display,
                                  const Atom * propertyRawData){ // Pointer to the property value data array
     QString out;
 
-    switch(propertyDataType){
+    switch (propertyDataType) {
     case ATOM_VALUE: // Text value, like 'off' or 'None'
         if(propertyDataFormat == 32){ // Only 32 bit supported here
             char* string = XGetAtomName(display, *propertyRawData);
@@ -337,20 +337,22 @@ QString translateProperty(Display * display,
         break;
 
     case INTEGER_VALUE: // Signed numeric value
-        switch(propertyDataFormat){
-        case 8: out = QString::number((qint8) *propertyRawData);
-        case 16: out = QString::number((qint16) *propertyRawData);
-        case 32: out = QString::number((qint32) *propertyRawData);
+        switch (propertyDataFormat) {
+            case 8: out = QString::number((qint8) *propertyRawData); break;
+            case 16: out = QString::number((qint16) *propertyRawData); break;
+            case 32: out = QString::number((qint32) *propertyRawData); break;
         }
         break;
 
     case CARDINAL_VALUE: // Unsigned numeric value
-        switch(propertyDataFormat){
-        case 8: out = QString::number((quint8) *propertyRawData);
-        case 16: out = QString::number((quint16) *propertyRawData);
-        case 32: out = QString::number((quint32) *propertyRawData);
+        switch (propertyDataFormat) {
+            case 8: out = QString::number((quint8) *propertyRawData); break;
+            case 16: out = QString::number((quint16) *propertyRawData); break;
+            case 32: out = QString::number((quint32) *propertyRawData); break;
         }
+            break;
     }
+
     return out.isEmpty() ? QString::number(*propertyRawData) : out; // If no match was found, return as number
 }
 

@@ -634,8 +634,8 @@ void dXorg::setupRegex(const QString &data) {
 
                 rxMatchIndex = 0;
                 clocksValueDivider = 1;
-                return;
             }
+            return;
 
         case DriverModule::MODULE_UNKNOWN:
             return;
@@ -663,7 +663,7 @@ void dXorg::figureOutDriverFeatures() {
     features.currentTemperatureSensor = getTemperatureSensor();
 
     switch (features.currentPowerMethod) {
-        case PowerMethod::DPM: {
+        case PowerMethod::DPM:
             qDebug() << "Power method: DPM";
 
             if (globalStuff::globalConfig.rootMode || daemonConnected())
@@ -675,8 +675,8 @@ void dXorg::figureOutDriverFeatures() {
                     f.close();
                 }
             }
+
             break;
-        }
         case PowerMethod::PROFILE: {
             qDebug() << "Power method: Profile";
 
@@ -686,6 +686,7 @@ void dXorg::figureOutDriverFeatures() {
                 f.close();
             }
         }
+            break;
         case PowerMethod::PM_UNKNOWN:
             qDebug() << "Power method unknown";
             break;

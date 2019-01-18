@@ -90,7 +90,7 @@ void ExecBin::execProcesFinished() {
 }
 
 void ExecBin::saveToFile() {
-        QString filename = QFileDialog::getSaveFileName(0, tr("Save"), QDir::homePath()+"/output_"+this->name);
+        QString filename = QFileDialog::getSaveFileName(nullptr, tr("Save"), QDir::homePath()+"/output_"+this->name);
         if (!filename.isEmpty()) {
             QFile f(filename);
             f.open(QIODevice::WriteOnly);

@@ -123,7 +123,7 @@ void radeon_profile::modifyPlotSchema(const QString &name) {
 
 void radeon_profile::on_btn_modifyPlotDefinition_clicked()
 {
-    if (ui->list_plotDefinitions->currentItem() == 0)
+    if (ui->list_plotDefinitions->currentItem() == nullptr)
         return;
 
     modifyPlotSchema(ui->list_plotDefinitions->currentItem()->text(0));
