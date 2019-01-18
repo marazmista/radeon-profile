@@ -240,11 +240,11 @@ QStringList gpu::getGLXInfo(QString gpuName) const {
 }
 
 QString gpu::getCurrentPowerLevel() {
-    return driverHandler->getCurrentPowerLevel().trimmed();
+    return driverHandler->getCurrentPowerLevel();
 }
 
 QString gpu::getCurrentPowerProfile()  {
-    return driverHandler->getCurrentPowerProfile().trimmed();
+    return driverHandler->getCurrentPowerProfile();
 }
 
 void gpu::refreshPowerLevel() {

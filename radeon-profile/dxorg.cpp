@@ -138,14 +138,11 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 
 // method for gather info about clocks from deamon or from debugfs if root
 QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
-    QFile clocksFile(driverFiles.debugfs_pm_info);
     QString data;
 
-    if (clocksFile.open(QIODevice::ReadOnly)) {
-        data = QString(clocksFile.readAll()).trimmed();
-        clocksFile.close();
+    data = getValueFromSysFsFile(driverFiles.debugfs_pm_info);
+    if (data != "-1")
         return data;
-    }
 
     if (daemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh){
@@ -297,29 +294,24 @@ float dXorg::getTemperature() {
     QString temp;
 
     switch (features.currentTemperatureSensor) {
-    case TemperatureSensor::SYSFS_HWMON:
-    case TemperatureSensor::CARD_HWMON: {
-        QFile hwmon(hwmonAttributes.temp1);
-        hwmon.open(QIODevice::ReadOnly);
-        temp = hwmon.readLine(20);
-        hwmon.close();
-        return temp.toFloat() / 1000;
+        case TemperatureSensor::SYSFS_HWMON:
+        case TemperatureSensor::CARD_HWMON:
+            return getValueFromSysFsFile(hwmonAttributes.temp1).toFloat() / 1000;
+        case TemperatureSensor::PCI_SENSOR: {
+            QStringList out = globalStuff::grabSystemInfo("sensors");
+            temp = out[sensorsGPUtempIndex+2].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
+            break;
+        }
+        case TemperatureSensor::MB_SENSOR: {
+            QStringList out = globalStuff::grabSystemInfo("sensors");
+            temp = out[sensorsGPUtempIndex].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
+            break;
+        }
+        case TemperatureSensor::TS_UNKNOWN:
+            temp = "-1";
+            break;
     }
-    case TemperatureSensor::PCI_SENSOR: {
-        QStringList out = globalStuff::grabSystemInfo("sensors");
-        temp = out[sensorsGPUtempIndex+2].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
-        break;
-    }
-    case TemperatureSensor::MB_SENSOR: {
-        QStringList out = globalStuff::grabSystemInfo("sensors");
-        temp = out[sensorsGPUtempIndex].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
-        break;
-    }
-    case TemperatureSensor::TS_UNKNOWN: {
-        temp = "-1";
-        break;
-    }
-    }
+
     return temp.toFloat();
 }
 
@@ -343,29 +335,23 @@ PowerMethod dXorg::getPowerMethod() {
     if (QFile::exists(driverFiles.sysFs.power_dpm_state))
         return PowerMethod::DPM;
 
-    QFile powerMethodFile(driverFiles.sysFs.power_method);
-    if (powerMethodFile.open(QIODevice::ReadOnly)) {
-        QString s = powerMethodFile.readLine(20);
+    QString s = getValueFromSysFsFile(driverFiles.sysFs.power_method);
 
-        if (s.contains("dpm",Qt::CaseInsensitive))
-            return PowerMethod::DPM;
-        else if (s.contains("profile",Qt::CaseInsensitive))
-            return PowerMethod::PROFILE;
-        else
-            return PowerMethod::PM_UNKNOWN;
-    }
-
-    return PowerMethod::PM_UNKNOWN;
+    if (s.contains("dpm",Qt::CaseInsensitive))
+        return PowerMethod::DPM;
+    else if (s.contains("profile",Qt::CaseInsensitive))
+        return PowerMethod::PROFILE;
+    else
+        return PowerMethod::PM_UNKNOWN;
 }
 
 TemperatureSensor dXorg::getTemperatureSensor() {
-    QFile hwmon(hwmonAttributes.temp1);
 
     // first method, try read temp from sysfs in card dir (path from figureOutGPUDataPaths())
-    if (hwmon.open(QIODevice::ReadOnly)) {
-        if (!QString(hwmon.readLine(20)).isEmpty())
-            return TemperatureSensor::CARD_HWMON;
-    } else {
+    QString tmpValue = getValueFromSysFsFile(hwmonAttributes.temp1);
+    if (!tmpValue.isEmpty() || tmpValue != "-1")
+        return TemperatureSensor::CARD_HWMON;
+    else {
         // second method, try find in system hwmon dir for file labeled VGA_TEMP
         hwmonAttributes.temp1 = findSysfsHwmonForGPU();
         if (!hwmonAttributes.temp1.isEmpty())
@@ -387,18 +373,18 @@ TemperatureSensor dXorg::getTemperatureSensor() {
 
 QString dXorg::findSysfsHwmonForGPU() {
     QStringList hwmonDev = globalStuff::grabSystemInfo("ls /sys/class/hwmon/");
+
     for (int i = 0; i < hwmonDev.count(); i++) {
         QStringList temp = globalStuff::grabSystemInfo("ls /sys/class/hwmon/"+hwmonDev[i]+"/device/").filter("label");
 
         for (int o = 0; o < temp.count(); o++) {
-            QFile f("/sys/class/hwmon/"+hwmonDev[i]+"/device/"+temp[o]);
-            if (f.open(QIODevice::ReadOnly))
-                if (f.readLine(20).contains("VGA_TEMP")) {
-                    f.close();
-                    return f.fileName().replace("label", "input");
-                }
+            QString file("/sys/class/hwmon/"+hwmonDev[i]+"/device/"+temp[o]);
+            QString s = getValueFromSysFsFile(file);
+            if (!s.isEmpty() && s.contains("VGA_TEMP"))
+                return file.replace("label", "input");
         }
     }
+
     return "";
 }
 
@@ -431,34 +417,22 @@ QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
 }
 
 QString dXorg::getCurrentPowerProfile() {
-    QFile f;
-
     switch (features.currentPowerMethod) {
         case PowerMethod::DPM:
-            f.setFileName(driverFiles.sysFs.power_dpm_state);
-            break;
+            return getValueFromSysFsFile(driverFiles.sysFs.power_dpm_state);
 
         case PowerMethod::PROFILE:
-            f.setFileName(driverFiles.sysFs.power_profile);
-            break;
+            return getValueFromSysFsFile(driverFiles.sysFs.power_profile);
 
         case PowerMethod::PM_UNKNOWN:
-            return "err";;
+            return "err";
     }
 
-    if (f.open(QIODevice::ReadOnly))
-        return QString(f.readLine(13));
-    else
-        return "err";
-
+    return "err";
 }
 
 QString dXorg::getCurrentPowerLevel() {
-    QFile forceProfile(driverFiles.sysFs.power_dpm_force_performance_level);
-    if (forceProfile.open(QIODevice::ReadOnly))
-        return QString(forceProfile.readLine(13));
-
-    return "err";
+    return getValueFromSysFsFile(driverFiles.sysFs.power_dpm_force_performance_level);
 }
 
 void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
@@ -572,20 +546,10 @@ GPUFanSpeed dXorg::getFanSpeed() {
     if (hwmonAttributes.pwm1.isEmpty())
         return tmp;
 
-    QFile f(hwmonAttributes.pwm1);
+    tmp.fanSpeedPercent = (getValueFromSysFsFile(hwmonAttributes.pwm1).toFloat() / params.pwmMaxSpeed) * 100;
 
-    if (f.open(QIODevice::ReadOnly)) {
-       tmp.fanSpeedPercent = (QString(f.readLine(4)).toFloat() / params.pwmMaxSpeed) * 100;
-       f.close();
-    }
-
-    if (!hwmonAttributes.fan1_input.isEmpty()) {
-        f.setFileName(hwmonAttributes.fan1_input);
-        if (f.open(QIODevice::ReadOnly)) {
-            tmp.fanSpeedRpm = QString(f.readLine(6)).toInt();
-            f.close();
-        }
-    }
+    if (!hwmonAttributes.fan1_input.isEmpty())
+        tmp.fanSpeedRpm = getValueFromSysFsFile(hwmonAttributes.pwm1).toInt();
 
     return tmp;
 }
@@ -729,44 +693,27 @@ void dXorg::figureOutConstParams() {
                  << "\n vram size: " << params.VRAMSize;
     }
 
-    if (!hwmonAttributes.temp1_crit.isEmpty()) {
-
-        QFile f(hwmonAttributes.temp1_crit);
-        if (f.open(QIODevice::ReadOnly)) {
-            params.temp1_crit = f.readLine(7).toInt() / 1000;
-            f.close();
-        }
-    }
+    if (!hwmonAttributes.temp1_crit.isEmpty())
+        params.temp1_crit = getValueFromSysFsFile(hwmonAttributes.temp1_crit).toInt() / 1000;
 
 
-    if (!hwmonAttributes.pwm1_max.isEmpty()) {
-
-        QFile f(hwmonAttributes.pwm1_max);
-        if (f.open(QIODevice::ReadOnly)) {
-            params.pwmMaxSpeed = f.readLine(4).toInt();
-            f.close();
-        }
-    }
+    if (!hwmonAttributes.pwm1_max.isEmpty())
+        params.pwmMaxSpeed = getValueFromSysFsFile(hwmonAttributes.pwm1_max).toInt();
 }
 
 GPUClocks dXorg::getFeaturesFallback() {
     GPUClocks fallbackfeatures;
-    QFile f("/tmp/"+features.sysInfo.driverModuleString+"_pm_info");
-    if (f.open(QIODevice::ReadOnly)) {
-        QString s = QString(f.readAll());
+    QString s = getValueFromSysFsFile("/tmp/"+features.sysInfo.driverModuleString+"_pm_info");
 
-        // just look for it, if it is, the value is not important at this point
-        if (s.contains("sclk"))
-            fallbackfeatures.coreClk = 0;
-        if (s.contains("mclk"))
-            fallbackfeatures.memClk = 0;
-        if (s.contains("vddc"))
-            fallbackfeatures.coreVolt = 0;
-        if (s.contains("vddci"))
-            fallbackfeatures.memVolt = 0;
-
-        f.close();
-    }
+    // just look for it, if it is, the value is not important at this point
+    if (s.contains("sclk"))
+        fallbackfeatures.coreClk = 0;
+    if (s.contains("mclk"))
+        fallbackfeatures.memClk = 0;
+    if (s.contains("vddc"))
+        fallbackfeatures.coreVolt = 0;
+    if (s.contains("vddci"))
+        fallbackfeatures.memVolt = 0;
 
     return fallbackfeatures;
 }
@@ -791,13 +738,11 @@ void dXorg::setOverclockValue(const QString &file, const int percentage) {
 }
 
 PowerPlayTable dXorg::loadPowerPlayTable(const QString &file) {
-    QFile f(file);
     PowerPlayTable ppt;
+    QStringList sl = getValueFromSysFsFile(file).split(QString::SkipEmptyParts);
 
-    if (!f.open(QIODevice::ReadOnly))
+    if (sl.isEmpty() || sl.at(0) == "-1")
         return ppt;
-
-    QStringList sl = QString(f.readAll()).split('\n', QString::SkipEmptyParts);
 
     for (const QString &s : sl) {
         QStringList tmp = s.split(":");
@@ -815,12 +760,11 @@ void dXorg::setPowerPlayFreq(const QString &file, const int tableIndex) {
 }
 
 int dXorg::getCurrentPowerPlayTableId(const QString &file) {
-    QFile f(file);
 
-    if (!f.open(QIODevice::ReadOnly))
+    QStringList sl = getValueFromSysFsFile(file).split(QString::SkipEmptyParts);
+
+    if (sl.isEmpty() || sl.at(0) == "-1")
         return 0;
-
-    QStringList sl = QString(f.readAll()).split("\n");
 
     for (int i = 0; i < sl.count(); ++i) {
         if (sl[i].endsWith("*"))
