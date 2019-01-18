@@ -16,7 +16,7 @@
 #include <QFile>
 
 
-#define SHARED_MEM_SIZE 128
+#define SHARED_MEM_SIZE 2048
 
 class dXorg
 {
