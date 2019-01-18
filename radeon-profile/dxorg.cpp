@@ -436,15 +436,23 @@ QString dXorg::getCurrentPowerLevel() {
 }
 
 void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
-    QFile file(filePath);
-    if(file.open(QIODevice::WriteOnly | QIODevice::Text)){
-        QTextStream stream(&file);
-        stream << newValue + "\n";
-        if( ! file.flush() )
-            qWarning() << "Failed to flush " << filePath;
-        file.close();
-    }else
-        qWarning() << "Unable to open " << filePath << " to write " << newValue;
+    if (daemonConnected())
+        dcomm.sendCommand(createDaemonSetCmd(filePath, newValue));
+    else {
+        QFile file(filePath);
+
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream stream(&file);
+            stream << newValue + "\n";
+
+            if (!file.flush())
+                qWarning() << "Failed to flush " << filePath;
+
+            file.close();
+
+        } else
+            qWarning() << "Unable to open " << filePath << " to write " << newValue;
+    }
 }
 
 void dXorg::setPowerProfile(PowerProfiles newPowerProfile) {
@@ -476,15 +484,11 @@ void dXorg::setPowerProfile(PowerProfiles newPowerProfile) {
         break;
     }
 
-    if (daemonConnected())
-        dcomm.sendCommand(createDaemonSetCmd(driverFiles.sysFs.power_dpm_state, newValue));
-    else {
-        // enum is int, so first three values are dpm, rest are profile
-        if (newPowerProfile <= PowerProfiles::PERFORMANCE)
-            setNewValue(driverFiles.sysFs.power_dpm_state, newValue);
-        else
-            setNewValue(driverFiles.sysFs.power_profile, newValue);
-    }
+    // enum is int, so first three values are dpm, rest are profile
+    if (newPowerProfile <= PowerProfiles::PERFORMANCE)
+        setNewValue(driverFiles.sysFs.power_dpm_state, newValue);
+    else
+        setNewValue(driverFiles.sysFs.power_profile, newValue);
 }
 
 void dXorg::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
@@ -516,28 +520,16 @@ void dXorg::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
             break;
     }
 
-    if (daemonConnected())
-        dcomm.sendCommand(createDaemonSetCmd(driverFiles.sysFs.power_dpm_force_performance_level, newValue));
-    else
-        setNewValue(driverFiles.sysFs.power_dpm_force_performance_level, newValue);
+    setNewValue(driverFiles.sysFs.power_dpm_force_performance_level, newValue);
 }
 
 void dXorg::setPwmValue(unsigned int value) {
     value = params.pwmMaxSpeed * value / 100;
-
-    if (daemonConnected())
-        dcomm.sendCommand(createDaemonSetCmd(hwmonAttributes.pwm1, QString::number(value)));
-    else
-        setNewValue(hwmonAttributes.pwm1,QString().setNum(value));
+    setNewValue(hwmonAttributes.pwm1,QString().setNum(value));
 }
 
 void dXorg::setPwmManualControl(bool manual) {
-    QString mode = QString(manual ? pwm_manual : pwm_auto);
-
-    if (daemonConnected())
-        dcomm.sendCommand(createDaemonSetCmd(hwmonAttributes.pwm1_enable, mode));
-    else
-        setNewValue(hwmonAttributes.pwm1_enable, mode);
+    setNewValue(hwmonAttributes.pwm1_enable, QString(manual ? pwm_manual : pwm_auto));
 }
 
 GPUFanSpeed dXorg::getFanSpeed() {
@@ -731,10 +723,7 @@ QString dXorg::createDaemonSetCmd(const QString &file, const QString &value)
 }
 
 void dXorg::setOverclockValue(const QString &file, const int percentage) {
-    if (daemonConnected())
-        dcomm.sendCommand(createDaemonSetCmd(file, QString::number(percentage)));
-    else
-        setNewValue(file, QString::number(percentage));
+    setNewValue(file, QString::number(percentage));
 }
 
 PowerPlayTable dXorg::loadPowerPlayTable(const QString &file) {
@@ -753,10 +742,7 @@ PowerPlayTable dXorg::loadPowerPlayTable(const QString &file) {
 }
 
 void dXorg::setPowerPlayFreq(const QString &file, const int tableIndex) {
-    if (daemonConnected())
-        dcomm.sendCommand(createDaemonSetCmd(file, QString::number(tableIndex)));
-    else
-        setNewValue(file, QString::number(tableIndex));
+    setNewValue(file, QString::number(tableIndex));
 }
 
 int dXorg::getCurrentPowerPlayTableId(const QString &file) {
