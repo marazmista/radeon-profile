@@ -294,10 +294,16 @@ void radeon_profile::refreshGpuData() {
     device.getTemperature();
     device.getGpuUsage();
     device.getFanSpeed();
+    device.getPowerCapCurrent();
 }
 
 void radeon_profile::addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
     parent->addTopLevelItem(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
+}
+
+QString radeon_profile::createCurrentMinMaxString(const ValueID idCurrent, const ValueID idMin, const ValueID idMax) {
+    return QString(device.gpuData.value(idCurrent).strValue + " (min: " + device.gpuData.value(idMin).strValue + " max: " + device.gpuData.value(idMax).strValue + ")");
+
 }
 
 void radeon_profile::refreshUI() {
@@ -307,14 +313,25 @@ void radeon_profile::refreshUI() {
     // GPU data list
     if (ui->mainTabs->currentIndex() == 0) {
         for (int i = 0; i < ui->list_currentGPUData->topLevelItemCount(); ++i) {
-            if (keysInCurrentGpuList.value(i) == ValueID::TEMPERATURE_CURRENT) {
-                ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue +
-                                                                  " (max: "+ device.gpuData.value(ValueID::TEMPERATURE_MAX).strValue +
-                                                                  " min: "+ device.gpuData.value(ValueID::TEMPERATURE_MIN).strValue+")");
-                continue;
-            }
+            switch (keysInCurrentGpuList.value(i)) {
+                case ValueID::TEMPERATURE_CURRENT:
+                    ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(ValueID::TEMPERATURE_CURRENT, ValueID::TEMPERATURE_MIN, ValueID::TEMPERATURE_MAX));
+                    continue;
+                case ValueID::POWER_CAP_CURRENT:
+                    ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(ValueID::POWER_CAP_CURRENT, ValueID::POWER_CAP_MIN, ValueID::POWER_CAP_MAX));
+                    continue;
 
-            ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue);
+                // ignored values
+                case ValueID::TEMPERATURE_BEFORE_CURRENT:
+                case ValueID::TEMPERATURE_MIN:
+                case ValueID::TEMPERATURE_MAX:
+                case ValueID::POWER_CAP_MIN:
+                case ValueID::POWER_CAP_MAX:
+                    continue;
+
+                default:
+                    ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue);
+            }
         }
     }
 
@@ -339,14 +356,20 @@ void radeon_profile::createCurrentGpuDataListItems()
     ui->list_currentGPUData->clear();
     for (int i = 0; i < device.gpuData.keys().count(); ++i) {
 
-        // exclude before current from list
-        if (device.gpuData.keys().at(i) == ValueID::TEMPERATURE_BEFORE_CURRENT ||
-                device.gpuData.keys().at(i) == ValueID::TEMPERATURE_MAX ||
-                device.gpuData.keys().at(i) == ValueID::TEMPERATURE_MIN)
-            continue;
+        switch (device.gpuData.keys().at(i)) {
 
-        addTreeWidgetItem(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
-        keysInCurrentGpuList.insert(ui->list_currentGPUData->topLevelItemCount() - 1, device.gpuData.keys().at(i));
+            // ignored values
+            case ValueID::TEMPERATURE_BEFORE_CURRENT:
+            case ValueID::TEMPERATURE_MIN:
+            case ValueID::TEMPERATURE_MAX:
+            case ValueID::POWER_CAP_MIN:
+            case ValueID::POWER_CAP_MAX:
+                continue;
+
+            default:
+                addTreeWidgetItem(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
+                keysInCurrentGpuList.insert(ui->list_currentGPUData->topLevelItemCount() - 1, device.gpuData.keys().at(i));
+        }
     }
 }
 

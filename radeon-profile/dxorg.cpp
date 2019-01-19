@@ -48,12 +48,13 @@ void dXorg::setupIoctl() {
 
 QString getValueFromSysFsFile(QString fileName) {
     QFile f(fileName);
-    QString value;
+    QString value("-1");
+
     if (f.open(QIODevice::ReadOnly))
         value = QString(f.readAll()).trimmed();
 
     f.close();
-    return (value.isEmpty()) ? "-1" : value;
+    return value;
 }
 
 
@@ -127,9 +128,9 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     driverFiles.sysFs = DeviceSysFs(devicePath);
 
     // look for hwmon devices in card dir
-    QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath+ "hwmon/")[0];
+    QString hwmonDevicePath = globalStuff::grabSystemInfo("ls "+ devicePath + "hwmon/")[0];
 
-    hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0" : hwmonDevicePath));
+    hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0/" : hwmonDevicePath + "/"));
 
     hwmonAttributes = HwmonAttributes(hwmonDevicePath);
 
@@ -660,6 +661,8 @@ void dXorg::figureOutDriverFeatures() {
         features.mclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_mclk);
         features.freqMemAvailable = features.mclkTable.count() > 0;
     }
+
+    features.powerCapAvailable = !hwmonAttributes.power1_cap.isEmpty();
 }
 
 bool dXorg::getIoctlAvailability() {
@@ -758,4 +761,14 @@ int dXorg::getCurrentPowerPlayTableId(const QString &file) {
     }
 
     return 0;
+}
+
+int dXorg::getPowerCapCurrent() const {
+    return getValueFromSysFsFile(hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER;
+}
+
+PowerCap dXorg::getPowerCap() const {
+    return PowerCap(getValueFromSysFsFile(hwmonAttributes.power1_cap_min).toInt() / MICROWATT_DIVIDER,
+                    getValueFromSysFsFile(hwmonAttributes.power1_cap_max).toInt() / MICROWATT_DIVIDER,
+                    getValueFromSysFsFile(hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER);
 }

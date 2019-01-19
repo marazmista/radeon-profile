@@ -35,6 +35,9 @@
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
+#define MICROWATT_DIVIDER 1000000
+
+static QString MOCK_PATH("/home/marazmista/aasd/testfies/");
 
 enum ValueID {
     CLK_CORE,
@@ -52,7 +55,10 @@ enum ValueID {
     GPU_VRAM_USAGE_MB,
     FAN_SPEED_PERCENT,
     FAN_SPEED_RPM,
-    POWER_LEVEL
+    POWER_LEVEL,
+    POWER_CAP_MIN,
+    POWER_CAP_MAX,
+    POWER_CAP_CURRENT
 };
 
 enum ValueUnit {
@@ -62,6 +68,7 @@ enum ValueUnit {
     MEGABYTE,
     MILIVOLT,
     RPM,
+    WATT,
     NONE
 };
 
@@ -140,11 +147,11 @@ struct RPValue {
                 return QString::number(value) + QString::fromUtf8("\u00B0C");
             case ValueUnit::RPM:
                 return QString::number(value) + "RPM";
+            case ValueUnit::WATT:
+                return QString::number(value) + "W";
             default:
                 return QString::number(value);
         }
-
-        return "";
     }
 };
 
@@ -160,7 +167,8 @@ struct DriverFeatures {
     ocCoreAvailable = false,
     ocMemAvailable = false,
     freqCoreAvailable = false,
-    freqMemAvailable = false;
+    freqMemAvailable = false,
+    powerCapAvailable = false;
 
     PowerMethod currentPowerMethod;
     ClocksDataSource clocksDataSource = ClocksDataSource::SOURCE_UNKNOWN;
@@ -187,7 +195,6 @@ struct DeviceSysFs {
     gpu_busy_percent;
 
     DeviceSysFs() { }
-
 
     DeviceSysFs(const QString &devicePath) {
         power_method = devicePath + "power_method";
@@ -235,17 +242,29 @@ struct DeviceFilePaths {
 };
 
 struct HwmonAttributes {
-    QString temp1, temp1_crit, pwm1, pwm1_enable, pwm1_max, fan1_input;
+    QString
+    temp1,
+    temp1_crit,
+    pwm1,
+    pwm1_enable,
+    pwm1_max,
+    fan1_input,
+    power1_cap_max,
+    power1_cap_min,
+    power1_cap;
 
     HwmonAttributes() { }
 
     HwmonAttributes(const QString &hwmonPath) {
-        temp1 = hwmonPath + "/temp1_input";
-        temp1_crit = hwmonPath + "/temp1_crit";
-        pwm1 = hwmonPath + "/pwm1";
-        pwm1_enable = hwmonPath + "/pwm1_enable";
-        pwm1_max = hwmonPath + "/pwm1_max";
-        fan1_input = hwmonPath + "/fan1_input";
+        temp1 = hwmonPath + "temp1_input";
+        temp1_crit = hwmonPath + "temp1_crit";
+        pwm1 = hwmonPath + "pwm1";
+        pwm1_enable = hwmonPath + "pwm1_enable";
+        pwm1_max = hwmonPath + "pwm1_max";
+        fan1_input = hwmonPath + "fan1_input";
+        power1_cap_max = hwmonPath + "power1_cap_max";
+        power1_cap_min = hwmonPath + "power1_cap_min";
+        power1_cap = hwmonPath + "power1_cap";
 
         if (!QFile::exists(temp1))
             temp1 = "";
@@ -258,6 +277,9 @@ struct HwmonAttributes {
 
         if (!QFile::exists(fan1_input))
             fan1_input = "";
+
+        if (!QFile::exists(power1_cap))
+            power1_cap = power1_cap_min = power1_cap_max = "";
     }
 };
 
@@ -278,6 +300,16 @@ struct GPUUsage {
 struct GPUConstParams {
      int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1, temp1_crit = -1;
      float VRAMSize = -1;
+};
+
+struct PowerCap {
+    int min = -1, max = -1, current = -1;
+
+    PowerCap(const int _min, const int _max, const int _current) {
+        min = _min;
+        max = _max;
+        current = _current;
+    }
 };
 
 class globalStuff {
@@ -336,10 +368,14 @@ public:
             case ValueID::GPU_VRAM_USAGE_MB:
                 return ValueUnit::MEGABYTE;
 
+            case ValueID::POWER_CAP_CURRENT:
+            case ValueID::POWER_CAP_MAX:
+            case ValueID::POWER_CAP_MIN:
+                return ValueUnit::WATT;
+
             default:
                 return ValueUnit::NONE;
         }
-        return ValueUnit::NONE;
     }
 
     static bool isValueIdPlottable(ValueID id) {
@@ -356,12 +392,12 @@ public:
             case ValueID::TEMPERATURE_MAX:
             case ValueID::TEMPERATURE_MIN:
             case ValueID::GPU_VRAM_USAGE_MB:
+            case ValueID::POWER_CAP_CURRENT:
                 return true;
 
             default:
-               break;
+               return false;
         }
-         return false;
     }
 
     static QString getNameOfValueID(ValueID id) {
@@ -379,11 +415,13 @@ public:
             case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min)");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram megabyte usage");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level");
-            default:
-                break;
-        }
+            case ValueID::POWER_CAP_CURRENT: return QObject::tr("Power cap");
+            case ValueID::POWER_CAP_MIN: return QObject::tr("Power cap (min)");
+            case ValueID::POWER_CAP_MAX: return QObject::tr("Power cap (max)");
 
-        return "";
+            default:
+                 return "";
+        }
     }
 
     static QString getNameOfValueIDWithUnit(ValueID id) {
@@ -401,11 +439,13 @@ public:
             case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min) [")+QString::fromUtf8("\u00B0C]");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram usage [MB]");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level ");
-            default:
-                break;
-        }
+            case ValueID::POWER_CAP_CURRENT: return  QObject::tr("Power cap [W]");
+            case ValueID::POWER_CAP_MIN: return  QObject::tr("Power cap (min) [W]");
+            case ValueID::POWER_CAP_MAX: return  QObject::tr("Power cap (max) [W]");
 
-        return "";
+            default:
+                return "";
+        }
     }
 
     static QString getNameOfUnit(ValueUnit u) {
@@ -416,11 +456,11 @@ public:
             case ValueUnit::MILIVOLT: return QObject::tr("Milivolt [mV]");
             case ValueUnit::CELSIUS: return QObject::tr("Temperature [")+QString::fromUtf8("\u00B0C]");
             case ValueUnit::RPM: return QObject::tr("Speed [RPM]");
-            default:
-                break;
-        }
+            case ValueUnit::WATT: return QObject::tr("Watt [W]");
 
-        return "";
+            default:
+                return "";
+        }
     }
 
     static QStringList createDPMCombo() {

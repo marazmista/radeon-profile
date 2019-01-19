@@ -166,6 +166,20 @@ void gpu::defineAvailableDataContainer() {
 
     if (tmpUsage.gpuVramUsagePercent != -1)
         gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsagePercent));
+
+
+    if (driverHandler->features.powerCapAvailable) {
+        PowerCap tmpPowerCap = driverHandler->getPowerCap();
+
+        if (tmpPowerCap.min != -1)
+            gpuData.insert(ValueID::POWER_CAP_MIN, RPValue(ValueUnit::WATT, tmpPowerCap.min));
+
+        if (tmpPowerCap.max != -1)
+            gpuData.insert(ValueID::POWER_CAP_MAX, RPValue(ValueUnit::WATT, tmpPowerCap.max));
+
+        if (tmpPowerCap.current != -1)
+            gpuData.insert(ValueID::POWER_CAP_CURRENT, RPValue(ValueUnit::WATT, tmpPowerCap.current));
+    }
 }
 
 void gpu::getClocks() {
@@ -316,6 +330,10 @@ int gpu::getCurrentPowerPlayTableId(const QString &file) {
     return driverHandler->getCurrentPowerPlayTableId(file);
 }
 
+void gpu::getPowerCapCurrent() {
+    if (getDriverFeatures().powerCapAvailable)
+        gpuData[ValueID::POWER_CAP_CURRENT].setValue(driverHandler->getPowerCapCurrent());
+}
 
 // Function that returns the human readable output of a property value
 // For reference:

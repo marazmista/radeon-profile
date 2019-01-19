@@ -230,6 +230,8 @@ private:
     PlotInitialValues figureOutInitialScale(const PlotDefinitionSchema &pds);
     void applyOc();
     void setupPlot(const PlotDefinitionSchema &pds);
+    QString createCurrentMinMaxString(const ValueID idCurrent, const ValueID idMin, const ValueID idMax);
+
 };
 
 #endif // RADEON_PROFILE_H

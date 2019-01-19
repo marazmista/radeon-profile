@@ -56,6 +56,9 @@ public:
     QString getCurrentPowerLevel();
     QString getCurrentPowerProfile();
 
+    int getPowerCapCurrent() const;
+    PowerCap getPowerCap() const;
+
     void setPowerProfile(PowerProfiles newPowerProfile);
     void setForcePowerLevel(ForcePowerLevels newForcePowerLevel);
     void setPwmManualControl(bool manual);
