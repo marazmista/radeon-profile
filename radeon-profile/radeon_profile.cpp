@@ -59,8 +59,8 @@ radeon_profile::radeon_profile(QWidget *parent) :
     if (!device.initialize()) {
         QMessageBox::critical(this,tr("Error"), tr("No Radeon cards have been found in the system."));
 
-        for (int i = 0; i < ui->mainTabs->count() - 1; ++i)
-            ui->mainTabs->setTabEnabled(i, false);
+        for (int i = 0; i < ui->tw_main->count() - 1; ++i)
+            ui->tw_main->setTabEnabled(i, false);
 
         return;
     }
@@ -117,8 +117,8 @@ void radeon_profile::setupUiElements()
 {
     qDebug() << "Creating ui elements";
 
-    ui->mainTabs->setCurrentIndex(0);
-    ui->tabs_systemInfo->setCurrentIndex(0);
+    ui->tw_main->setCurrentIndex(0);
+    ui->tw_systemInfo->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
     ui->execPages->setCurrentIndex(0);
     setupForcePowerLevelMenu();
@@ -134,7 +134,7 @@ void radeon_profile::addRuntimeWidgets() {
     // add button for manual refresh glx info, connectors, mod params
     QPushButton *refreshBtn = new QPushButton();
     refreshBtn->setIcon(QIcon(":/icon/symbols/refresh.png"));
-    ui->tabs_systemInfo->setCornerWidget(refreshBtn);
+    ui->tw_systemInfo->setCornerWidget(refreshBtn);
     refreshBtn->setIconSize(QSize(20,20));
     refreshBtn->show();
     connect(refreshBtn,SIGNAL(clicked()),this,SLOT(refreshBtnClicked()));
@@ -148,7 +148,7 @@ void radeon_profile::addRuntimeWidgets() {
     f.setWeight(QFont::Bold);
     f.setPointSize(8);
     l->setFont(f);
-    ui->mainTabs->setCornerWidget(l,Qt::BottomRightCorner);
+    ui->tw_main->setCornerWidget(l,Qt::BottomRightCorner);
     l->show();
 
     // button on exec pages
@@ -220,20 +220,20 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         ui->cb_eventsTracking->setChecked(false);
     }
 
-    ui->tabs_systemInfo->setTabEnabled(3,data.contains(ValueID::CLK_CORE));
+    ui->tw_systemInfo->setTabEnabled(3,data.contains(ValueID::CLK_CORE));
 
     if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::TEMPERATURE_CURRENT) && !device.gpuData.contains(ValueID::VOLT_CORE))
-        ui->mainTabs->setTabEnabled(1,false);
+        ui->tw_main->setTabEnabled(1,false);
 
     if (data.contains(ValueID::FAN_SPEED_PERCENT) && features.isChangeProfileAvailable) {
         qDebug() << "Fan control available";
-        on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
+        on_slider_fanSpeed_valueChanged(ui->slider_fanSpeed->value());
         ui->l_fanProfileUnsavedIndicator->setVisible(false);
 
         setupFanProfilesMenu();
 
         if (ui->cb_saveFanMode->isChecked()) {
-            switch (ui->fanModesTabs->currentIndex()) {
+            switch (ui->stack_fanModes->currentIndex()) {
                 case 1:
                     on_btn_pwmFixed_clicked();
                     break;
@@ -245,7 +245,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         }
     } else {
         qDebug() << "Fan control not available";
-        ui->mainTabs->setTabEnabled(3,false);
+        ui->tw_main->setTabEnabled(3,false);
         ui->btn_fanControl->setVisible(false);
         ui->group_cfgFan->setEnabled(false);
     }
@@ -286,7 +286,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         }
     }
     else
-        ui->mainTabs->setTabEnabled(2, false);
+        ui->tw_main->setTabEnabled(2, false);
 }
 
 void radeon_profile::refreshGpuData() {
@@ -312,7 +312,7 @@ void radeon_profile::refreshUI() {
     topbarManager.updateItems(device.gpuData);
 
     // GPU data list
-    if (ui->mainTabs->currentIndex() == 0) {
+    if (ui->tw_main->currentIndex() == 0) {
         for (int i = 0; i < ui->list_currentGPUData->topLevelItemCount(); ++i) {
             switch (keysInCurrentGpuList.value(i)) {
                 case ValueID::TEMPERATURE_CURRENT:
@@ -347,7 +347,7 @@ void radeon_profile::refreshUI() {
     }
 
     // do the math only when user looking at stats table
-    if (ui->tabs_systemInfo->currentIndex() == 3 && ui->mainTabs->currentIndex() == 0)
+    if (ui->tw_systemInfo->currentIndex() == 3 && ui->tw_main->currentIndex() == 0)
         updateStatsTable();
 
 }

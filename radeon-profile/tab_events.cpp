@@ -64,14 +64,14 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
     savedState->powerLevel = static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex());
 
     if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
-        switch (ui->fanModesTabs->currentIndex()) {
+        switch (ui->stack_fanModes->currentIndex()) {
             case 0:
             case 1:
-             savedState->fanIndex = ui->fanModesTabs->currentIndex();
+             savedState->fanIndex = ui->stack_fanModes->currentIndex();
                 break;
             case 2:
                 savedState->fanProfileName = ui->l_currentFanProfile->text();
-                savedState->fanIndex = ui->fanModesTabs->currentIndex();
+                savedState->fanIndex = ui->stack_fanModes->currentIndex();
                 break;
         }
     }

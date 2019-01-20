@@ -269,7 +269,7 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
     makeFanProfilePlot();
 }
 
-void radeon_profile::on_fanSpeedSlider_valueChanged(int value)
+void radeon_profile::on_slider_fanSpeed_valueChanged(int value)
 {
     ui->labelFixedSpeed->setText(QString().setNum(value)+"%");
 }

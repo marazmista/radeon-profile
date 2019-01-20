@@ -358,7 +358,7 @@
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="QTabWidget" name="mainTabs">
+     <widget class="QTabWidget" name="tw_main">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -380,7 +380,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="infoTab">
+      <widget class="QWidget" name="tab_info">
        <attribute name="title">
         <string>GPU Summary</string>
        </attribute>
@@ -442,7 +442,7 @@
          </widget>
         </item>
         <item row="1" column="0" colspan="2">
-         <widget class="QTabWidget" name="tabs_systemInfo">
+         <widget class="QTabWidget" name="tw_systemInfo">
           <property name="currentIndex">
            <number>0</number>
           </property>
@@ -650,7 +650,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="graphTab">
+      <widget class="QWidget" name="tab_graph">
        <attribute name="title">
         <string>Graphs</string>
        </attribute>
@@ -1051,7 +1051,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="overclockTab">
+      <widget class="QWidget" name="tab_overclock">
        <attribute name="title">
         <string>Overclock</string>
        </attribute>
@@ -1078,7 +1078,7 @@
         <item>
          <widget class="QGroupBox" name="group_oc">
           <property name="title">
-           <string>Overclock</string>
+           <string>Overcloc&amp;k</string>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -1223,7 +1223,7 @@
         <item>
          <widget class="QGroupBox" name="group_freq">
           <property name="title">
-           <string>Manual frequency control</string>
+           <string>&amp;Manual frequency control</string>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -1380,7 +1380,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="fanTab">
+      <widget class="QWidget" name="tab_fan">
        <attribute name="title">
         <string>Fan Control</string>
        </attribute>
@@ -1494,7 +1494,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QStackedWidget" name="fanModesTabs">
+         <widget class="QStackedWidget" name="stack_fanModes">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -1536,7 +1536,7 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QSlider" name="fanSpeedSlider">
+             <widget class="QSlider" name="slider_fanSpeed">
               <property name="minimum">
                <number>10</number>
               </property>
@@ -1617,7 +1617,7 @@
             </item>
            </layout>
            <zorder>btn_pwmFixedApply</zorder>
-           <zorder>fanSpeedSlider</zorder>
+           <zorder>slider_fanSpeed</zorder>
            <zorder>l_minFanSpeed</zorder>
            <zorder>labelFixedSpeed</zorder>
           </widget>
@@ -1825,7 +1825,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="eventsTab">
+      <widget class="QWidget" name="tab_events">
        <attribute name="title">
         <string>Events</string>
        </attribute>
@@ -1975,7 +1975,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="execTab">
+      <widget class="QWidget" name="tab_exec">
        <attribute name="title">
         <string>Exec</string>
        </attribute>
@@ -1998,7 +1998,7 @@
         <item row="0" column="0">
          <widget class="QStackedWidget" name="execPages">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="page_profiles">
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -2154,6 +2154,15 @@
                    </color>
                   </brush>
                  </colorrole>
+                 <colorrole role="PlaceholderText">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="128">
+                    <red>255</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
                 </active>
                 <inactive>
                  <colorrole role="WindowText">
@@ -2291,6 +2300,15 @@
                    </color>
                   </brush>
                  </colorrole>
+                 <colorrole role="PlaceholderText">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="128">
+                    <red>255</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
                 </inactive>
                 <disabled>
                  <colorrole role="WindowText">
@@ -2423,6 +2441,15 @@
                   <brush brushstyle="SolidPattern">
                    <color alpha="255">
                     <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="PlaceholderText">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="128">
+                    <red>255</red>
                     <green>0</green>
                     <blue>0</blue>
                    </color>
@@ -2897,6 +2924,15 @@
                          </color>
                         </brush>
                        </colorrole>
+                       <colorrole role="PlaceholderText">
+                        <brush brushstyle="NoBrush">
+                         <color alpha="128">
+                          <red>170</red>
+                          <green>0</green>
+                          <blue>0</blue>
+                         </color>
+                        </brush>
+                       </colorrole>
                       </active>
                       <inactive>
                        <colorrole role="WindowText">
@@ -3029,6 +3065,15 @@
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
                           <red>0</red>
+                          <green>0</green>
+                          <blue>0</blue>
+                         </color>
+                        </brush>
+                       </colorrole>
+                       <colorrole role="PlaceholderText">
+                        <brush brushstyle="NoBrush">
+                         <color alpha="128">
+                          <red>170</red>
                           <green>0</green>
                           <blue>0</blue>
                          </color>
@@ -3171,6 +3216,15 @@
                          </color>
                         </brush>
                        </colorrole>
+                       <colorrole role="PlaceholderText">
+                        <brush brushstyle="NoBrush">
+                         <color alpha="128">
+                          <red>170</red>
+                          <green>0</green>
+                          <blue>0</blue>
+                         </color>
+                        </brush>
+                       </colorrole>
                       </disabled>
                      </palette>
                     </property>
@@ -3249,7 +3303,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="configTab">
+      <widget class="QWidget" name="tab_config">
        <attribute name="title">
         <string>Configuration</string>
        </attribute>
@@ -3739,7 +3793,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="aboutTab">
+      <widget class="QWidget" name="tab_about">
        <attribute name="title">
         <string>About</string>
        </attribute>

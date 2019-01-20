@@ -48,9 +48,9 @@ void radeon_profile::saveConfig() {
         settings.setValue("plotsBackgroundColor", ui->frame_plotsBackground->palette().background().color().name());
         settings.setValue("setCommonPlotsBg", ui->cb_overridePlotsBg->isChecked());
         settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
-        settings.setValue("fanSpeedSlider",ui->fanSpeedSlider->value());
+        settings.setValue("fanSpeedSlider",ui->slider_fanSpeed->value());
         settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
-        settings.setValue("fanMode",ui->fanModesTabs->currentIndex());
+        settings.setValue("fanMode",ui->stack_fanModes->currentIndex());
         settings.setValue("fanProfileName",ui->l_currentFanProfile->text());
         settings.setValue("enableZeroPercentFanSpeed", ui->cb_zeroPercentFanSpeed->isChecked());
 
@@ -229,12 +229,12 @@ void radeon_profile::loadConfig() {
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
     ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",true).toBool());
     ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
-    ui->fanSpeedSlider->setValue(settings.value("fanSpeedSlider",20).toInt());
+    ui->slider_fanSpeed->setValue(settings.value("fanSpeedSlider",20).toInt());
     ui->cb_saveFanMode->setChecked(settings.value("saveSelectedFanMode",false).toBool());
     ui->l_currentFanProfile->setText(settings.value("fanProfileName","default").toString());
     ui->cb_zeroPercentFanSpeed->setChecked(settings.value("enableZeroPercentFanSpeed",false).toBool());
     if (ui->cb_saveFanMode->isChecked())
-        ui->fanModesTabs->setCurrentIndex(settings.value("fanMode",0).toInt());
+        ui->stack_fanModes->setCurrentIndex(settings.value("fanMode",0).toInt());
 
     ui->cb_plotsRightGap->setChecked(settings.value("graphOffset",true).toBool());
     ui->slider_timeRange->setValue(settings.value("graphRange",600).toInt());
@@ -274,9 +274,9 @@ void radeon_profile::loadConfig() {
     timer->setInterval(ui->spin_timerInterval->value() * 1000);
 
     if (ui->cb_stats->isChecked())
-        ui->tabs_systemInfo->setTabEnabled(3,true);
+        ui->tw_systemInfo->setTabEnabled(3,true);
     else
-        ui->tabs_systemInfo->setTabEnabled(3,false);
+        ui->tw_systemInfo->setTabEnabled(3,false);
 
     if (ui->cb_zeroPercentFanSpeed->isChecked())
         setupMinFanSpeedSetting(0);
@@ -459,5 +459,5 @@ void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
 void radeon_profile::setupMinFanSpeedSetting(unsigned int speed) {
     minFanStepsSpeed = speed;
     ui->l_minFanSpeed->setText(QString::number(minFanStepsSpeed)+"%");
-    ui->fanSpeedSlider->setMinimum(minFanStepsSpeed);
+    ui->slider_fanSpeed->setMinimum(minFanStepsSpeed);
 }
