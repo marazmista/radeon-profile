@@ -132,7 +132,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 
     hwmonDevicePath =  devicePath + "hwmon/" + ((hwmonDevicePath.isEmpty() ? "hwmon0/" : hwmonDevicePath + "/"));
 
-    hwmonAttributes = HwmonAttributes(hwmonDevicePath);
+    driverFiles.hwmonAttributes = HwmonAttributes(hwmonDevicePath);
 
     qDebug() << "hwmon path: " << hwmonDevicePath;
 }
@@ -297,7 +297,7 @@ float dXorg::getTemperature() {
     switch (features.currentTemperatureSensor) {
         case TemperatureSensor::SYSFS_HWMON:
         case TemperatureSensor::CARD_HWMON:
-            return getValueFromSysFsFile(hwmonAttributes.temp1).toFloat() / 1000;
+            return getValueFromSysFsFile(driverFiles.hwmonAttributes.temp1).toFloat() / 1000;
         case TemperatureSensor::PCI_SENSOR: {
             QStringList out = globalStuff::grabSystemInfo("sensors");
             temp = out[sensorsGPUtempIndex+2].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
@@ -349,13 +349,13 @@ PowerMethod dXorg::getPowerMethod() {
 TemperatureSensor dXorg::getTemperatureSensor() {
 
     // first method, try read temp from sysfs in card dir (path from figureOutGPUDataPaths())
-    QString tmpValue = getValueFromSysFsFile(hwmonAttributes.temp1);
+    QString tmpValue = getValueFromSysFsFile(driverFiles.hwmonAttributes.temp1);
     if (!tmpValue.isEmpty() || tmpValue != "-1")
         return TemperatureSensor::CARD_HWMON;
     else {
         // second method, try find in system hwmon dir for file labeled VGA_TEMP
-        hwmonAttributes.temp1 = findSysfsHwmonForGPU();
-        if (!hwmonAttributes.temp1.isEmpty())
+        driverFiles.hwmonAttributes.temp1 = findSysfsHwmonForGPU();
+        if (!driverFiles.hwmonAttributes.temp1.isEmpty())
             return TemperatureSensor::SYSFS_HWMON;
 
         // if above fails, use lm_sensors
@@ -526,23 +526,23 @@ void dXorg::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
 
 void dXorg::setPwmValue(unsigned int value) {
     value = params.pwmMaxSpeed * value / 100;
-    setNewValue(hwmonAttributes.pwm1,QString().setNum(value));
+    setNewValue(driverFiles.hwmonAttributes.pwm1,QString().setNum(value));
 }
 
 void dXorg::setPwmManualControl(bool manual) {
-    setNewValue(hwmonAttributes.pwm1_enable, QString(manual ? pwm_manual : pwm_auto));
+    setNewValue(driverFiles.hwmonAttributes.pwm1_enable, QString(manual ? pwm_manual : pwm_auto));
 }
 
 GPUFanSpeed dXorg::getFanSpeed() {
     GPUFanSpeed tmp;
 
-    if (hwmonAttributes.pwm1.isEmpty())
+    if (driverFiles.hwmonAttributes.pwm1.isEmpty())
         return tmp;
 
-    tmp.fanSpeedPercent = (getValueFromSysFsFile(hwmonAttributes.pwm1).toFloat() / params.pwmMaxSpeed) * 100;
+    tmp.fanSpeedPercent = (getValueFromSysFsFile(driverFiles.hwmonAttributes.pwm1).toFloat() / params.pwmMaxSpeed) * 100;
 
-    if (!hwmonAttributes.fan1_input.isEmpty())
-        tmp.fanSpeedRpm = getValueFromSysFsFile(hwmonAttributes.pwm1).toInt();
+    if (!driverFiles.hwmonAttributes.fan1_input.isEmpty())
+        tmp.fanSpeedRpm = getValueFromSysFsFile(driverFiles.hwmonAttributes.pwm1).toInt();
 
     return tmp;
 }
@@ -662,7 +662,7 @@ void dXorg::figureOutDriverFeatures() {
         features.isDpmMemFreqTableAvailable = features.mclkTable.count() > 0;
     }
 
-    features.isPowerCapAvailable = !hwmonAttributes.power1_cap.isEmpty();
+    features.isPowerCapAvailable = !driverFiles.hwmonAttributes.power1_cap.isEmpty();
 
     if (!driverFiles.sysFs.pp_od_clk_voltage.isEmpty()) {
         features.isOcTableAvailable = true;
@@ -697,12 +697,12 @@ void dXorg::figureOutConstParams() {
                  << "\n vram size: " << params.VRAMSize;
     }
 
-    if (!hwmonAttributes.temp1_crit.isEmpty())
-        params.temp1_crit = getValueFromSysFsFile(hwmonAttributes.temp1_crit).toInt() / 1000;
+    if (!driverFiles.hwmonAttributes.temp1_crit.isEmpty())
+        params.temp1_crit = getValueFromSysFsFile(driverFiles.hwmonAttributes.temp1_crit).toInt() / 1000;
 
 
-    if (!hwmonAttributes.pwm1_max.isEmpty())
-        params.pwmMaxSpeed = getValueFromSysFsFile(hwmonAttributes.pwm1_max).toInt();
+    if (!driverFiles.hwmonAttributes.pwm1_max.isEmpty())
+        params.pwmMaxSpeed = getValueFromSysFsFile(driverFiles.hwmonAttributes.pwm1_max).toInt();
 }
 
 GPUClocks dXorg::getFeaturesFallback() {
@@ -773,13 +773,13 @@ int dXorg::getCurrentPowerPlayTableId(const QString &file) {
 }
 
 int dXorg::getPowerCapCurrent() const {
-    return getValueFromSysFsFile(hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER;
+    return getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER;
 }
 
 PowerCap dXorg::getPowerCap() const {
-    return PowerCap(getValueFromSysFsFile(hwmonAttributes.power1_cap_min).toInt() / MICROWATT_DIVIDER,
-                    getValueFromSysFsFile(hwmonAttributes.power1_cap_max).toInt() / MICROWATT_DIVIDER,
-                    getValueFromSysFsFile(hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER);
+    return PowerCap(getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap_min).toInt() / MICROWATT_DIVIDER,
+                    getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap_max).toInt() / MICROWATT_DIVIDER,
+                    getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER);
 }
 
 const QList<FVTable> dXorg::loadOcTable() {

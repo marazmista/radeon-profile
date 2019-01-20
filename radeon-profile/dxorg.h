@@ -80,7 +80,6 @@ private:
     int sensorsGPUtempIndex;
     short rxMatchIndex, clocksValueDivider;
     RxPatterns rxPatterns;
-    HwmonAttributes hwmonAttributes;
 
     daemonComm dcomm;
     ioctlHandler *ioctlHnd = nullptr;

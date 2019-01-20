@@ -269,11 +269,6 @@ struct DeviceSysFs {
     }
 };
 
-struct DeviceFilePaths {
-    QString debugfs_pm_info, moduleParams;
-    DeviceSysFs sysFs;
-};
-
 struct HwmonAttributes {
     QString
     temp1,
@@ -314,6 +309,12 @@ struct HwmonAttributes {
         if (!QFile::exists(power1_cap))
             power1_cap = power1_cap_min = power1_cap_max = "";
     }
+};
+
+struct DeviceFilePaths {
+    QString debugfs_pm_info, moduleParams;
+    DeviceSysFs sysFs;
+    HwmonAttributes hwmonAttributes;
 };
 
 struct GPUClocks {
