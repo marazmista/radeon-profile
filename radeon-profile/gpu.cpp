@@ -168,7 +168,7 @@ void gpu::defineAvailableDataContainer() {
         gpuData.insert(ValueID::GPU_VRAM_USAGE_PERCENT, RPValue(ValueUnit::PERCENT, tmpUsage.gpuVramUsagePercent));
 
 
-    if (driverHandler->features.powerCapAvailable) {
+    if (driverHandler->features.isPowerCapAvailable) {
         PowerCap tmpPowerCap = driverHandler->getPowerCap();
 
         if (tmpPowerCap.min != -1)
@@ -310,7 +310,7 @@ void gpu::finalize() {
     if (gpuData.contains(ValueID::FAN_SPEED_PERCENT))
         setPwmManualControl(false);
 
-    if (getDriverFeatures().ocCoreAvailable)
+    if (getDriverFeatures().isPercentCoreOcAvailable)
         resetOverclock();
 
     if (futureGpuUsage.isRunning())
@@ -331,7 +331,7 @@ int gpu::getCurrentPowerPlayTableId(const QString &file) {
 }
 
 void gpu::getPowerCapCurrent() {
-    if (getDriverFeatures().powerCapAvailable)
+    if (getDriverFeatures().isPowerCapAvailable)
         gpuData[ValueID::POWER_CAP_CURRENT].setValue(driverHandler->getPowerCapCurrent());
 }
 

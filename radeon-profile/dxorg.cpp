@@ -624,11 +624,11 @@ void dXorg::figureOutDriverFeatures() {
             qDebug() << "Power method: DPM";
 
             if (globalStuff::globalConfig.rootMode || daemonConnected())
-                features.canChangeProfile = true;
+                features.isChangeProfileAvailable = true;
             else {
                 QFile f(driverFiles.sysFs.power_dpm_state);
                 if (f.open(QIODevice::WriteOnly)) {
-                    features.canChangeProfile = true;
+                    features.isChangeProfileAvailable = true;
                     f.close();
                 }
             }
@@ -639,7 +639,7 @@ void dXorg::figureOutDriverFeatures() {
 
             QFile f(driverFiles.sysFs.power_profile);
             if (f.open(QIODevice::WriteOnly)) {
-                features.canChangeProfile = true;
+                features.isChangeProfileAvailable = true;
                 f.close();
             }
         }
@@ -649,23 +649,23 @@ void dXorg::figureOutDriverFeatures() {
             break;
     }
 
-    features.ocCoreAvailable = !driverFiles.sysFs.pp_sclk_od.isEmpty();
-    features.ocMemAvailable = !driverFiles.sysFs.pp_mclk_od.isEmpty();
+    features.isPercentCoreOcAvailable = !driverFiles.sysFs.pp_sclk_od.isEmpty();
+    features.isPercentMemOcAvailable = !driverFiles.sysFs.pp_mclk_od.isEmpty();
 
     if (!driverFiles.sysFs.pp_dpm_sclk.isEmpty()) {
         features.sclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_sclk);
-        features.freqCoreAvailable = features.sclkTable.count() > 0;
+        features.isDpmCoreFreqTableAvailable = features.sclkTable.count() > 0;
     }
 
     if (!driverFiles.sysFs.pp_dpm_mclk.isEmpty()) {
         features.mclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_mclk);
-        features.freqMemAvailable = features.mclkTable.count() > 0;
+        features.isDpmMemFreqTableAvailable = features.mclkTable.count() > 0;
     }
 
-    features.powerCapAvailable = !hwmonAttributes.power1_cap.isEmpty();
+    features.isPowerCapAvailable = !hwmonAttributes.power1_cap.isEmpty();
 
     if (!driverFiles.sysFs.pp_od_clk_voltage.isEmpty()) {
-        features.ocTableAvailable = true;
+        features.isOcTableAvailable = true;
 
         QList<FVTable> tables = loadOcTable();
 

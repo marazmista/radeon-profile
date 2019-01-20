@@ -205,7 +205,7 @@ void radeon_profile::addRuntimeWidgets() {
 void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data) {
     qDebug() << "Handling found device features";
 
-    if (features.canChangeProfile && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
+    if (features.isChangeProfileAvailable && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
         ui->stack_pm->setCurrentIndex(features.currentPowerMethod);
 
         changeProfile->setEnabled(features.currentPowerMethod == PowerMethod::PROFILE);
@@ -225,7 +225,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::TEMPERATURE_CURRENT) && !device.gpuData.contains(ValueID::VOLT_CORE))
         ui->mainTabs->setTabEnabled(1,false);
 
-    if (data.contains(ValueID::FAN_SPEED_PERCENT) && features.canChangeProfile) {
+    if (data.contains(ValueID::FAN_SPEED_PERCENT) && features.isChangeProfileAvailable) {
         qDebug() << "Fan control available";
         on_fanSpeedSlider_valueChanged(ui->fanSpeedSlider->value());
         ui->l_fanProfileUnsavedIndicator->setVisible(false);
@@ -258,33 +258,34 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     createCurrentGpuDataListItems();
 
     // oc working only on amdgpu
-    if (features.canChangeProfile && device.getDriverFeatures().sysInfo.module == DriverModule::AMDGPU) {
-        if (device.getDriverFeatures().ocCoreAvailable) {
+    if (features.isChangeProfileAvailable && device.getDriverFeatures().sysInfo.module == DriverModule::AMDGPU) {
+        if (device.getDriverFeatures().isPercentCoreOcAvailable) {
             on_btn_applyOverclock_clicked();
 
-            ui->slider_ocMclk->setEnabled(device.getDriverFeatures().ocMemAvailable);
-            ui->label_memOc->setEnabled(device.getDriverFeatures().ocMemAvailable);
-            ui->l_ocMclk->setEnabled(device.getDriverFeatures().ocMemAvailable);
+            ui->slider_ocMclk->setEnabled(device.getDriverFeatures().isPercentMemOcAvailable);
+            ui->label_memOc->setEnabled(device.getDriverFeatures().isPercentMemOcAvailable);
+            ui->l_ocMclk->setEnabled(device.getDriverFeatures().isPercentMemOcAvailable);
         } else {
             ui->group_oc->setCheckable(false);
             ui->group_oc->setEnabled(false);
         }
 
-        if (device.getDriverFeatures().freqCoreAvailable) {
+        if (device.getDriverFeatures().isDpmCoreFreqTableAvailable) {
             ui->slider_freqSclk->setMaximum(device.getDriverFeatures().sclkTable.count() - 1);
 
-            if (device.getDriverFeatures().freqMemAvailable)
+            if (device.getDriverFeatures().isDpmMemFreqTableAvailable)
                 ui->slider_freqMclk->setMaximum(device.getDriverFeatures().mclkTable.count() - 1);
             else {
                 ui->slider_freqMclk->setEnabled(false);
-                ui->label_memFreq->setEnabled(device.getDriverFeatures().freqMemAvailable);
-                ui->l_freqMclk->setEnabled(device.getDriverFeatures().freqMemAvailable);
+                ui->label_memFreq->setEnabled(device.getDriverFeatures().isDpmMemFreqTableAvailable);
+                ui->l_freqMclk->setEnabled(device.getDriverFeatures().isDpmMemFreqTableAvailable);
             }
         } else {
             ui->group_freq->setCheckable(false);
             ui->group_freq->setEnabled(false);
         }
-    } else
+    }
+    else
         ui->mainTabs->setTabEnabled(2, false);
 }
 
@@ -394,7 +395,7 @@ void radeon_profile::timerEvent() {
     if (!refreshWhenHidden->isChecked() && this->isHidden()) {
 
         // even if in tray, keep the fan control active (if enabled)
-        if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && device.getDriverFeatures().canChangeProfile && ui->btn_pwmProfile->isChecked()) {
+        if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && device.getDriverFeatures().isChangeProfileAvailable && ui->btn_pwmProfile->isChecked()) {
             device.getTemperature();
             adjustFanSpeed();
         }
@@ -403,7 +404,7 @@ void radeon_profile::timerEvent() {
 
     refreshGpuData();
 
-    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && device.getDriverFeatures().canChangeProfile && ui->btn_pwmProfile->isChecked())
+    if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT) && device.getDriverFeatures().isChangeProfileAvailable && ui->btn_pwmProfile->isChecked())
         adjustFanSpeed();
 
     if (Q_LIKELY(ui->cb_graphs->isChecked()))

@@ -317,7 +317,7 @@ void radeon_profile::on_group_freq_toggled(bool arg1)
         device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
 
         ui->slider_freqSclk->setValue(device.getCurrentPowerPlayTableId(device.getDriverFiles().sysFs.pp_dpm_sclk));
-        if (device.getDriverFeatures().freqMemAvailable)
+        if (device.getDriverFeatures().isDpmMemFreqTableAvailable)
             ui->slider_freqMclk->setValue(device.getCurrentPowerPlayTableId(device.getDriverFiles().sysFs.pp_dpm_mclk));
     } else
         device.setForcePowerLevel(ForcePowerLevels::F_AUTO);

@@ -184,13 +184,13 @@ typedef QMap<int, unsigned int> FanProfileSteps;
 // we enable ui elements
 struct DriverFeatures {
     bool
-    canChangeProfile = false,
-    ocCoreAvailable = false,
-    ocMemAvailable = false,
-    freqCoreAvailable = false,
-    freqMemAvailable = false,
-    powerCapAvailable = false,
-    ocTableAvailable = false;
+    isChangeProfileAvailable = false,
+    isPercentCoreOcAvailable = false,
+    isPercentMemOcAvailable = false,
+    isDpmCoreFreqTableAvailable = false,
+    isDpmMemFreqTableAvailable = false,
+    isPowerCapAvailable = false,
+    isOcTableAvailable = false;
 
     PowerMethod currentPowerMethod;
     ClocksDataSource clocksDataSource = ClocksDataSource::SOURCE_UNKNOWN;

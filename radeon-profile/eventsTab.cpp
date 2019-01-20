@@ -54,7 +54,7 @@ void radeon_profile::checkEvents() {
 }
 
 void radeon_profile::activateEvent(const RPEvent &rpe) {
-    if (!device.getDriverFeatures().canChangeProfile)
+    if (!device.getDriverFeatures().isChangeProfileAvailable)
         return;
 
     qDebug() << "Activating event: " + rpe.name;
