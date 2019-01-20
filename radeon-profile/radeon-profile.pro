@@ -34,15 +34,15 @@ SOURCES += main.cpp\
     ioctlHandler.cpp \
     ioctl_radeon.cpp \
     ioctl_amdgpu.cpp \
-    execTab.cpp \
     execbin.cpp \
-    eventsTab.cpp \
-    fanControlTab.cpp \
-    plotsTab.cpp \
     dialogs/dialog_defineplot.cpp \
     dialogs/dialog_rpevent.cpp \
     dialogs/dialog_topbarcfg.cpp \
-    dialogs/dialog_deinetopbaritem.cpp
+    dialogs/dialog_deinetopbaritem.cpp \
+    tab_events.cpp \
+    tab_plots.cpp \
+    tab_fanControl.cpp \
+    tab_exec.cpp
 
 HEADERS  += radeon_profile.h \
     gpu.h \
