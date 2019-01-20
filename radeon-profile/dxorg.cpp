@@ -663,6 +663,15 @@ void dXorg::figureOutDriverFeatures() {
     }
 
     features.powerCapAvailable = !hwmonAttributes.power1_cap.isEmpty();
+
+    if (!driverFiles.sysFs.pp_od_clk_voltage.isEmpty()) {
+        features.ocTableAvailable = true;
+
+        QList<FVTable> tables = loadOcTable();
+
+        features.coreTable = tables.at(0);
+        features.memTable = tables.at(1);
+    }
 }
 
 bool dXorg::getIoctlAvailability() {
@@ -771,4 +780,46 @@ PowerCap dXorg::getPowerCap() const {
     return PowerCap(getValueFromSysFsFile(hwmonAttributes.power1_cap_min).toInt() / MICROWATT_DIVIDER,
                     getValueFromSysFsFile(hwmonAttributes.power1_cap_max).toInt() / MICROWATT_DIVIDER,
                     getValueFromSysFsFile(hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER);
+}
+
+const QList<FVTable> dXorg::loadOcTable() {
+    FVTable tables[2];
+    int tableType = 0; // 0 - core, 1 - mem //
+
+    QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_od_clk_voltage).split('\n');
+
+    for (QString &s: sl) {
+        if (s.contains("OD_SCLK")) {
+            tableType = 0;
+            continue;
+        }
+
+        if (s.contains("OD_MCLK")) {
+            tableType = 1;
+            continue;
+        }
+
+        if (s.contains("OD_RANGE"))
+            continue;
+
+        QStringList state = s.replace(" ","").replace(":", "|").replace("MHz", "|").replace("mV","|").split("|",QString::SkipEmptyParts);
+
+        // read and setup OC ranges
+        if (state[0] == "SCLK") {
+            features.coreRange = OCRange(state[1].toUInt(), state[2].toUInt());
+            continue;
+        }
+        if (state[0] == "MCLK") {
+            features.memRange = OCRange(state[1].toUInt(), state[2].toUInt());
+            continue;
+        }
+        if (state[0] == "VDDC") {
+            features.voltageRange = OCRange(state[1].toUInt(), state[2].toUInt());
+            continue;
+        }
+
+        tables[tableType].insert(state[0].toUInt(), FreqVoltPair(state[1].toUInt(), state[2].toUInt()));
+    }
+
+    return QList<FVTable>() << tables[0] << tables[1];
 }

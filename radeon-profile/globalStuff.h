@@ -155,8 +155,29 @@ struct RPValue {
     }
 };
 
+struct FreqVoltPair {
+    unsigned frequency, voltage;
+
+    FreqVoltPair(unsigned freq, unsigned volt) {
+        frequency = freq;
+        voltage = volt;
+    }
+};
+
+struct OCRange {
+    unsigned min, max;
+
+    OCRange() { }
+
+    OCRange(unsigned _min, unsigned _max) {
+        min = _min;
+        max = _max;
+    }
+};
+
 typedef QMap<ValueID, RPValue> GPUDataContainer;
 typedef QMap<int, QString> PowerPlayTable;
+typedef QMap<unsigned, FreqVoltPair> FVTable;
 typedef QMap<int, unsigned int> FanProfileSteps;
 
 // structure which holds what can be display on ui and on its base
@@ -168,13 +189,20 @@ struct DriverFeatures {
     ocMemAvailable = false,
     freqCoreAvailable = false,
     freqMemAvailable = false,
-    powerCapAvailable = false;
+    powerCapAvailable = false,
+    ocTableAvailable = false;
 
     PowerMethod currentPowerMethod;
     ClocksDataSource clocksDataSource = ClocksDataSource::SOURCE_UNKNOWN;
     TemperatureSensor currentTemperatureSensor;
     GPUSysInfo sysInfo;
+
+    // base on files  pp_dpm_sclk and  pp_dpm_mclk
     PowerPlayTable sclkTable, mclkTable;
+
+    // base on file pp_od_clk_voltage
+    FVTable coreTable, memTable;
+    OCRange coreRange, memRange, voltageRange;
 
     DriverFeatures() {
         currentPowerMethod = PowerMethod::PM_UNKNOWN;
@@ -192,7 +220,8 @@ struct DeviceSysFs {
     pp_mclk_od,
     pp_dpm_sclk,
     pp_dpm_mclk,
-    gpu_busy_percent;
+    gpu_busy_percent,
+    pp_od_clk_voltage;
 
     DeviceSysFs() { }
 
@@ -206,6 +235,7 @@ struct DeviceSysFs {
         pp_dpm_sclk = devicePath + "pp_dpm_sclk";
         pp_dpm_mclk = devicePath + "pp_dpm_mclk";
         gpu_busy_percent = devicePath + "gpu_busy_percent";
+        pp_od_clk_voltage = devicePath + "pp_od_clk_voltage";
 
         if (!QFile::exists(power_method))
             power_method = "";
@@ -233,6 +263,9 @@ struct DeviceSysFs {
 
         if (!QFile::exists(gpu_busy_percent))
             gpu_busy_percent = "";
+
+        if (!QFile::exists(pp_od_clk_voltage))
+            pp_od_clk_voltage = "";
     }
 };
 
