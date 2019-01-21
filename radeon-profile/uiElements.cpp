@@ -180,3 +180,74 @@ void radeon_profile::fillModInfo(){
     ui->list_modInfo->addTopLevelItems(device.getModuleInfo());
     ui->list_modInfo->header()->resizeSections(QHeaderView::ResizeToContents);
 }
+
+void radeon_profile::addRuntimeWidgets() {
+    // add button for manual refresh glx info, connectors, mod params
+    QPushButton *refreshBtn = new QPushButton();
+    refreshBtn->setIcon(QIcon(":/icon/symbols/refresh.png"));
+    ui->tw_systemInfo->setCornerWidget(refreshBtn);
+    refreshBtn->setIconSize(QSize(20,20));
+    refreshBtn->show();
+    connect(refreshBtn,SIGNAL(clicked()),this,SLOT(refreshBtnClicked()));
+
+    ui->label_version->setText(tr("version %n", NULL, appVersion));
+
+    // version label
+    QLabel *l = new QLabel("v. " +QString().setNum(appVersion),this);
+    QFont f;
+    f.setStretch(QFont::Unstretched);
+    f.setWeight(QFont::Bold);
+    f.setPointSize(8);
+    l->setFont(f);
+    ui->tw_main->setCornerWidget(l,Qt::BottomRightCorner);
+    l->show();
+
+    // button on exec pages
+    QPushButton *btnBackProfiles = new QPushButton();
+    btnBackProfiles->setText(tr("Back to profiles"));
+    ui->tabs_execOutputs->setCornerWidget(btnBackProfiles);
+    btnBackProfiles->show();
+    connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
+
+    // set pwm buttons in group
+    pwmGroup.addButton(ui->btn_pwmAuto);
+    pwmGroup.addButton(ui->btn_pwmFixed);
+    pwmGroup.addButton(ui->btn_pwmProfile);
+
+    dpmGroup.addButton(ui->btn_dpmBattery, PowerProfiles::BATTERY);
+    dpmGroup.addButton(ui->btn_dpmBalanced, PowerProfiles::BALANCED);
+    dpmGroup.addButton(ui->btn_dpmPerformance, PowerProfiles::PERFORMANCE);
+
+    //setup fan profile graph
+    fanProfileChart = new QChartView(this);
+    QChart *fanChart = new QChart();
+    fanProfileChart->setRenderHint(QPainter::Antialiasing);
+    fanChart->setBackgroundBrush(QBrush(Qt::darkGray));
+    fanProfileChart->setChart(fanChart);
+    fanChart->setBackgroundRoundness(2);
+    fanChart->setMargins(QMargins(5,0,0,0));
+    fanSeries = new QLineSeries(fanChart);
+    fanChart->legend()->setVisible(false);
+    fanChart->addSeries(fanSeries);
+    fanSeries->setColor(Qt::yellow);
+
+    QValueAxis *axisTemperature = new QValueAxis(fanChart);
+    QValueAxis *axisSpeed = new QValueAxis(fanChart);
+    fanChart->addAxis(axisTemperature,Qt::AlignBottom);
+    fanChart->addAxis(axisSpeed, Qt::AlignLeft);
+    axisTemperature->setRange(0, 100);
+    axisSpeed->setRange(0, 100);
+    axisSpeed->setGridLineColor(Qt::white);
+    axisTemperature->setGridLineColor(Qt::white);
+    axisSpeed->setLabelsColor(Qt::white);
+    axisTemperature->setLabelsColor(Qt::white);
+    axisSpeed->setTitleText(tr("Fan Speed [%]"));
+    axisTemperature->setTitleText(tr("Temperature [°C]"));
+    axisSpeed->setTitleBrush(QBrush(Qt::white));
+    axisTemperature->setTitleBrush(QBrush(Qt::white));
+    fanSeries->attachAxis(axisTemperature);
+    fanSeries->attachAxis(axisSpeed);
+    fanSeries->setPointsVisible(true);
+
+    ui->verticalLayout_22->addWidget(fanProfileChart);
+}
