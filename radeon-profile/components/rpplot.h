@@ -237,7 +237,7 @@ public:
     }
 
     void createPlotFromSchema(const QString &name, const PlotInitialValues &intialValues) {
-        PlotDefinitionSchema pds = schemas.value(name);
+        const PlotDefinitionSchema &pds = schemas.value(name);
 
         RPPlot *rpp = new  RPPlot();
         rpp->name = pds.name;

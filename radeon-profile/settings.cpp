@@ -176,7 +176,7 @@ void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
     xml.writeStartElement("Plots");
 
     for (const QString &k : plotManager.schemas.keys()) {
-        PlotDefinitionSchema pds = plotManager.schemas.value(k);
+        const PlotDefinitionSchema &pds = plotManager.schemas.value(k);
 
         xml.writeStartElement("plot");
         xml.writeAttribute("name", k);

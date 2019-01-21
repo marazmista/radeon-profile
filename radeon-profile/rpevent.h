@@ -27,10 +27,8 @@ public:
         switch (type) {
             case RPEventType::TEMPERATURE:
                 return activationTemperature < check.checkTemperature;
-                break;
             case RPEventType::BINARY:
                 return !globalStuff::grabSystemInfo("pidof \""+activationBinary+"\"")[0].isEmpty();
-                break;
         }
 
         return false;

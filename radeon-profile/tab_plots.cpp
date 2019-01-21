@@ -49,7 +49,7 @@ void radeon_profile::on_btn_addPlotDefinition_clicked()
     d->setAvailableGPUData(device.gpuData.keys());
 
     if (d->exec() == QDialog::Accepted) {
-        PlotDefinitionSchema pds = d->getCreatedSchema();
+        const PlotDefinitionSchema pds = d->getCreatedSchema();
 
         QTreeWidgetItem *item = new QTreeWidgetItem();
         item->setText(0, pds.name);
