@@ -46,8 +46,8 @@ radeon_profile::radeon_profile(QWidget *parent) :
         ui->label_rootWarrning->setVisible(false);
     }
 
-    ticksCounter = 0;
-    statsTickCounter = 0;
+    counter_ticks = 0;
+    counter_statsTick = 0;
 	savedState = nullptr;
     timer = new QTimer(this);
 
@@ -441,12 +441,12 @@ void radeon_profile::refreshGraphs() {
     if (ui->stack_plots->currentIndex() != 0 || plotManager.plots.count() == 0)
         return;
 
-    plotManager.updateSeries(++ticksCounter, device.gpuData);
+    plotManager.updateSeries(++counter_ticks, device.gpuData);
 }
 
 void radeon_profile::doTheStats() {
     // count ticks for stats //
-    statsTickCounter++;
+    counter_statsTick++;
 
     // figure out pm level based on data provided
     QString pmLevelName = "Core: " + device.gpuData.value(ValueID::CLK_CORE).strValue + "  Mem: " + device.gpuData.value(ValueID::CLK_MEM).strValue;
@@ -463,7 +463,7 @@ void radeon_profile::doTheStats() {
 void radeon_profile::updateStatsTable() {
     // do the math with percents
     for (QTreeWidgetItemIterator item(ui->list_stats); *item; item++)
-        (*item)->setText(1,QString::number(pmStats.value((*item)->text(0)) * 100.0 / statsTickCounter) + "%");
+        (*item)->setText(1,QString::number(pmStats.value((*item)->text(0)) * 100.0 / counter_statsTick) + "%");
 }
 
 void radeon_profile::refreshTooltip()
