@@ -10,31 +10,31 @@
 //===================================
 // === GUI setup functions === //
 void radeon_profile::setupTrayIcon() {
-    trayMenu = new QMenu(this);
+    menu_tray = new QMenu(this);
     setWindowState(Qt::WindowMinimized);
     //close //
-    closeApp = new QAction(trayMenu);
+    closeApp = new QAction(menu_tray);
     closeApp->setText(tr("Quit"));
     connect(closeApp,SIGNAL(triggered()),this,SLOT(closeFromTray()));
 
     // standard profiles
-    changeProfile = new QAction(trayMenu);
+    changeProfile = new QAction(menu_tray);
     changeProfile->setText(tr("Change standard profile"));
     connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
 
     // refresh when hidden
-    refreshWhenHidden = new QAction(trayMenu);
+    refreshWhenHidden = new QAction(menu_tray);
     refreshWhenHidden->setCheckable(true);
     refreshWhenHidden->setChecked(true);
     refreshWhenHidden->setText(tr("Keep refreshing when hidden"));
 
     // dpm menu //
-    dpmMenu = new QMenu(this);
-    dpmMenu->setTitle(tr("DPM"));
+    menu_dpm = new QMenu(this);
+    menu_dpm->setTitle(tr("DPM"));
 
-    dpmSetBattery = new QAction(dpmMenu);
-    dpmSetBalanced = new QAction(dpmMenu);
-    dpmSetPerformance = new QAction(dpmMenu);
+    dpmSetBattery = new QAction(menu_dpm);
+    dpmSetBalanced = new QAction(menu_dpm);
+    dpmSetPerformance = new QAction(menu_dpm);
 
     dpmSetBattery->setText(tr("Battery"));
     dpmSetBattery->setIcon(QIcon(":/icon/symbols/arrow1.png"));
@@ -47,64 +47,64 @@ void radeon_profile::setupTrayIcon() {
     connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(setBalanced()));
     connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(setPerformance()));
 
-    dpmMenu->addAction(dpmSetBattery);
-    dpmMenu->addAction(dpmSetBalanced);
-    dpmMenu->addAction(dpmSetPerformance);
-    dpmMenu->addSeparator();
-    dpmMenu->addMenu(forcePowerMenu);
+    menu_dpm->addAction(dpmSetBattery);
+    menu_dpm->addAction(dpmSetBalanced);
+    menu_dpm->addAction(dpmSetPerformance);
+    menu_dpm->addSeparator();
+    menu_dpm->addMenu(menu_forcePower);
 
     // add stuff above to menu //
-    trayMenu->addAction(refreshWhenHidden);
-    trayMenu->addSeparator();
-    trayMenu->addAction(changeProfile);
-    trayMenu->addMenu(dpmMenu);
-    trayMenu->addSeparator();
-    trayMenu->addAction(closeApp);
+    menu_tray->addAction(refreshWhenHidden);
+    menu_tray->addSeparator();
+    menu_tray->addAction(changeProfile);
+    menu_tray->addMenu(menu_dpm);
+    menu_tray->addSeparator();
+    menu_tray->addAction(closeApp);
 
     // setup icon finally //
     QIcon appicon(":/icon/extra/radeon-profile.png");
-    trayIcon = new QSystemTrayIcon(appicon,this);
-    trayIcon->show();
-    trayIcon->setContextMenu(trayMenu);
-    connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+    icon_tray = new QSystemTrayIcon(appicon,this);
+    icon_tray->show();
+    icon_tray->setContextMenu(menu_tray);
+    connect(icon_tray,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 }
 
 void radeon_profile::createGeneralMenu() {
-    generalMenu = new QMenu(this);
-    ui->btn_general->setMenu(generalMenu);
+    menu_general = new QMenu(this);
+    ui->btn_general->setMenu(menu_general);
 
-    QAction *pause = new QAction(generalMenu);
+    QAction *pause = new QAction(menu_general);
     pause->setCheckable(true);
     pause->setText(tr("Pause refresh temporairly"));
     pause->setIcon(QIcon(":/icon/symbols/pause.png"));
     connect(pause, SIGNAL(toggled(bool)), this,SLOT(pauseRefresh(bool)));
 
-    QAction *resetTemp = new QAction(generalMenu);
+    QAction *resetTemp = new QAction(menu_general);
     resetTemp->setText(tr("Reset min and max temperatures"));
     connect(resetTemp,SIGNAL(triggered()), this, SLOT(resetMinMax()));
 
-    generalMenu->addAction(pause);
-    generalMenu->addSeparator();
-    generalMenu->addAction(resetTemp);
+    menu_general->addAction(pause);
+    menu_general->addSeparator();
+    menu_general->addAction(resetTemp);
 }
 
 void radeon_profile::setupForcePowerLevelMenu() {
-    forcePowerMenu = new QMenu(this);
+    menu_forcePower = new QMenu(this);
 
-    QAction *forceAuto = new QAction(forcePowerMenu);
+    QAction *forceAuto = new QAction(menu_forcePower);
     forceAuto->setText(tr("Auto"));
 
-    QAction *forceLow = new QAction(forcePowerMenu);
+    QAction *forceLow = new QAction(menu_forcePower);
     forceLow->setText(tr("Low"));
 
-    QAction *forceHigh = new QAction(forcePowerMenu);
+    QAction *forceHigh = new QAction(menu_forcePower);
     forceHigh->setText(tr("High"));
 
-    forcePowerMenu->setTitle(tr("Force power level"));
-    forcePowerMenu->addAction(forceAuto);
-    forcePowerMenu->addSeparator();
-    forcePowerMenu->addAction(forceLow);
-    forcePowerMenu->addAction(forceHigh);
+    menu_forcePower->setTitle(tr("Force power level"));
+    menu_forcePower->addAction(forceAuto);
+    menu_forcePower->addSeparator();
+    menu_forcePower->addAction(forceLow);
+    menu_forcePower->addAction(forceHigh);
 
     connect(forceAuto,SIGNAL(triggered()),this,SLOT(forceAuto()));
     connect(forceLow,SIGNAL(triggered()),this,SLOT(forceLow()));
@@ -133,39 +133,39 @@ void radeon_profile::setupContextMenus() {
 
 void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
     if (rebuildMode)
-        delete fanProfilesMenu;
+        delete menu_fanProfiles;
 
-    fanProfilesMenu = new QMenu(this);
-    connect(fanProfilesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fanProfileMenuActionClicked(QAction*)));
-    QActionGroup *ag = new QActionGroup(fanProfilesMenu);
+    menu_fanProfiles = new QMenu(this);
+    connect(menu_fanProfiles, SIGNAL(triggered(QAction*)), this, SLOT(fanProfileMenuActionClicked(QAction*)));
+    QActionGroup *ag = new QActionGroup(menu_fanProfiles);
 
-    QAction *fanAuto = new QAction(fanProfilesMenu);
+    QAction *fanAuto = new QAction(menu_fanProfiles);
     fanAuto->setText(tr("Auto"));
     fanAuto->setCheckable(true);
     fanAuto->setChecked(true);
     fanAuto->setActionGroup(ag);
     connect(fanAuto, SIGNAL(triggered()), this, SLOT(on_btn_pwmAuto_clicked()));
 
-    QAction *fanFixed = new QAction(fanProfilesMenu);
+    QAction *fanFixed = new QAction(menu_fanProfiles);
     fanFixed->setText(tr("Fixed ") + ui->labelFixedSpeed->text());
     fanFixed->setCheckable(true);
     fanFixed->setActionGroup(ag);
     connect(fanFixed, SIGNAL(triggered()), this, SLOT(on_btn_pwmFixed_clicked()));
 
-    fanProfilesMenu->addAction(fanAuto);
-    fanProfilesMenu->addAction(fanFixed);
+    menu_fanProfiles->addAction(fanAuto);
+    menu_fanProfiles->addAction(fanFixed);
 
-    fanProfilesMenu->addSeparator();
+    menu_fanProfiles->addSeparator();
 
     for (QString p : fanProfiles.keys()) {
-        QAction *a = new QAction(fanProfilesMenu);
+        QAction *a = new QAction(menu_fanProfiles);
         a->setText(p);
         a->setCheckable(true);
         a->setActionGroup(ag);
-        fanProfilesMenu->addAction(a);
+        menu_fanProfiles->addAction(a);
     }
 
-    ui->btn_fanControl->setMenu(fanProfilesMenu);
+    ui->btn_fanControl->setMenu(menu_fanProfiles);
 }
 
 void radeon_profile::fillConnectors(){
@@ -236,74 +236,74 @@ void radeon_profile::addRuntimeWidgets() {
     connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
 
     // set pwm buttons in group
-    pwmGroup.addButton(ui->btn_pwmAuto);
-    pwmGroup.addButton(ui->btn_pwmFixed);
-    pwmGroup.addButton(ui->btn_pwmProfile);
+    group_pwm.addButton(ui->btn_pwmAuto);
+    group_pwm.addButton(ui->btn_pwmFixed);
+    group_pwm.addButton(ui->btn_pwmProfile);
 
-    dpmGroup.addButton(ui->btn_dpmBattery, PowerProfiles::BATTERY);
-    dpmGroup.addButton(ui->btn_dpmBalanced, PowerProfiles::BALANCED);
-    dpmGroup.addButton(ui->btn_dpmPerformance, PowerProfiles::PERFORMANCE);
+    group_Dpm.addButton(ui->btn_dpmBattery, PowerProfiles::BATTERY);
+    group_Dpm.addButton(ui->btn_dpmBalanced, PowerProfiles::BALANCED);
+    group_Dpm.addButton(ui->btn_dpmPerformance, PowerProfiles::PERFORMANCE);
 
     //setup fan profile graph
-    fanProfileChart = new QChartView(this);
-    QChart *fanChart = new QChart();
-    fanProfileChart->setRenderHint(QPainter::Antialiasing);
-    fanProfileChart->setChart(fanChart);
+    chartView_fan = new QChartView(this);
+    QChart *chart_fan = new QChart();
+    chartView_fan->setRenderHint(QPainter::Antialiasing);
+    chartView_fan->setChart(chart_fan);
 
-    setupChart(fanChart, false);
+    setupChart(chart_fan, false);
 
-    fanSeries = new QLineSeries(fanChart);
-    fanChart->addSeries(fanSeries);
+    series_fan = new QLineSeries(chart_fan);
+    chart_fan->addSeries(series_fan);
 
-    QValueAxis *axisTemperature = new QValueAxis(fanChart);
-    QValueAxis *axisSpeed = new QValueAxis(fanChart);
-    fanChart->addAxis(axisTemperature,Qt::AlignBottom);
-    fanChart->addAxis(axisSpeed, Qt::AlignLeft);
-    axisTemperature->setRange(0, 100);
-    axisSpeed->setRange(0, 100);
+    QValueAxis *axis_temperature = new QValueAxis(chart_fan);
+    QValueAxis *axis_speed = new QValueAxis(chart_fan);
+    chart_fan->addAxis(axis_temperature,Qt::AlignBottom);
+    chart_fan->addAxis(axis_speed, Qt::AlignLeft);
+    axis_temperature->setRange(0, 100);
+    axis_speed->setRange(0, 100);
 
-    setupAxis(axisSpeed, Qt::white, tr("Fan Speed [%]"));
-    setupAxis(axisTemperature, Qt::white, tr("Temperature [°C]"));
-    setupSeries(fanSeries, Qt::yellow, "", axisSpeed, axisTemperature);
+    setupAxis(axis_speed, Qt::white, tr("Fan Speed [%]"));
+    setupAxis(axis_temperature, Qt::white, tr("Temperature [°C]"));
+    setupSeries(series_fan, Qt::yellow, "", axis_speed, axis_temperature);
 
-    ui->verticalLayout_22->addWidget(fanProfileChart);
+    ui->verticalLayout_22->addWidget(chartView_fan);
 
     //setup oc table graph
-    ocTableChart = new QChartView(this);
-    QChart *ocChart = new QChart();
-    ocTableChart->setRenderHint(QPainter::Antialiasing);
-    ocTableChart->setChart(ocChart);
+    chartView_oc = new QChartView(this);
+    QChart *chart_oc = new QChart();
+    chartView_oc->setRenderHint(QPainter::Antialiasing);
+    chartView_oc->setChart(chart_oc);
 
-    setupChart(ocChart, true);
+    setupChart(chart_oc, true);
 
-    ocClockFreqSeries = new QLineSeries(ocChart);
-    ocMemFreqkSeries = new QLineSeries(ocChart);
-    ocCoreVoltSeries = new QLineSeries(ocChart);
-    ocMemVoltSeries = new QLineSeries(ocChart);
+    series_ocClockFreq = new QLineSeries(chart_oc);
+    series_ocMemFreqk = new QLineSeries(chart_oc);
+    series_ocCoreVolt = new QLineSeries(chart_oc);
+    series_ocMemVolt = new QLineSeries(chart_oc);
 
-    ocChart->addSeries(ocClockFreqSeries);
-    ocChart->addSeries(ocMemFreqkSeries);
-    ocChart->addSeries(ocCoreVoltSeries);
-    ocChart->addSeries(ocMemVoltSeries);
+    chart_oc->addSeries(series_ocClockFreq);
+    chart_oc->addSeries(series_ocMemFreqk);
+    chart_oc->addSeries(series_ocCoreVolt);
+    chart_oc->addSeries(series_ocMemVolt);
 
-    axisState = new QValueAxis(ocChart);
-    axisFrequency = new QValueAxis(ocChart);
-    axisVolts = new QValueAxis(ocChart);
+    axis_state = new QValueAxis(chart_oc);
+    axis_frequency = new QValueAxis(chart_oc);
+    axis_volts = new QValueAxis(chart_oc);
 
-    ocChart->addAxis(axisState,Qt::AlignBottom);
-    ocChart->addAxis(axisFrequency, Qt::AlignLeft);
-    ocChart->addAxis(axisVolts, Qt::AlignRight);
+    chart_oc->addAxis(axis_state,Qt::AlignBottom);
+    chart_oc->addAxis(axis_frequency, Qt::AlignLeft);
+    chart_oc->addAxis(axis_volts, Qt::AlignRight);
 
-    setupAxis(axisState, Qt::white, tr("State"));
-    setupAxis(axisFrequency, Qt::white, tr("Frequency [MHz]"));
-    setupAxis(axisVolts, Qt::white, tr("Voltage [mV]"));
+    setupAxis(axis_state, Qt::white, tr("State"));
+    setupAxis(axis_frequency, Qt::white, tr("Frequency [MHz]"));
+    setupAxis(axis_volts, Qt::white, tr("Voltage [mV]"));
 
-    setupSeries(ocClockFreqSeries, Qt::yellow, tr("Core frequency [MHz]"), axisState, axisFrequency);
-    setupSeries(ocMemFreqkSeries, Qt::blue, tr("Memory Voltage [MHz]"), axisState, axisFrequency);
-    setupSeries(ocCoreVoltSeries, Qt::green, tr("Core Voltage [mV]"), axisState, axisVolts);
-    setupSeries(ocMemVoltSeries, Qt::cyan, tr("Memory Voltage [mV]"), axisState, axisVolts);
+    setupSeries(series_ocClockFreq, Qt::yellow, tr("Core frequency [MHz]"), axis_state, axis_frequency);
+    setupSeries(series_ocMemFreqk, Qt::blue, tr("Memory Voltage [MHz]"), axis_state, axis_frequency);
+    setupSeries(series_ocCoreVolt, Qt::green, tr("Core Voltage [mV]"), axis_state, axis_volts);
+    setupSeries(series_ocMemVolt, Qt::cyan, tr("Memory Voltage [mV]"), axis_state, axis_volts);
 
-    ui->verticalLayout_10->addWidget(ocTableChart);
+    ui->verticalLayout_10->addWidget(chartView_oc);
 
     ui->list_coreStates->resizeColumnToContents(0);
     ui->list_memStates->resizeColumnToContents(0);

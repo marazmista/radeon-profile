@@ -52,15 +52,15 @@ void radeon_profile::setPerformance() {
 void radeon_profile::on_btn_pwmFixedApply_clicked()
 {
     device.setPwmValue(ui->slider_fanSpeed->value());
-    fanProfilesMenu->actions()[1]->setText(tr("Fixed ") + ui->labelFixedSpeed->text());
-    ui->btn_fanControl->setText(fanProfilesMenu->actions()[1]->text());
+    menu_fanProfiles->actions()[1]->setText(tr("Fixed ") + ui->labelFixedSpeed->text());
+    ui->btn_fanControl->setText(menu_fanProfiles->actions()[1]->text());
 }
 
 void radeon_profile::on_btn_pwmFixed_clicked()
 {
     ui->btn_pwmFixed->setChecked(true);
-    fanProfilesMenu->actions()[1]->setChecked(true);
-    ui->btn_fanControl->setText(fanProfilesMenu->actions()[1]->text());
+    menu_fanProfiles->actions()[1]->setChecked(true);
+    ui->btn_fanControl->setText(menu_fanProfiles->actions()[1]->text());
     ui->stack_fanModes->setCurrentIndex(1);
 
     device.setPwmManualControl(true);
@@ -70,8 +70,8 @@ void radeon_profile::on_btn_pwmFixed_clicked()
 void radeon_profile::on_btn_pwmAuto_clicked()
 {
     ui->btn_pwmAuto->setChecked(true);
-    fanProfilesMenu->actions()[0]->setChecked(true);
-    ui->btn_fanControl->setText(fanProfilesMenu->actions()[0]->text());
+    menu_fanProfiles->actions()[0]->setChecked(true);
+    ui->btn_fanControl->setText(menu_fanProfiles->actions()[0]->text());
     device.setPwmManualControl(false);
     ui->stack_fanModes->setCurrentIndex(0);
 }
@@ -194,7 +194,7 @@ void radeon_profile::on_cb_stats_clicked(bool checked)
     ui->tw_systemInfo->setTabEnabled(3,checked);
 
     // reset stats data
-    statsTickCounter = 0;
+    counter_statsTick = 0;
     if (!checked)
         resetStats();
 }
@@ -221,7 +221,7 @@ void radeon_profile::copyConnectorsToClipboard(){
 }
 
 void radeon_profile::resetStats() {
-    statsTickCounter = 0;
+    counter_statsTick = 0;
     pmStats.clear();
     ui->list_stats->clear();
 }

@@ -60,7 +60,7 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
     qDebug() << "Activating event: " + rpe.name;
 
     savedState = new CurrentStateInfo();
-    savedState->profile = static_cast<PowerProfiles>(dpmGroup.checkedId());
+    savedState->profile = static_cast<PowerProfiles>(group_Dpm.checkedId());
     savedState->powerLevel = static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex());
 
     if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {

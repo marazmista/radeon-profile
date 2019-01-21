@@ -17,20 +17,20 @@ void radeon_profile::createDefaultFanProfile() {
 }
 
 void radeon_profile::makeFanProfileListaAndGraph(const FanProfileSteps &profile) {
-    fanSeries->clear();
+    series_fan->clear();
     ui->list_fanSteps->clear();
 
     for (int temperature : profile.keys()) {
-        fanSeries->append(temperature, profile.value(temperature));
+        series_fan->append(temperature, profile.value(temperature));
         ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.value(temperature))));
     }
 }
 
 void radeon_profile::makeFanProfilePlot() {
-    fanSeries->clear();
+    series_fan->clear();
 
     for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i) {
-        fanSeries->append(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(), ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
+        series_fan->append(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(), ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
     }
 }
 
@@ -105,8 +105,8 @@ void radeon_profile::on_btn_saveFanProfile_clicked()
 }
 
 int radeon_profile::findCurrentFanProfileMenuIndex() {
-    for (int i = 0; i < fanProfilesMenu->actions().count(); ++i) {
-        if (fanProfilesMenu->actions()[i]->text() == ui->l_currentFanProfile->text())
+    for (int i = 0; i < menu_fanProfiles->actions().count(); ++i) {
+        if (menu_fanProfiles->actions()[i]->text() == ui->l_currentFanProfile->text())
             return i;
     }
 
@@ -133,7 +133,7 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
     ui->combo_fanProfiles->addItem(name);
     ui->combo_fanProfiles->setCurrentText(name);
     setupFanProfilesMenu(true);
-    fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
+    menu_fanProfiles->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
     saveConfig();
 }
 
@@ -147,13 +147,13 @@ void radeon_profile::on_btn_activateFanProfile_clicked()
     }
 
     setCurrentFanProfile(ui->combo_fanProfiles->currentText(), fanProfiles.value(ui->combo_fanProfiles->currentText()));
-    fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
+    menu_fanProfiles->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
 }
 
 void radeon_profile::setCurrentFanProfile(const QString &profileName, const FanProfileSteps &profile) {
     ui->l_currentFanProfile->setText(profileName);
     ui->btn_fanControl->setText(profileName);
-    fanProfilesMenu->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
+    menu_fanProfiles->actions()[findCurrentFanProfileMenuIndex()]->setChecked(true);
 
     currentFanProfile = profile;
     adjustFanSpeed();
@@ -171,7 +171,7 @@ void radeon_profile::fanProfileMenuActionClicked(QAction *a) {
     if (a->isSeparator())
         return;
 
-    if (a == fanProfilesMenu->actions()[0] || a == fanProfilesMenu->actions()[1])
+    if (a == menu_fanProfiles->actions()[0] || a == menu_fanProfiles->actions()[1])
         return;
 
     if (!ui->btn_pwmProfile->isChecked()) {

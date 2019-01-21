@@ -144,9 +144,9 @@ private:
         QString fanProfileName;
     };
 
-    QSystemTrayIcon *trayIcon;
-    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance,*changeProfile, *refreshWhenHidden;
-    QMenu *dpmMenu, *trayMenu, *generalMenu, *forcePowerMenu, *fanProfilesMenu;
+    QSystemTrayIcon *icon_tray;
+    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden;
+    QMenu *menu_dpm, *menu_tray, *menu_general, *menu_forcePower, *menu_fanProfiles;
     QTimer *timer = nullptr;
 
     gpu device;
@@ -155,16 +155,16 @@ private:
     QMap<QString, FanProfileSteps> fanProfiles;
     QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
-    unsigned int ticksCounter, statsTickCounter;
+    unsigned int counter_ticks, counter_statsTick;
     short hysteresisRelativeTepmerature = 0;
-    QButtonGroup pwmGroup, dpmGroup;
+    QButtonGroup group_pwm, group_Dpm;
     CurrentStateInfo *savedState;
     QFutureWatcher<void> *initFuture;
     PlotManager plotManager;
     TopbarManager topbarManager;
-    QChartView *fanProfileChart, *ocTableChart;
-    QLineSeries *fanSeries, *ocClockFreqSeries, *ocMemFreqkSeries, *ocCoreVoltSeries, *ocMemVoltSeries;
-    QValueAxis *axisState, *axisFrequency, *axisVolts;
+    QChartView *chartView_fan, *chartView_oc;
+    QLineSeries *series_fan, *series_ocClockFreq, *series_ocMemFreqk, *series_ocCoreVolt, *series_ocMemVolt;
+    QValueAxis *axis_state, *axis_frequency, *axis_volts;
     QList<TopbarItem*> topBarItems;
     QMap<int, ValueID> keysInCurrentGpuList;
 

@@ -109,7 +109,7 @@ void radeon_profile::connectSignals()
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(setPowerLevelFromCombo()));
-    connect(&dpmGroup, SIGNAL(buttonClicked(int)), this, SLOT(setPowerLevel(int)));
+    connect(&group_Dpm, SIGNAL(buttonClicked(int)), this, SLOT(setPowerLevel(int)));
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
 }
 
@@ -138,12 +138,12 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         ui->stack_pm->setCurrentIndex(features.currentPowerMethod);
 
         changeProfile->setEnabled(features.currentPowerMethod == PowerMethod::PROFILE);
-        dpmMenu->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
+        menu_dpm->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
         ui->combo_pLevel->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
     } else {
         ui->stack_pm->setEnabled(false);
         changeProfile->setEnabled(false);
-        dpmMenu->setEnabled(false);
+        menu_dpm->setEnabled(false);
         ui->combo_pLevel->setEnabled(false);
         ui->cb_eventsTracking->setEnabled(false);
         ui->cb_eventsTracking->setChecked(false);
@@ -224,8 +224,8 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         for (const unsigned k :  device.getDriverFeatures().coreTable.keys()) {
             const FreqVoltPair &fvt = device.getDriverFeatures().coreTable.value(k);
 
-            ocClockFreqSeries->append(k, fvt.frequency);
-            ocCoreVoltSeries->append(k, fvt.voltage);
+            series_ocClockFreq->append(k, fvt.frequency);
+            series_ocCoreVolt->append(k, fvt.voltage);
 
             ui->list_coreStates->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
                                                                      << QString::number(fvt.frequency)
@@ -235,20 +235,20 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         for (const unsigned k :  device.getDriverFeatures().memTable.keys()) {
             const FreqVoltPair &fvt = device.getDriverFeatures().memTable.value(k);
 
-            ocMemFreqkSeries->append(k, fvt.frequency);
-            ocMemVoltSeries->append(k, fvt.voltage);
+            series_ocMemFreqk->append(k, fvt.frequency);
+            series_ocMemVolt->append(k, fvt.voltage);
 
             ui->list_memStates->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
                                                                     << QString::number(fvt.frequency)
                                                                     << QString::number(fvt.voltage)));
         }
 
-        axisFrequency->setRange(0, device.getDriverFeatures().coreRange.max + 100);
-        axisVolts->setRange(0,  device.getDriverFeatures().voltageRange.max + 100);
-        axisState->setRange(0, device.getDriverFeatures().coreTable.lastKey());
-        axisState->setTickCount(device.getDriverFeatures().coreTable.lastKey() + 2);
-        axisFrequency->setTickCount(6);
-        axisVolts->setTickCount(6);
+        axis_frequency->setRange(0, device.getDriverFeatures().coreRange.max + 100);
+        axis_volts->setRange(0,  device.getDriverFeatures().voltageRange.max + 100);
+        axis_state->setRange(0, device.getDriverFeatures().coreTable.lastKey());
+        axis_state->setTickCount(device.getDriverFeatures().coreTable.lastKey() + 2);
+        axis_frequency->setTickCount(6);
+        axis_volts->setTickCount(6);
     } else {
         ui->tw_overclock->setTabEnabled(1, false);
 
@@ -474,7 +474,7 @@ void radeon_profile::refreshTooltip()
         tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
 
     tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
-    trayIcon->setToolTip(tooltipdata);
+    icon_tray->setToolTip(tooltipdata);
 }
 
 bool radeon_profile::askConfirmation(const QString title, const QString question){
