@@ -210,6 +210,26 @@ struct DriverFeatures {
     }
 };
 
+static bool checkFileCorrectness(const QString &fileName, const bool isZeroValidValue = false) {
+    if (!QFile::exists(fileName))
+        return false;
+
+    QFile f(fileName);
+    if (!f.open(QIODevice::ReadOnly))
+        return false;
+
+    QString value = QString(f.readAll().trimmed());
+    f.close();
+
+    if (value.isEmpty())
+        return false;
+
+    if (isZeroValidValue == false && value == "0")
+        return false;
+
+    return true;
+}
+
 struct DeviceSysFs {
     QString
     power_method,
@@ -237,34 +257,34 @@ struct DeviceSysFs {
         gpu_busy_percent = devicePath + "gpu_busy_percent";
         pp_od_clk_voltage = devicePath + "pp_od_clk_voltage";
 
-        if (!QFile::exists(power_method))
+        if (!checkFileCorrectness(power_method))
             power_method = "";
 
-        if (!QFile::exists(power_profile))
+        if (!checkFileCorrectness(power_profile))
             power_profile = "";
 
-        if (!QFile::exists(power_dpm_state))
+        if (!checkFileCorrectness(power_dpm_state))
             power_dpm_state = "";
 
-        if (!QFile::exists(power_dpm_force_performance_level))
+        if (!checkFileCorrectness(power_dpm_force_performance_level))
             power_dpm_force_performance_level = "";
 
-        if (!QFile::exists(pp_sclk_od))
+        if (!checkFileCorrectness(pp_sclk_od))
             pp_sclk_od = "";
 
-        if (!QFile::exists(pp_mclk_od))
+        if (checkFileCorrectness(pp_mclk_od))
             pp_mclk_od = "";
 
-        if (!QFile::exists(pp_dpm_sclk))
+        if (!checkFileCorrectness(pp_dpm_sclk))
             pp_dpm_sclk = "";
 
-        if (!QFile::exists(pp_dpm_mclk))
+        if (!checkFileCorrectness(pp_dpm_mclk))
             pp_dpm_mclk = "";
 
-        if (!QFile::exists(gpu_busy_percent))
+        if (!checkFileCorrectness(gpu_busy_percent, true))
             gpu_busy_percent = "";
 
-        if (!QFile::exists(pp_od_clk_voltage))
+        if (!checkFileCorrectness(pp_od_clk_voltage))
             pp_od_clk_voltage = "";
     }
 };
@@ -294,19 +314,19 @@ struct HwmonAttributes {
         power1_cap_min = hwmonPath + "power1_cap_min";
         power1_cap = hwmonPath + "power1_cap";
 
-        if (!QFile::exists(temp1))
+        if (!checkFileCorrectness(temp1))
             temp1 = "";
 
-        if (!QFile::exists(temp1_crit))
+        if (!checkFileCorrectness(temp1_crit))
             temp1_crit = "";
 
-        if (!QFile::exists(pwm1_enable))
+        if (!checkFileCorrectness(pwm1_enable, true))
             pwm1 = pwm1_enable = pwm1_max = "";
 
-        if (!QFile::exists(fan1_input))
+        if (!checkFileCorrectness(fan1_input))
             fan1_input = "";
 
-        if (!QFile::exists(power1_cap))
+        if (!checkFileCorrectness(power1_cap))
             power1_cap = power1_cap_min = power1_cap_max = "";
     }
 };
