@@ -162,8 +162,9 @@ private:
     QFutureWatcher<void> *initFuture;
     PlotManager plotManager;
     TopbarManager topbarManager;
-    QChartView *fanProfileChart;
-    QLineSeries *fanSeries;
+    QChartView *fanProfileChart, *ocTableChart;
+    QLineSeries *fanSeries, *ocClockFreqSeries, *ocMemFreqkSeries, *ocCoreVoltSeries, *ocMemVoltSeries;
+    QValueAxis *axisState, *axisFrequency, *axisVolts;
     QList<TopbarItem*> topBarItems;
     QMap<int, ValueID> keysInCurrentGpuList;
 

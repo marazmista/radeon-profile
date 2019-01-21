@@ -181,6 +181,32 @@ void radeon_profile::fillModInfo(){
     ui->list_modInfo->header()->resizeSections(QHeaderView::ResizeToContents);
 }
 
+void setupAxis(QValueAxis* axis, QColor color, QString title) {
+    axis->setGridLineColor(color);
+    axis->setGridLineColor(color);
+    axis->setLabelsColor(color);
+    axis->setTitleText(title);
+    axis->setTitleBrush(QBrush(color));
+    axis->setLabelFormat("%d");
+}
+
+void setupSeries(QLineSeries *series, QColor color, QString name, QValueAxis *axisBottom, QValueAxis *axisSide) {
+    series->setColor(color);
+    series->setName(name);
+    series->setPointsVisible(true);
+
+    series->attachAxis(axisBottom);
+    series->attachAxis(axisSide);
+}
+
+void setupChart(QChart *chart, bool legendVisable) {
+    chart->setBackgroundRoundness(2);
+    chart->setMargins(QMargins(5,0,0,0));
+    chart->legend()->setVisible(legendVisable);
+
+    chart->setBackgroundBrush(QBrush(Qt::darkGray));
+}
+
 void radeon_profile::addRuntimeWidgets() {
     // add button for manual refresh glx info, connectors, mod params
     QPushButton *refreshBtn = new QPushButton();
@@ -222,14 +248,12 @@ void radeon_profile::addRuntimeWidgets() {
     fanProfileChart = new QChartView(this);
     QChart *fanChart = new QChart();
     fanProfileChart->setRenderHint(QPainter::Antialiasing);
-    fanChart->setBackgroundBrush(QBrush(Qt::darkGray));
     fanProfileChart->setChart(fanChart);
-    fanChart->setBackgroundRoundness(2);
-    fanChart->setMargins(QMargins(5,0,0,0));
+
+    setupChart(fanChart, false);
+
     fanSeries = new QLineSeries(fanChart);
-    fanChart->legend()->setVisible(false);
     fanChart->addSeries(fanSeries);
-    fanSeries->setColor(Qt::yellow);
 
     QValueAxis *axisTemperature = new QValueAxis(fanChart);
     QValueAxis *axisSpeed = new QValueAxis(fanChart);
@@ -237,17 +261,50 @@ void radeon_profile::addRuntimeWidgets() {
     fanChart->addAxis(axisSpeed, Qt::AlignLeft);
     axisTemperature->setRange(0, 100);
     axisSpeed->setRange(0, 100);
-    axisSpeed->setGridLineColor(Qt::white);
-    axisTemperature->setGridLineColor(Qt::white);
-    axisSpeed->setLabelsColor(Qt::white);
-    axisTemperature->setLabelsColor(Qt::white);
-    axisSpeed->setTitleText(tr("Fan Speed [%]"));
-    axisTemperature->setTitleText(tr("Temperature [°C]"));
-    axisSpeed->setTitleBrush(QBrush(Qt::white));
-    axisTemperature->setTitleBrush(QBrush(Qt::white));
-    fanSeries->attachAxis(axisTemperature);
-    fanSeries->attachAxis(axisSpeed);
-    fanSeries->setPointsVisible(true);
+
+    setupAxis(axisSpeed, Qt::white, tr("Fan Speed [%]"));
+    setupAxis(axisTemperature, Qt::white, tr("Temperature [°C]"));
+    setupSeries(fanSeries, Qt::yellow, "", axisSpeed, axisTemperature);
 
     ui->verticalLayout_22->addWidget(fanProfileChart);
+
+    //setup oc table graph
+    ocTableChart = new QChartView(this);
+    QChart *ocChart = new QChart();
+    ocTableChart->setRenderHint(QPainter::Antialiasing);
+    ocTableChart->setChart(ocChart);
+
+    setupChart(ocChart, true);
+
+    ocClockFreqSeries = new QLineSeries(ocChart);
+    ocMemFreqkSeries = new QLineSeries(ocChart);
+    ocCoreVoltSeries = new QLineSeries(ocChart);
+    ocMemVoltSeries = new QLineSeries(ocChart);
+
+    ocChart->addSeries(ocClockFreqSeries);
+    ocChart->addSeries(ocMemFreqkSeries);
+    ocChart->addSeries(ocCoreVoltSeries);
+    ocChart->addSeries(ocMemVoltSeries);
+
+    axisState = new QValueAxis(ocChart);
+    axisFrequency = new QValueAxis(ocChart);
+    axisVolts = new QValueAxis(ocChart);
+
+    ocChart->addAxis(axisState,Qt::AlignBottom);
+    ocChart->addAxis(axisFrequency, Qt::AlignLeft);
+    ocChart->addAxis(axisVolts, Qt::AlignRight);
+
+    setupAxis(axisState, Qt::white, tr("State"));
+    setupAxis(axisFrequency, Qt::white, tr("Frequency [MHz]"));
+    setupAxis(axisVolts, Qt::white, tr("Voltage [mV]"));
+
+    setupSeries(ocClockFreqSeries, Qt::yellow, tr("Core frequency [MHz]"), axisState, axisFrequency);
+    setupSeries(ocMemFreqkSeries, Qt::blue, tr("Memory Voltage [MHz]"), axisState, axisFrequency);
+    setupSeries(ocCoreVoltSeries, Qt::green, tr("Core Voltage [mV]"), axisState, axisVolts);
+    setupSeries(ocMemVoltSeries, Qt::cyan, tr("Memory Voltage [mV]"), axisState, axisVolts);
+
+    ui->verticalLayout_10->addWidget(ocTableChart);
+
+    ui->list_coreStates->resizeColumnToContents(0);
+    ui->list_memStates->resizeColumnToContents(0);
 }

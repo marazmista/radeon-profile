@@ -158,6 +158,8 @@ struct RPValue {
 struct FreqVoltPair {
     unsigned frequency, voltage;
 
+    FreqVoltPair() { }
+
     FreqVoltPair(unsigned freq, unsigned volt) {
         frequency = freq;
         voltage = volt;

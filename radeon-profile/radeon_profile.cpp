@@ -216,6 +216,43 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     }
     else
         ui->tw_main->setTabEnabled(2, false);
+
+
+    if (device.getDriverFeatures().isOcTableAvailable) {
+        ui->tw_overclock->setTabEnabled(1, true);
+
+        for (const unsigned k :  device.getDriverFeatures().coreTable.keys()) {
+            const FreqVoltPair &fvt = device.getDriverFeatures().coreTable.value(k);
+
+            ocClockFreqSeries->append(k, fvt.frequency);
+            ocCoreVoltSeries->append(k, fvt.voltage);
+
+            ui->list_coreStates->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
+                                                                     << QString::number(fvt.frequency)
+                                                                     << QString::number(fvt.voltage)));
+        }
+
+        for (const unsigned k :  device.getDriverFeatures().memTable.keys()) {
+            const FreqVoltPair &fvt = device.getDriverFeatures().memTable.value(k);
+
+            ocMemFreqkSeries->append(k, fvt.frequency);
+            ocMemVoltSeries->append(k, fvt.voltage);
+
+            ui->list_memStates->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
+                                                                    << QString::number(fvt.frequency)
+                                                                    << QString::number(fvt.voltage)));
+        }
+
+        axisFrequency->setRange(0, device.getDriverFeatures().coreRange.max + 100);
+        axisVolts->setRange(0,  device.getDriverFeatures().voltageRange.max + 100);
+        axisState->setRange(0, device.getDriverFeatures().coreTable.lastKey());
+        axisState->setTickCount(device.getDriverFeatures().coreTable.lastKey() + 2);
+        axisFrequency->setTickCount(6);
+        axisVolts->setTickCount(6);
+    } else {
+        ui->tw_overclock->setTabEnabled(1, false);
+
+    }
 }
 
 void radeon_profile::refreshGpuData() {
