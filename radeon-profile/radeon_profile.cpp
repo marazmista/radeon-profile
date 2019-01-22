@@ -46,16 +46,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
         ui->label_rootWarrning->setVisible(false);
     }
 
-    counter_ticks = 0;
-    counter_statsTick = 0;
-	savedState = nullptr;
-    timer = new QTimer(this);
-
-    // create runtime stuff, setup rest of ui
-    setupUiElements();
-
-    loadConfig();
-
+    // find device and initialize it
     if (!device.initialize()) {
         QMessageBox::critical(this,tr("Error"), tr("No Radeon cards have been found in the system."));
 
@@ -65,14 +56,24 @@ radeon_profile::radeon_profile(QWidget *parent) :
         return;
     }
 
+    counter_ticks = 0;
+    counter_statsTick = 0;
+    savedState = nullptr;
+    timer = new QTimer(this);
+
+    // create runtime stuff, setup rest of ui
+    setupUiElements(device.getDriverFeatures());
+
+    loadConfig();
+
     for (int i = 0; i < device.gpuList.count(); ++i)
         ui->combo_gpus->addItem(device.gpuList.at(i).sysName);
 
     // start is heavy, delegated to another thread to show ui smoothly, deleted after init
-    initFuture = new QFutureWatcher<void>();
-    connect(initFuture, SIGNAL(finished()), this,  SLOT(initFutureHandler()));
-    initFuture->setFuture(QtConcurrent::run(this, &radeon_profile::refreshGpuData));
-
+//    initFuture = new QFutureWatcher<void>();
+//    connect(initFuture, SIGNAL(finished()), this,  SLOT(initFutureHandler()));
+//    initFuture->setFuture(QtConcurrent::run(this, &radeon_profile::refreshGpuData));
+    initFutureHandler();
     // fill tables with data at the start //
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
     fillConnectors();
@@ -101,7 +102,7 @@ void radeon_profile::initFutureHandler() {
 
     refreshUI();
     connectSignals();
-    delete initFuture;
+//    delete initFuture;
 }
 
 void radeon_profile::connectSignals()
@@ -113,7 +114,7 @@ void radeon_profile::connectSignals()
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
 }
 
-void radeon_profile::setupUiElements()
+void radeon_profile::setupUiElements(const DriverFeatures &features)
 {
     qDebug() << "Creating ui elements";
 
@@ -121,11 +122,14 @@ void radeon_profile::setupUiElements()
     ui->tw_systemInfo->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
     ui->execPages->setCurrentIndex(0);
-    setupForcePowerLevelMenu();
+
     setupContextMenus();
-    setupTrayIcon();
+
+    setupTrayIcon(features);
+
     addRuntimeWidgets();
-    createGeneralMenu();
+    ui->btn_general->setMenu(createGeneralMenu());
+
 
     ui->centralWidget->setEnabled(false);
 }
@@ -137,13 +141,13 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     if (features.isChangeProfileAvailable && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
         ui->stack_pm->setCurrentIndex(features.currentPowerMethod);
 
-        changeProfile->setEnabled(features.currentPowerMethod == PowerMethod::PROFILE);
-        menu_dpm->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
+//        changeProfile->setEnabled(features.currentPowerMethod == PowerMethod::PROFILE);
+//        menu_dpm->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
         ui->combo_pLevel->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
     } else {
         ui->stack_pm->setEnabled(false);
-        changeProfile->setEnabled(false);
-        menu_dpm->setEnabled(false);
+//        changeProfile->setEnabled(false);
+//        menu_dpm->setEnabled(false);
         ui->combo_pLevel->setEnabled(false);
         ui->cb_eventsTracking->setEnabled(false);
         ui->cb_eventsTracking->setChecked(false);

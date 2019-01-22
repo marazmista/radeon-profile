@@ -9,18 +9,13 @@
 
 //===================================
 // === GUI setup functions === //
-void radeon_profile::setupTrayIcon() {
-    menu_tray = new QMenu(this);
+void radeon_profile::setupTrayIcon(const DriverFeatures &features) {
+    QMenu *menu_tray = new QMenu(this);
     setWindowState(Qt::WindowMinimized);
     //close //
-    closeApp = new QAction(menu_tray);
+    QAction *closeApp = new QAction(menu_tray);
     closeApp->setText(tr("Quit"));
     connect(closeApp,SIGNAL(triggered()),this,SLOT(closeFromTray()));
-
-    // standard profiles
-    changeProfile = new QAction(menu_tray);
-    changeProfile->setText(tr("Change standard profile"));
-    connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
 
     // refresh when hidden
     refreshWhenHidden = new QAction(menu_tray);
@@ -28,36 +23,19 @@ void radeon_profile::setupTrayIcon() {
     refreshWhenHidden->setChecked(true);
     refreshWhenHidden->setText(tr("Keep refreshing when hidden"));
 
-    // dpm menu //
-    menu_dpm = new QMenu(this);
-    menu_dpm->setTitle(tr("DPM"));
-
-    dpmSetBattery = new QAction(menu_dpm);
-    dpmSetBalanced = new QAction(menu_dpm);
-    dpmSetPerformance = new QAction(menu_dpm);
-
-    dpmSetBattery->setText(tr("Battery"));
-    dpmSetBattery->setIcon(QIcon(":/icon/symbols/arrow1.png"));
-    dpmSetBalanced->setText(tr("Balanced"));
-    dpmSetBalanced->setIcon(QIcon(":/icon/symbols/arrow2.png"));
-    dpmSetPerformance->setText(tr("Performance"));
-    dpmSetPerformance->setIcon(QIcon(":/icon/symbols/arrow3.png"));
-
-    connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(setBattery()));
-    connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(setBalanced()));
-    connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(setPerformance()));
-
-    menu_dpm->addAction(dpmSetBattery);
-    menu_dpm->addAction(dpmSetBalanced);
-    menu_dpm->addAction(dpmSetPerformance);
-    menu_dpm->addSeparator();
-    menu_dpm->addMenu(menu_forcePower);
-
-    // add stuff above to menu //
+    // add stuff to menu //
     menu_tray->addAction(refreshWhenHidden);
     menu_tray->addSeparator();
-    menu_tray->addAction(changeProfile);
-    menu_tray->addMenu(menu_dpm);
+
+    if (features.currentPowerMethod == PowerMethod::DPM)
+        menu_tray->addMenu(createDpmMenu());
+    else if (features.currentPowerMethod == PowerMethod::PROFILE) {
+        QAction *changeProfile = new QAction(menu_tray);
+        changeProfile->setText(tr("Change standard profile"));
+        connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
+
+        menu_tray->addAction(changeProfile);
+    }
     menu_tray->addSeparator();
     menu_tray->addAction(closeApp);
 
@@ -69,9 +47,8 @@ void radeon_profile::setupTrayIcon() {
     connect(icon_tray,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 }
 
-void radeon_profile::createGeneralMenu() {
-    menu_general = new QMenu(this);
-    ui->btn_general->setMenu(menu_general);
+QMenu* radeon_profile::createGeneralMenu() {
+    QMenu *menu_general = new QMenu(this);
 
     QAction *pause = new QAction(menu_general);
     pause->setCheckable(true);
@@ -86,10 +63,32 @@ void radeon_profile::createGeneralMenu() {
     menu_general->addAction(pause);
     menu_general->addSeparator();
     menu_general->addAction(resetTemp);
+
+    return menu_general;
 }
 
-void radeon_profile::setupForcePowerLevelMenu() {
-    menu_forcePower = new QMenu(this);
+QMenu* radeon_profile::createDpmMenu() {
+    QMenu *menu_dpm = new QMenu(this);
+    menu_dpm->setTitle(tr("DPM"));
+
+    QMenu *menu_forcePower = new QMenu(this);
+    menu_forcePower->setTitle(tr("Force power level"));
+
+    QAction *dpmSetBattery = new QAction(menu_dpm);
+    QAction *dpmSetBalanced = new QAction(menu_dpm);
+    QAction *dpmSetPerformance = new QAction(menu_dpm);
+
+    dpmSetBattery->setText(tr("Battery"));
+    dpmSetBattery->setIcon(QIcon(":/icon/symbols/arrow1.png"));
+    dpmSetBalanced->setText(tr("Balanced"));
+    dpmSetBalanced->setIcon(QIcon(":/icon/symbols/arrow2.png"));
+    dpmSetPerformance->setText(tr("Performance"));
+    dpmSetPerformance->setIcon(QIcon(":/icon/symbols/arrow3.png"));
+
+    connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(setBattery()));
+    connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(setBalanced()));
+    connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(setPerformance()));
+
 
     QAction *forceAuto = new QAction(menu_forcePower);
     forceAuto->setText(tr("Auto"));
@@ -100,7 +99,6 @@ void radeon_profile::setupForcePowerLevelMenu() {
     QAction *forceHigh = new QAction(menu_forcePower);
     forceHigh->setText(tr("High"));
 
-    menu_forcePower->setTitle(tr("Force power level"));
     menu_forcePower->addAction(forceAuto);
     menu_forcePower->addSeparator();
     menu_forcePower->addAction(forceLow);
@@ -109,6 +107,15 @@ void radeon_profile::setupForcePowerLevelMenu() {
     connect(forceAuto,SIGNAL(triggered()),this,SLOT(forceAuto()));
     connect(forceLow,SIGNAL(triggered()),this,SLOT(forceLow()));
     connect(forceHigh,SIGNAL(triggered()),this,SLOT(forceHigh()));
+
+    // add all items to menu
+    menu_dpm->addAction(dpmSetBattery);
+    menu_dpm->addAction(dpmSetBalanced);
+    menu_dpm->addAction(dpmSetPerformance);
+    menu_dpm->addSeparator();
+    menu_dpm->addMenu(menu_forcePower);
+
+    return menu_dpm;
 }
 
 void radeon_profile::setupContextMenus() {
@@ -118,7 +125,7 @@ void radeon_profile::setupContextMenus() {
     ui->list_glxinfo->addAction(copyToClipboard);
     connect(copyToClipboard, SIGNAL(triggered()),this,SLOT(copyGlxInfoToClipboard()));
 
-    QAction * copyConnectors = new QAction(this);
+    QAction *copyConnectors = new QAction(this);
     copyConnectors->setText(tr("Copy to clipboard"));
     ui->list_connectors->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->list_connectors->addAction(copyConnectors);
@@ -209,7 +216,7 @@ void setupChart(QChart *chart, bool legendVisable) {
 
 void radeon_profile::addRuntimeWidgets() {
     // add button for manual refresh glx info, connectors, mod params
-    QPushButton *refreshBtn = new QPushButton();
+    QPushButton *refreshBtn = new QPushButton(this);
     refreshBtn->setIcon(QIcon(":/icon/symbols/refresh.png"));
     ui->tw_systemInfo->setCornerWidget(refreshBtn);
     refreshBtn->setIconSize(QSize(20,20));
@@ -229,7 +236,7 @@ void radeon_profile::addRuntimeWidgets() {
     l->show();
 
     // button on exec pages
-    QPushButton *btnBackProfiles = new QPushButton();
+    QPushButton *btnBackProfiles = new QPushButton(this);
     btnBackProfiles->setText(tr("Back to profiles"));
     ui->tabs_execOutputs->setCornerWidget(btnBackProfiles);
     btnBackProfiles->show();

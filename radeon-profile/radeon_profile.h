@@ -145,8 +145,8 @@ private:
     };
 
     QSystemTrayIcon *icon_tray;
-    QAction *closeApp, *dpmSetBattery, *dpmSetBalanced, *dpmSetPerformance, *changeProfile, *refreshWhenHidden;
-    QMenu *menu_dpm, *menu_tray, *menu_general, *menu_forcePower, *menu_fanProfiles;
+    QAction *refreshWhenHidden;
+    QMenu *menu_fanProfiles;
     QTimer *timer = nullptr;
 
     gpu device;
@@ -169,9 +169,9 @@ private:
     QMap<int, ValueID> keysInCurrentGpuList;
 
     Ui::radeon_profile *ui;
-    void setupTrayIcon();
+    void setupTrayIcon(const DriverFeatures &features);
     void refreshTooltip();
-    void setupForcePowerLevelMenu();
+    QMenu* createDpmMenu();
     void changeEvent(QEvent *event);
     void saveConfig();
     void loadConfig();
@@ -216,7 +216,7 @@ private:
     void loadPlotAxisSchema(const QXmlStreamReader &xml, PlotAxisSchema &pas);
     void createDefaultFanProfile();
     void loadExecProfiles();
-    void setupUiElements();
+    void setupUiElements(const DriverFeatures &features);
     void createPlots();
     void modifyPlotSchema(const QString &name);
     void createCurrentGpuDataListItems();
@@ -227,7 +227,7 @@ private:
     void showWindow();
     bool isFanStepValid(unsigned int temperature, unsigned int fanSpeed);
     void addFanStep (int temperature, int fanSpeed);
-    void createGeneralMenu();
+    QMenu* createGeneralMenu();
     PlotInitialValues figureOutInitialScale(const PlotDefinitionSchema &pds);
     void applyOc();
     void setupPlot(const PlotDefinitionSchema &pds);
