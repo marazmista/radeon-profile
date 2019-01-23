@@ -24,6 +24,8 @@ public:
         secondaryValueIdEnabled = true;
     }
 
+    virtual ~TopbarItem() { }
+
     QWidget* getItemWidget() {
         return itemWidget;
     }
@@ -36,10 +38,8 @@ protected:
 };
 
 class LabelPairItem : public QWidget, public TopbarItem {
-    QLabel labelTop, labelBottom;
-
 public:
-    LabelPairItem(const ValueID vId, const QColor &c, QWidget *parent = 0) : QWidget(parent) {
+    LabelPairItem(const ValueID vId, const QColor &c, QWidget *parent = nullptr) : QWidget(parent) {
         itemType = TopbarItemType::LABEL_PAIR;
         primaryValueId = vId;
 
@@ -64,34 +64,37 @@ public:
         itemWidget = this;
     }
 
-    void updateItemValue(const GPUDataContainer &data) {
+    void updateItemValue(const GPUDataContainer &data) override {
         labelTop.setText(data.value(primaryValueId).strValue);
 
         if (secondaryValueIdEnabled)
             labelBottom.setText(data.value(secondaryValueId).strValue);
     }
 
-    void setPrimaryColor(const QColor &c) {
+    void setPrimaryColor(const QColor &c) override {
         QPalette p = this->palette();
         p.setColor(this->foregroundRole(), c);
         labelTop.setPalette(p);
     }
 
-    void setSecondaryColor(const QColor &c) {
+    void setSecondaryColor(const QColor &c) override {
         QPalette p = this->palette();
         p.setColor(this->foregroundRole(), c);
         labelBottom.setPalette(p);
     }
 
-    void setSecondaryValueId(const ValueID vId) {
+    void setSecondaryValueId(const ValueID vId) override {
         TopbarItem::setSecondaryValueId(vId);
         labelBottom.setToolTip(globalStuff::getNameOfValueID(secondaryValueId));
     }
+
+private:
+    QLabel labelTop, labelBottom;
 };
 
 class LargeLabelItem : public QLabel, public TopbarItem {
 public:
-    LargeLabelItem(const ValueID vId, const QColor &c, QWidget *parent = 0) : QLabel(parent) {
+    LargeLabelItem(const ValueID vId, const QColor &c, QWidget *parent = nullptr) : QLabel(parent) {
         itemType = TopbarItemType::LARGE_LABEL;
 
         QFont f;
@@ -108,11 +111,11 @@ public:
         itemWidget = this;
     }
 
-    void updateItemValue(const GPUDataContainer &data) {
+    void updateItemValue(const GPUDataContainer &data) override {
         this->setText(data.value(primaryValueId).strValue);
     }
 
-    void setPrimaryColor(const QColor &c) {
+    void setPrimaryColor(const QColor &c) override {
         QPalette p = this->palette();
         p.setColor(this->foregroundRole(), c);
         this->QLabel::setPalette(p);
@@ -121,7 +124,7 @@ public:
 
 class PieItem : public PieProgressBar, public TopbarItem {
 public:
-    PieItem(const int max, ValueID vId, QColor fillColor, QWidget *parent = 0) : PieProgressBar(max, vId, fillColor, parent) {
+    PieItem(const int max, ValueID vId, QColor fillColor, QWidget *parent = nullptr) : PieProgressBar(max, vId, fillColor, parent) {
         itemType = TopbarItemType::PIE;
 
         setMinimumHeight(60);
@@ -132,15 +135,15 @@ public:
         itemWidget = this;
     }
 
-    void updateItemValue(const GPUDataContainer &data) {
+    void updateItemValue(const GPUDataContainer &data) override {
         this->updateValue(data);
     }
 
-    void setPrimaryColor(const QColor &c) {
+    void setPrimaryColor(const QColor &c) override {
         this->PieProgressBar::setFillColor(c);
     }
 
-    void setSecondaryValueId(const ValueID vId) {
+    void setSecondaryValueId(const ValueID vId) override {
         TopbarItem::setSecondaryValueId(vId);
         PieProgressBar::setSecondaryDataId(vId);
     }
@@ -171,9 +174,8 @@ struct TopbarItemDefinitionSchema {
             case TopbarItemType::PIE:
                 name.append("[Pie]\n");
                 break;
-            default:
-                break;
         }
+
         name.append(globalStuff::getNameOfValueID(vId));
     }
 
@@ -193,9 +195,6 @@ struct TopbarItemDefinitionSchema {
 };
 
 class TopbarManager {
-private:
-    QColor defaultForeground;
-
 public:
     QList<TopbarItemDefinitionSchema> schemas;
     QList<TopbarItem*> items;
@@ -284,6 +283,9 @@ public:
             addSchema(tis);
         }
     }
+
+private:
+    QColor defaultForeground;
 };
 
 

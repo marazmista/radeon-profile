@@ -21,12 +21,12 @@ class PieProgressBar : public QWidget
     Q_OBJECT
 
 public:
-    explicit PieProgressBar(QWidget *parent = 0) : QWidget(parent), ui(new Ui::PieProgressBar){
+    explicit PieProgressBar(QWidget *parent = nullptr) : QWidget(parent), ui(new Ui::PieProgressBar){
         ui->setupUi(this);
         init();
     }
 
-    explicit PieProgressBar(const int max, ValueID id, QColor fillColor, QWidget *parent = 0) : QWidget(parent), ui(new Ui::PieProgressBar) {
+    explicit PieProgressBar(const int max, ValueID id, QColor fillColor, QWidget *parent = nullptr) : QWidget(parent), ui(new Ui::PieProgressBar) {
         ui->setupUi(this);
 
         maxValue = max;
@@ -36,7 +36,9 @@ public:
         init();
     }
 
-    virtual ~PieProgressBar() { }
+    ~PieProgressBar() {
+        delete ui;
+    }
 
     void updateValue(const GPUDataContainer &gpuData) {
         data.slices().at(1)->setValue(gpuData.value(dataId).value);
