@@ -57,9 +57,9 @@ public:
     bool daemonConnected();
     void setOverclockValue(const QString &file, int value);
     void resetOverclock();
-    const DriverFeatures& getDriverFeatures();
-    const GPUConstParams& getGpuConstParams();
-    const DeviceFilePaths& getDriverFiles();
+    const DriverFeatures& getDriverFeatures() const;
+    const GPUConstParams& getGpuConstParams() const;
+    const DeviceFilePaths& getDriverFiles() const;
     void finalize();
     bool isInitialized();
     int getCurrentPowerPlayTableId(const QString &file);

@@ -294,15 +294,15 @@ void gpu::getFanSpeed() {
         gpuData[ValueID::FAN_SPEED_RPM].setValue(tmp.fanSpeedRpm);
 }
 
-const DriverFeatures& gpu::getDriverFeatures() {
+const DriverFeatures& gpu::getDriverFeatures() const {
     return driverHandler->features;
 }
 
-const GPUConstParams& gpu::getGpuConstParams() {
+const GPUConstParams& gpu::getGpuConstParams() const {
     return driverHandler->params;
 }
 
-const DeviceFilePaths& gpu::getDriverFiles() {
+const DeviceFilePaths& gpu::getDriverFiles() const {
     return driverHandler->driverFiles;
 }
 
