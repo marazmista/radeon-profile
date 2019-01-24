@@ -46,6 +46,9 @@ radeon_profile::radeon_profile(QWidget *parent) :
         ui->label_rootWarrning->setVisible(false);
     }
 
+    timer = new QTimer(this);
+    loadConfig();
+
     // find device and initialize it
     if (!device.initialize()) {
         QMessageBox::critical(this,tr("Error"), tr("No Radeon cards have been found in the system."));
@@ -59,9 +62,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     counter_ticks = 0;
     counter_statsTick = 0;
     savedState = nullptr;
-    timer = new QTimer(this);
-
-    loadConfig();
 
     // create runtime stuff, setup rest of ui
     setupUiElements();

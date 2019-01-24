@@ -26,14 +26,13 @@ void dXorg::configure() {
         return;
     }
 
-    if (globalStuff::globalConfig.daemonData)
-        setupSharedMem();
-
     dcomm.connectToDaemon();
 
-    if (daemonConnected())
+    if (daemonConnected() && globalStuff::globalConfig.daemonData) {
+        qDebug() << "Confguring shared memory for daemon";
+        setupSharedMem();
         setupDaemon();
-    else
+    } else
         qCritical() << "Daemon is not connected, therefore it can't be configured";
 
     figureOutDriverFeatures();
@@ -63,6 +62,8 @@ QString getRandomString() {
    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
 
    QString randomString;
+   qsrand(QTime::currentTime().msecsSinceStartOfDay());
+
    for (int i = 0; i < 10; ++i)
        randomString.append(possibleCharacters.at(qrand() % possibleCharacters.length()));
 
@@ -92,16 +93,7 @@ void dXorg::setupSharedMem() {
 }
 
 void dXorg::setupDaemon() {
-    qDebug() << "Daemon connected";
     QString command;
-
-    if (!globalStuff::globalConfig.daemonData) {
-        command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append('_').append(SEPARATOR);
-        qDebug() << "Sending daemon config command: " << command;
-        dcomm.sendCommand(command);
-        return;
-    }
-
     command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR);
     command.append(driverFiles.debugfs_pm_info).append(SEPARATOR);
     command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append(sharedMem.key()).append(SEPARATOR);
@@ -109,8 +101,7 @@ void dXorg::setupDaemon() {
     if (globalStuff::globalConfig.daemonAutoRefresh) {
         command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR);
         command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR);
-    }
-    else
+    } else
         command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR);
 
     qDebug() << "Sending daemon config command: " << command;
