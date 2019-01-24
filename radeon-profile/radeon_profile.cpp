@@ -61,23 +61,12 @@ radeon_profile::radeon_profile(QWidget *parent) :
     savedState = nullptr;
     timer = new QTimer(this);
 
-    // create runtime stuff, setup rest of ui
-    setupUiElements(device.getDriverFeatures());
-
     loadConfig();
 
-    for (int i = 0; i < device.gpuList.count(); ++i)
-        ui->combo_gpus->addItem(device.gpuList.at(i).sysName);
+    // create runtime stuff, setup rest of ui
+    setupUiElements();
 
-    // start is heavy, delegated to another thread to show ui smoothly, deleted after init
-//    initFuture = new QFutureWatcher<void>();
-//    connect(initFuture, SIGNAL(finished()), this,  SLOT(initFutureHandler()));
-//    initFuture->setFuture(QtConcurrent::run(this, &radeon_profile::refreshGpuData));
-    initFutureHandler();
-    // fill tables with data at the start //
-    ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
-    fillConnectors();
-    fillModInfo();
+    refreshUI();
 
     timer->start();
 
@@ -89,22 +78,6 @@ radeon_profile::~radeon_profile()
     delete ui;
 }
 
-void radeon_profile::initFutureHandler() {
-    setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
-    ui->centralWidget->setEnabled(true);
-
-    createPlots();
-
-    if (topbarManager.schemas.count() == 0)
-        topbarManager.createDefaultTopbarSchema(device.gpuData.keys());
-
-    topbarManager.createTopbar(ui->topbar_layout);
-
-    refreshUI();
-    connectSignals();
-//    delete initFuture;
-}
-
 void radeon_profile::connectSignals()
 {
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
@@ -112,9 +85,10 @@ void radeon_profile::connectSignals()
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(setPowerLevelFromCombo()));
     connect(&group_Dpm, SIGNAL(buttonClicked(int)), this, SLOT(setPowerLevel(int)));
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
+    connect(ui->combo_fanProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(makeFanProfileListaAndGraph(const QString&)));
 }
 
-void radeon_profile::setupUiElements(const DriverFeatures &features)
+void radeon_profile::setupUiElements()
 {
     qDebug() << "Creating ui elements";
 
@@ -122,33 +96,45 @@ void radeon_profile::setupUiElements(const DriverFeatures &features)
     ui->tw_systemInfo->setCurrentIndex(0);
     ui->list_currentGPUData->setHeaderHidden(false);
     ui->execPages->setCurrentIndex(0);
-
-    setupContextMenus();
-
-    setupTrayIcon(features);
-
-    addRuntimeWidgets();
     ui->btn_general->setMenu(createGeneralMenu());
 
+    addRuntmeWidgets();
+    setupTrayIcon(device.getDriverFeatures());
 
-    ui->centralWidget->setEnabled(false);
+    setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
+
+    if (topbarManager.schemas.count() == 0)
+        topbarManager.createDefaultTopbarSchema(device.gpuData.keys());
+
+    topbarManager.createTopbar(ui->topbar_layout);
+
+    for (int i = 0; i < device.gpuList.count(); ++i)
+        ui->combo_gpus->addItem(device.gpuList.at(i).sysName);
+
+    ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
+
+    fillConnectors();
+    fillModInfo();
+
+    createPlots();
+
+    connectSignals();
 }
 
-// based on driverFeatures structure returned by gpu class, adjust ui elements
+
 void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data) {
     qDebug() << "Handling found device features";
 
     if (features.isChangeProfileAvailable && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
         ui->stack_pm->setCurrentIndex(features.currentPowerMethod);
+        ui->stack_pm->setEnabled(true);
 
-//        changeProfile->setEnabled(features.currentPowerMethod == PowerMethod::PROFILE);
-//        menu_dpm->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
-        ui->combo_pLevel->setEnabled(features.currentPowerMethod == PowerMethod::DPM);
+        if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM)) {
+            addDpmButtons();
+            ui->combo_pLevel->setEnabled(true);
+            ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo(device.getDriverFeatures().sysInfo.module));
+        }
     } else {
-        ui->stack_pm->setEnabled(false);
-//        changeProfile->setEnabled(false);
-//        menu_dpm->setEnabled(false);
-        ui->combo_pLevel->setEnabled(false);
         ui->cb_eventsTracking->setEnabled(false);
         ui->cb_eventsTracking->setChecked(false);
     }
@@ -158,10 +144,28 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::TEMPERATURE_CURRENT) && !device.gpuData.contains(ValueID::VOLT_CORE))
         ui->tw_main->setTabEnabled(1,false);
 
-    if (data.contains(ValueID::FAN_SPEED_PERCENT) && features.isChangeProfileAvailable) {
+    ui->group_cfgDaemon->setEnabled(device.daemonConnected());
+
+    createCurrentGpuDataListItems();
+
+    // SETUP FAN CONTROL
+    if (features.isFanControlAvailable && features.isChangeProfileAvailable) {
         qDebug() << "Fan control available";
         on_slider_fanSpeed_valueChanged(ui->slider_fanSpeed->value());
         ui->l_fanProfileUnsavedIndicator->setVisible(false);
+
+        // set pwm buttons in group
+        group_pwm.addButton(ui->btn_pwmAuto);
+        group_pwm.addButton(ui->btn_pwmFixed);
+        group_pwm.addButton(ui->btn_pwmProfile);
+
+        //setup fan profile graph
+        createFanProfileChart();
+
+        for (const QString &fpName : fanProfiles.keys())
+            ui->combo_fanProfiles->addItem(fpName);
+
+        makeFanProfileListaAndGraph(ui->combo_fanProfiles->currentText());
 
         setupFanProfilesMenu();
 
@@ -183,24 +187,26 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         ui->group_cfgFan->setEnabled(false);
     }
 
-    if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM))
-        ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo(device.getDriverFeatures().sysInfo.module));
+    // SETUP OC
+    ui->tw_main->setTabEnabled(2, false);
 
-    ui->group_cfgDaemon->setEnabled(device.daemonConnected());
+    if (features.isChangeProfileAvailable && (device.getDriverFeatures().isOcTableAvailable || device.getDriverFeatures().isPercentCoreOcAvailable)) {
+        ui->tw_main->setTabEnabled(2, true);
+        ui->tw_overclock->setEnabled(true);
+        ui->tw_overclock->setTabEnabled(0, false);
+        ui->tw_overclock->setTabEnabled(1, false);
 
-    createCurrentGpuDataListItems();
-
-    // oc working only on amdgpu
-    if (features.isChangeProfileAvailable && device.getDriverFeatures().sysInfo.module == DriverModule::AMDGPU) {
         if (device.getDriverFeatures().isPercentCoreOcAvailable) {
-            on_btn_applyOverclock_clicked();
-
             ui->slider_ocMclk->setEnabled(device.getDriverFeatures().isPercentMemOcAvailable);
             ui->label_memOc->setEnabled(device.getDriverFeatures().isPercentMemOcAvailable);
             ui->l_ocMclk->setEnabled(device.getDriverFeatures().isPercentMemOcAvailable);
-        } else {
-            ui->group_oc->setCheckable(false);
-            ui->group_oc->setEnabled(false);
+
+            ui->group_oc->setCheckable(true);
+            ui->group_oc->setEnabled(true);
+            ui->tw_overclock->setTabEnabled(0, true);
+            ui->btn_applyOverclock->setEnabled(true);
+
+            on_btn_applyOverclock_clicked();
         }
 
         if (device.getDriverFeatures().isDpmCoreFreqTableAvailable) {
@@ -213,49 +219,21 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
                 ui->label_memFreq->setEnabled(device.getDriverFeatures().isDpmMemFreqTableAvailable);
                 ui->l_freqMclk->setEnabled(device.getDriverFeatures().isDpmMemFreqTableAvailable);
             }
-        } else {
-            ui->group_freq->setCheckable(false);
-            ui->group_freq->setEnabled(false);
-        }
-    }
-    else
-        ui->tw_main->setTabEnabled(2, false);
 
-
-    if (device.getDriverFeatures().isOcTableAvailable) {
-        ui->tw_overclock->setTabEnabled(1, true);
-
-        for (const unsigned k :  device.getDriverFeatures().coreTable.keys()) {
-            const FreqVoltPair &fvt = device.getDriverFeatures().coreTable.value(k);
-
-            series_ocClockFreq->append(k, fvt.frequency);
-            series_ocCoreVolt->append(k, fvt.voltage);
-
-            ui->list_coreStates->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
-                                                                     << QString::number(fvt.frequency)
-                                                                     << QString::number(fvt.voltage)));
+            ui->group_freq->setCheckable(true);
+            ui->group_freq->setChecked(false);
+            ui->group_freq->setEnabled(true);
+            ui->tw_overclock->setTabEnabled(0, true);
+            ui->btn_applyOverclock->setEnabled(true);
         }
 
-        for (const unsigned k :  device.getDriverFeatures().memTable.keys()) {
-            const FreqVoltPair &fvt = device.getDriverFeatures().memTable.value(k);
+        if (device.getDriverFeatures().isOcTableAvailable) {
+            createOcProfileChart();
+            setupOcTableOverclock();
 
-            series_ocMemFreqk->append(k, fvt.frequency);
-            series_ocMemVolt->append(k, fvt.voltage);
-
-            ui->list_memStates->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
-                                                                    << QString::number(fvt.frequency)
-                                                                    << QString::number(fvt.voltage)));
+            ui->tw_overclock->setTabEnabled(1, true);
+            ui->btn_applyOverclock->setEnabled(true);
         }
-
-        axis_frequency->setRange(0, device.getDriverFeatures().coreRange.max + 100);
-        axis_volts->setRange(0,  device.getDriverFeatures().voltageRange.max + 100);
-        axis_state->setRange(0, device.getDriverFeatures().coreTable.lastKey());
-        axis_state->setTickCount(device.getDriverFeatures().coreTable.lastKey() + 2);
-        axis_frequency->setTickCount(6);
-        axis_volts->setTickCount(6);
-    } else {
-        ui->tw_overclock->setTabEnabled(1, false);
-
     }
 }
 
@@ -494,4 +472,40 @@ void radeon_profile::showWindow() {
         this->showMinimized();
     else
         this->showNormal();
+}
+
+void loadOcTable(const FVTable &table, QTreeWidget *list, QLineSeries *series_Freq, QLineSeries *series_Voltage) {
+    for (const unsigned k :  table.keys()) {
+        const FreqVoltPair &fvp = table.value(k);
+
+        series_Freq->append(k, fvp.frequency);
+        series_Voltage->append(k, fvp.voltage);
+
+        list->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
+                                                                << QString::number(fvp.frequency)
+                                                                << QString::number(fvp.voltage)));
+    }
+}
+
+void radeon_profile::setupOcTableOverclock() {
+    ui->tw_overclock->setTabEnabled(1, true);
+
+    loadOcTable(device.getDriverFeatures().coreTable, ui->list_coreStates,
+                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_FREQUENCY]),
+                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_VOLTAGE]));
+
+    loadOcTable(device.getDriverFeatures().memTable, ui->list_memStates,
+                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_FREQUENCY]),
+                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_VOLTAGE]));
+
+    auto axis_frequency = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::FREQUENCY]);
+    auto axis_volts = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::VOLTAGE]);
+    auto axis_state = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Horizontal)[0]);
+
+    axis_frequency->setRange(0, device.getDriverFeatures().coreRange.max + 100);
+    axis_volts->setRange(0,  device.getDriverFeatures().voltageRange.max + 100);
+    axis_state->setRange(0, device.getDriverFeatures().coreTable.lastKey());
+    axis_state->setTickCount(device.getDriverFeatures().coreTable.lastKey() + 2);
+    axis_frequency->setTickCount(6);
+    axis_volts->setTickCount(6);
 }

@@ -649,6 +649,8 @@ void dXorg::figureOutDriverFeatures() {
             break;
     }
 
+    features.isFanControlAvailable = !driverFiles.hwmonAttributes.pwm1.isEmpty();
+
     features.isPercentCoreOcAvailable = !driverFiles.sysFs.pp_sclk_od.isEmpty();
     features.isPercentMemOcAvailable = !driverFiles.sysFs.pp_mclk_od.isEmpty();
 

@@ -118,7 +118,7 @@ QMenu* radeon_profile::createDpmMenu() {
     return menu_dpm;
 }
 
-void radeon_profile::setupContextMenus() {
+void radeon_profile::addRuntmeWidgets() {
     QAction *copyToClipboard = new QAction(this);
     copyToClipboard->setText(tr("Copy to clipboard"));
     ui->list_glxinfo->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -136,13 +136,40 @@ void radeon_profile::setupContextMenus() {
     ui->list_stats->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->list_stats->addAction(reset);
     connect(reset,SIGNAL(triggered()),this,SLOT(resetStats()));
+
+    // add button for manual refresh glx info, connectors, mod params
+    QPushButton *refreshBtn = new QPushButton(this);
+    refreshBtn->setIcon(QIcon(":/icon/symbols/refresh.png"));
+    ui->tw_systemInfo->setCornerWidget(refreshBtn);
+    refreshBtn->setIconSize(QSize(20,20));
+    refreshBtn->show();
+    connect(refreshBtn,SIGNAL(clicked()),this,SLOT(refreshBtnClicked()));
+
+    ui->label_version->setText(tr("version %n", NULL, appVersion));
+
+    // version label
+    QLabel *l = new QLabel("v. " +QString().setNum(appVersion),this);
+    QFont f;
+    f.setStretch(QFont::Unstretched);
+    f.setWeight(QFont::Bold);
+    f.setPointSize(8);
+    l->setFont(f);
+    ui->tw_main->setCornerWidget(l,Qt::BottomRightCorner);
+    l->show();
+
+    // button on exec pages
+    QPushButton *btnBackProfiles = new QPushButton(this);
+    btnBackProfiles->setText(tr("Back to profiles"));
+    ui->tabs_execOutputs->setCornerWidget(btnBackProfiles);
+    btnBackProfiles->show();
+    connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
 }
 
 void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
-    if (rebuildMode)
-        delete menu_fanProfiles;
+    if (rebuildMode && ui->btn_fanControl->menu() != nullptr)
+        delete ui->btn_fanControl->menu();
 
-    menu_fanProfiles = new QMenu(this);
+    auto *menu_fanProfiles = new QMenu(this);
     connect(menu_fanProfiles, SIGNAL(triggered(QAction*)), this, SLOT(fanProfileMenuActionClicked(QAction*)));
     QActionGroup *ag = new QActionGroup(menu_fanProfiles);
 
@@ -188,16 +215,17 @@ void radeon_profile::fillModInfo(){
     ui->list_modInfo->header()->resizeSections(QHeaderView::ResizeToContents);
 }
 
-void setupAxis(QValueAxis* axis, QColor color, QString title) {
+void setupAxis(QValueAxis* axis, const QColor color, const QString title, unsigned tickCount = 7) {
     axis->setGridLineColor(color);
     axis->setGridLineColor(color);
     axis->setLabelsColor(color);
     axis->setTitleText(title);
     axis->setTitleBrush(QBrush(color));
     axis->setLabelFormat("%d");
+    axis->setTickCount(tickCount);
 }
 
-void setupSeries(QLineSeries *series, QColor color, QString name, QValueAxis *axisBottom, QValueAxis *axisSide) {
+void setupSeries(QLineSeries *series, const QColor color, const QString name, QValueAxis *axisBottom, QValueAxis *axisSide) {
     series->setColor(color);
     series->setName(name);
     series->setPointsVisible(true);
@@ -214,44 +242,15 @@ void setupChart(QChart *chart, bool legendVisable) {
     chart->setBackgroundBrush(QBrush(Qt::darkGray));
 }
 
-void radeon_profile::addRuntimeWidgets() {
-    // add button for manual refresh glx info, connectors, mod params
-    QPushButton *refreshBtn = new QPushButton(this);
-    refreshBtn->setIcon(QIcon(":/icon/symbols/refresh.png"));
-    ui->tw_systemInfo->setCornerWidget(refreshBtn);
-    refreshBtn->setIconSize(QSize(20,20));
-    refreshBtn->show();
-    connect(refreshBtn,SIGNAL(clicked()),this,SLOT(refreshBtnClicked()));
-
-    ui->label_version->setText(tr("version %n", NULL, appVersion));
-
-    // version label
-    QLabel *l = new QLabel("v. " +QString().setNum(appVersion),this);
-    QFont f;
-    f.setStretch(QFont::Unstretched);
-    f.setWeight(QFont::Bold);
-    f.setPointSize(8);
-    l->setFont(f);
-    ui->tw_main->setCornerWidget(l,Qt::BottomRightCorner);
-    l->show();
-
-    // button on exec pages
-    QPushButton *btnBackProfiles = new QPushButton(this);
-    btnBackProfiles->setText(tr("Back to profiles"));
-    ui->tabs_execOutputs->setCornerWidget(btnBackProfiles);
-    btnBackProfiles->show();
-    connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
-
-    // set pwm buttons in group
-    group_pwm.addButton(ui->btn_pwmAuto);
-    group_pwm.addButton(ui->btn_pwmFixed);
-    group_pwm.addButton(ui->btn_pwmProfile);
-
+void radeon_profile::addDpmButtons()
+{
     group_Dpm.addButton(ui->btn_dpmBattery, PowerProfiles::BATTERY);
     group_Dpm.addButton(ui->btn_dpmBalanced, PowerProfiles::BALANCED);
     group_Dpm.addButton(ui->btn_dpmPerformance, PowerProfiles::PERFORMANCE);
+}
 
-    //setup fan profile graph
+void radeon_profile::createFanProfileChart()
+{
     chartView_fan = new QChartView(this);
     QChart *chart_fan = new QChart();
     chartView_fan->setRenderHint(QPainter::Antialiasing);
@@ -259,8 +258,7 @@ void radeon_profile::addRuntimeWidgets() {
 
     setupChart(chart_fan, false);
 
-    series_fan = new QLineSeries(chart_fan);
-    chart_fan->addSeries(series_fan);
+    chart_fan->addSeries(new QLineSeries(chart_fan));
 
     QValueAxis *axis_temperature = new QValueAxis(chart_fan);
     QValueAxis *axis_speed = new QValueAxis(chart_fan);
@@ -269,13 +267,14 @@ void radeon_profile::addRuntimeWidgets() {
     axis_temperature->setRange(0, 100);
     axis_speed->setRange(0, 100);
 
-    setupAxis(axis_speed, Qt::white, tr("Fan Speed [%]"));
-    setupAxis(axis_temperature, Qt::white, tr("Temperature [°C]"));
-    setupSeries(series_fan, Qt::yellow, "", axis_speed, axis_temperature);
+    setupAxis(axis_speed, Qt::white, tr("Fan Speed [%]"), 11);
+    setupAxis(axis_temperature, Qt::white, tr("Temperature [°C]"), 11);
+    setupSeries(static_cast<QLineSeries*>(chart_fan->series()[0]) , Qt::yellow, "", axis_speed, axis_temperature);
 
     ui->verticalLayout_22->addWidget(chartView_fan);
+}
 
-    //setup oc table graph
+void radeon_profile::createOcProfileChart() {
     chartView_oc = new QChartView(this);
     QChart *chart_oc = new QChart();
     chartView_oc->setRenderHint(QPainter::Antialiasing);
@@ -283,19 +282,20 @@ void radeon_profile::addRuntimeWidgets() {
 
     setupChart(chart_oc, true);
 
-    series_ocClockFreq = new QLineSeries(chart_oc);
-    series_ocMemFreqk = new QLineSeries(chart_oc);
-    series_ocCoreVolt = new QLineSeries(chart_oc);
-    series_ocMemVolt = new QLineSeries(chart_oc);
+    // keep the order as in OcSeriesType enum //
+    auto series_ocClockFreq = new QLineSeries(chart_oc);
+    auto series_ocMemFreqk = new QLineSeries(chart_oc);
+    auto series_ocCoreVolt = new QLineSeries(chart_oc);
+    auto series_ocMemVolt = new QLineSeries(chart_oc);
 
     chart_oc->addSeries(series_ocClockFreq);
     chart_oc->addSeries(series_ocMemFreqk);
     chart_oc->addSeries(series_ocCoreVolt);
     chart_oc->addSeries(series_ocMemVolt);
 
-    axis_state = new QValueAxis(chart_oc);
-    axis_frequency = new QValueAxis(chart_oc);
-    axis_volts = new QValueAxis(chart_oc);
+    auto axis_state = new QValueAxis(chart_oc);
+    auto axis_frequency = new QValueAxis(chart_oc);
+    auto axis_volts = new QValueAxis(chart_oc);
 
     chart_oc->addAxis(axis_state,Qt::AlignBottom);
     chart_oc->addAxis(axis_frequency, Qt::AlignLeft);

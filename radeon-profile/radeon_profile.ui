@@ -122,6 +122,9 @@
     </item>
     <item row="2" column="0">
      <widget class="QStackedWidget" name="stack_pm">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
         <horstretch>0</horstretch>
@@ -130,8 +133,14 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>110</width>
+        <width>120</width>
         <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
        </size>
       </property>
       <property name="currentIndex">
@@ -1052,6 +1061,9 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tab_overclock">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <attribute name="title">
         <string>Overclock</string>
        </attribute>
@@ -1090,12 +1102,15 @@
         <item>
          <widget class="QTabWidget" name="tw_overclock">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="currentIndex">
            <number>0</number>
           </property>
           <widget class="QWidget" name="tab_percent">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <attribute name="title">
             <string>Percent</string>
            </attribute>
@@ -1117,14 +1132,17 @@
             </property>
             <item>
              <widget class="QGroupBox" name="group_oc">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="title">
                <string>Overcloc&amp;k</string>
               </property>
               <property name="checkable">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <layout class="QGridLayout" name="gridLayout_7" columnstretch="1,0,0,0">
                <property name="leftMargin">
@@ -1221,7 +1239,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string notr="true">20</string>
+                  <string notr="true">0</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1237,7 +1255,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string notr="true">20</string>
+                  <string notr="true">0</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1248,28 +1266,18 @@
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
              <widget class="QGroupBox" name="group_freq">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="title">
                <string>&amp;Manual frequency control</string>
               </property>
               <property name="checkable">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <layout class="QGridLayout" name="gridLayout_16" columnstretch="1,0">
                <property name="leftMargin">
@@ -1392,9 +1400,25 @@
               </layout>
              </widget>
             </item>
+            <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </widget>
           <widget class="QWidget" name="tab_ocTable">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <attribute name="title">
             <string>States table</string>
            </attribute>
@@ -1414,8 +1438,64 @@
             <property name="horizontalSpacing">
              <number>5</number>
             </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_21">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Core</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="1" rowspan="4">
              <layout class="QVBoxLayout" name="verticalLayout_10"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QTreeWidget" name="list_coreStates">
+              <property name="minimumSize">
+               <size>
+                <width>200</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>200</width>
+                <height>300</height>
+               </size>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>false</bool>
+              </property>
+              <property name="indentation">
+               <number>2</number>
+              </property>
+              <attribute name="headerCascadingSectionResizes">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="headerDefaultSectionSize">
+               <number>65</number>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>State</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Clock</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Voltage</string>
+               </property>
+              </column>
+             </widget>
             </item>
             <item row="2" column="0">
              <widget class="QLabel" name="label_19">
@@ -1473,71 +1553,18 @@
               </column>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_21">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Core</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QTreeWidget" name="list_coreStates">
-              <property name="minimumSize">
-               <size>
-                <width>200</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>300</height>
-               </size>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>false</bool>
-              </property>
-              <property name="indentation">
-               <number>2</number>
-              </property>
-              <attribute name="headerCascadingSectionResizes">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="headerDefaultSectionSize">
-               <number>65</number>
-              </attribute>
-              <column>
-               <property name="text">
-                <string>State</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Clock</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Voltage</string>
-               </property>
-              </column>
-             </widget>
-            </item>
            </layout>
           </widget>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btn_applyOverclock">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="maximumSize">
            <size>
-            <width>150</width>
+            <width>208</width>
             <height>16777215</height>
            </size>
           </property>
@@ -1549,6 +1576,9 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tab_fan">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <attribute name="title">
         <string>Fan Control</string>
        </attribute>
@@ -1663,6 +1693,9 @@
         </item>
         <item>
          <widget class="QStackedWidget" name="stack_fanModes">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -3510,7 +3543,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>777</width>
+             <width>767</width>
              <height>572</height>
             </rect>
            </property>

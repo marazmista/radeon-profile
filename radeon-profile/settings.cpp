@@ -331,7 +331,7 @@ void radeon_profile::loadConfig() {
     }
 
     // create default if empty
-    if (ui->combo_fanProfiles->count() == 0)
+    if (fanProfiles.count() == 0)
         createDefaultFanProfile();
 
     // create plots from xml config
@@ -340,7 +340,6 @@ void radeon_profile::loadConfig() {
 
     topbarManager.setDefaultForeground(QWidget::palette().foreground().color());
 
-    makeFanProfileListaAndGraph(fanProfiles.value(ui->combo_fanProfiles->currentText()));
 }
 
 void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
@@ -450,7 +449,6 @@ void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
 
         if (xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "fanProfile") {
             fanProfiles.insert(fpName, fps);
-            ui->combo_fanProfiles->addItem(fpName);
             return;
         }
     }

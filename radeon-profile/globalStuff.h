@@ -187,6 +187,7 @@ typedef QMap<int, unsigned int> FanProfileSteps;
 struct DriverFeatures {
     bool
     isChangeProfileAvailable = false,
+    isFanControlAvailable = false,
     isPercentCoreOcAvailable = false,
     isPercentMemOcAvailable = false,
     isDpmCoreFreqTableAvailable = false,
@@ -271,10 +272,10 @@ struct DeviceSysFs {
         if (!checkFileCorrectness(power_dpm_force_performance_level))
             power_dpm_force_performance_level = "";
 
-        if (!checkFileCorrectness(pp_sclk_od))
+        if (!checkFileCorrectness(pp_sclk_od, true))
             pp_sclk_od = "";
 
-        if (checkFileCorrectness(pp_mclk_od))
+        if (checkFileCorrectness(pp_mclk_od, true))
             pp_mclk_od = "";
 
         if (!checkFileCorrectness(pp_dpm_sclk))

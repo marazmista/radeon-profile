@@ -20,7 +20,6 @@
 #include <QListWidgetItem>
 #include <QButtonGroup>
 #include <QXmlStreamWriter>
-#include <QtConcurrent/QtConcurrent>
 
 #define minFanStepsTemp 0
 #define maxFanStepsTemp 99
@@ -46,6 +45,18 @@ class radeon_profile : public QMainWindow
         LOG_FILE_DATE_APPEND
     };
 
+    enum OcSeriesType {
+        CORE_FREQUENCY,
+        CORE_VOLTAGE,
+        MEM_FREQUENCY,
+        MEM_VOLTAGE
+    };
+
+    enum AxisType {
+        FREQUENCY,
+        VOLTAGE
+    };
+
 public:
     static unsigned int minFanStepsSpeed;
 
@@ -54,7 +65,6 @@ public:
     
 private slots:
     void timerEvent();
-    void initFutureHandler();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void forceAuto();
     void forceLow();
@@ -107,7 +117,6 @@ private slots:
     void on_btn_saveAsFanProfile_clicked();
     void fanProfileMenuActionClicked(QAction *a);
     void on_cb_zeroPercentFanSpeed_clicked(bool checked);
-    void on_combo_fanProfiles_currentIndexChanged(const QString &arg1);
     void on_btn_addEvent_clicked();
     void on_list_events_itemChanged(QTreeWidgetItem *item, int column);
     void on_btn_eventsInfo_clicked();
@@ -135,6 +144,7 @@ private slots:
     void on_group_freq_toggled(bool arg1);
     void on_btn_configureTopbar_clicked();
     void on_btn_setPlotsBackground_clicked();
+    void makeFanProfileListaAndGraph(const QString &profile);
 
 private:
     struct CurrentStateInfo {
@@ -146,7 +156,6 @@ private:
 
     QSystemTrayIcon *icon_tray;
     QAction *refreshWhenHidden;
-    QMenu *menu_fanProfiles;
     QTimer *timer = nullptr;
 
     gpu device;
@@ -159,12 +168,9 @@ private:
     short hysteresisRelativeTepmerature = 0;
     QButtonGroup group_pwm, group_Dpm;
     CurrentStateInfo *savedState;
-    QFutureWatcher<void> *initFuture;
     PlotManager plotManager;
     TopbarManager topbarManager;
     QChartView *chartView_fan, *chartView_oc;
-    QLineSeries *series_fan, *series_ocClockFreq, *series_ocMemFreqk, *series_ocCoreVolt, *series_ocMemVolt;
-    QValueAxis *axis_state, *axis_frequency, *axis_volts;
     QList<TopbarItem*> topBarItems;
     QMap<int, ValueID> keysInCurrentGpuList;
 
@@ -177,16 +183,15 @@ private:
     void loadConfig();
     void doTheStats();
     void updateStatsTable();
-    void setupContextMenus();
+    void addRuntmeWidgets();
     void refreshGpuData();
     void refreshGraphs();
     void setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data);
     void loadVariables();
     void updateExecLogs();
-    void addRuntimeWidgets();
+    void createOcProfileChart();
     void loadFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
-    void makeFanProfileListaAndGraph(const FanProfileSteps &profile);
     void makeFanProfilePlot();
     void refreshUI();
     void connectSignals();
@@ -216,7 +221,7 @@ private:
     void loadPlotAxisSchema(const QXmlStreamReader &xml, PlotAxisSchema &pas);
     void createDefaultFanProfile();
     void loadExecProfiles();
-    void setupUiElements(const DriverFeatures &features);
+    void setupUiElements();
     void createPlots();
     void modifyPlotSchema(const QString &name);
     void createCurrentGpuDataListItems();
@@ -232,7 +237,9 @@ private:
     void applyOc();
     void setupPlot(const PlotDefinitionSchema &pds);
     QString createCurrentMinMaxString(const ValueID idCurrent, const ValueID idMin, const ValueID idMax);
-
+    void addDpmButtons();
+    void createFanProfileChart();
+    void setupOcTableOverclock();
 };
 
 #endif // RADEON_PROFILE_H
