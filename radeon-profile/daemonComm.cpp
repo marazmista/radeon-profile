@@ -6,7 +6,8 @@
 
 daemonComm::daemonComm() {
     signalSender = new QLocalSocket(this);
-    connect(signalSender,SIGNAL(connected()),this,SLOT(onConnect()));
+    feedback.setDevice(signalSender);
+    connect(signalSender,SIGNAL(readyRead()), this, SLOT(receiveFeedback()));
 }
 
 daemonComm::~daemonComm() {
@@ -24,6 +25,14 @@ void daemonComm::sendCommand(const QString command) {
         qWarning() << "Failed sending signal: " << command;
 }
 
-void daemonComm::onConnect() {
+void daemonComm::receiveFeedback() {
+    feedback.startTransaction();
 
+    QString confirmMsg ;
+    feedback >> confirmMsg;
+
+    if (!feedback.commitTransaction())
+        return;
+
+    qDebug() << "ekstra " << confirmMsg.toLatin1();
 }

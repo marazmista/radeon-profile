@@ -7,6 +7,7 @@
 #define DAEMONCOMM_H
 
 #include <QLocalSocket>
+#include <QDataStream>
 
 #define SEPARATOR '#'
 #define DAEMON_SIGNAL_CONFIG '0'
@@ -25,15 +26,17 @@ public:
     void connectToDaemon();
     void sendCommand(const QString command);
 
-    inline bool connected() {
+    inline bool isConnected() {
         return (signalSender->state() == QLocalSocket::ConnectedState);
     }
 
     QLocalSocket *signalSender;
 
-
 public slots:
-    void onConnect();
+    void receiveFeedback();
+
+private:
+    QDataStream feedback;
 
 };
 

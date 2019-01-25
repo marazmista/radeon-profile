@@ -109,7 +109,7 @@ void dXorg::setupDaemon() {
 }
 
 bool dXorg::daemonConnected() {
-    return dcomm.connected();
+    return dcomm.isConnected();
 }
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
