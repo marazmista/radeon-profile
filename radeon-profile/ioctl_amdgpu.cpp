@@ -57,7 +57,8 @@ bool amdgpuIoctlHandler::getValue(void *data, unsigned dataSize, unsigned comman
 
 bool amdgpuIoctlHandler::getGpuUsage(float *data) const {
 #ifdef AMDGPU_INFO_SENSOR_GPU_LOAD
-    return getSensorValue(data, sizeof(data), AMDGPU_INFO_SENSOR_GPU_LOAD);
+    int *tmp = reinterpret_cast<int*>(data);
+    return getSensorValue(&tmp, sizeof(tmp), AMDGPU_INFO_SENSOR_GPU_LOAD);
 #else
     Q_UNUSED(data);
     return false;
