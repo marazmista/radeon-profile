@@ -335,6 +335,27 @@ void gpu::getPowerCapCurrent() {
         gpuData[ValueID::POWER_CAP_CURRENT].setValue(driverHandler->getPowerCapCurrent());
 }
 
+void gpu::setOcTableValue(const QString &type, int powerState, const FreqVoltPair powerStateValues) {
+    if (type == "s")
+        driverHandler->features.coreTable.insert(powerState, powerStateValues);
+    else if (type == "m")
+        driverHandler->features.memTable.insert(powerState, powerStateValues);
+
+    driverHandler->setNewValue(getDriverFiles().sysFs.pp_od_clk_voltage,
+                               type + " " + QString::number(powerState) + " " +
+                               QString::number(powerStateValues.frequency) + " " +
+                               QString::number(powerStateValues.voltage));
+}
+
+void gpu::sendOcTableCommand(const QString cmd) {
+    driverHandler->setNewValue(getDriverFiles().sysFs.pp_od_clk_voltage, cmd);
+}
+
+void gpu::loadOcTable() {
+    driverHandler->loadOcTable();
+}
+
+
 // Function that returns the human readable output of a property value
 // For reference:
 // http://cgit.freedesktop.org/xorg/app/xrandr/tree/xrandr.c#n2408

@@ -51,6 +51,8 @@ public:
     void setForcePowerLevel(ForcePowerLevels _newForcePowerLevel);
     void setPwmManualControl(bool manual);
     void setPwmValue(unsigned int value);
+    void setOcTableValue(const QString &type, int powerState, const FreqVoltPair powerStateValues);
+    void sendOcTableCommand(const QString cmd);
 
     void detectCards();
     bool initialize();
@@ -63,6 +65,7 @@ public:
     void finalize();
     bool isInitialized();
     int getCurrentPowerPlayTableId(const QString &file);
+    void loadOcTable();
 
 private slots:
     void handleGpuUsageResult() {

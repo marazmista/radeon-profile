@@ -238,7 +238,7 @@ void setupChart(QChart *chart, bool legendVisable) {
     chart->setBackgroundRoundness(2);
     chart->setMargins(QMargins(5,0,0,0));
     chart->legend()->setVisible(legendVisable);
-
+    chart->legend()->setLabelColor(Qt::white);
     chart->setBackgroundBrush(QBrush(Qt::darkGray));
 }
 
@@ -249,7 +249,7 @@ void radeon_profile::addDpmButtons()
     group_Dpm.addButton(ui->btn_dpmPerformance, PowerProfiles::PERFORMANCE);
 }
 
-void radeon_profile::createFanProfileChart()
+void radeon_profile::createFanProfileGraph()
 {
     chartView_fan = new QChartView(this);
     QChart *chart_fan = new QChart();
@@ -274,7 +274,7 @@ void radeon_profile::createFanProfileChart()
     ui->verticalLayout_22->addWidget(chartView_fan);
 }
 
-void radeon_profile::createOcProfileChart() {
+void radeon_profile::createOcProfileGraph() {
     chartView_oc = new QChartView(this);
     QChart *chart_oc = new QChart();
     chartView_oc->setRenderHint(QPainter::Antialiasing);
@@ -284,13 +284,13 @@ void radeon_profile::createOcProfileChart() {
 
     // keep the order as in OcSeriesType enum //
     auto series_ocClockFreq = new QLineSeries(chart_oc);
-    auto series_ocMemFreqk = new QLineSeries(chart_oc);
     auto series_ocCoreVolt = new QLineSeries(chart_oc);
+    auto series_ocMemFreq = new QLineSeries(chart_oc);
     auto series_ocMemVolt = new QLineSeries(chart_oc);
 
     chart_oc->addSeries(series_ocClockFreq);
-    chart_oc->addSeries(series_ocMemFreqk);
     chart_oc->addSeries(series_ocCoreVolt);
+    chart_oc->addSeries(series_ocMemFreq);
     chart_oc->addSeries(series_ocMemVolt);
 
     auto axis_state = new QValueAxis(chart_oc);
@@ -306,7 +306,7 @@ void radeon_profile::createOcProfileChart() {
     setupAxis(axis_volts, Qt::white, tr("Voltage [mV]"));
 
     setupSeries(series_ocClockFreq, Qt::yellow, tr("Core frequency [MHz]"), axis_state, axis_frequency);
-    setupSeries(series_ocMemFreqk, Qt::blue, tr("Memory Voltage [MHz]"), axis_state, axis_frequency);
+    setupSeries(series_ocMemFreq, Qt::blue, tr("Memory Voltage [MHz]"), axis_state, axis_frequency);
     setupSeries(series_ocCoreVolt, Qt::green, tr("Core Voltage [mV]"), axis_state, axis_volts);
     setupSeries(series_ocMemVolt, Qt::cyan, tr("Memory Voltage [mV]"), axis_state, axis_volts);
 

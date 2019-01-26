@@ -144,7 +144,11 @@ private slots:
     void on_group_freq_toggled(bool arg1);
     void on_btn_configureTopbar_clicked();
     void on_btn_setPlotsBackground_clicked();
-    void makeFanProfileListaAndGraph(const QString &profile);
+    void createFanProfileListaAndGraph(const QString &profile);
+    void on_list_coreStates_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_btn_applyOcTable_clicked();
+    void on_btn_resetOcTable_clicked();
 
 private:
     struct CurrentStateInfo {
@@ -189,7 +193,7 @@ private:
     void setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data);
     void loadVariables();
     void updateExecLogs();
-    void createOcProfileChart();
+    void createOcProfileGraph();
     void loadFanProfiles();
     int askNumber(const int value, const int min, const int max, const QString label);
     void makeFanProfilePlot();
@@ -238,8 +242,9 @@ private:
     void setupPlot(const PlotDefinitionSchema &pds);
     QString createCurrentMinMaxString(const ValueID idCurrent, const ValueID idMin, const ValueID idMax);
     void addDpmButtons();
-    void createFanProfileChart();
+    void createFanProfileGraph();
     void setupOcTableOverclock();
+    void updateOcGraphSeries(const FVTable &table, QLineSeries *series, OcSeriesType type);
 };
 
 #endif // RADEON_PROFILE_H

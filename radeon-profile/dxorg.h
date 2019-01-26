@@ -70,7 +70,7 @@ public:
     void setupRegex(const QString &data);
     int getCurrentPowerPlayTableId(const QString &file);
     void setNewValue(const QString &filePath, const QString &newValue);
-
+    void loadOcTable();
 
 private:
     QChar gpuSysIndex;
@@ -95,7 +95,7 @@ private:
     void setupDaemon();
     PowerPlayTable loadPowerPlayTable(const QString &file);
     QString createDaemonSetCmd(const QString &file, const QString &tableIndex);
-    const QMap<QString, FVTable> loadOcTable();
+    const QMap<QString, FVTable> parseOcTable();
 };
 
 #endif // DXORG_H

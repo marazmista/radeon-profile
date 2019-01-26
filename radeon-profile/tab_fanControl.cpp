@@ -14,7 +14,7 @@ void radeon_profile::createDefaultFanProfile() {
     fanProfiles.insert("default", p);
 }
 
-void radeon_profile::makeFanProfileListaAndGraph(const QString &profileName) {
+void radeon_profile::createFanProfileListaAndGraph(const QString &profileName) {
     auto profile = fanProfiles.value(profileName);
     auto series = static_cast<QLineSeries*>(chartView_fan->chart()->series()[0]);
 

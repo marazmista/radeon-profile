@@ -651,13 +651,7 @@ void dXorg::figureOutDriverFeatures() {
     if (!driverFiles.sysFs.pp_od_clk_voltage.isEmpty()) {
         features.isOcTableAvailable = true;
 
-        const QMap<QString, FVTable> tables = loadOcTable();
-
-        if (tables.contains("OD_SCLK"))
-            features.coreTable = tables.value("OD_SCLK");
-
-        if (tables.contains("OD_MCLK"))
-            features.memTable = tables.value("OD_MCLK");
+        loadOcTable();
     }
 }
 
@@ -761,7 +755,7 @@ PowerCap dXorg::getPowerCap() const {
                     getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER);
 }
 
-const QMap<QString, FVTable> dXorg::loadOcTable() {
+const QMap<QString, FVTable> dXorg::parseOcTable() {
     bool supportedTable = false;
     QMap<QString, FVTable> tables;
 
@@ -817,4 +811,14 @@ const QMap<QString, FVTable> dXorg::loadOcTable() {
     }
 
     return tables;
+}
+
+void dXorg::loadOcTable() {
+    const QMap<QString, FVTable> tables = parseOcTable();
+
+    if (tables.contains("OD_SCLK"))
+        features.coreTable = tables.value("OD_SCLK");
+
+    if (tables.contains("OD_MCLK"))
+        features.memTable = tables.value("OD_MCLK");
 }

@@ -85,7 +85,7 @@ void radeon_profile::connectSignals()
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(setPowerLevelFromCombo()));
     connect(&group_Dpm, SIGNAL(buttonClicked(int)), this, SLOT(setPowerLevel(int)));
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
-    connect(ui->combo_fanProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(makeFanProfileListaAndGraph(const QString&)));
+    connect(ui->combo_fanProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(createFanProfileListaAndGraph(const QString&)));
 }
 
 void radeon_profile::setupUiElements()
@@ -160,12 +160,12 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         group_pwm.addButton(ui->btn_pwmProfile);
 
         //setup fan profile graph
-        createFanProfileChart();
+        createFanProfileGraph();
 
         for (const QString &fpName : fanProfiles.keys())
             ui->combo_fanProfiles->addItem(fpName);
 
-        makeFanProfileListaAndGraph(ui->combo_fanProfiles->currentText());
+        createFanProfileListaAndGraph(ui->combo_fanProfiles->currentText());
 
         setupFanProfilesMenu();
 
@@ -228,7 +228,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         }
 
         if (device.getDriverFeatures().isOcTableAvailable) {
-            createOcProfileChart();
+            createOcProfileGraph();
             setupOcTableOverclock();
 
             ui->tw_overclock->setTabEnabled(1, true);
@@ -472,40 +472,4 @@ void radeon_profile::showWindow() {
         this->showMinimized();
     else
         this->showNormal();
-}
-
-void loadOcTable(const FVTable &table, QTreeWidget *list, QLineSeries *series_Freq, QLineSeries *series_Voltage) {
-    for (const unsigned k :  table.keys()) {
-        const FreqVoltPair &fvp = table.value(k);
-
-        series_Freq->append(k, fvp.frequency);
-        series_Voltage->append(k, fvp.voltage);
-
-        list->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
-                                                                << QString::number(fvp.frequency)
-                                                                << QString::number(fvp.voltage)));
-    }
-}
-
-void radeon_profile::setupOcTableOverclock() {
-    ui->tw_overclock->setTabEnabled(1, true);
-
-    loadOcTable(device.getDriverFeatures().coreTable, ui->list_coreStates,
-                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_FREQUENCY]),
-                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_VOLTAGE]));
-
-    loadOcTable(device.getDriverFeatures().memTable, ui->list_memStates,
-                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_FREQUENCY]),
-                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_VOLTAGE]));
-
-    auto axis_frequency = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::FREQUENCY]);
-    auto axis_volts = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::VOLTAGE]);
-    auto axis_state = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Horizontal)[0]);
-
-    axis_frequency->setRange(0, device.getDriverFeatures().coreRange.max + 100);
-    axis_volts->setRange(0,  device.getDriverFeatures().voltageRange.max + 100);
-    axis_state->setRange(0, device.getDriverFeatures().coreTable.lastKey());
-    axis_state->setTickCount(device.getDriverFeatures().coreTable.lastKey() + 2);
-    axis_frequency->setTickCount(6);
-    axis_volts->setTickCount(6);
 }

@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     tab_events.cpp \
     tab_plots.cpp \
     tab_fanControl.cpp \
-    tab_exec.cpp
+    tab_exec.cpp \
+    tab_overclock.cpp
 
 HEADERS  += radeon_profile.h \
     gpu.h \
