@@ -660,10 +660,13 @@ void dXorg::figureOutDriverFeatures() {
     if (!driverFiles.sysFs.pp_od_clk_voltage.isEmpty()) {
         features.isOcTableAvailable = true;
 
-        QList<FVTable> tables = loadOcTable();
+        const QMap<QString, FVTable> tables = loadOcTable();
 
-        features.coreTable = tables.at(0);
-        features.memTable = tables.at(1);
+        if (tables.contains("OD_SCLK"))
+            features.coreTable = tables.value("OD_SCLK");
+
+        if (tables.contains("OD_MCLK"))
+            features.memTable = tables.value("OD_MCLK");
     }
 }
 
@@ -775,24 +778,38 @@ PowerCap dXorg::getPowerCap() const {
                     getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER);
 }
 
-const QList<FVTable> dXorg::loadOcTable() {
-    FVTable tables[2];
-    int tableType = 0; // 0 - core, 1 - mem //
+const QMap<QString, FVTable> dXorg::loadOcTable() {
+    bool supportedTable = false;
+    QMap<QString, FVTable> tables;
 
     QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_od_clk_voltage).split('\n');
 
     for (QString &s: sl) {
         if (s.contains("OD_SCLK")) {
-            tableType = 0;
+            tables.insert("OD_SCLK", FVTable());
+            supportedTable = true;
             continue;
         }
 
         if (s.contains("OD_MCLK")) {
-            tableType = 1;
+            tables.insert("OD_MCLK", FVTable());
+            supportedTable = true;
             continue;
         }
 
-        if (s.contains("OD_RANGE"))
+        if (s.contains("OD_RANGE")) {
+            supportedTable = true;
+            continue;
+        }
+
+        // unknown table title, not supported
+        if (s.right(1) == ":") {
+            supportedTable = false;
+            continue;
+        }
+
+        // parse only known tables
+        if (!supportedTable)
             continue;
 
         QStringList state = s.replace(" ","").replace(":", "|").replace("MHz", "|").replace("mV","|").split("|",QString::SkipEmptyParts);
@@ -811,8 +828,10 @@ const QList<FVTable> dXorg::loadOcTable() {
             continue;
         }
 
-        tables[tableType].insert(state[0].toUInt(), FreqVoltPair(state[1].toUInt(), state[2].toUInt()));
+
+        FVTable &t = tables[tables.keys().first()];
+        t.insert(state[0].toUInt(), FreqVoltPair(state[1].toUInt(), state[2].toUInt()));
     }
 
-    return QList<FVTable>() << tables[0] << tables[1];
+    return tables;
 }
