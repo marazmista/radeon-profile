@@ -261,7 +261,7 @@ QString gpu::getCurrentPowerProfile()  {
     return driverHandler->getCurrentPowerProfile();
 }
 
-void gpu::refreshPowerLevel() {
+void gpu::getPowerLevel() {
     currentPowerLevel = getCurrentPowerLevel();
     currentPowerProfile = getCurrentPowerProfile();
 }
@@ -275,11 +275,11 @@ void gpu::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
 }
 
 void gpu::setPwmValue(unsigned int value) {
-    driverHandler->setPwmValue(value);
+    driverHandler->setNewValue(getDriverFiles().hwmonAttributes.pwm1, QString::number(value));
 }
 
 void gpu::setPwmManualControl(bool manual) {
-    driverHandler->setPwmManualControl(manual);
+    driverHandler->setNewValue(getDriverFiles().hwmonAttributes.pwm1_enable, QString(manual ? pwm_manual : pwm_auto));
 }
 
 void gpu::getFanSpeed() {
@@ -318,12 +318,12 @@ void gpu::finalize() {
 }
 
 void gpu::setOverclockValue(const QString &file, const int value) {
-        driverHandler->setOverclockValue(file, value);
+    driverHandler->setNewValue(file, QString::number(value));
 }
 
 void gpu::resetOverclock() {
-    driverHandler->setOverclockValue(getDriverFiles().sysFs.pp_sclk_od, 0);
-    driverHandler->setOverclockValue(getDriverFiles().sysFs.pp_mclk_od, 0);
+    driverHandler->setNewValue(getDriverFiles().sysFs.pp_sclk_od, 0);
+    driverHandler->setNewValue(getDriverFiles().sysFs.pp_mclk_od, 0);
 }
 
 int gpu::getCurrentPowerPlayTableId(const QString &file) {

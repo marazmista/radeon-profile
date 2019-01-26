@@ -515,15 +515,6 @@ void dXorg::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
     setNewValue(driverFiles.sysFs.power_dpm_force_performance_level, newValue);
 }
 
-void dXorg::setPwmValue(unsigned int value) {
-    value = params.pwmMaxSpeed * value / 100;
-    setNewValue(driverFiles.hwmonAttributes.pwm1,QString().setNum(value));
-}
-
-void dXorg::setPwmManualControl(bool manual) {
-    setNewValue(driverFiles.hwmonAttributes.pwm1_enable, QString(manual ? pwm_manual : pwm_auto));
-}
-
 GPUFanSpeed dXorg::getFanSpeed() {
     GPUFanSpeed tmp;
 
@@ -730,10 +721,6 @@ QString dXorg::createDaemonSetCmd(const QString &file, const QString &value)
     return command;
 }
 
-void dXorg::setOverclockValue(const QString &file, const int percentage) {
-    setNewValue(file, QString::number(percentage));
-}
-
 PowerPlayTable dXorg::loadPowerPlayTable(const QString &file) {
     PowerPlayTable ppt;
     QStringList sl = getValueFromSysFsFile(file).split(QString::SkipEmptyParts);
@@ -747,10 +734,6 @@ PowerPlayTable dXorg::loadPowerPlayTable(const QString &file) {
     }
 
     return ppt;
-}
-
-void dXorg::setPowerPlayFreq(const QString &file, const int tableIndex) {
-    setNewValue(file, QString::number(tableIndex));
 }
 
 int dXorg::getCurrentPowerPlayTableId(const QString &file) {
@@ -803,7 +786,7 @@ const QMap<QString, FVTable> dXorg::loadOcTable() {
         }
 
         // unknown table title, not supported
-        if (s.right(1) == ":") {
+        if (s.endsWith(':')) {
             supportedTable = false;
             continue;
         }

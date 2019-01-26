@@ -238,7 +238,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 }
 
 void radeon_profile::refreshGpuData() {
-    device.refreshPowerLevel();
+    device.getPowerLevel();
     device.getClocks();
     device.getTemperature();
     device.getGpuUsage();

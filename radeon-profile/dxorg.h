@@ -61,8 +61,6 @@ public:
 
     void setPowerProfile(PowerProfiles newPowerProfile);
     void setForcePowerLevel(ForcePowerLevels newForcePowerLevel);
-    void setPwmManualControl(bool manual);
-    void setPwmValue(unsigned int value);
 
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure();
@@ -70,9 +68,9 @@ public:
     bool daemonConnected();
     GPUClocks getFeaturesFallback();
     void setupRegex(const QString &data);
-    void setOverclockValue(const QString &file, const int percentage);
-    void setPowerPlayFreq(const QString &file, const int tableIndex);
     int getCurrentPowerPlayTableId(const QString &file);
+    void setNewValue(const QString &filePath, const QString &newValue);
+
 
 private:
     QChar gpuSysIndex;
@@ -88,7 +86,6 @@ private:
     QString findSysfsHwmonForGPU();
     PowerMethod getPowerMethod();
     TemperatureSensor getTemperatureSensor();
-    void setNewValue(const QString &filePath, const QString &newValue);
     QString findSysFsHwmonForGpu();
     bool getIoctlAvailability();
     void figureOutDriverFeatures();

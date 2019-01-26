@@ -37,7 +37,7 @@ public:
     QList<QTreeWidgetItem *> getModuleInfo() const;
     QString getCurrentPowerLevel();
     QString getCurrentPowerProfile();
-    void refreshPowerLevel();
+    void getPowerLevel();
 
     void getClocks();
     void getTemperature();
