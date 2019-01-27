@@ -148,7 +148,7 @@ void radeon_profile::addRuntmeWidgets() {
     ui->label_version->setText(tr("version %n", NULL, appVersion));
 
     // version label
-    QLabel *l = new QLabel("v. " +QString().setNum(appVersion),this);
+    QLabel *l = new QLabel("v. " +QString::number(appVersion),this);
     QFont f;
     f.setStretch(QFont::Unstretched);
     f.setWeight(QFont::Bold);

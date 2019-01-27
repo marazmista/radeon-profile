@@ -257,17 +257,17 @@ GPUClocks dXorg::getClocksFromPmFile() {
                 switch (i) {
                     case 1:
                         if (dataStr[i].contains("current engine clock"))
-                            clocksData.coreClk = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
+                            clocksData.coreClk = QString::number(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
                         break;
 
                     case 3:
                         if (dataStr[i].contains("current memory clock"))
-                            clocksData.memClk = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
+                            clocksData.memClk = QString::number(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[3].toFloat() / 1000).toFloat();
                         break;
 
                     case 4:
                         if (dataStr[i].contains("voltage"))
-                            clocksData.coreVolt = QString().setNum(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toFloat();
+                            clocksData.coreVolt = QString::number(dataStr[i].split(' ',QString::SkipEmptyParts,Qt::CaseInsensitive)[1].toFloat()).toFloat();
                         break;
                 }
             }

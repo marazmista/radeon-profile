@@ -269,5 +269,5 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
 
 void radeon_profile::on_slider_fanSpeed_valueChanged(int value)
 {
-    ui->labelFixedSpeed->setText(QString().setNum(value)+"%");
+    ui->labelFixedSpeed->setText(QString::number(value)+"%");
 }
