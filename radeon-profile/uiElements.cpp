@@ -306,9 +306,9 @@ void radeon_profile::createOcProfileGraph() {
     setupAxis(axis_volts, Qt::white, tr("Voltage [mV]"));
 
     setupSeries(series_ocClockFreq, Qt::yellow, tr("Core frequency [MHz]"), axis_state, axis_frequency);
-    setupSeries(series_ocMemFreq, Qt::blue, tr("Memory Voltage [MHz]"), axis_state, axis_frequency);
-    setupSeries(series_ocCoreVolt, Qt::green, tr("Core Voltage [mV]"), axis_state, axis_volts);
-    setupSeries(series_ocMemVolt, Qt::cyan, tr("Memory Voltage [mV]"), axis_state, axis_volts);
+    setupSeries(series_ocMemFreq, Qt::blue, tr("Memory frequency [MHz]"), axis_state, axis_frequency);
+    setupSeries(series_ocCoreVolt, Qt::green, tr("Core voltage [mV]"), axis_state, axis_volts);
+    setupSeries(series_ocMemVolt, Qt::cyan, tr("Memory voltage [mV]"), axis_state, axis_volts);
 
     ui->verticalLayout_10->addWidget(chartView_oc);
 
