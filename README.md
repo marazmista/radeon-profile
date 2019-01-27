@@ -3,7 +3,14 @@ Simple application to read current clocks of ATi Radeon cards (xf86-video-ati, x
 # xf86-video-ati and xf86-video-amdgpu  driver
 Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-profile-daemon) for using this app as normal user. Otherwise app need to be run with root privilages for changing power profiles (and clocks readings sometimes). You can add `username ALL = NOPASSWD: /usr/bin/radeon-profile` to your `/etc/sudoers`. Here is tip for run app as normal user but involves change permissions to system files: http://bit.ly/1dvQMhS
 
-Fan control is available only on Radeon HD 7000 series and above.
+# Functionality
+
+* Monitoring of basic GPU parameters (frequencies, voltages, usage, temperature, fan speed)
+* DPM profiles and power levels
+* Fan control (HD 7000+), definition of multiple custom curves or fixed speed
+* Overclocking (amdgpu) (Wattman, Overdrive, PowerPlay etc)
+* Event derinitions (i.e. change fan profile when temp above defined or set DPM to high when selected binary executed)
+* Define binaries to run with set of envirnoment variablees (i.e. GALLIUM_HUD, MESA, LIBGL etc)
 
 # Dependencies
 
