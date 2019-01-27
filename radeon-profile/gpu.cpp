@@ -269,6 +269,7 @@ void gpu::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
 }
 
 void gpu::setPwmValue(unsigned int value) {
+    value = getGpuConstParams().pwmMaxSpeed * value / 100;
     driverHandler->setNewValue(getDriverFiles().hwmonAttributes.pwm1, QString::number(value));
 }
 
