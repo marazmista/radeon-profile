@@ -11,7 +11,7 @@
 #include <QString>
 #include <QStringList>
 
-dXorg::dXorg(const GPUSysInfo &si) {
+dXorg::dXorg(const GPUSysInfo &si) : ioctlHnd(nullptr) {
     features.sysInfo = si;
     configure();
     figureOutConstParams();

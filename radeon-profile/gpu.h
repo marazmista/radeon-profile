@@ -16,8 +16,7 @@ class gpu : public QObject
 
     Q_OBJECT
 public:
-    explicit gpu(QObject *parent = 0 ) : QObject(parent) {
-        currentGpuIndex = 0;
+    explicit gpu(QObject *parent = 0 ) : QObject(parent), currentGpuIndex(0) {
         connect(&futureGpuUsage, SIGNAL(finished()),this,SLOT(handleGpuUsageResult()));
     }
 

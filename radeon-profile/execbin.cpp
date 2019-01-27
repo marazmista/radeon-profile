@@ -7,16 +7,17 @@
 #include <QLabel>
 #include <QFileDialog>
 
-ExecBin::ExecBin() : QObject() {
-    p = new QProcess();
-    mainLay = new QVBoxLayout();
-    btnLay = new QHBoxLayout();
-    tab = new QWidget();
-    output = new QPlainTextEdit();
-    cmd = new QPlainTextEdit();
-    lStatus = new QLabel();
-    btnSave = new QPushButton();
+ExecBin::ExecBin() : QObject(),
+    tab(new QWidget()),
+    p(new QProcess(this)),
+    output(new QPlainTextEdit()),
+    cmd(new QPlainTextEdit()),
+    mainLay(new  QVBoxLayout()),
+    btnLay(new QHBoxLayout()),
+    lStatus(new QLabel()),
+    btnSave(new QPushButton())
 
+{
     setupTab();
 
     connect(p,SIGNAL(readyReadStandardOutput()),this,SLOT(execProcessReadOutput()));

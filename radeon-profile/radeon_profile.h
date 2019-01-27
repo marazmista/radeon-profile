@@ -161,7 +161,7 @@ private:
 
     QSystemTrayIcon *icon_tray;
     QAction *refreshWhenHidden;
-    QTimer *timer = nullptr;
+    QTimer *timer;
 
     gpu device;
     QList<ExecBin*> execsRunning;
@@ -170,8 +170,8 @@ private:
     QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
     unsigned int counter_ticks, counter_statsTick;
-    short hysteresisRelativeTepmerature = 0;
-    bool ocTableModified = false;
+    short hysteresisRelativeTepmerature;
+    bool ocTableModified;
     QButtonGroup group_pwm, group_Dpm;
     CurrentStateInfo *savedState;
     PlotManager plotManager;

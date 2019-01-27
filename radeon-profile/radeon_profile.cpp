@@ -33,6 +33,12 @@ unsigned int radeon_profile::minFanStepsSpeed = 10;
 
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
+    timer(new QTimer(this)),
+    counter_ticks(0),
+    counter_statsTick(0),
+    hysteresisRelativeTepmerature(0),
+    ocTableModified(false),
+    savedState(nullptr),
     ui(new Ui::radeon_profile)
 {
     ui->setupUi(this);
@@ -46,7 +52,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
         ui->label_rootWarrning->setVisible(false);
     }
 
-    timer = new QTimer(this);
     loadConfig();
 
     // find device and initialize it
@@ -58,10 +63,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
         return;
     }
-
-    counter_ticks = 0;
-    counter_statsTick = 0;
-    savedState = nullptr;
 
     // create runtime stuff, setup rest of ui
     setupUiElements();

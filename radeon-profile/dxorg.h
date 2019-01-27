@@ -25,7 +25,7 @@ class dXorg
     };
 
 public:
-    dXorg() { }
+    dXorg() : ioctlHnd(nullptr) { }
     dXorg(const GPUSysInfo &si);
 
     void cleanup() {
@@ -79,7 +79,7 @@ private:
     RxPatterns rxPatterns;
 
     daemonComm dcomm;
-    ioctlHandler *ioctlHnd = nullptr;
+    ioctlHandler *ioctlHnd;
 
     QString getClocksRawData(bool forFeatures = false);
     QString findSysfsHwmonForGPU();

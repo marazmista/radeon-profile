@@ -4,8 +4,7 @@
 #include "daemonComm.h"
 #include <QDebug>
 
-daemonComm::daemonComm() {
-    signalSender = new QLocalSocket(this);
+daemonComm::daemonComm() : signalSender(new QLocalSocket(this)) {
     feedback.setDevice(signalSender);
     connect(signalSender,SIGNAL(readyRead()), this, SLOT(receiveFeedback()));
 }
