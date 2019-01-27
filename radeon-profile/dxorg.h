@@ -57,7 +57,6 @@ public:
     QString getCurrentPowerProfile();
 
     int getPowerCapCurrent() const;
-    PowerCap getPowerCap() const;
 
     void setPowerProfile(PowerProfiles newPowerProfile);
     void setForcePowerLevel(ForcePowerLevels newForcePowerLevel);

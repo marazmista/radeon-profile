@@ -234,6 +234,12 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
             ui->tw_overclock->setTabEnabled(1, true);
             ui->btn_applyOverclock->setEnabled(true);
         }
+
+        if (device.getDriverFeatures().isPowerCapAvailable) {
+            ui->group_powerCap->setEnabled(true);
+
+            ui->slider_powerCap->setRange(device.getGpuConstParams().power1_cap_min, device.getGpuConstParams().power1_cap_max);
+        }
     }
 }
 
@@ -250,9 +256,12 @@ void radeon_profile::addTreeWidgetItem(QTreeWidget * parent, const QString &left
     parent->addTopLevelItem(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
 }
 
-QString radeon_profile::createCurrentMinMaxString(const ValueID idCurrent, const ValueID idMin, const ValueID idMax) {
-    return QString(device.gpuData.value(idCurrent).strValue + " (min: " + device.gpuData.value(idMin).strValue + " max: " + device.gpuData.value(idMax).strValue + ")");
+QString radeon_profile::createCurrentMinMaxString(const QString &current, const QString &min,  const QString &max) {
+    return QString(current + " (min: " + min + " max: " + max + ")");
+}
 
+QString radeon_profile::createCurrentMinMaxString(const ValueID idCurrent, const ValueID idMin, const ValueID idMax) {
+    return createCurrentMinMaxString(device.gpuData.value(idCurrent).strValue, device.gpuData.value(idMin).strValue, device.gpuData.value(idMax).strValue);
 }
 
 void radeon_profile::refreshUI() {
@@ -267,15 +276,15 @@ void radeon_profile::refreshUI() {
                     ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(ValueID::TEMPERATURE_CURRENT, ValueID::TEMPERATURE_MIN, ValueID::TEMPERATURE_MAX));
                     continue;
                 case ValueID::POWER_CAP_CURRENT:
-                    ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(ValueID::POWER_CAP_CURRENT, ValueID::POWER_CAP_MIN, ValueID::POWER_CAP_MAX));
+                    ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(device.gpuData.value(ValueID::POWER_CAP_CURRENT).strValue,
+                                                                                                   QString::number(device.getGpuConstParams().power1_cap_min),
+                                                                                                   QString::number(device.getGpuConstParams().power1_cap_max)));
                     continue;
 
                 // ignored values
                 case ValueID::TEMPERATURE_BEFORE_CURRENT:
                 case ValueID::TEMPERATURE_MIN:
                 case ValueID::TEMPERATURE_MAX:
-                case ValueID::POWER_CAP_MIN:
-                case ValueID::POWER_CAP_MAX:
                     continue;
 
                 default:
@@ -311,8 +320,6 @@ void radeon_profile::createCurrentGpuDataListItems()
             case ValueID::TEMPERATURE_BEFORE_CURRENT:
             case ValueID::TEMPERATURE_MIN:
             case ValueID::TEMPERATURE_MAX:
-            case ValueID::POWER_CAP_MIN:
-            case ValueID::POWER_CAP_MAX:
                 continue;
 
             default:

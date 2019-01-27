@@ -62,8 +62,8 @@ void radeon_profile::setupOcTableOverclock() {
     axis_state->setMax(device.getDriverFeatures().coreTable.lastKey());
     axis_state->setTickCount(device.getDriverFeatures().coreTable.keys().count());
 
-    axis_frequency->setTickCount(10);
-    axis_volts->setTickCount(10);
+    axis_frequency->setTickCount(8);
+    axis_volts->setTickCount(8);
 }
 
 QString displayRange(unsigned min, unsigned max) {
@@ -102,8 +102,13 @@ void radeon_profile::on_list_coreStates_itemDoubleClicked(QTreeWidgetItem *item,
         }
     }
 
+    if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
+        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+
     device.setOcTableValue("s", ui->list_coreStates->currentIndex().row(), FreqVoltPair(item->text(1).toUInt(), item->text(2).toUInt()));
     updateOcGraphSeries(device.getDriverFeatures().coreTable, static_cast<QLineSeries*>(chartView_oc->chart()->series()[type]), type);
+
+    ocTableModified = true;
 }
 
 void radeon_profile::on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -138,17 +143,37 @@ void radeon_profile::on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, 
         }
     }
 
+    if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
+        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+
     device.setOcTableValue("m", ui->list_memStates->currentIndex().row(), FreqVoltPair(item->text(1).toUInt(), item->text(2).toUInt()));
     updateOcGraphSeries(device.getDriverFeatures().coreTable, static_cast<QLineSeries*>(chartView_oc->chart()->series()[type]), type);
+    ocTableModified = true;
 }
 
 void radeon_profile::on_btn_applyOcTable_clicked()
 {
-    device.sendOcTableCommand("c");
+    if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
+        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+
+    if (ocTableModified)
+        device.sendOcTableCommand("c");
+
+    ocTableModified = false;
+
+    if (device.getDriverFeatures().isPowerCapAvailable && device.gpuData[ValueID::POWER_CAP_CURRENT].value != ui->slider_powerCap->value())
+        device.setPowerCap(ui->slider_powerCap->value());
 }
 
 void radeon_profile::on_btn_resetOcTable_clicked()
 {
     device.sendOcTableCommand("r");
     device.loadOcTable();
+
+    ocTableModified = false;
+}
+
+void radeon_profile::on_slider_powerCap_valueChanged(int value)
+{
+    ui->l_powerCapMax->setText(QString::number(value) + "W");
 }

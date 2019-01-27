@@ -169,16 +169,10 @@ void gpu::defineAvailableDataContainer() {
 
 
     if (driverHandler->features.isPowerCapAvailable) {
-        PowerCap tmpPowerCap = driverHandler->getPowerCap();
+        int tmpPowerCap = driverHandler->getPowerCapCurrent();
 
-        if (tmpPowerCap.min != -1)
-            gpuData.insert(ValueID::POWER_CAP_MIN, RPValue(ValueUnit::WATT, tmpPowerCap.min));
-
-        if (tmpPowerCap.max != -1)
-            gpuData.insert(ValueID::POWER_CAP_MAX, RPValue(ValueUnit::WATT, tmpPowerCap.max));
-
-        if (tmpPowerCap.current != -1)
-            gpuData.insert(ValueID::POWER_CAP_CURRENT, RPValue(ValueUnit::WATT, tmpPowerCap.current));
+        if (tmpPowerCap != -1)
+            gpuData.insert(ValueID::POWER_CAP_CURRENT, RPValue(ValueUnit::WATT, tmpPowerCap));
     }
 }
 
@@ -333,6 +327,10 @@ int gpu::getCurrentPowerPlayTableId(const QString &file) {
 void gpu::getPowerCapCurrent() {
     if (getDriverFeatures().isPowerCapAvailable)
         gpuData[ValueID::POWER_CAP_CURRENT].setValue(driverHandler->getPowerCapCurrent());
+}
+
+void gpu::setPowerCap(const unsigned int value) {
+    driverHandler->setNewValue(getDriverFiles().hwmonAttributes.power1_cap, QString::number(value + MICROWATT_DIVIDER));
 }
 
 void gpu::setOcTableValue(const QString &type, int powerState, const FreqVoltPair powerStateValues) {

@@ -53,6 +53,7 @@ public:
     void setPwmValue(unsigned int value);
     void setOcTableValue(const QString &type, int powerState, const FreqVoltPair powerStateValues);
     void sendOcTableCommand(const QString cmd);
+    void setPowerCap(const unsigned value);
 
     void detectCards();
     bool initialize();

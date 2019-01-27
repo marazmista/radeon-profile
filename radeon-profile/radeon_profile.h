@@ -149,6 +149,7 @@ private slots:
     void on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_applyOcTable_clicked();
     void on_btn_resetOcTable_clicked();
+    void on_slider_powerCap_valueChanged(int value);
 
 private:
     struct CurrentStateInfo {
@@ -170,6 +171,7 @@ private:
     QMap<QString, unsigned int> pmStats;
     unsigned int counter_ticks, counter_statsTick;
     short hysteresisRelativeTepmerature = 0;
+    bool ocTableModified = false;
     QButtonGroup group_pwm, group_Dpm;
     CurrentStateInfo *savedState;
     PlotManager plotManager;
@@ -241,6 +243,7 @@ private:
     void applyOc();
     void setupPlot(const PlotDefinitionSchema &pds);
     QString createCurrentMinMaxString(const ValueID idCurrent, const ValueID idMin, const ValueID idMax);
+    QString createCurrentMinMaxString(const QString &current, const QString &min,  const QString &max);
     void addDpmButtons();
     void createFanProfileGraph();
     void setupOcTableOverclock();

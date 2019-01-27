@@ -684,6 +684,13 @@ void dXorg::figureOutConstParams() {
 
     if (!driverFiles.hwmonAttributes.pwm1_max.isEmpty())
         params.pwmMaxSpeed = getValueFromSysFsFile(driverFiles.hwmonAttributes.pwm1_max).toInt();
+
+    if (!driverFiles.hwmonAttributes.power1_cap_min.isEmpty())
+        params.power1_cap_min = getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap_min).toInt() / MICROWATT_DIVIDER;
+
+    if (!driverFiles.hwmonAttributes.power1_cap_max.isEmpty())
+        params.power1_cap_max = getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap_max).toInt() / MICROWATT_DIVIDER;
+
 }
 
 GPUClocks dXorg::getFeaturesFallback() {
@@ -749,11 +756,6 @@ int dXorg::getPowerCapCurrent() const {
     return getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER;
 }
 
-PowerCap dXorg::getPowerCap() const {
-    return PowerCap(getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap_min).toInt() / MICROWATT_DIVIDER,
-                    getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap_max).toInt() / MICROWATT_DIVIDER,
-                    getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER);
-}
 
 const QMap<QString, FVTable> dXorg::parseOcTable() {
     bool supportedTable = false;

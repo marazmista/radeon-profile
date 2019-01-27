@@ -56,8 +56,6 @@ enum ValueID {
     FAN_SPEED_PERCENT,
     FAN_SPEED_RPM,
     POWER_LEVEL,
-    POWER_CAP_MIN,
-    POWER_CAP_MAX,
     POWER_CAP_CURRENT
 };
 
@@ -355,18 +353,8 @@ struct GPUUsage {
 };
 
 struct GPUConstParams {
-     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1, temp1_crit = -1;
+     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1, temp1_crit = -1, power1_cap_max = -1, power1_cap_min = -1;
      float VRAMSize = -1;
-};
-
-struct PowerCap {
-    int min = -1, max = -1, current = -1;
-
-    PowerCap(const int _min, const int _max, const int _current) {
-        min = _min;
-        max = _max;
-        current = _current;
-    }
 };
 
 class globalStuff {
@@ -426,8 +414,6 @@ public:
                 return ValueUnit::MEGABYTE;
 
             case ValueID::POWER_CAP_CURRENT:
-            case ValueID::POWER_CAP_MAX:
-            case ValueID::POWER_CAP_MIN:
                 return ValueUnit::WATT;
 
             default:
@@ -473,8 +459,6 @@ public:
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram megabyte usage");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level");
             case ValueID::POWER_CAP_CURRENT: return QObject::tr("Power cap");
-            case ValueID::POWER_CAP_MIN: return QObject::tr("Power cap (min)");
-            case ValueID::POWER_CAP_MAX: return QObject::tr("Power cap (max)");
 
             default:
                  return "";
@@ -497,8 +481,6 @@ public:
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram usage [MB]");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level ");
             case ValueID::POWER_CAP_CURRENT: return  QObject::tr("Power cap [W]");
-            case ValueID::POWER_CAP_MIN: return  QObject::tr("Power cap (min) [W]");
-            case ValueID::POWER_CAP_MAX: return  QObject::tr("Power cap (max) [W]");
 
             default:
                 return "";
