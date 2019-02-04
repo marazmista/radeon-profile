@@ -791,7 +791,7 @@ const QMap<QString, FVTable> dXorg::parseOcTable() {
         if (!supportedTable)
             continue;
 
-        QStringList state = s.replace(" ","").replace(":", "|").replace("MHz", "|").replace("Mhz","|").replace("mV", "|").split("|",QString::SkipEmptyParts);
+        QStringList state = s.remove(" ").replace(QRegularExpression(":|MHz|mV", QRegularExpression::CaseInsensitiveOption), "|").split("|", QString::SkipEmptyParts);
 
         // read and setup OC ranges
         if (state[0] == "SCLK") {
