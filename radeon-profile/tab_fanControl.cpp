@@ -8,8 +8,8 @@
 void radeon_profile::createDefaultFanProfile() {
     FanProfileSteps p;
 
-    p.insert(40,35);
-    p.insert(65,maxFanStepsSpeed);
+    p.insert(40, 35);
+    p.insert(65, maxFanStepSpeed);
     fanProfiles.insert("default", p);
 }
 
@@ -60,16 +60,6 @@ void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
 
 void radeon_profile::markFanProfileUnsaved(bool unsaved) {
     ui->l_fanProfileUnsavedIndicator->setVisible(unsaved);
-}
-
-void radeon_profile::on_cb_zeroPercentFanSpeed_clicked(bool checked)
-{
-    if (checked && !askConfirmation(tr("Question"), tr("This option may cause overheat of your card and it is your responsibility if this happens. Do you want to enable it?"))) {
-        ui->cb_zeroPercentFanSpeed->setChecked(false);
-        return;
-    }
-
-    setupMinFanSpeedSetting((checked) ? 0 : 10);
 }
 
 void radeon_profile::on_btn_removeFanProfile_clicked()
@@ -182,14 +172,14 @@ void radeon_profile::on_btn_fanInfo_clicked()
 
 void radeon_profile::on_btn_addFanStep_clicked()
 {
-    const int temperature = askNumber(0, minFanStepsTemp, maxFanStepsTemp, tr("Temperature"));
+    const int temperature = askNumber(0, minFanStepTemperature, maxFanStepTemperature, tr("Temperature"));
     if (temperature == -1) // User clicked Cancel
         return;
 
     if (currentFanProfile.contains(temperature)) // A step with this temperature already exists
         QMessageBox::warning(this, tr("Error"), tr("This step already exists. Double click on it, to change its value"));
     else { // This step does not exist, proceed
-        const int fanSpeed = askNumber(0, minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%]"));
+        const int fanSpeed = askNumber(0, minFanStepSpeed, maxFanStepSpeed, tr("Speed [%]"));
         if (fanSpeed == -1) // User clicked Cancel
             return;
 
@@ -226,8 +216,8 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
 
     switch (column) {
         case 0: {
-            int newTemp = askNumber(item->text(column).toInt(),  (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(0).toInt() + 1 : minFanStepsTemp,
-                                    (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(0).toInt() - 1 : maxFanStepsTemp,
+            int newTemp = askNumber(item->text(column).toInt(),  (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(0).toInt() + 1 : minFanStepTemperature,
+                                    (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(0).toInt() - 1 : maxFanStepTemperature,
                                     tr("Temperature"));
 
             if (newTemp == -1)
@@ -237,8 +227,8 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
             break;
         }
         case 1: {
-            int newSpeed = askNumber(item->text(column).toInt(),  (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepsSpeed,
-                                     (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toInt() - 1 : maxFanStepsSpeed,
+            int newSpeed = askNumber(item->text(column).toInt(),  (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepSpeed,
+                                     (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toInt() - 1 : maxFanStepSpeed,
                                      tr("Speed [%]"));
 
             if (newSpeed == -1)

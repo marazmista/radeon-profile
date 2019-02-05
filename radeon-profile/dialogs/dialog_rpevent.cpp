@@ -16,7 +16,6 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
     setFixedSize(size());
 
     setFixedFanSpeedVisibility(false);
-    ui->spin_fixedFanSpeed->setMinimum(radeon_profile::minFanStepsSpeed);
 }
 
 void Dialog_RPEvent::setFeatures(const GPUDataContainer &gpuData, const DriverFeatures &features, const QList<QString> &profiles) {

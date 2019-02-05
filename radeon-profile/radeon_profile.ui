@@ -1845,23 +1845,10 @@
             <property name="spacing">
              <number>5</number>
             </property>
-            <item row="2" column="0">
-             <widget class="QLabel" name="l_minFanSpeed">
-              <property name="font">
-               <font>
-                <family>Monospace</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>10%</string>
-              </property>
-             </widget>
-            </item>
             <item row="2" column="1">
              <widget class="QSlider" name="slider_fanSpeed">
               <property name="minimum">
-               <number>10</number>
+               <number>0</number>
               </property>
               <property name="maximum">
                <number>100</number>
@@ -1941,7 +1928,6 @@
            </layout>
            <zorder>btn_pwmFixedApply</zorder>
            <zorder>slider_fanSpeed</zorder>
-           <zorder>l_minFanSpeed</zorder>
            <zorder>labelFixedSpeed</zorder>
           </widget>
           <widget class="QWidget" name="page_profile">
@@ -3877,13 +3863,6 @@
                 <widget class="QCheckBox" name="cb_saveFanMode">
                  <property name="text">
                   <string>Save selected fan control mode</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="cb_zeroPercentFanSpeed">
-                 <property name="text">
-                  <string>Enable 0% fan speed</string>
                  </property>
                 </widget>
                </item>

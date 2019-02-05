@@ -52,7 +52,6 @@ void radeon_profile::saveConfig() {
         settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
         settings.setValue("fanMode",ui->stack_fanModes->currentIndex());
         settings.setValue("fanProfileName",ui->l_currentFanProfile->text());
-        settings.setValue("enableZeroPercentFanSpeed", ui->cb_zeroPercentFanSpeed->isChecked());
 
         settings.setValue("overclockEnabled", ui->group_oc->isChecked());
         settings.setValue("manualFreqEnabled", ui->group_freq->isChecked());
@@ -232,7 +231,6 @@ void radeon_profile::loadConfig() {
     ui->slider_fanSpeed->setValue(settings.value("fanSpeedSlider",20).toInt());
     ui->cb_saveFanMode->setChecked(settings.value("saveSelectedFanMode",false).toBool());
     ui->l_currentFanProfile->setText(settings.value("fanProfileName","default").toString());
-    ui->cb_zeroPercentFanSpeed->setChecked(settings.value("enableZeroPercentFanSpeed",false).toBool());
     if (ui->cb_saveFanMode->isChecked())
         ui->stack_fanModes->setCurrentIndex(settings.value("fanMode",0).toInt());
 
@@ -277,9 +275,6 @@ void radeon_profile::loadConfig() {
         ui->tw_systemInfo->setTabEnabled(3,true);
     else
         ui->tw_systemInfo->setTabEnabled(3,false);
-
-    if (ui->cb_zeroPercentFanSpeed->isChecked())
-        setupMinFanSpeedSetting(0);
 
     ui->list_currentGPUData->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
     ui->list_glxinfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
@@ -452,10 +447,4 @@ void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
             return;
         }
     }
-}
-
-void radeon_profile::setupMinFanSpeedSetting(unsigned int speed) {
-    minFanStepsSpeed = speed;
-    ui->l_minFanSpeed->setText(QString::number(minFanStepsSpeed)+"%");
-    ui->slider_fanSpeed->setMinimum(minFanStepsSpeed);
 }

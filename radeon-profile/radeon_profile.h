@@ -21,10 +21,11 @@
 #include <QButtonGroup>
 #include <QXmlStreamWriter>
 
-#define minFanStepsTemp 0
-#define maxFanStepsTemp 99
+#define minFanStepTemperature 0
+#define maxFanStepTemperature 100
 
-#define maxFanStepsSpeed 100
+#define minFanStepSpeed 0
+#define maxFanStepSpeed 100
 
 #define appVersion 20190127
 
@@ -58,8 +59,6 @@ class radeon_profile : public QMainWindow
     };
 
 public:
-    static unsigned int minFanStepsSpeed;
-
     explicit radeon_profile(QWidget *parent = 0);
     ~radeon_profile();
     
@@ -116,7 +115,6 @@ private slots:
     void on_btn_saveFanProfile_clicked();
     void on_btn_saveAsFanProfile_clicked();
     void fanProfileMenuActionClicked(QAction *a);
-    void on_cb_zeroPercentFanSpeed_clicked(bool checked);
     void on_btn_addEvent_clicked();
     void on_list_events_itemChanged(QTreeWidgetItem *item, int column);
     void on_btn_eventsInfo_clicked();
@@ -207,7 +205,6 @@ private:
     void addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
     void setupFanProfilesMenu(const bool rebuildMode = false);
     int findCurrentFanProfileMenuIndex();
-    void setupMinFanSpeedSetting(unsigned int speed);
     void markFanProfileUnsaved(bool unsaved);
     void checkEvents();
     void activateEvent(const RPEvent &rpe);

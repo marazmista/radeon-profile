@@ -28,9 +28,6 @@
 #include <QMessageBox>
 #include <QDebug>
 
-unsigned int radeon_profile::minFanStepsSpeed = 10;
-
-
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
     timer(new QTimer(this)),
@@ -424,9 +421,7 @@ void radeon_profile::adjustFanSpeed() {
             lTemperature = low.key();
 
     float speed = (float)(hSpeed - lSpeed) / (float)(hTemperature - lTemperature)  * (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value - lTemperature)  + lSpeed;
-
-    device.setPwmValue((speed < minFanStepsSpeed) ? minFanStepsSpeed : speed);
-
+    device.setPwmValue(speed);
 }
 
 
