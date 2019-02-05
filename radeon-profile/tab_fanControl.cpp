@@ -7,10 +7,9 @@
 
 void radeon_profile::createDefaultFanProfile() {
     FanProfileSteps p;
-    p.insert(0,minFanStepsSpeed);
-    p.insert(65,maxFanStepsSpeed);
-    p.insert(90,maxFanStepsSpeed);
 
+    p.insert(40,35);
+    p.insert(65,maxFanStepsSpeed);
     fanProfiles.insert("default", p);
 }
 
@@ -21,33 +20,30 @@ void radeon_profile::createFanProfileListaAndGraph(const QString &profileName) {
     series->clear();
     ui->list_fanSteps->clear();
 
+    series->append(0, profile.first());
+
     for (int temperature : profile.keys()) {
         series->append(temperature, profile.value(temperature));
         ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.value(temperature))));
     }
+
+    series->append(100, profile.last());
 }
 
 void radeon_profile::makeFanProfilePlot() {
     auto series = static_cast<QLineSeries*>(chartView_fan->chart()->series()[0]);
     series->clear();
 
+    series->append(0, ui->list_fanSteps->topLevelItem(0)->text(1).toInt());
+
     for (int i = 0; i < ui->list_fanSteps->topLevelItemCount(); ++i)
         series->append(ui->list_fanSteps->topLevelItem(i)->text(0).toInt(), ui->list_fanSteps->topLevelItem(i)->text(1).toInt());
-}
 
-bool radeon_profile::isFanStepValid(const unsigned int temperature, const unsigned int fanSpeed) {
-    return temperature <= maxFanStepsTemp &&
-            fanSpeed >= minFanStepsSpeed &&
-            fanSpeed <= maxFanStepsSpeed;
+
+    series->append(100, ui->list_fanSteps->topLevelItem(ui->list_fanSteps->topLevelItemCount() - 1)->text(1).toInt());
 }
 
 void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
-
-    if (!isFanStepValid(temperature, fanSpeed)) {
-        qWarning() << "Invalid value, can't be inserted into the fan step list:" << temperature << fanSpeed;
-        return;
-    }
-
     const QString temperatureString = QString::number(temperature),
             speedString = QString::number(fanSpeed);
     const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString,Qt::MatchExactly);
@@ -96,8 +92,12 @@ void radeon_profile::on_btn_removeFanProfile_clicked()
 void radeon_profile::on_btn_saveFanProfile_clicked()
 {
     markFanProfileUnsaved(false);
-    fanProfiles.insert(ui->combo_fanProfiles->currentText(), stepsListToMap());
+    const auto fanProfile = stepsListToMap();
+    fanProfiles.insert(ui->combo_fanProfiles->currentText(), fanProfile);
     saveConfig();
+
+    if (ui->combo_fanProfiles->currentText() == ui->l_currentFanProfile->text())
+        currentFanProfile = fanProfile;
 }
 
 int radeon_profile::findCurrentFanProfileMenuIndex() {
@@ -114,11 +114,6 @@ int radeon_profile::findCurrentFanProfileMenuIndex() {
 void radeon_profile::on_btn_saveAsFanProfile_clicked()
 {
     QString name =  QInputDialog::getText(this, "", tr("Fan profile name:"));
-
-    if (name.contains('|')) {
-        QMessageBox::information(this, "", tr("Profile name musn't contain '|' character."), QMessageBox::Ok);
-        return;
-    }
 
     if (fanProfiles.contains(name)) {
         QMessageBox::information(this, "", tr("Cannot add another profile with the same name that already exists."),QMessageBox::Ok);
@@ -207,18 +202,14 @@ void radeon_profile::on_btn_addFanStep_clicked()
 
 void radeon_profile::on_btn_removeFanStep_clicked()
 {
-    QTreeWidgetItem *current = ui->list_fanSteps->currentItem();
-
-    if (ui->list_fanSteps->indexOfTopLevelItem(current) == 0 || ui->list_fanSteps->indexOfTopLevelItem(current) == ui->list_fanSteps->topLevelItemCount()-1) {
-        // The selected item is the first or the last, it can't be deleted
-        QMessageBox::warning(this, tr("Error"), tr("You can't delete the first and the last item"));
+    // at least one element must stay
+    if (ui->list_fanSteps->topLevelItemCount() == 1)
         return;
-    }
+
+    QTreeWidgetItem *current = ui->list_fanSteps->takeTopLevelItem(ui->list_fanSteps->currentIndex().row());
 
     // The selected item can be removed, remove it
-    int temperature = current->text(0).toInt();
-
-    currentFanProfile.remove(temperature);
+    currentFanProfile.remove(current->text(0).toInt());
     adjustFanSpeed();
 
     // Remove the step from the list and from the graph
@@ -231,20 +222,13 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 
 void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    if (ui->list_fanSteps->indexOfTopLevelItem(item) == ui->list_fanSteps->topLevelItemCount()-1) {
-        // The selected item is the first or the last, it can't be edited
-        QMessageBox::warning(this, tr("Error"), tr("You can't edit the last item"));
-        return;
-    }
-
-    if (ui->list_fanSteps->indexOfTopLevelItem(item) == 0 && column == 0) {
-        QMessageBox::warning(this, tr("Error"), tr("You can't edit temperature of the first item"));
-        return;
-    }
+    auto index = ui->list_fanSteps->currentIndex().row();
 
     switch (column) {
         case 0: {
-            int newTemp = askNumber(item->text(column).toInt(), minFanStepsTemp, maxFanStepsTemp, tr("Temperature"));
+            int newTemp = askNumber(item->text(column).toInt(),  (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(0).toInt() + 1 : minFanStepsTemp,
+                                    (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(0).toInt() - 1 : maxFanStepsTemp,
+                                    tr("Temperature"));
 
             if (newTemp == -1)
                 return;
@@ -253,7 +237,9 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
             break;
         }
         case 1: {
-            int newSpeed = askNumber(item->text(column).toInt(), minFanStepsSpeed, maxFanStepsSpeed, tr("Speed [%]"));
+            int newSpeed = askNumber(item->text(column).toInt(),  (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepsSpeed,
+                                     (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toInt() - 1 : maxFanStepsSpeed,
+                                     tr("Speed [%]"));
 
             if (newSpeed == -1)
                 return;

@@ -393,27 +393,30 @@ void radeon_profile::adjustFanSpeed() {
 
     hysteresisRelativeTepmerature = device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value;
 
+    // exact match
     if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {
         device.setPwmValue(currentFanProfile.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));
         return;
     }
 
+    // below first step
+    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value <= currentFanProfile.firstKey()) {
+        device.setPwmValue(currentFanProfile.first());
+        return;
+    }
+
+    // above last setep
+    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value >= currentFanProfile.lastKey()) {
+        device.setPwmValue(currentFanProfile.last());
+        return;
+    }
+
     // find bounds of current temperature
-    QMap<int,unsigned int>::const_iterator high = currentFanProfile.upperBound(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
-    QMap<int,unsigned int>::const_iterator low = (currentFanProfile.size() > 1 ? high - 1 : high);
+    auto high = currentFanProfile.upperBound(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+    auto low = (currentFanProfile.size() > 1 ? high - 1 : high);
 
     int hSpeed = high.value(),
             lSpeed = low.value();
-
-    if (high == currentFanProfile.constBegin()) {
-        device.setPwmValue(hSpeed);
-        return;
-    }
-
-    if (low == currentFanProfile.constEnd()) {
-        device.setPwmValue(lSpeed);
-        return;
-    }
 
     // calculate two point stright line equation based on boundaries of current temperature
     // y = mx + b = (y2-y1)/(x2-x1)*(x-x1)+y1

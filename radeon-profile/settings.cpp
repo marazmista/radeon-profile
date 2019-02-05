@@ -443,7 +443,7 @@ void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
 
     FanProfileSteps fps;
     while (xml.readNext()) {
-        if (xml.name().toString() == "step")
+        if (xml.name().toString() == "step" && !xml.attributes().value("temperature").isEmpty())
             fps.insert(xml.attributes().value("temperature").toString().toInt(),
                        xml.attributes().value("speed").toString().toInt());
 
