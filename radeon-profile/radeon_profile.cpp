@@ -149,7 +149,6 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     // SETUP FAN CONTROL
     if (features.isFanControlAvailable && features.isChangeProfileAvailable) {
         qDebug() << "Fan control available";
-        on_slider_fanSpeed_valueChanged(ui->slider_fanSpeed->value());
         ui->l_fanProfileUnsavedIndicator->setVisible(false);
 
         // set pwm buttons in group

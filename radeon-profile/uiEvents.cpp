@@ -52,7 +52,7 @@ void radeon_profile::setPerformance() {
 void radeon_profile::on_btn_pwmFixedApply_clicked()
 {
     device.setPwmValue(ui->slider_fanSpeed->value());
-    ui->btn_fanControl->menu()->actions()[1]->setText(tr("Fixed ") + ui->labelFixedSpeed->text());
+    ui->btn_fanControl->menu()->actions()[1]->setText(tr("Fixed ") + ui->spin_fanFixedSpeed->text());
     ui->btn_fanControl->setText(ui->btn_fanControl->menu()->actions()[1]->text());
 }
 

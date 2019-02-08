@@ -137,8 +137,3 @@ void radeon_profile::on_btn_resetOcTable_clicked()
 
     ocTableModified = false;
 }
-
-void radeon_profile::on_slider_powerCap_valueChanged(int value)
-{
-    ui->l_powerCapMax->setText(QString::number(value) + "W");
-}

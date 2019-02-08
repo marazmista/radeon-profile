@@ -107,7 +107,6 @@ private slots:
     void on_btn_addFanStep_clicked();
     void on_btn_removeFanStep_clicked();
     void on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column);
-    void on_slider_fanSpeed_valueChanged(int value);
     void on_btn_applyOverclock_clicked();
     void on_slider_ocSclk_valueChanged(int value);
     void on_btn_activateFanProfile_clicked();
@@ -147,7 +146,6 @@ private slots:
     void on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_applyOcTable_clicked();
     void on_btn_resetOcTable_clicked();
-    void on_slider_powerCap_valueChanged(int value);
 
 private:
     struct CurrentStateInfo {

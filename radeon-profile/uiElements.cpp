@@ -181,7 +181,7 @@ void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
     connect(fanAuto, SIGNAL(triggered()), this, SLOT(on_btn_pwmAuto_clicked()));
 
     QAction *fanFixed = new QAction(menu_fanProfiles);
-    fanFixed->setText(tr("Fixed ") + ui->labelFixedSpeed->text());
+    fanFixed->setText(tr("Fixed ") + ui->spin_fanFixedSpeed->text());
     fanFixed->setCheckable(true);
     fanFixed->setActionGroup(ag);
     connect(fanFixed, SIGNAL(triggered()), this, SLOT(on_btn_pwmFixed_clicked()));
