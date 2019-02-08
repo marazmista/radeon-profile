@@ -34,8 +34,7 @@ public:
     explicit Dialog_sliders(const DialogSlidersConfig &config, const QString &tile, QWidget *parent = nullptr);
     ~Dialog_sliders();
 
-    unsigned getValue1() const;
-    unsigned getValue2() const;
+    unsigned getValue(DialogSet set) const;
 
 private slots:
     void on_btn_ok_clicked();

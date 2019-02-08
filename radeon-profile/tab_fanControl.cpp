@@ -237,8 +237,8 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
         return;
     }
 
-    item->setText(0, QString::number(d->getValue1()));
-    item->setText(1, QString::number(d->getValue2()));
+    item->setText(0, QString::number(d->getValue(DialogSet::FIRST)));
+    item->setText(1, QString::number(d->getValue(DialogSet::SECOND)));
 
     markFanProfileUnsaved(true);
     makeFanProfilePlot();

@@ -20,15 +20,14 @@ Dialog_sliders::Dialog_sliders(const DialogSlidersConfig &config, const QString 
 
     ui->slider_value1->setRange(config.mins[DialogSet::FIRST], config.maxes[DialogSet::FIRST]);
     ui->slider_value2->setRange(config.mins[DialogSet::SECOND], config.maxes[DialogSet::SECOND]);
-
-    ui->slider_value1->setValue(config.values[DialogSet::FIRST]);
-    ui->slider_value2->setValue(config.values[DialogSet::SECOND]);
-
     ui->spin_value1->setRange(config.mins[DialogSet::FIRST], config.maxes[DialogSet::FIRST]);
     ui->spin_value2->setRange(config.mins[DialogSet::SECOND], config.maxes[DialogSet::SECOND]);
 
     ui->spin_value1->setSuffix(config.suffixes[DialogSet::FIRST]);
     ui->spin_value2->setSuffix(config.suffixes[DialogSet::SECOND]);
+
+    ui->slider_value1->setValue(config.values[DialogSet::FIRST]);
+    ui->slider_value2->setValue(config.values[DialogSet::SECOND]);
 }
 
 Dialog_sliders::~Dialog_sliders()
@@ -46,10 +45,11 @@ void Dialog_sliders::on_btn_cancel_clicked()
     reject();
 }
 
-unsigned Dialog_sliders::getValue1() const {
-    return ui->slider_value1->value();
-}
-
-unsigned Dialog_sliders::getValue2() const {
-    return ui->slider_value2->value();
+unsigned Dialog_sliders::getValue(DialogSet set) const {
+    switch (set) {
+        case DialogSet::FIRST:
+            return ui->slider_value1->value();
+        case DialogSet::SECOND:
+            return ui->slider_value2->value();
+    }
 }

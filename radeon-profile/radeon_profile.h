@@ -244,6 +244,8 @@ private:
     void createFanProfileGraph();
     void setupOcTableOverclock();
     void updateOcGraphSeries(const FVTable &table, QLineSeries *series, OcSeriesType type);
+    void adjustState(const QTreeWidget *list, QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange,
+                     OcSeriesType frequencyType, OcSeriesType voltageType, const FVTable &table, const QString s);
 };
 
 #endif // RADEON_PROFILE_H

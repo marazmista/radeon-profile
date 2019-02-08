@@ -1,10 +1,10 @@
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
 
+#include "dialogs/dialog_sliders.h"
+
 #include <QMessageBox>
 #include <QMenu>
-#include <QInputDialog>
-
 
 void loadOcTable(const FVTable &table, QTreeWidget *list, QLineSeries *series_Freq, QLineSeries *series_Voltage) {
     for (const unsigned k :  table.keys()) {
@@ -66,89 +66,54 @@ void radeon_profile::setupOcTableOverclock() {
     axis_volts->setTickCount(8);
 }
 
-QString displayRange(unsigned min, unsigned max) {
-    return " [" + QString::number(min) + " - " + QString::number(max) + "]";
+void radeon_profile::adjustState(const QTreeWidget *list, QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange,
+                                 OcSeriesType frequencyType, OcSeriesType voltageType, const FVTable &table, const QString stateTypeString) {
+
+    auto index = list->currentIndex().row();
+
+    DialogSlidersConfig dialogConfig;
+
+    dialogConfig.configureSet(DialogSet::FIRST, tr("Frequency"), "MHz", frequencyRange.min, frequencyRange.max,
+                              item->text(1).toUInt());
+
+    dialogConfig.configureSet(DialogSet::SECOND, tr("Voltage"), "mV", voltageRange.min, voltageRange.max,
+                              item->text(2).toUInt());
+
+    auto d = new Dialog_sliders(dialogConfig, tr("Adjust state"), this);
+
+    if (d->exec() == QDialog::Rejected) {
+        delete d;
+        return;
+    }
+
+    item->setText(1, QString::number(d->getValue(DialogSet::FIRST)));
+    item->setText(2, QString::number(d->getValue(DialogSet::SECOND)));
+
+    if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
+        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+
+    device.setOcTableValue(stateTypeString, index, FreqVoltPair(item->text(1).toUInt(), item->text(2).toUInt()));
+    updateOcGraphSeries(table, static_cast<QLineSeries*>(chartView_oc->chart()->series()[frequencyType]), frequencyType);
+    updateOcGraphSeries(table, static_cast<QLineSeries*>(chartView_oc->chart()->series()[voltageType]), voltageType);
+
+    ocTableModified = true;
+    delete d;
 }
 
 void radeon_profile::on_list_coreStates_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    OcSeriesType type;
+    Q_UNUSED(column);
 
-    switch (column) {
-        case 0:
-            return;
-
-        case 1: {
-            int newFrequency = askNumber(item->text(column).toInt(), device.getDriverFeatures().coreRange.min, device.getDriverFeatures().coreRange.max,
-                                         tr("Core frequency") + displayRange(device.getDriverFeatures().coreRange.min, device.getDriverFeatures().coreRange.max));
-
-            if (newFrequency == -1)
-                return;
-
-            item->setText(column, QString::number(newFrequency));
-            type = OcSeriesType::CORE_FREQUENCY;
-            break;
-        }
-        case 2: {
-            int newVoltage = askNumber(item->text(column).toInt(), device.getDriverFeatures().voltageRange.min, device.getDriverFeatures().voltageRange.max,
-                                       tr("Core voltage") + displayRange(device.getDriverFeatures().voltageRange.min, device.getDriverFeatures().voltageRange.max));
-
-            if (newVoltage == -1)
-                return;
-
-            item->setText(column, QString::number(newVoltage));
-            type = OcSeriesType::CORE_VOLTAGE;
-            break;
-        }
-    }
-
-    if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
-        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
-
-    device.setOcTableValue("s", ui->list_coreStates->currentIndex().row(), FreqVoltPair(item->text(1).toUInt(), item->text(2).toUInt()));
-    updateOcGraphSeries(device.getDriverFeatures().coreTable, static_cast<QLineSeries*>(chartView_oc->chart()->series()[type]), type);
-
-    ocTableModified = true;
+    adjustState(ui->list_coreStates, item, device.getDriverFeatures().coreRange, device.getDriverFeatures().voltageRange,
+                OcSeriesType::CORE_FREQUENCY, OcSeriesType::CORE_VOLTAGE, device.getDriverFeatures().coreTable, "s");
 }
 
 void radeon_profile::on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    OcSeriesType type;
+    Q_UNUSED(column);
 
-    switch (column) {
-        case 0:
-            return;
-
-        case 1: {
-            int newFrequency = askNumber(item->text(column).toInt(), device.getDriverFeatures().memRange.min, device.getDriverFeatures().memRange.max,
-                                         tr("Memory frequency") + displayRange(device.getDriverFeatures().memRange.min, device.getDriverFeatures().memRange.max));
-
-            if (newFrequency == -1)
-                return;
-
-            item->setText(column, QString::number(newFrequency));
-            type = OcSeriesType::MEM_FREQUENCY;
-            break;
-        }
-        case 2: {
-            int newVoltage = askNumber(item->text(column).toInt(), device.getDriverFeatures().voltageRange.min, device.getDriverFeatures().voltageRange.max,
-                                       tr("Memory voltage") + displayRange(device.getDriverFeatures().voltageRange.min, device.getDriverFeatures().voltageRange.max));
-
-            if (newVoltage == -1)
-                return;
-
-            item->setText(column, QString::number(newVoltage));
-            type = OcSeriesType::MEM_VOLTAGE;
-            break;
-        }
-    }
-
-    if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
-        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
-
-    device.setOcTableValue("m", ui->list_memStates->currentIndex().row(), FreqVoltPair(item->text(1).toUInt(), item->text(2).toUInt()));
-    updateOcGraphSeries(device.getDriverFeatures().coreTable, static_cast<QLineSeries*>(chartView_oc->chart()->series()[type]), type);
-    ocTableModified = true;
+    adjustState(ui->list_memStates, item, device.getDriverFeatures().memRange, device.getDriverFeatures().voltageRange,
+                OcSeriesType::MEM_FREQUENCY, OcSeriesType::MEM_VOLTAGE, device.getDriverFeatures().memTable, "m");
 }
 
 void radeon_profile::on_btn_applyOcTable_clicked()
