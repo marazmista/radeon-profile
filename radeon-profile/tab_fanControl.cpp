@@ -218,20 +218,17 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
     auto index = ui->list_fanSteps->currentIndex().row();
 
     DialogSlidersConfig dialogConfig;
-    dialogConfig.label1 = tr("Temperature");
-    dialogConfig.label2 = tr("Fan speed");
 
-    dialogConfig.suffix1 = QString::fromUtf8("\u00B0C");
-    dialogConfig.suffix2 = "%";
+    dialogConfig.configureSet(DialogSet::FIRST,  tr("Temperature"), QString::fromUtf8("\u00B0C"),
+                              (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(0).toInt() + 1 : minFanStepTemperature,
+                              (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(0).toUInt() - 1 : maxFanStepTemperature,
+                              item->text(0).toUInt());
 
-    dialogConfig.min1 = (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(0).toInt() + 1 : minFanStepTemperature;
-    dialogConfig.max1 = (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(0).toInt() - 1 : maxFanStepTemperature;
+    dialogConfig.configureSet(DialogSet::SECOND,   tr("Fan speed"), "%",
+                              (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepSpeed,
+                              (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toUInt() - 1 : maxFanStepSpeed,
+                              item->text(1).toUInt());
 
-    dialogConfig.min2 = (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepSpeed;
-    dialogConfig.max2 = (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toInt() - 1 : maxFanStepSpeed;
-
-    dialogConfig.value1 = item->text(0).toUInt();
-    dialogConfig.value2 = item->text(1).toUInt();
 
     auto d = new Dialog_sliders(dialogConfig, tr("Adjust fan step"), this);
 

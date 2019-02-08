@@ -15,20 +15,20 @@ Dialog_sliders::Dialog_sliders(const DialogSlidersConfig &config, const QString 
     ui->setupUi(this);
     setWindowTitle(title);
 
-    ui->label_value1->setText(config.label1);
-    ui->label_value2->setText(config.label2);
+    ui->label_value1->setText(config.labels[DialogSet::FIRST]);
+    ui->label_value2->setText(config.labels[DialogSet::SECOND]);
 
-    ui->slider_value1->setRange(config.min1, config.max1);
-    ui->slider_value2->setRange(config.min2, config.max2);
+    ui->slider_value1->setRange(config.mins[DialogSet::FIRST], config.maxes[DialogSet::FIRST]);
+    ui->slider_value2->setRange(config.mins[DialogSet::SECOND], config.maxes[DialogSet::SECOND]);
 
-    ui->slider_value1->setValue(config.value1);
-    ui->slider_value2->setValue(config.value2);
+    ui->slider_value1->setValue(config.values[DialogSet::FIRST]);
+    ui->slider_value2->setValue(config.values[DialogSet::SECOND]);
 
-    ui->spin_value1->setRange(config.min1, config.max1);
-    ui->spin_value2->setRange(config.min2, config.max2);
+    ui->spin_value1->setRange(config.mins[DialogSet::FIRST], config.maxes[DialogSet::FIRST]);
+    ui->spin_value2->setRange(config.mins[DialogSet::SECOND], config.maxes[DialogSet::SECOND]);
 
-    ui->spin_value1->setSuffix(config.suffix1);
-    ui->spin_value2->setSuffix(config.suffix2);
+    ui->spin_value1->setSuffix(config.suffixes[DialogSet::FIRST]);
+    ui->spin_value2->setSuffix(config.suffixes[DialogSet::SECOND]);
 }
 
 Dialog_sliders::~Dialog_sliders()

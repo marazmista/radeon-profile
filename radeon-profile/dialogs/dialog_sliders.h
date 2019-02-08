@@ -7,9 +7,22 @@ namespace Ui {
 class Dialog_sliders;
 }
 
+enum DialogSet {
+    FIRST = 0,
+    SECOND = 1,
+};
+
 struct DialogSlidersConfig {
-    QString label1, label2, suffix1, suffix2;
-    unsigned min1, max1, min2, max2, value1, value2;
+    QString labels[2], suffixes[2];
+    unsigned mins[2], maxes[2], values[2];
+
+    void configureSet(DialogSet set, const QString &label, const QString &suffix, unsigned min, unsigned max, unsigned value) {
+        labels[set] = label;
+        suffixes[set] = suffix;
+        mins[set] = min;
+        maxes[set] = max;
+        values[set] = value;
+    }
 };
 
 class Dialog_sliders : public QDialog
