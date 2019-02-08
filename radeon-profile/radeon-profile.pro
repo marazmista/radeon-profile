@@ -88,7 +88,23 @@ TRANSLATIONS += translations/strings.it.ts \
     translations/strings.pl.ts \
     translations/strings.hr.ts
 
+DESTDIR = target
+
 DISTFILES += \
     translations/strings.it.ts \
     translations/strings.pl.ts \
     translations/strings.hr.ts
+
+bin.path = /usr/bin
+bin.files = target/radeon-profile
+
+desktop.path = /usr/share/applications
+desktop.files = extra/radeon-profile.desktop
+
+icon.path = /usr/share/icons/hicolor/512x512/apps
+icon.files = extra/radeon-profile.png
+
+INSTALLS += \
+	bin \
+	desktop \
+	icon
