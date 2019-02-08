@@ -43,7 +43,8 @@ SOURCES += main.cpp\
     tab_plots.cpp \
     tab_fanControl.cpp \
     tab_exec.cpp \
-    tab_overclock.cpp
+    tab_overclock.cpp \
+    dialogs/dialog_sliders.cpp
 
 HEADERS  += radeon_profile.h \
     gpu.h \
@@ -59,14 +60,16 @@ HEADERS  += radeon_profile.h \
     dialogs/dialog_defineplot.h \
     dialogs/dialog_rpevent.h \
     dialogs/dialog_topbarcfg.h \
-    dialogs/dialog_deinetopbaritem.h
+    dialogs/dialog_deinetopbaritem.h \
+    dialogs/dialog_sliders.h
 
 FORMS    += radeon_profile.ui \
     components/pieprogressbar.ui \
     dialogs/dialog_defineplot.ui \
     dialogs/dialog_rpevent.ui \
     dialogs/dialog_topbarcfg.ui \
-    dialogs/dialog_deinetopbaritem.ui
+    dialogs/dialog_deinetopbaritem.ui \
+    dialogs/dialog_sliders.ui
 
 RESOURCES += \
     radeon-resource.qrc

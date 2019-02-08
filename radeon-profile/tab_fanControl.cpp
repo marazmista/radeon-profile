@@ -1,9 +1,10 @@
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
 
+#include "dialogs/dialog_sliders.h"
+
 #include <QMessageBox>
 #include <QMenu>
-#include <QInputDialog>
 
 void radeon_profile::createDefaultFanProfile() {
     FanProfileSteps p;
@@ -212,35 +213,40 @@ void radeon_profile::on_btn_removeFanStep_clicked()
 
 void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
+    Q_UNUSED(column);
+
     auto index = ui->list_fanSteps->currentIndex().row();
 
-    switch (column) {
-        case 0: {
-            int newTemp = askNumber(item->text(column).toInt(),  (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(0).toInt() + 1 : minFanStepTemperature,
-                                    (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(0).toInt() - 1 : maxFanStepTemperature,
-                                    tr("Temperature"));
+    DialogSlidersConfig dialogConfig;
+    dialogConfig.label1 = tr("Temperature");
+    dialogConfig.label2 = tr("Fan speed");
 
-            if (newTemp == -1)
-                return;
+    dialogConfig.suffix1 = QString::fromUtf8("\u00B0C");
+    dialogConfig.suffix2 = "%";
 
-            item->setText(column, QString::number(newTemp));
-            break;
-        }
-        case 1: {
-            int newSpeed = askNumber(item->text(column).toInt(),  (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepSpeed,
-                                     (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toInt() - 1 : maxFanStepSpeed,
-                                     tr("Speed [%]"));
+    dialogConfig.min1 = (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(0).toInt() + 1 : minFanStepTemperature;
+    dialogConfig.max1 = (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(0).toInt() - 1 : maxFanStepTemperature;
 
-            if (newSpeed == -1)
-                return;
+    dialogConfig.min2 = (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepSpeed;
+    dialogConfig.max2 = (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toInt() - 1 : maxFanStepSpeed;
 
-            item->setText(column, QString::number(newSpeed));
-            break;
-        }
+    dialogConfig.value1 = item->text(0).toUInt();
+    dialogConfig.value2 = item->text(1).toUInt();
+
+    auto d = new Dialog_sliders(dialogConfig, tr("Adjust fan step"), this);
+
+    if (d->exec() == QDialog::Rejected) {
+        delete d;
+        return;
     }
+
+    item->setText(0, QString::number(d->getValue1()));
+    item->setText(1, QString::number(d->getValue2()));
 
     markFanProfileUnsaved(true);
     makeFanProfilePlot();
+
+    delete d;
 }
 
 void radeon_profile::on_slider_fanSpeed_valueChanged(int value)
