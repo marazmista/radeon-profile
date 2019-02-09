@@ -22,7 +22,6 @@ int main(int argc, char *argv[])
 
     qDebug() << "Creating radeon_profile";
     radeon_profile w;
-    w.show();
 
     return a.exec();
 }

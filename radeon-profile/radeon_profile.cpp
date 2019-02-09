@@ -35,6 +35,7 @@ radeon_profile::radeon_profile(QWidget *parent) :
     counter_statsTick(0),
     hysteresisRelativeTepmerature(0),
     ocTableModified(false),
+    enableChangeEvent(false),
     savedState(nullptr),
     ui(new Ui::radeon_profile)
 {
@@ -472,6 +473,9 @@ bool radeon_profile::askConfirmation(const QString title, const QString question
 void radeon_profile::showWindow() {
     if (ui->cb_minimizeTray->isChecked() && ui->cb_startMinimized->isChecked())
         return;
+
+    // disable changeEvent() for some time to properly configure window state at start
+    QTimer::singleShot(200, this, SLOT(setEnabledChangeEvent()));
 
     if (ui->cb_startMinimized->isChecked())
         this->showMinimized();

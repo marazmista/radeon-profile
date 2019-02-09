@@ -146,6 +146,7 @@ private slots:
     void on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_applyOcTable_clicked();
     void on_btn_resetOcTable_clicked();
+    void setEnabledChangeEvent() { enableChangeEvent = true; };
 
 private:
     struct CurrentStateInfo {
@@ -167,7 +168,7 @@ private:
     QMap<QString, unsigned int> pmStats;
     unsigned int counter_ticks, counter_statsTick;
     short hysteresisRelativeTepmerature;
-    bool ocTableModified;
+    bool ocTableModified, enableChangeEvent;
     QButtonGroup group_pwm, group_Dpm;
     CurrentStateInfo *savedState;
     PlotManager plotManager;

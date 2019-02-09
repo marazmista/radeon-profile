@@ -105,6 +105,9 @@ void radeon_profile::setPowerLevel(int level) {
 
 void radeon_profile::changeEvent(QEvent *event)
 {
+    if (!enableChangeEvent)
+        return;
+
     if (event->type() == QEvent::WindowStateChange && ui->cb_minimizeTray->isChecked()) {
         if (isMinimized())
             this->hide();
@@ -112,6 +115,8 @@ void radeon_profile::changeEvent(QEvent *event)
         event->accept();
         return;
     }
+
+    QMainWindow::changeEvent(event);
 }
 
 void radeon_profile::gpuChanged()
