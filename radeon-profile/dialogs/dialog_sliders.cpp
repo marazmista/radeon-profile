@@ -52,4 +52,6 @@ unsigned Dialog_sliders::getValue(DialogSet set) const {
         case DialogSet::SECOND:
             return ui->slider_value2->value();
     }
+
+    return 0;
 }
