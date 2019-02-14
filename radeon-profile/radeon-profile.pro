@@ -61,7 +61,8 @@ HEADERS  += radeon_profile.h \
     dialogs/dialog_rpevent.h \
     dialogs/dialog_topbarcfg.h \
     dialogs/dialog_deinetopbaritem.h \
-    dialogs/dialog_sliders.h
+    dialogs/dialog_sliders.h \
+    components/slider.h
 
 FORMS    += radeon_profile.ui \
     components/pieprogressbar.ui \
@@ -69,7 +70,8 @@ FORMS    += radeon_profile.ui \
     dialogs/dialog_rpevent.ui \
     dialogs/dialog_topbarcfg.ui \
     dialogs/dialog_deinetopbaritem.ui \
-    dialogs/dialog_sliders.ui
+    dialogs/dialog_sliders.ui \
+    components/slider.ui
 
 RESOURCES += \
     radeon-resource.qrc

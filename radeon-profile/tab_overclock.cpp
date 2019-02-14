@@ -71,23 +71,18 @@ void radeon_profile::adjustState(const QTreeWidget *list, QTreeWidgetItem *item,
 
     auto index = list->currentIndex().row();
 
-    DialogSlidersConfig dialogConfig;
+    auto d = new Dialog_sliders(tr("Adjust state"), this);
 
-    dialogConfig.configureSet(DialogSet::FIRST, tr("Frequency"), "MHz", frequencyRange.min, frequencyRange.max,
-                              item->text(1).toUInt());
-
-    dialogConfig.configureSet(DialogSet::SECOND, tr("Voltage"), "mV", voltageRange.min, voltageRange.max,
-                              item->text(2).toUInt());
-
-    auto d = new Dialog_sliders(dialogConfig, tr("Adjust state"), this);
+    d->addSlider(tr("Frequency"), "MHz", frequencyRange.min, frequencyRange.max, item->text(1).toUInt());
+    d->addSlider(tr("Voltage"), "mV", voltageRange.min, voltageRange.max, item->text(2).toUInt());
 
     if (d->exec() == QDialog::Rejected) {
         delete d;
         return;
     }
 
-    item->setText(1, QString::number(d->getValue(DialogSet::FIRST)));
-    item->setText(2, QString::number(d->getValue(DialogSet::SECOND)));
+    item->setText(1, QString::number(d->getValue(0)));
+    item->setText(2, QString::number(d->getValue(1)));
 
     if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
         device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);

@@ -217,28 +217,27 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
 
     auto index = ui->list_fanSteps->currentIndex().row();
 
-    DialogSlidersConfig dialogConfig;
+    auto d = new Dialog_sliders(tr("Adjust fan step"), this);
 
-    dialogConfig.configureSet(DialogSet::FIRST,  tr("Temperature"), QString::fromUtf8("\u00B0C"),
-                              (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(0).toInt() + 1 : minFanStepTemperature,
-                              (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(0).toUInt() - 1 : maxFanStepTemperature,
-                              item->text(0).toUInt());
+    d->addSlider(tr("Temperature"),
+                 QString::fromUtf8("\u00B0C"),
+                 (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(0).toInt() + 1 : minFanStepTemperature,
+                 (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(0).toUInt() - 1 : maxFanStepTemperature,
+                 item->text(0).toUInt());
 
-    dialogConfig.configureSet(DialogSet::SECOND,   tr("Fan speed"), "%",
-                              (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepSpeed,
-                              (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toUInt() - 1 : maxFanStepSpeed,
-                              item->text(1).toUInt());
+    d->addSlider(tr("Fan speed"), "%",
+                 (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepSpeed,
+                 (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toUInt() - 1 : maxFanStepSpeed,
+                 item->text(1).toUInt());
 
-
-    auto d = new Dialog_sliders(dialogConfig, tr("Adjust fan step"), this);
 
     if (d->exec() == QDialog::Rejected) {
         delete d;
         return;
     }
 
-    item->setText(0, QString::number(d->getValue(DialogSet::FIRST)));
-    item->setText(1, QString::number(d->getValue(DialogSet::SECOND)));
+    item->setText(0, QString::number(d->getValue(0)));
+    item->setText(1, QString::number(d->getValue(1)));
 
     markFanProfileUnsaved(true);
     makeFanProfilePlot();
