@@ -173,22 +173,28 @@ void radeon_profile::on_btn_fanInfo_clicked()
 
 void radeon_profile::on_btn_addFanStep_clicked()
 {
-    const int temperature = askNumber(0, minFanStepTemperature, maxFanStepTemperature, tr("Temperature"));
-    if (temperature == -1) // User clicked Cancel
+    auto d = new Dialog_sliders(tr("Add fan step"), this);
+
+    d->addSlider(tr("Temperature"), QString::fromUtf8("\u00B0C"), minFanStepTemperature, maxFanStepTemperature, 0);
+    d->addSlider(tr("Fan speed"), "%", minFanStepSpeed, maxFanStepSpeed, 0);
+
+    if (d->exec() == QDialog::Rejected) {
+        delete d;
         return;
-
-    if (currentFanProfile.contains(temperature)) // A step with this temperature already exists
-        QMessageBox::warning(this, tr("Error"), tr("This step already exists. Double click on it, to change its value"));
-    else { // This step does not exist, proceed
-        const int fanSpeed = askNumber(0, minFanStepSpeed, maxFanStepSpeed, tr("Speed [%]"));
-        if (fanSpeed == -1) // User clicked Cancel
-            return;
-
-        addFanStep(temperature,fanSpeed);
     }
+
+    if (currentFanProfile.contains(d->getValue(0))) {
+        QMessageBox::warning(this, tr("Error"), tr("This step already exists. Double click on it, to change its value"));
+        delete d;
+        return;
+    }
+
+    addFanStep(d->getValue(0), d->getValue(1));
 
     markFanProfileUnsaved(true);
     makeFanProfilePlot();
+
+    delete d;
 }
 
 void radeon_profile::on_btn_removeFanStep_clicked()
