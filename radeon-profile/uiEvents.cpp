@@ -377,10 +377,22 @@ void radeon_profile::on_cb_daemonData_clicked(bool checked)
 
 void radeon_profile::pauseRefresh(bool checked)
 {
+    if (!checked) {
+        timer->start();
+        return;
+    }
+
+    if (!ui->btn_pwmAuto->isChecked() &&
+            !askConfirmation(tr("Pausing refresh"), tr("When refreshing is paused, radeon-profile cannot control fan speeds and it will be restored to auto state.\nPause refreshing?"))) {
+
+        ui->btn_general->menu()->actions()[0]->setChecked(false);
+        return;
+    }
+
+    ui->btn_pwmAuto->click();
+
     if (checked)
         timer->stop();
-    else
-        timer->start();
 }
 
 void radeon_profile::on_btn_general_clicked()
