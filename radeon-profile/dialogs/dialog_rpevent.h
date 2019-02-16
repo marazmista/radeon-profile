@@ -28,8 +28,6 @@ private slots:
     void on_btn_setBinary_clicked();
 
 private:
-    void setFixedFanSpeedVisibility(bool visibility);
-
     Ui::Dialog_RPEvent *ui;
     RPEvent createdEvent;
 };

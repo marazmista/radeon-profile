@@ -15,7 +15,7 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
     ui->setupUi(this);
     setFixedSize(size());
 
-    setFixedFanSpeedVisibility(false);
+    ui->spin_fixedFanSpeed->setVisible(false);
 }
 
 void Dialog_RPEvent::setFeatures(const GPUDataContainer &gpuData, const DriverFeatures &features, const QList<QString> &profiles) {
@@ -119,17 +119,9 @@ void Dialog_RPEvent::setEditedEvent(const RPEvent &rpe) {
     ui->spin_fixedFanSpeed->setValue(rpe.fixedFanSpeedChange);
 }
 
-void Dialog_RPEvent::setFixedFanSpeedVisibility(bool visibility) {
-    ui->spin_fixedFanSpeed->setVisible(visibility);
-    ui->l_percent->setVisible(visibility);
-}
-
 void Dialog_RPEvent::on_combo_fanChange_currentIndexChanged(int index)
 {
-    if (index == 2)
-        setFixedFanSpeedVisibility(true);
-     else
-        setFixedFanSpeedVisibility(false);
+    ui->spin_fixedFanSpeed->setVisible(index == 2);
 }
 
 void Dialog_RPEvent::on_btn_setBinary_clicked()
