@@ -7,6 +7,8 @@
 daemonComm::daemonComm() : signalSender(new QLocalSocket(this)) {
     feedback.setDevice(signalSender);
     connect(signalSender,SIGNAL(readyRead()), this, SLOT(receiveFeedback()));
+    connect(signalSender, SIGNAL(connected()), this, SLOT(connectionSucess()));
+    connect(signalSender, SIGNAL(disconnected()), this, SLOT(disconnected()));
 }
 
 daemonComm::~daemonComm() {
@@ -34,4 +36,11 @@ void daemonComm::receiveFeedback() {
         return;
 
     qDebug() << "ekstra " << confirmMsg.toLatin1();
+}
+
+void daemonComm::connectionSucess() {
+    qDebug() << "Daemon connected";
+}
+void daemonComm::disconnected() {
+    qDebug() << "Daemon disconnected";
 }

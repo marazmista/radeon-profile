@@ -30,13 +30,15 @@ public:
         return (signalSender->state() == QLocalSocket::ConnectedState);
     }
 
-    QLocalSocket *signalSender;
 
 public slots:
     void receiveFeedback();
+    void connectionSucess();
+    void disconnected();
 
 private:
     QDataStream feedback;
+    QLocalSocket *signalSender;
 
 };
 

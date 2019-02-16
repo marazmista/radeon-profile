@@ -64,7 +64,7 @@ public:
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure();
     void reconfigureDaemon();
-    bool daemonConnected();
+    bool isDaemonConnected();
     GPUClocks getFeaturesFallback();
     void setupRegex(const QString &data);
     int getCurrentPowerPlayTableId(const QString &file);

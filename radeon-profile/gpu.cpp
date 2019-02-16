@@ -40,8 +40,8 @@ static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
     "/usr/share/hwdata/pnp.ids"
 };
 
-bool gpu::daemonConnected() {
-   return driverHandler->daemonConnected();
+bool gpu::isDaemonConnected() {
+   return driverHandler->isDaemonConnected();
 }
 
 void gpu::detectCards() {

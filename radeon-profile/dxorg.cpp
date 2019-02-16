@@ -28,12 +28,11 @@ void dXorg::configure() {
 
     dcomm.connectToDaemon();
 
-    if (daemonConnected() && globalStuff::globalConfig.daemonData) {
+    if (isDaemonConnected() && globalStuff::globalConfig.daemonData) {
         qDebug() << "Confguring shared memory for daemon";
         setupSharedMem();
         setupDaemon();
-    } else
-        qCritical() << "Daemon is not connected, therefore it can't be configured";
+    }
 
     figureOutDriverFeatures();
 }
@@ -108,7 +107,7 @@ void dXorg::setupDaemon() {
     dcomm.sendCommand(command);
 }
 
-bool dXorg::daemonConnected() {
+bool dXorg::isDaemonConnected() {
     return dcomm.isConnected();
 }
 
@@ -136,7 +135,7 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     if (data != "-1")
         return data;
 
-    if (daemonConnected()) {
+    if (isDaemonConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh){
             qDebug() << "Asking the daemon to read clocks";
             dcomm.sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR)); // SIGNAL_READ_CLOCKS + SEPARATOR
@@ -428,7 +427,7 @@ QString dXorg::getCurrentPowerLevel() {
 }
 
 void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
-    if (daemonConnected())
+    if (isDaemonConnected())
         dcomm.sendCommand(createDaemonSetCmd(filePath, newValue));
     else {
         QFile file(filePath);
@@ -605,7 +604,7 @@ void dXorg::figureOutDriverFeatures() {
         case PowerMethod::DPM:
             qDebug() << "Power method: DPM";
 
-            if (globalStuff::globalConfig.rootMode || daemonConnected())
+            if (globalStuff::globalConfig.rootMode || isDaemonConnected())
                 features.isChangeProfileAvailable = true;
             else {
                 QFile f(driverFiles.sysFs.power_dpm_state);

@@ -32,7 +32,7 @@ public:
         delete ui;
     };
 
-    void setLabel(const QString label) {
+    void setLabel(const QString &label) {
         ui->label->setText(label);
     };
 

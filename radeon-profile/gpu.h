@@ -56,7 +56,7 @@ public:
 
     void detectCards();
     bool initialize();
-    bool daemonConnected();
+    bool isDaemonConnected();
     void setOverclockValue(const QString &file, int value);
     void resetOverclock();
     const DriverFeatures& getDriverFeatures() const;

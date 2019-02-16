@@ -143,7 +143,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::TEMPERATURE_CURRENT) && !device.gpuData.contains(ValueID::VOLT_CORE))
         ui->tw_main->setTabEnabled(1,false);
 
-    ui->group_cfgDaemon->setEnabled(device.daemonConnected());
+    ui->group_cfgDaemon->setEnabled(device.isDaemonConnected());
 
     createCurrentGpuDataListItems();
 
@@ -345,6 +345,12 @@ void radeon_profile::updateExecLogs() {
 //===================================
 // === Main timer loop  === //
 void radeon_profile::timerEvent() {
+    if (!globalStuff::globalConfig.rootMode && !device.isDaemonConnected()) {
+        ui->tw_main->setTabEnabled(2, false);
+        ui->tw_main->setTabEnabled(3, false);
+        ui->stack_pm->setEnabled(false);
+    }
+
     if (!refreshWhenHidden->isChecked() && this->isHidden()) {
 
         // even if in tray, keep the fan control active (if enabled)
