@@ -35,6 +35,10 @@ void dXorg::configure() {
     }
 
     figureOutDriverFeatures();
+
+    if (features.isFanControlAvailable)
+        dcomm.sendCommand(QString().append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR).
+                          append("pwm1_enable").append(SEPARATOR).append(driverFiles.hwmonAttributes.pwm1_enable).append(SEPARATOR));
 }
 
 void dXorg::setupIoctl() {
@@ -94,7 +98,7 @@ void dXorg::setupSharedMem() {
 void dXorg::setupDaemon() {
     QString command;
     command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR);
-    command.append(driverFiles.debugfs_pm_info).append(SEPARATOR);
+    command.append("pm_info").append(SEPARATOR).append(driverFiles.debugfs_pm_info).append(SEPARATOR);
     command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append(sharedMem.key()).append(SEPARATOR);
 
     if (globalStuff::globalConfig.daemonAutoRefresh) {
