@@ -4,9 +4,11 @@
 #include "daemonComm.h"
 #include <QDebug>
 
+const QString confirmationString("7#1#");
+
 daemonComm::daemonComm() : signalSender(new QLocalSocket(this)) {
     feedback.setDevice(signalSender);
-    connect(signalSender,SIGNAL(readyRead()), this, SLOT(receiveFeedback()));
+    connect(signalSender,SIGNAL(readyRead()), this, SLOT(receiveFromDaemon()));
     connect(signalSender, SIGNAL(connected()), this, SLOT(connectionSucess()));
     connect(signalSender, SIGNAL(disconnected()), this, SLOT(disconnected()));
 }
@@ -26,7 +28,7 @@ void daemonComm::sendCommand(const QString command) {
         qWarning() << "Failed sending signal: " << command;
 }
 
-void daemonComm::receiveFeedback() {
+void daemonComm::receiveFromDaemon() {
     feedback.startTransaction();
 
     QString confirmMsg ;
@@ -35,7 +37,10 @@ void daemonComm::receiveFeedback() {
     if (!feedback.commitTransaction())
         return;
 
-    qDebug() << "ekstra " << confirmMsg.toLatin1();
+    if (confirmMsg.toLatin1() == confirmationString)
+        sendCommand(confirmMsg.toLatin1());
+
+    qDebug() << confirmMsg.toLatin1();
 }
 
 void daemonComm::connectionSucess() {

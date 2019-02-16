@@ -32,7 +32,7 @@ public:
 
 
 public slots:
-    void receiveFeedback();
+    void receiveFromDaemon();
     void connectionSucess();
     void disconnected();
 
