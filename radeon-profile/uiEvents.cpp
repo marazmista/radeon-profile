@@ -328,16 +328,6 @@ void radeon_profile::on_group_freq_toggled(bool arg1)
         device.setForcePowerLevel(ForcePowerLevels::F_AUTO);
 }
 
-void radeon_profile::on_slider_ocSclk_valueChanged(const int value)
-{
-    ui->l_ocSclk->setText(QString::number(value) + "%");
-}
-
-void radeon_profile::on_slider_ocMclk_valueChanged(const int value)
-{
-    ui->l_ocMclk->setText(QString::number(value) + "%");
-}
-
 void radeon_profile::on_slider_freqSclk_valueChanged(int value)
 {
     ui->l_freqSclk->setText(device.getDriverFeatures().sclkTable.value(value));

@@ -1144,7 +1144,7 @@
               <property name="checked">
                <bool>false</bool>
               </property>
-              <layout class="QGridLayout" name="gridLayout_7" columnstretch="1,0,0,0">
+              <layout class="QGridLayout" name="gridLayout_7">
                <property name="leftMargin">
                 <number>5</number>
                </property>
@@ -1160,42 +1160,14 @@
                <property name="spacing">
                 <number>5</number>
                </property>
-               <item row="2" column="0" colspan="2">
-                <widget class="QLabel" name="label_memOc">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_coreOc">
                  <property name="text">
-                  <string>Memory</string>
+                  <string>Core</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0" colspan="3">
-                <widget class="QSlider" name="slider_ocMclk">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="maximum">
-                  <number>20</number>
-                 </property>
-                 <property name="pageStep">
-                  <number>5</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="tickPosition">
-                  <enum>QSlider::TicksBothSides</enum>
-                 </property>
-                 <property name="tickInterval">
-                  <number>1</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0" colspan="3">
+               <item row="1" column="0">
                 <widget class="QSlider" name="slider_ocSclk">
                  <property name="enabled">
                   <bool>false</bool>
@@ -1223,42 +1195,70 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="0" colspan="2">
-                <widget class="QLabel" name="label_coreOc">
-                 <property name="text">
-                  <string>Core</string>
+               <item row="1" column="1">
+                <widget class="QSpinBox" name="spin_ocSclk">
+                 <property name="minimumSize">
+                  <size>
+                   <width>60</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="maximum">
+                  <number>20</number>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="3">
-                <widget class="QLabel" name="l_ocSclk">
-                 <property name="font">
-                  <font>
-                   <family>Monospace</family>
-                   <pointsize>10</pointsize>
-                  </font>
-                 </property>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_memOc">
                  <property name="text">
-                  <string notr="true">0</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  <string>Memory</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="3">
-                <widget class="QLabel" name="l_ocMclk">
-                 <property name="font">
-                  <font>
-                   <family>Monospace</family>
-                   <pointsize>10</pointsize>
-                  </font>
+               <item row="3" column="0">
+                <widget class="QSlider" name="slider_ocMclk">
+                 <property name="enabled">
+                  <bool>false</bool>
                  </property>
-                 <property name="text">
-                  <string notr="true">0</string>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
                  </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <property name="maximum">
+                  <number>20</number>
+                 </property>
+                 <property name="pageStep">
+                  <number>5</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="tickPosition">
+                  <enum>QSlider::TicksBothSides</enum>
+                 </property>
+                 <property name="tickInterval">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QSpinBox" name="spin_ocMclk">
+                 <property name="minimumSize">
+                  <size>
+                   <width>60</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="maximum">
+                  <number>20</number>
                  </property>
                 </widget>
                </item>
@@ -1279,7 +1279,7 @@
               <property name="checked">
                <bool>false</bool>
               </property>
-              <layout class="QGridLayout" name="gridLayout_16" columnstretch="1,0">
+              <layout class="QGridLayout" name="gridLayout_16" columnstretch="0,0">
                <property name="leftMargin">
                 <number>5</number>
                </property>
@@ -1295,6 +1295,34 @@
                <property name="spacing">
                 <number>5</number>
                </property>
+               <item row="3" column="0">
+                <widget class="QSlider" name="slider_freqMclk">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximum">
+                  <number>1</number>
+                 </property>
+                 <property name="pageStep">
+                  <number>5</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="tickPosition">
+                  <enum>QSlider::TicksBothSides</enum>
+                 </property>
+                 <property name="tickInterval">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="label_CoreFreq">
                  <property name="text">
@@ -1330,8 +1358,15 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
-                <widget class="QLabel" name="l_freqSclk">
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_memFreq">
+                 <property name="text">
+                  <string>Memory</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLabel" name="l_freqMclk">
                  <property name="font">
                   <font>
                    <family>Monospace</family>
@@ -1346,43 +1381,8 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_memFreq">
-                 <property name="text">
-                  <string>Memory</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QSlider" name="slider_freqMclk">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="maximum">
-                  <number>1</number>
-                 </property>
-                 <property name="pageStep">
-                  <number>5</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="tickPosition">
-                  <enum>QSlider::TicksBothSides</enum>
-                 </property>
-                 <property name="tickInterval">
-                  <number>1</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QLabel" name="l_freqMclk">
+               <item row="1" column="1">
+                <widget class="QLabel" name="l_freqSclk">
                  <property name="font">
                   <font>
                    <family>Monospace</family>
@@ -4344,12 +4344,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>233</x>
-     <y>108</y>
+     <x>214</x>
+     <y>113</y>
     </hint>
     <hint type="destinationlabel">
-     <x>233</x>
-     <y>108</y>
+     <x>212</x>
+     <y>110</y>
     </hint>
    </hints>
   </connection>
@@ -4360,12 +4360,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>233</x>
-     <y>108</y>
+     <x>214</x>
+     <y>113</y>
     </hint>
     <hint type="destinationlabel">
-     <x>183</x>
-     <y>108</y>
+     <x>265</x>
+     <y>110</y>
     </hint>
    </hints>
   </connection>
@@ -4376,12 +4376,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>233</x>
-     <y>130</y>
+     <x>183</x>
+     <y>113</y>
     </hint>
     <hint type="destinationlabel">
-     <x>233</x>
-     <y>130</y>
+     <x>228</x>
+     <y>113</y>
     </hint>
    </hints>
   </connection>
@@ -4392,12 +4392,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>233</x>
-     <y>130</y>
+     <x>228</x>
+     <y>113</y>
     </hint>
     <hint type="destinationlabel">
-     <x>233</x>
-     <y>130</y>
+     <x>183</x>
+     <y>113</y>
     </hint>
    </hints>
   </connection>
@@ -4408,12 +4408,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>449</x>
-     <y>434</y>
+     <x>204</x>
+     <y>198</y>
     </hint>
     <hint type="destinationlabel">
-     <x>900</x>
-     <y>433</y>
+     <x>221</x>
+     <y>197</y>
     </hint>
    </hints>
   </connection>
@@ -4424,12 +4424,172 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>900</x>
-     <y>433</y>
+     <x>221</x>
+     <y>197</y>
     </hint>
     <hint type="destinationlabel">
-     <x>449</x>
-     <y>434</y>
+     <x>204</x>
+     <y>198</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>slider_ocSclk</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spin_ocSclk</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>434</x>
+     <y>181</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>854</x>
+     <y>183</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spin_ocSclk</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>slider_ocSclk</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>854</x>
+     <y>170</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>802</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>slider_ocMclk</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spin_ocMclk</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>653</x>
+     <y>222</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>870</x>
+     <y>231</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spin_ocMclk</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>slider_ocMclk</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>855</x>
+     <y>221</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>756</x>
+     <y>222</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>group_oc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>slider_ocSclk</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>170</x>
+     <y>128</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>177</x>
+     <y>172</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>group_oc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_coreOc</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>153</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>153</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>group_oc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spin_ocSclk</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>872</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>870</x>
+     <y>178</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>group_oc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_memOc</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>836</x>
+     <y>129</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>645</x>
+     <y>201</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>group_oc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>slider_ocMclk</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>714</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>608</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>group_oc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spin_ocMclk</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>800</x>
+     <y>128</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>865</x>
+     <y>218</y>
     </hint>
    </hints>
   </connection>

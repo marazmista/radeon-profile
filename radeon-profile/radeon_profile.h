@@ -108,7 +108,6 @@ private slots:
     void on_btn_removeFanStep_clicked();
     void on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_applyOverclock_clicked();
-    void on_slider_ocSclk_valueChanged(int value);
     void on_btn_activateFanProfile_clicked();
     void on_btn_removeFanProfile_clicked();
     void on_btn_saveFanProfile_clicked();
@@ -134,7 +133,6 @@ private slots:
     void on_cb_daemonData_clicked(bool checked);
     void pauseRefresh(bool checked);
     void on_btn_general_clicked();
-    void on_slider_ocMclk_valueChanged(const int value);
     void on_group_oc_toggled(bool arg1);
     void on_slider_freqSclk_valueChanged(int value);
     void on_slider_freqMclk_valueChanged(int value);

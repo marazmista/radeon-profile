@@ -195,12 +195,9 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         ui->tw_overclock->setTabEnabled(1, false);
 
         if (device.getDriverFeatures().isPercentCoreOcAvailable) {
-            ui->slider_ocMclk->setEnabled(device.getDriverFeatures().isPercentMemOcAvailable);
-            ui->label_memOc->setEnabled(device.getDriverFeatures().isPercentMemOcAvailable);
-            ui->l_ocMclk->setEnabled(device.getDriverFeatures().isPercentMemOcAvailable);
-
             ui->group_oc->setCheckable(true);
             ui->group_oc->setEnabled(true);
+            ui->group_oc->setChecked(false);
             ui->tw_overclock->setTabEnabled(0, true);
             ui->btn_applyOverclock->setEnabled(true);
 
