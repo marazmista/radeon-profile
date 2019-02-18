@@ -94,7 +94,8 @@ private:
     void setupDaemon();
     PowerPlayTable loadPowerPlayTable(const QString &file);
     QString createDaemonSetCmd(const QString &file, const QString &tableIndex);
-    const QMap<QString, FVTable> parseOcTable();
+        const std::tuple<QMap<QString, FVTable>, QMap<QString, OCRange>> parseOcTable();
 };
+
 
 #endif // DXORG_H

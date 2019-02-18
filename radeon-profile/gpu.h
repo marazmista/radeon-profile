@@ -50,8 +50,9 @@ public:
     void setForcePowerLevel(ForcePowerLevels _newForcePowerLevel);
     void setPwmManualControl(bool manual);
     void setPwmValue(unsigned int value);
-    void setOcTableValue(const QString &type, int powerState, const FreqVoltPair powerStateValues);
+    void setOcTableValue(const QString &type, const QString &tableKey, int powerState, const FreqVoltPair powerStateValues);
     void sendOcTableCommand(const QString cmd);
+    void setOcRanges(const QString &type, const QString &tableKey, int powerState, int rangeValue);
     void setPowerCap(const unsigned value);
 
     void detectCards();

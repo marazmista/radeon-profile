@@ -147,6 +147,7 @@ private slots:
     void on_btn_applyOcTable_clicked();
     void on_btn_resetOcTable_clicked();
     void setEnabledChangeEvent() { enableChangeEvent = true; };
+    void on_btn_setOcRanges_clicked();
 
 private:
     struct CurrentStateInfo {
@@ -243,8 +244,8 @@ private:
     void createFanProfileGraph();
     void setupOcTableOverclock();
     void updateOcGraphSeries(const FVTable &table, QLineSeries *series, OcSeriesType type);
-    void adjustState(const QTreeWidget *list, QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange,
-                     OcSeriesType frequencyType, OcSeriesType voltageType, const FVTable &table, const QString s);
+    void adjustState(const int index, QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange,
+                     OcSeriesType frequencyType, OcSeriesType voltageType, const QString &tableKey, const QString s);
 };
 
 #endif // RADEON_PROFILE_H

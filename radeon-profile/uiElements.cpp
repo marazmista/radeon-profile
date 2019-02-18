@@ -282,17 +282,6 @@ void radeon_profile::createOcProfileGraph() {
 
     setupChart(chart_oc, true);
 
-    // keep the order as in OcSeriesType enum //
-    auto series_ocClockFreq = new QLineSeries(chart_oc);
-    auto series_ocCoreVolt = new QLineSeries(chart_oc);
-    auto series_ocMemFreq = new QLineSeries(chart_oc);
-    auto series_ocMemVolt = new QLineSeries(chart_oc);
-
-    chart_oc->addSeries(series_ocClockFreq);
-    chart_oc->addSeries(series_ocCoreVolt);
-    chart_oc->addSeries(series_ocMemFreq);
-    chart_oc->addSeries(series_ocMemVolt);
-
     auto axis_state = new QValueAxis(chart_oc);
     auto axis_frequency = new QValueAxis(chart_oc);
     auto axis_volts = new QValueAxis(chart_oc);
@@ -305,10 +294,24 @@ void radeon_profile::createOcProfileGraph() {
     setupAxis(axis_frequency, Qt::white, tr("Frequency [MHz]"));
     setupAxis(axis_volts, Qt::white, tr("Voltage [mV]"));
 
+
+    // keep the order as in OcSeriesType enum //
+    auto series_ocClockFreq = new QLineSeries(chart_oc);
+    auto series_ocCoreVolt = new QLineSeries(chart_oc);
+    chart_oc->addSeries(series_ocClockFreq);
+    chart_oc->addSeries(series_ocCoreVolt);
+
     setupSeries(series_ocClockFreq, Qt::yellow, tr("Core frequency [MHz]"), axis_state, axis_frequency);
-    setupSeries(series_ocMemFreq, Qt::blue, tr("Memory frequency [MHz]"), axis_state, axis_frequency);
     setupSeries(series_ocCoreVolt, Qt::green, tr("Core voltage [mV]"), axis_state, axis_volts);
-    setupSeries(series_ocMemVolt, Qt::cyan, tr("Memory voltage [mV]"), axis_state, axis_volts);
+
+    if (!device.getDriverFeatures().isVDDCCurveAvailable) {
+        auto series_ocMemFreq = new QLineSeries(chart_oc);
+        auto series_ocMemVolt = new QLineSeries(chart_oc);
+        chart_oc->addSeries(series_ocMemFreq);
+        chart_oc->addSeries(series_ocMemVolt);
+        setupSeries(series_ocMemFreq, Qt::blue, tr("Memory frequency [MHz]"), axis_state, axis_frequency);
+        setupSeries(series_ocMemVolt, Qt::cyan, tr("Memory voltage [mV]"), axis_state, axis_volts);
+    }
 
     ui->verticalLayout_10->addWidget(chartView_oc);
 

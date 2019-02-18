@@ -231,6 +231,16 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
             ui->tw_overclock->setTabEnabled(1, true);
             ui->btn_applyOverclock->setEnabled(true);
+
+            if (device.getDriverFeatures().isVDDCCurveAvailable) {
+                ui->label_ocTableTitle->setText(tr("VDDC curve"));
+                ui->btn_setOcRanges->setVisible(true);
+
+                ui->list_memStates->setVisible(false);
+                ui->label_memOcTableTitle->setVisible(false);
+            } else {
+                ui->btn_setOcRanges->setVisible(false);
+            }
         }
 
         if (device.getDriverFeatures().isPowerCapAvailable) {

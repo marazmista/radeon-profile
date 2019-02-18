@@ -43,33 +43,47 @@ void radeon_profile::updateOcGraphSeries(const FVTable &table, QLineSeries *seri
 void radeon_profile::setupOcTableOverclock() {
     ui->tw_overclock->setTabEnabled(1, true);
 
-    loadOcTable(device.getDriverFeatures().coreTable, ui->list_coreStates,
-                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_FREQUENCY]),
-                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_VOLTAGE]));
-
-    loadOcTable(device.getDriverFeatures().memTable, ui->list_memStates,
-                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_FREQUENCY]),
-                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_VOLTAGE]));
-
     auto axis_frequency = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::FREQUENCY]);
     auto axis_volts = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::VOLTAGE]);
     auto axis_state = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Horizontal)[0]);
 
-    axis_frequency->setMax((device.getDriverFeatures().coreRange.max > device.getDriverFeatures().memRange.max)
-                             ? device.getDriverFeatures().coreRange.max + 100 : device.getDriverFeatures().memRange.max + 100);
-    axis_volts->setMax(device.getDriverFeatures().voltageRange.max + 100);
+    if (device.getDriverFeatures().isVDDCCurveAvailable) {
+        loadOcTable(device.getDriverFeatures().statesTables.value(OD_VDDC_CURVE), ui->list_coreStates,
+                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_FREQUENCY]),
+                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_VOLTAGE]));
 
-    axis_state->setMax(device.getDriverFeatures().coreTable.lastKey());
-    axis_state->setTickCount(device.getDriverFeatures().coreTable.keys().count());
+        axis_state->setMax(2);
+        axis_state->setTickCount(3);
+
+        axis_volts->setRange(device.getDriverFeatures().ocRages.value("VDDC_CURVE_VOLT[2]").min - 100,
+                             device.getDriverFeatures().ocRages.value("VDDC_CURVE_VOLT[2]").max + 100);
+
+    } else {
+
+        loadOcTable(device.getDriverFeatures().statesTables.value(OD_SCLK), ui->list_coreStates,
+                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_FREQUENCY]),
+                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_VOLTAGE]));
+
+        loadOcTable(device.getDriverFeatures().statesTables.value(OD_MCLK), ui->list_memStates,
+                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_FREQUENCY]),
+                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_VOLTAGE]));
+
+        axis_state->setMax(device.getDriverFeatures().statesTables.value(OD_SCLK).lastKey());
+        axis_state->setTickCount(device.getDriverFeatures().statesTables.value(OD_SCLK).keys().count());
+
+        axis_volts->setMax(device.getDriverFeatures().ocRages.value(VDDC).max + 100);
+    }
+
+    axis_frequency->setMax((device.getDriverFeatures().ocRages.value(SCLK).max > device.getDriverFeatures().ocRages.value(MCLK).max)
+                             ? device.getDriverFeatures().ocRages.value(SCLK).max + 100
+                             : device.getDriverFeatures().ocRages.value(MCLK).max + 100);
 
     axis_frequency->setTickCount(8);
     axis_volts->setTickCount(8);
 }
 
-void radeon_profile::adjustState(const QTreeWidget *list, QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange,
-                                 OcSeriesType frequencyType, OcSeriesType voltageType, const FVTable &table, const QString stateTypeString) {
-
-    auto index = list->currentIndex().row();
+void radeon_profile::adjustState(const int index, QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange,
+                                 OcSeriesType frequencyType, OcSeriesType voltageType, const QString &tableKey, const QString stateTypeString) {
 
     auto d = new Dialog_sliders(tr("Adjust state"), this);
 
@@ -87,9 +101,9 @@ void radeon_profile::adjustState(const QTreeWidget *list, QTreeWidgetItem *item,
     if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
         device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
 
-    device.setOcTableValue(stateTypeString, index, FreqVoltPair(item->text(1).toUInt(), item->text(2).toUInt()));
-    updateOcGraphSeries(table, static_cast<QLineSeries*>(chartView_oc->chart()->series()[frequencyType]), frequencyType);
-    updateOcGraphSeries(table, static_cast<QLineSeries*>(chartView_oc->chart()->series()[voltageType]), voltageType);
+    device.setOcTableValue(stateTypeString, tableKey, index, FreqVoltPair(item->text(1).toUInt(), item->text(2).toUInt()));
+    updateOcGraphSeries(device.getDriverFeatures().statesTables.value(tableKey), static_cast<QLineSeries*>(chartView_oc->chart()->series()[frequencyType]), frequencyType);
+    updateOcGraphSeries(device.getDriverFeatures().statesTables.value(tableKey), static_cast<QLineSeries*>(chartView_oc->chart()->series()[voltageType]), voltageType);
 
     ocTableModified = true;
     delete d;
@@ -99,16 +113,21 @@ void radeon_profile::on_list_coreStates_itemDoubleClicked(QTreeWidgetItem *item,
 {
     Q_UNUSED(column);
 
-    adjustState(ui->list_coreStates, item, device.getDriverFeatures().coreRange, device.getDriverFeatures().voltageRange,
-                OcSeriesType::CORE_FREQUENCY, OcSeriesType::CORE_VOLTAGE, device.getDriverFeatures().coreTable, "s");
+    if (device.getDriverFeatures().isVDDCCurveAvailable) {
+        adjustState(ui->list_coreStates->currentIndex().row(), item,  device.getDriverFeatures().ocRages.value("VDDC_CURVE_SCLK["+QString::number(ui->list_coreStates->currentIndex().row())+"]"),
+                    device.getDriverFeatures().ocRages.value("VDDC_CURVE_VOLT["+QString::number(ui->list_coreStates->currentIndex().row())+"]"),
+                    OcSeriesType::CORE_FREQUENCY, OcSeriesType::CORE_VOLTAGE, OD_VDDC_CURVE, "vc");
+    } else
+        adjustState(ui->list_coreStates->currentIndex().row(), item, device.getDriverFeatures().ocRages.value(SCLK), device.getDriverFeatures().ocRages.value(VDDC),
+                    OcSeriesType::CORE_FREQUENCY, OcSeriesType::CORE_VOLTAGE, SCLK, "s");
 }
 
 void radeon_profile::on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column);
 
-    adjustState(ui->list_memStates, item, device.getDriverFeatures().memRange, device.getDriverFeatures().voltageRange,
-                OcSeriesType::MEM_FREQUENCY, OcSeriesType::MEM_VOLTAGE, device.getDriverFeatures().memTable, "m");
+    adjustState(ui->list_memStates->currentIndex().row(), item, device.getDriverFeatures().ocRages.value(MCLK), device.getDriverFeatures().ocRages.value(VDDC),
+                OcSeriesType::MEM_FREQUENCY, OcSeriesType::MEM_VOLTAGE, MCLK, "m");
 }
 
 void radeon_profile::on_btn_applyOcTable_clicked()
@@ -131,4 +150,32 @@ void radeon_profile::on_btn_resetOcTable_clicked()
     device.loadOcTable();
 
     ocTableModified = false;
+}
+
+void radeon_profile::on_btn_setOcRanges_clicked()
+{
+    auto d = new Dialog_sliders("Set ranges", this);
+    auto coreRange = device.getDriverFeatures().ocRages.value(SCLK);
+    auto currentRanges = device.getDriverFeatures().ocRages.value(OD_SCLK);
+
+    d->addSlider(tr("Minimum core clock"), "MHz", coreRange.min , coreRange.max, currentRanges.min);
+    d->addSlider(tr("Maximum core clock"), "MHz", coreRange.min, coreRange.max, currentRanges.max);
+    d->addSlider(tr("Maximum memory clock"), "MHz", device.getDriverFeatures().ocRages.value(MCLK).min,
+                 device.getDriverFeatures().ocRages.value(MCLK).max, device.getDriverFeatures().ocRages.value(OD_MCLK).max);
+
+    if (d->exec() == QDialog::Rejected) {
+        delete d;
+        return;
+    }
+
+    if (d->getValue(0) != currentRanges.min)
+        device.setOcRanges("s", OD_SCLK, 0, d->getValue(0));
+
+    if (d->getValue(1) != currentRanges.max)
+        device.setOcRanges("s", OD_SCLK, 1, d->getValue(1));
+
+    if (d->getValue(2) != device.getDriverFeatures().ocRages.value(OD_MCLK).max)
+        device.setOcRanges("m", OD_SCLK, 1, d->getValue(2));
+
+    delete d;
 }

@@ -655,6 +655,8 @@ void dXorg::figureOutDriverFeatures() {
         features.isOcTableAvailable = true;
 
         loadOcTable();
+
+        features.isVDDCCurveAvailable = features.statesTables.contains(OD_VDDC_CURVE);
     }
 }
 
@@ -759,71 +761,76 @@ int dXorg::getPowerCapCurrent() const {
     return getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER;
 }
 
+const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
+    MapFVTables tables;
+    MapOCRanges ocRanges;
 
-const QMap<QString, FVTable> dXorg::parseOcTable() {
-    bool supportedTable = false;
-    QMap<QString, FVTable> tables;
+    QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_od_clk_voltage).remove(' ')
+            .replace(QRegularExpression(":|MHz|mV", QRegularExpression::CaseInsensitiveOption), "|").split('\n');
 
-    QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_od_clk_voltage).split('\n');
+    // OD_VDDC_CURVE only in Vega20+
+    bool vega20Mode = sl.contains(QString(OD_VDDC_CURVE).append('|'));
 
-    for (QString &s: sl) {
-        if (s.contains("OD_SCLK")) {
-            tables.insert("OD_SCLK", FVTable());
-            supportedTable = true;
-            continue;
+    for (auto i = 0; i < sl.length(); ++i) {
+
+        if (vega20Mode) {
+            if (sl.at(i).contains(OD_SCLK)) {
+                QStringList stateMin = sl[++i].split("|", QString::SkipEmptyParts);
+                QStringList stateMax = sl[++i].split("|", QString::SkipEmptyParts);
+                ocRanges.insert(OD_SCLK, OCRange(stateMin[1].toUInt(), stateMax[1].toUInt()));
+                continue;
+            }
+
+            if (sl.at(i).contains(OD_MCLK)) {
+                QStringList stateMax = sl[++i].split("|", QString::SkipEmptyParts);
+                ocRanges.insert(OD_MCLK, OCRange(0, stateMax[1].toUInt()));
+                continue;
+            }
         }
 
-        if (s.contains("OD_MCLK")) {
-            tables.insert("OD_MCLK", FVTable());
-            supportedTable = true;
-            continue;
+        QString tableKey;
+        for (; i < sl.length(); ++i) {
+            auto tableItems = sl[i].split("|", QString::SkipEmptyParts);
+
+            if (tableItems.length() == 1) {
+
+                if (tableItems[0] == OD_RANGE) {
+                    for (++i; i < sl.length(); ++i) {
+
+                        auto state = sl[i].split("|", QString::SkipEmptyParts);
+                        if (state.length() == 1)
+                            break;
+
+                        ocRanges.insert(state[0], OCRange(state[1].toUInt(), state[2].toUInt()));
+                    }
+                } else
+                    tableKey = tableItems[0]; // next table key
+
+            } else {
+
+                FVTable fvt;
+                for (; i < sl.length(); ++i) {
+                    auto state = sl[i].split("|", QString::SkipEmptyParts);
+
+                    if (state.length() == 1) {
+                        --i; // go back to next table start
+                        break;
+                    }
+
+                    fvt.insert(state[0].toUInt(), FreqVoltPair(state[1].toUInt(), state[2].toUInt()));
+                }
+
+                tables.insert(tableKey, fvt);
+            }
         }
-
-        if (s.contains("OD_RANGE")) {
-            supportedTable = true;
-            continue;
-        }
-
-        // unknown table title, not supported
-        if (s.endsWith(':')) {
-            supportedTable = false;
-            continue;
-        }
-
-        // parse only known tables
-        if (!supportedTable)
-            continue;
-
-        QStringList state = s.remove(" ").replace(QRegularExpression(":|MHz|mV", QRegularExpression::CaseInsensitiveOption), "|").split("|", QString::SkipEmptyParts);
-
-        // read and setup OC ranges
-        if (state[0] == "SCLK") {
-            features.coreRange = OCRange(state[1].toUInt(), state[2].toUInt());
-            continue;
-        }
-        if (state[0] == "MCLK") {
-            features.memRange = OCRange(state[1].toUInt(), state[2].toUInt());
-            continue;
-        }
-        if (state[0] == "VDDC") {
-            features.voltageRange = OCRange(state[1].toUInt(), state[2].toUInt());
-            continue;
-        }
-
-
-        FVTable &t = tables[tables.keys().first()];
-        t.insert(state[0].toUInt(), FreqVoltPair(state[1].toUInt(), state[2].toUInt()));
     }
 
-    return tables;
+    return std::make_tuple(tables, ocRanges);
 }
 
 void dXorg::loadOcTable() {
-    const QMap<QString, FVTable> tables = parseOcTable();
+    auto ocTable = parseOcTable();
 
-    if (tables.contains("OD_SCLK"))
-        features.coreTable = tables.value("OD_SCLK");
-
-    if (tables.contains("OD_MCLK"))
-        features.memTable = tables.value("OD_MCLK");
+    features.statesTables = std::get<0>(ocTable);
+    features.ocRages = std::get<1>(ocTable);
 }

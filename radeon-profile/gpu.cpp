@@ -334,11 +334,8 @@ void gpu::setPowerCap(const unsigned int value) {
     driverHandler->setNewValue(getDriverFiles().hwmonAttributes.power1_cap, QString::number(value + MICROWATT_DIVIDER));
 }
 
-void gpu::setOcTableValue(const QString &type, int powerState, const FreqVoltPair powerStateValues) {
-    if (type == "s")
-        driverHandler->features.coreTable.insert(powerState, powerStateValues);
-    else if (type == "m")
-        driverHandler->features.memTable.insert(powerState, powerStateValues);
+void gpu::setOcTableValue(const QString &type, const QString &tableKey, int powerState, const FreqVoltPair powerStateValues) {
+    driverHandler->features.statesTables[tableKey].insert(powerState, powerStateValues);
 
     driverHandler->setNewValue(getDriverFiles().sysFs.pp_od_clk_voltage,
                                type + " " + QString::number(powerState) + " " +
@@ -348,6 +345,17 @@ void gpu::setOcTableValue(const QString &type, int powerState, const FreqVoltPai
 
 void gpu::sendOcTableCommand(const QString cmd) {
     driverHandler->setNewValue(getDriverFiles().sysFs.pp_od_clk_voltage, cmd);
+}
+
+void gpu::setOcRanges(const QString &type, const QString &tableKey, int powerState, int rangeValue) {
+    OCRange &ocr = driverHandler->features.ocRages[tableKey];
+
+    if (powerState == 0)
+        ocr.min = rangeValue;
+    else
+        ocr.max = rangeValue;
+
+    sendOcTableCommand(type + " " + QString::number(powerState) + " " + QString::number(rangeValue));
 }
 
 void gpu::loadOcTable() {

@@ -33,6 +33,14 @@
 #define pwm_manual '1'
 #define pwm_auto '2'
 
+#define OD_RANGE "OD_RANGE"
+#define OD_MCLK "OD_MCLK"
+#define OD_SCLK "OD_SCLK"
+#define SCLK "SCLK"
+#define MCLK "MCLK"
+#define VDDC "VDDC"
+#define OD_VDDC_CURVE "OD_VDDC_CURVE"
+
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
 #define MICROWATT_DIVIDER 1000000
@@ -178,6 +186,8 @@ struct OCRange {
 typedef QMap<ValueID, RPValue> GPUDataContainer;
 typedef QMap<int, QString> PowerPlayTable;
 typedef QMap<unsigned, FreqVoltPair> FVTable;
+typedef QMap<QString, FVTable> MapFVTables;
+typedef QMap<QString, OCRange> MapOCRanges;
 typedef QMap<int, unsigned int> FanProfileSteps;
 
 // structure which holds what can be display on ui and on its base
@@ -191,7 +201,8 @@ struct DriverFeatures {
     isDpmCoreFreqTableAvailable = false,
     isDpmMemFreqTableAvailable = false,
     isPowerCapAvailable = false,
-    isOcTableAvailable = false;
+    isOcTableAvailable = false,
+    isVDDCCurveAvailable = false;
 
     PowerMethod currentPowerMethod;
     ClocksDataSource clocksDataSource = ClocksDataSource::SOURCE_UNKNOWN;
@@ -202,8 +213,8 @@ struct DriverFeatures {
     PowerPlayTable sclkTable, mclkTable;
 
     // base on file pp_od_clk_voltage
-    FVTable coreTable, memTable;
-    OCRange coreRange, memRange, voltageRange;
+    MapFVTables statesTables;
+    MapOCRanges ocRages;
 
     DriverFeatures() {
         currentPowerMethod = PowerMethod::PM_UNKNOWN;
