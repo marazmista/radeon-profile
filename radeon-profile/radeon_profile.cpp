@@ -241,12 +241,14 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
             } else {
                 ui->btn_setOcRanges->setVisible(false);
             }
-        }
 
-        if (device.getDriverFeatures().isPowerCapAvailable) {
-            ui->group_powerCap->setEnabled(true);
+            if (device.getDriverFeatures().isPowerCapAvailable) {
+                ui->group_powerCap->setEnabled(true);
 
-            ui->slider_powerCap->setRange(device.getGpuConstParams().power1_cap_min, device.getGpuConstParams().power1_cap_max);
+                ui->slider_powerCap->setRange(device.getGpuConstParams().power1_cap_min, device.getGpuConstParams().power1_cap_max);
+                ui->spin_powerCap->setRange(device.getGpuConstParams().power1_cap_min, device.getGpuConstParams().power1_cap_max);
+                ui->slider_powerCap->setValue(device.gpuData[ValueID::POWER_CAP_CURRENT].value);
+            }
         }
     }
 }
