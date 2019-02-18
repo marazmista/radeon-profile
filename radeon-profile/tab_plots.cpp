@@ -29,6 +29,7 @@ void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
     }
 
     ui->stack_plots->setCurrentIndex(0);
+    saveConfig();
 }
 
 PlotInitialValues radeon_profile::figureOutInitialScale(const PlotDefinitionSchema &pds)
