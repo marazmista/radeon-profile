@@ -119,7 +119,7 @@ void radeon_profile::on_list_coreStates_itemDoubleClicked(QTreeWidgetItem *item,
                     OcSeriesType::CORE_FREQUENCY, OcSeriesType::CORE_VOLTAGE, OD_VDDC_CURVE, "vc");
     } else
         adjustState(ui->list_coreStates->currentIndex().row(), item, device.getDriverFeatures().ocRages.value(SCLK), device.getDriverFeatures().ocRages.value(VDDC),
-                    OcSeriesType::CORE_FREQUENCY, OcSeriesType::CORE_VOLTAGE, SCLK, "s");
+                    OcSeriesType::CORE_FREQUENCY, OcSeriesType::CORE_VOLTAGE, OD_SCLK, "s");
 }
 
 void radeon_profile::on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -127,7 +127,7 @@ void radeon_profile::on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, 
     Q_UNUSED(column);
 
     adjustState(ui->list_memStates->currentIndex().row(), item, device.getDriverFeatures().ocRages.value(MCLK), device.getDriverFeatures().ocRages.value(VDDC),
-                OcSeriesType::MEM_FREQUENCY, OcSeriesType::MEM_VOLTAGE, MCLK, "m");
+                OcSeriesType::MEM_FREQUENCY, OcSeriesType::MEM_VOLTAGE, OD_MCLK, "m");
 }
 
 void radeon_profile::on_btn_applyOcTable_clicked()
