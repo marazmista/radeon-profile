@@ -1465,7 +1465,7 @@
               <property name="maximumSize">
                <size>
                 <width>200</width>
-                <height>300</height>
+                <height>350</height>
                </size>
               </property>
               <property name="alternatingRowColors">
@@ -1597,7 +1597,7 @@
               <property name="maximumSize">
                <size>
                 <width>200</width>
-                <height>150</height>
+                <height>220</height>
                </size>
               </property>
               <property name="alternatingRowColors">
