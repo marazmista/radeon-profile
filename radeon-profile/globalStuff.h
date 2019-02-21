@@ -335,7 +335,7 @@ struct HwmonAttributes {
         if (!checkFileCorrectness(pwm1_enable, true))
             pwm1 = pwm1_enable = pwm1_max = "";
 
-        if (!checkFileCorrectness(fan1_input))
+        if (!checkFileCorrectness(fan1_input, true))
             fan1_input = "";
 
         if (!checkFileCorrectness(power1_cap))

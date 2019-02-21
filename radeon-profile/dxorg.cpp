@@ -527,7 +527,7 @@ GPUFanSpeed dXorg::getFanSpeed() {
     tmp.fanSpeedPercent = (getValueFromSysFsFile(driverFiles.hwmonAttributes.pwm1).toFloat() / params.pwmMaxSpeed) * 100;
 
     if (!driverFiles.hwmonAttributes.fan1_input.isEmpty())
-        tmp.fanSpeedRpm = getValueFromSysFsFile(driverFiles.hwmonAttributes.pwm1).toInt();
+        tmp.fanSpeedRpm = getValueFromSysFsFile(driverFiles.hwmonAttributes.fan1_input).toInt();
 
     return tmp;
 }
