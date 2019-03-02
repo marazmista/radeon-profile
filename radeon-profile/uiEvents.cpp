@@ -86,10 +86,10 @@ void radeon_profile::on_btn_pwmProfile_clicked()
 }
 
 void radeon_profile::setPowerLevelFromCombo() {
-    if (ui->group_freq->isChecked() && (ForcePowerLevels)ui->combo_pLevel->currentIndex() != ForcePowerLevels::F_MANUAL)
+    if (ui->group_freq->isChecked() && static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
         ui->group_freq->setChecked(false);
 
-    device.setForcePowerLevel((ForcePowerLevels)ui->combo_pLevel->currentIndex());
+    device.setForcePowerLevel(static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()));
 }
 
 void radeon_profile::resetMinMax() {
