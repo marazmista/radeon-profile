@@ -6,84 +6,34 @@
 #include <QMessageBox>
 #include <QMenu>
 
-void loadOcTable(const FVTable &table, QTreeWidget *list, QLineSeries *series_Freq, QLineSeries *series_Voltage) {
-    for (const unsigned k :  table.keys()) {
-        const FreqVoltPair &fvp = table.value(k);
+FVTable listToMap(const QTreeWidget *list) {
+    FVTable fvt;
+    for (auto i = 0; i < list->topLevelItemCount(); ++i)
+        fvt.insert(i, FreqVoltPair(list->topLevelItem(i)->text(1).toUInt(), list->topLevelItem(i)->text(2).toUInt()));
 
-        series_Freq->append(k, fvp.frequency);
-        series_Voltage->append(k, fvp.voltage);
+    return fvt;
+}
 
+void radeon_profile::loadListFromOcProfile(const FVTable &table, QTreeWidget *list) {
+    for (auto k : table.keys()) {
         list->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
-                                                                << QString::number(fvp.frequency)
-                                                                << QString::number(fvp.voltage)));
+                              << QString::number(table.value(k).frequency)
+                              << QString::number(table.value(k).voltage)));
     }
 }
 
-void radeon_profile::updateOcGraphSeries(const FVTable &table, QLineSeries *series, OcSeriesType type) {
+void radeon_profile::createOcGraphSeriesFromList(const QTreeWidget *list, QLineSeries *seriesClocks, QLineSeries *seriesVoltages) {
 
-    series->clear();
+    seriesClocks->clear();
+    seriesVoltages->clear();
 
-    for (const unsigned k: table.keys()) {
-        switch (type) {
-            case OcSeriesType::MEM_FREQUENCY:
-            case OcSeriesType::CORE_FREQUENCY:
-                series->append(k, table.value(k).frequency);
-                break;
-
-            case OcSeriesType::MEM_VOLTAGE:
-            case OcSeriesType::CORE_VOLTAGE:
-                series->append(k, table.value(k).voltage);
-                break;
-        }
+    for (auto i = 0; i < list->topLevelItemCount(); ++i) {
+        seriesClocks->append(i, list->topLevelItem(i)->text(1).toUInt());
+        seriesVoltages->append(i, list->topLevelItem(i)->text(2).toUInt());
     }
-
 }
 
-
-void radeon_profile::setupOcTableOverclock() {
-    ui->tw_overclock->setTabEnabled(1, true);
-
-    auto axis_frequency = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::FREQUENCY]);
-    auto axis_volts = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::VOLTAGE]);
-    auto axis_state = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Horizontal)[0]);
-
-    if (device.getDriverFeatures().isVDDCCurveAvailable) {
-        loadOcTable(device.getDriverFeatures().statesTables.value(OD_VDDC_CURVE), ui->list_coreStates,
-                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_FREQUENCY]),
-                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_VOLTAGE]));
-
-        axis_state->setMax(2);
-        axis_state->setTickCount(3);
-
-        axis_volts->setRange(device.getDriverFeatures().ocRages.value("VDDC_CURVE_VOLT[2]").min - 100,
-                             device.getDriverFeatures().ocRages.value("VDDC_CURVE_VOLT[2]").max + 100);
-
-    } else {
-
-        loadOcTable(device.getDriverFeatures().statesTables.value(OD_SCLK), ui->list_coreStates,
-                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_FREQUENCY]),
-                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_VOLTAGE]));
-
-        loadOcTable(device.getDriverFeatures().statesTables.value(OD_MCLK), ui->list_memStates,
-                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_FREQUENCY]),
-                    static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_VOLTAGE]));
-
-        axis_state->setMax(device.getDriverFeatures().statesTables.value(OD_SCLK).lastKey());
-        axis_state->setTickCount(device.getDriverFeatures().statesTables.value(OD_SCLK).keys().count());
-
-        axis_volts->setMax(device.getDriverFeatures().ocRages.value(VDDC).max + 100);
-    }
-
-    axis_frequency->setMax((device.getDriverFeatures().ocRages.value(SCLK).max > device.getDriverFeatures().ocRages.value(MCLK).max)
-                             ? device.getDriverFeatures().ocRages.value(SCLK).max + 100
-                             : device.getDriverFeatures().ocRages.value(MCLK).max + 100);
-
-    axis_frequency->setTickCount(8);
-    axis_volts->setTickCount(8);
-}
-
-void radeon_profile::adjustState(const int index, QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange,
-                                 OcSeriesType frequencyType, OcSeriesType voltageType, const QString &tableKey, const QString stateTypeString) {
+void radeon_profile::adjustState(QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange) {
 
     auto d = new Dialog_sliders(tr("Adjust state"), this);
 
@@ -98,14 +48,7 @@ void radeon_profile::adjustState(const int index, QTreeWidgetItem *item, const O
     item->setText(1, QString::number(d->getValue(0)));
     item->setText(2, QString::number(d->getValue(1)));
 
-    if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
-        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
-
-    device.setOcTableValue(stateTypeString, tableKey, index, FreqVoltPair(item->text(1).toUInt(), item->text(2).toUInt()));
-    updateOcGraphSeries(device.getDriverFeatures().statesTables.value(tableKey), static_cast<QLineSeries*>(chartView_oc->chart()->series()[frequencyType]), frequencyType);
-    updateOcGraphSeries(device.getDriverFeatures().statesTables.value(tableKey), static_cast<QLineSeries*>(chartView_oc->chart()->series()[voltageType]), voltageType);
-
-    ocTableModified = true;
+    ui->l_ocProfileUnsavedInficator->setVisible(true);
     delete d;
 }
 
@@ -114,42 +57,48 @@ void radeon_profile::on_list_coreStates_itemDoubleClicked(QTreeWidgetItem *item,
     Q_UNUSED(column);
 
     if (device.getDriverFeatures().isVDDCCurveAvailable) {
-        adjustState(ui->list_coreStates->currentIndex().row(), item,  device.getDriverFeatures().ocRages.value("VDDC_CURVE_SCLK["+QString::number(ui->list_coreStates->currentIndex().row())+"]"),
-                    device.getDriverFeatures().ocRages.value("VDDC_CURVE_VOLT["+QString::number(ui->list_coreStates->currentIndex().row())+"]"),
-                    OcSeriesType::CORE_FREQUENCY, OcSeriesType::CORE_VOLTAGE, OD_VDDC_CURVE, "vc");
+        adjustState(item,  device.getDriverFeatures().ocRages.value("VDDC_CURVE_SCLK["+QString::number(ui->list_coreStates->currentIndex().row())+"]"),
+                    device.getDriverFeatures().ocRages.value("VDDC_CURVE_VOLT["+QString::number(ui->list_coreStates->currentIndex().row())+"]"));
     } else
-        adjustState(ui->list_coreStates->currentIndex().row(), item, device.getDriverFeatures().ocRages.value(SCLK), device.getDriverFeatures().ocRages.value(VDDC),
-                    OcSeriesType::CORE_FREQUENCY, OcSeriesType::CORE_VOLTAGE, OD_SCLK, "s");
+        adjustState(item, device.getDriverFeatures().ocRages.value(SCLK), device.getDriverFeatures().ocRages.value(VDDC));
+
+
+    createOcGraphSeriesFromList(ui->list_coreStates, static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_FREQUENCY]),
+            static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_VOLTAGE]));
 }
 
 void radeon_profile::on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column);
 
-    adjustState(ui->list_memStates->currentIndex().row(), item, device.getDriverFeatures().ocRages.value(MCLK), device.getDriverFeatures().ocRages.value(VDDC),
-                OcSeriesType::MEM_FREQUENCY, OcSeriesType::MEM_VOLTAGE, OD_MCLK, "m");
+    adjustState(item, device.getDriverFeatures().ocRages.value(MCLK), device.getDriverFeatures().ocRages.value(VDDC));
+
+    createOcGraphSeriesFromList(ui->list_memStates, static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_FREQUENCY]),
+            static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_VOLTAGE]));
 }
 
 void radeon_profile::on_btn_applyOcTable_clicked()
 {
-    if (device.currentPowerLevel != ForcePowerLevels::F_MANUAL)
-        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+    if (ui->l_ocProfileUnsavedInficator->isVisible()) {
+        if (!askConfirmation("", tr("Cannot activate unsaved profile. Do you want to save it?")))
+            return;
 
-    if (ocTableModified)
-        device.sendOcTableCommand("c");
+        on_btn_saveOcProfile_clicked();
+    }
 
-    ocTableModified = false;
-
-    if (device.getDriverFeatures().isPowerCapAvailable && device.gpuData[ValueID::POWER_CAP_CURRENT].value != ui->slider_powerCap->value())
-        device.setPowerCap(ui->slider_powerCap->value());
+    setCurrentOcProfile(ui->combo_ocProfiles->currentText());
 }
 
 void radeon_profile::on_btn_resetOcTable_clicked()
 {
     device.sendOcTableCommand("r");
-    device.loadOcTable();
+    device.readOcTableAndRanges();
 
-    ocTableModified = false;
+    auto &ocp = ocProfiles[ui->combo_ocProfiles->currentText()];
+    ocp.tables = device.getDriverFeatures().currentStatesTables;
+    createOcProfileListsAndGraph(ui->combo_ocProfiles->currentText());
+
+    ui->l_ocProfileUnsavedInficator->setVisible(true);
 }
 
 void radeon_profile::on_btn_setOcRanges_clicked()
@@ -175,7 +124,147 @@ void radeon_profile::on_btn_setOcRanges_clicked()
         device.setOcRanges("s", OD_SCLK, 1, d->getValue(1));
 
     if (d->getValue(2) != device.getDriverFeatures().ocRages.value(OD_MCLK).max)
-        device.setOcRanges("m", OD_SCLK, 1, d->getValue(2));
+        device.setOcRanges("m", OD_MCLK, 1, d->getValue(2));
 
     delete d;
+}
+
+
+OCProfile radeon_profile::createOcProfile() {
+    OCProfile ocp;
+
+    ocp.powerCap = ui->slider_powerCap->value();
+
+    if (device.getDriverFeatures().isVDDCCurveAvailable)
+        ocp.tables.insert(OD_VDDC_CURVE, listToMap(ui->list_coreStates));
+    else {
+        ocp.tables.insert(OD_SCLK, listToMap(ui->list_coreStates));
+        ocp.tables.insert(OD_MCLK, listToMap(ui->list_memStates));
+    }
+
+    return ocp;
+}
+
+void radeon_profile::on_btn_saveOcProfile_clicked()
+{
+    ocProfiles.insert(ui->combo_ocProfiles->currentText(), createOcProfile());
+    saveConfig();
+
+    ui->l_ocProfileUnsavedInficator->setVisible(false);
+}
+
+void radeon_profile::on_btn_saveOcProfileAs_clicked()
+{
+    QString name =  QInputDialog::getText(this, "", tr("Overclock profile name:"));
+
+    if (name.isEmpty())
+        return;
+
+    if (ocProfiles.contains(name)) {
+        QMessageBox::information(this, "", tr("Cannot add another profile with the same name that already exists."), QMessageBox::Ok);
+        return;
+    }
+
+    ocProfiles.insert(name, createOcProfile());
+    ui->combo_ocProfiles->addItem(name);
+    ui->combo_ocProfiles->setCurrentText(name);
+
+    saveConfig();
+
+    ui->l_ocProfileUnsavedInficator->setVisible(false);
+}
+
+void radeon_profile::createOcProfileListsAndGraph(const QString &arg1)
+{
+    ui->list_coreStates->clear();
+    ui->list_memStates->clear();
+
+    const auto ocp = ocProfiles.value(arg1);
+
+    ui->slider_powerCap->setValue(ocp.powerCap);
+
+    auto axis_frequency = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::FREQUENCY]);
+    auto axis_volts = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Vertical)[AxisType::VOLTAGE]);
+    auto axis_state = static_cast<QValueAxis*>(chartView_oc->chart()->axes(Qt::Horizontal)[0]);
+
+    if (device.getDriverFeatures().isVDDCCurveAvailable) {
+        loadListFromOcProfile(ocp.tables.value(OD_VDDC_CURVE), ui->list_coreStates);
+
+        axis_state->setMax(2);
+        axis_state->setTickCount(3);
+
+        axis_volts->setRange(device.getDriverFeatures().ocRages.value("VDDC_CURVE_VOLT[2]").min - 100,
+                             device.getDriverFeatures().ocRages.value("VDDC_CURVE_VOLT[2]").max + 100);
+
+    } else {
+        loadListFromOcProfile(ocp.tables.value(OD_SCLK), ui->list_coreStates);
+        loadListFromOcProfile(ocp.tables.value(OD_MCLK), ui->list_memStates);
+
+        createOcGraphSeriesFromList(ui->list_memStates, static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_FREQUENCY]),
+                static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_VOLTAGE]));
+
+        axis_state->setMax(device.getDriverFeatures().currentStatesTables.value(OD_SCLK).lastKey());
+        axis_state->setTickCount(device.getDriverFeatures().currentStatesTables.value(OD_SCLK).keys().count());
+
+        axis_volts->setMax(device.getDriverFeatures().ocRages.value(VDDC).max + 100);
+    }
+
+    createOcGraphSeriesFromList(ui->list_coreStates, static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_FREQUENCY]),
+            static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::CORE_VOLTAGE]));
+
+
+    axis_frequency->setMax((device.getDriverFeatures().ocRages.value(SCLK).max > device.getDriverFeatures().ocRages.value(MCLK).max)
+                             ? device.getDriverFeatures().ocRages.value(SCLK).max + 100
+                             : device.getDriverFeatures().ocRages.value(MCLK).max + 100);
+
+    axis_frequency->setTickCount(8);
+    axis_volts->setTickCount(8);
+
+    ui->l_ocProfileUnsavedInficator->setVisible(false);
+}
+
+void radeon_profile::on_btn_removeOcProfile_clicked()
+{
+    if (ui->combo_ocProfiles->currentText() == "default") {
+        QMessageBox::information(this, "", tr("Cannot remove default profile."), QMessageBox::Ok);
+        return;
+    }
+
+    if (!askConfirmation("", tr("Remove profile: ")+ui->combo_ocProfiles->currentText() + "?"))
+        return;
+
+    ocProfiles.remove(ui->combo_ocProfiles->currentText());
+    ui->combo_ocProfiles->removeItem(ui->combo_ocProfiles->currentIndex());
+
+    setCurrentOcProfile("default");
+    saveConfig();
+
+    ui->l_ocProfileUnsavedInficator->setVisible(false);
+}
+
+void radeon_profile::setCurrentOcProfile(const QString &name) {
+    if (static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
+        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+
+    if (device.getDriverFeatures().isVDDCCurveAvailable)
+        device.setOcTable("vc", ocProfiles.value(name).tables.value(OD_VDDC_CURVE));
+    else {
+        device.setOcTable("s", ocProfiles.value(name).tables.value(OD_SCLK));
+        device.setOcTable("m", ocProfiles.value(name).tables.value(OD_MCLK));
+    }
+
+    device.sendOcTableCommand("c");
+
+    if (device.getDriverFeatures().isPowerCapAvailable && device.gpuData[ValueID::POWER_CAP_CURRENT].value != ui->slider_powerCap->value())
+        device.setPowerCap(ui->slider_powerCap->value());
+
+    ui->l_currentOcProfile->setText(name);
+    ui->combo_ocProfiles->setCurrentText(name);
+}
+
+void radeon_profile::powerCapValueChange(int value)
+{
+    Q_UNUSED(value)
+
+    ui->l_ocProfileUnsavedInficator->setVisible(true);
 }

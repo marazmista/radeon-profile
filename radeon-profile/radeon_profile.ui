@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>926</width>
-    <height>486</height>
+    <width>1054</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -1438,23 +1438,130 @@
            <attribute name="title">
             <string>States table</string>
            </attribute>
-           <layout class="QGridLayout" name="gridLayout_13">
+           <layout class="QGridLayout" name="gridLayout_20" columnstretch="0,0,1">
             <property name="leftMargin">
-             <number>4</number>
-            </property>
-            <property name="topMargin">
-             <number>4</number>
-            </property>
-            <property name="rightMargin">
-             <number>4</number>
-            </property>
-            <property name="bottomMargin">
-             <number>4</number>
-            </property>
-            <property name="spacing">
              <number>5</number>
             </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <property name="spacing">
+             <number>4</number>
+            </property>
+            <item row="0" column="0" colspan="2">
+             <layout class="QGridLayout" name="gridLayout_13">
+              <item row="1" column="1">
+               <widget class="QPushButton" name="btn_applyOcTable">
+                <property name="maximumSize">
+                 <size>
+                  <width>110</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Apply</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="l_currentOcProfile">
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>default</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_19">
+                <property name="text">
+                 <string>Current profile:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QComboBox" name="combo_ocProfiles"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QPushButton" name="btn_saveOcProfile">
+                <property name="text">
+                 <string>Save</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QPushButton" name="btn_saveOcProfileAs">
+                <property name="text">
+                 <string>Save as</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QPushButton" name="btn_removeOcProfile">
+                <property name="text">
+                 <string>Remove profile</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0" colspan="2">
+               <widget class="QPushButton" name="btn_resetOcTable">
+                <property name="text">
+                 <string>Reset overclock</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="l_ocProfileUnsavedInficator">
+                <property name="font">
+                 <font>
+                  <pointsize>8</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Unsaved</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
             <item row="1" column="0">
+             <widget class="QLabel" name="l_ocTableTitle">
+              <property name="maximumSize">
+               <size>
+                <width>200</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Core</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
              <widget class="QTreeWidget" name="list_coreStates">
               <property name="minimumSize">
                <size>
@@ -1465,7 +1572,7 @@
               <property name="maximumSize">
                <size>
                 <width>200</width>
-                <height>350</height>
+                <height>16777215</height>
                </size>
               </property>
               <property name="alternatingRowColors">
@@ -1497,107 +1604,32 @@
               </column>
              </widget>
             </item>
-            <item row="5" column="0">
-             <spacer name="verticalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
+            <item row="3" column="0">
+             <widget class="QPushButton" name="btn_setOcRanges">
+              <property name="text">
+               <string>Set ranges</string>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="6" column="1">
-             <widget class="QGroupBox" name="group_powerCap">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>70</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>70</height>
-               </size>
-              </property>
-              <property name="title">
-               <string>Power Cap</string>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout">
-               <property name="spacing">
-                <number>4</number>
-               </property>
-               <property name="leftMargin">
-                <number>2</number>
-               </property>
-               <property name="topMargin">
-                <number>2</number>
-               </property>
-               <property name="rightMargin">
-                <number>2</number>
-               </property>
-               <property name="bottomMargin">
-                <number>2</number>
-               </property>
-               <item>
-                <widget class="QSlider" name="slider_powerCap">
-                 <property name="minimum">
-                  <number>10</number>
-                 </property>
-                 <property name="maximum">
-                  <number>100</number>
-                 </property>
-                 <property name="value">
-                  <number>20</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="invertedControls">
-                  <bool>false</bool>
-                 </property>
-                 <property name="tickPosition">
-                  <enum>QSlider::TicksBothSides</enum>
-                 </property>
-                 <property name="tickInterval">
-                  <number>5</number>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QSpinBox" name="spin_powerCap">
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                  </font>
-                 </property>
-                 <property name="suffix">
-                  <string>W</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
              </widget>
             </item>
             <item row="4" column="0">
-             <widget class="QTreeWidget" name="list_memStates">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
+             <widget class="QLabel" name="l_memOcTableTitle">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
+              <property name="text">
+               <string>Memory</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QTreeWidget" name="list_memStates">
               <property name="maximumSize">
                <size>
                 <width>200</width>
-                <height>220</height>
+                <height>16777215</height>
                </size>
               </property>
               <property name="alternatingRowColors">
@@ -1629,102 +1661,101 @@
               </column>
              </widget>
             </item>
-            <item row="0" column="1" rowspan="6" colspan="2">
+            <item row="1" column="1" rowspan="5">
+             <widget class="QGroupBox" name="group_powerCap">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="title">
+               <string>Power Cap</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_19">
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <item row="1" column="2">
+                <spacer name="horizontalSpacer_6">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>5</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="1">
+                <widget class="QSlider" name="slider_powerCap">
+                 <property name="minimum">
+                  <number>10</number>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                 <property name="value">
+                  <number>20</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="invertedControls">
+                  <bool>false</bool>
+                 </property>
+                 <property name="tickPosition">
+                  <enum>QSlider::TicksBothSides</enum>
+                 </property>
+                 <property name="tickInterval">
+                  <number>5</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <spacer name="horizontalSpacer_8">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>5</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="0" colspan="3">
+                <widget class="QSpinBox" name="spin_powerCap">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="suffix">
+                  <string>W</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="0" column="2" rowspan="6">
              <layout class="QVBoxLayout" name="verticalLayout_10"/>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_memOcTableTitle">
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Memory</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_ocTableTitle">
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Core</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <layout class="QVBoxLayout" name="verticalLayout_31">
-              <property name="spacing">
-               <number>4</number>
-              </property>
-              <item>
-               <widget class="QPushButton" name="btn_resetOcTable">
-                <property name="maximumSize">
-                 <size>
-                  <width>200</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Reset</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer_9">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>5</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btn_applyOcTable">
-                <property name="maximumSize">
-                 <size>
-                  <width>200</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Apply</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="2" column="0">
-             <widget class="QPushButton" name="btn_setOcRanges">
-              <property name="text">
-               <string>Set ranges</string>
-              </property>
-             </widget>
             </item>
            </layout>
           </widget>
@@ -1996,43 +2027,6 @@
             </item>
             <item row="2" column="2" colspan="2">
              <widget class="QLabel" name="l_fanProfileUnsavedIndicator">
-              <property name="palette">
-               <palette>
-                <active>
-                 <colorrole role="WindowText">
-                  <brush brushstyle="SolidPattern">
-                   <color alpha="255">
-                    <red>170</red>
-                    <green>0</green>
-                    <blue>0</blue>
-                   </color>
-                  </brush>
-                 </colorrole>
-                </active>
-                <inactive>
-                 <colorrole role="WindowText">
-                  <brush brushstyle="SolidPattern">
-                   <color alpha="255">
-                    <red>170</red>
-                    <green>0</green>
-                    <blue>0</blue>
-                   </color>
-                  </brush>
-                 </colorrole>
-                </inactive>
-                <disabled>
-                 <colorrole role="WindowText">
-                  <brush brushstyle="SolidPattern">
-                   <color alpha="96">
-                    <red>164</red>
-                    <green>166</green>
-                    <blue>168</blue>
-                   </color>
-                  </brush>
-                 </colorrole>
-                </disabled>
-               </palette>
-              </property>
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -2107,10 +2101,10 @@
                </font>
               </property>
               <property name="text">
-               <string/>
+               <string>default</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -3631,8 +3625,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>767</width>
-             <height>549</height>
+             <width>895</width>
+             <height>562</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_27">

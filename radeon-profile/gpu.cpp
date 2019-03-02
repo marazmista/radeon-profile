@@ -335,7 +335,7 @@ void gpu::setPowerCap(const unsigned int value) {
 }
 
 void gpu::setOcTableValue(const QString &type, const QString &tableKey, int powerState, const FreqVoltPair powerStateValues) {
-    driverHandler->features.statesTables[tableKey].insert(powerState, powerStateValues);
+    driverHandler->features.currentStatesTables[tableKey].insert(powerState, powerStateValues);
 
     driverHandler->setNewValue(getDriverFiles().sysFs.pp_od_clk_voltage,
                                type + " " + QString::number(powerState) + " " +
@@ -358,10 +358,15 @@ void gpu::setOcRanges(const QString &type, const QString &tableKey, int powerSta
     sendOcTableCommand(type + " " + QString::number(powerState) + " " + QString::number(rangeValue));
 }
 
-void gpu::loadOcTable() {
-    driverHandler->loadOcTable();
+void gpu::readOcTableAndRanges() {
+    driverHandler->readOcTableAndRanges();
 }
 
+void gpu::setOcTable(const QString &tableType, const FVTable &table) {
+    driverHandler->setOcTable(tableType, table);
+
+    readOcTableAndRanges();
+}
 
 // Function that returns the human readable output of a property value
 // For reference:

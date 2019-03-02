@@ -146,6 +146,11 @@ private slots:
     void on_btn_resetOcTable_clicked();
     void setEnabledChangeEvent() { enableChangeEvent = true; };
     void on_btn_setOcRanges_clicked();
+    void on_btn_saveOcProfile_clicked();
+    void on_btn_saveOcProfileAs_clicked();
+    void createOcProfileListsAndGraph(const QString &arg1);
+    void on_btn_removeOcProfile_clicked();
+    void powerCapValueChange(int arg1);
 
 private:
     struct CurrentStateInfo {
@@ -163,11 +168,12 @@ private:
     QList<ExecBin*> execsRunning;
     FanProfileSteps currentFanProfile;
     QMap<QString, FanProfileSteps> fanProfiles;
+    QMap<QString, OCProfile> ocProfiles;
     QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
     unsigned int counter_ticks, counter_statsTick;
     short hysteresisRelativeTepmerature;
-    bool ocTableModified, enableChangeEvent;
+    bool enableChangeEvent;
     QButtonGroup group_pwm, group_Dpm;
     CurrentStateInfo *savedState;
     PlotManager plotManager;
@@ -240,10 +246,13 @@ private:
     QString createCurrentMinMaxString(const QString &current, const QString &min,  const QString &max);
     void addDpmButtons();
     void createFanProfileGraph();
-    void setupOcTableOverclock();
-    void updateOcGraphSeries(const FVTable &table, QLineSeries *series, OcSeriesType type);
-    void adjustState(const int index, QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange,
-                     OcSeriesType frequencyType, OcSeriesType voltageType, const QString &tableKey, const QString s);
+    void createOcGraphSeriesFromList(const QTreeWidget *list, QLineSeries *seriesClocks, QLineSeries *seriesVoltages);
+    void adjustState(QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange);
+    void saveOcProfiles(QXmlStreamWriter &xml);
+    void loadOcProfile(QXmlStreamReader &xml);
+    OCProfile createOcProfile();
+    void setCurrentOcProfile(const QString &name);
+    void loadListFromOcProfile(const FVTable &table, QTreeWidget *list);
 };
 
 #endif // RADEON_PROFILE_H

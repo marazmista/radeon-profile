@@ -76,6 +76,7 @@ void radeon_profile::saveConfig() {
     saveFanProfiles(xml);
     savePlotSchemas(xml);
     saveTopbarItemsSchemas(xml);
+    saveOcProfiles(xml);
 
     xml.writeEndElement();
     xml.writeEndDocument();
@@ -148,6 +149,43 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
         }
         xml.writeEndElement();
     }
+    xml.writeEndElement();
+}
+
+void radeon_profile::saveOcProfiles(QXmlStreamWriter &xml) {
+    xml.writeStartElement("OcProfiles");
+
+    for (QString k : ocProfiles.keys()) {
+        xml.writeStartElement("ocProfile");
+        xml.writeAttribute("name", k);
+
+        auto oct = ocProfiles.value(k);
+        xml.writeAttribute("powerCap", QString::number(oct.powerCap));
+
+        for (auto tk : oct.tables.keys()) {
+            const FVTable &fvt = oct.tables.value(tk);
+
+            xml.writeStartElement("table");
+            xml.writeAttribute("tableName", tk);
+
+            for (auto fvtk : fvt.keys()) {
+                const FreqVoltPair &fvp = fvt.value(fvtk);
+
+                xml.writeStartElement("state");
+                xml.writeAttribute("enabled", QString::number(true));
+                xml.writeAttribute("stateNumber", QString::number(fvtk));
+                xml.writeAttribute("frequency", QString::number(fvp.frequency));
+                xml.writeAttribute("voltage", QString::number(fvp.voltage));
+
+                xml.writeEndElement();
+            }
+
+            xml.writeEndElement();
+        }
+
+        xml.writeEndElement();
+    }
+
     xml.writeEndElement();
 }
 
@@ -310,6 +348,11 @@ void radeon_profile::loadConfig() {
                     continue;
                 }
 
+                if (xml.name().toString() == "ocProfile") {
+                    loadOcProfile(xml);
+                    continue;
+                }
+
                 if (xml.name().toString() == "plot") {
                     loadPlotSchemas(xml);
                     continue;
@@ -444,6 +487,38 @@ void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
 
         if (xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "fanProfile") {
             fanProfiles.insert(fpName, fps);
+            return;
+        }
+    }
+}
+
+void radeon_profile::loadOcProfile(QXmlStreamReader &xml) {
+    const QString name = xml.attributes().value("name").toString();
+
+    OCProfile ocp;
+    ocp.powerCap = xml.attributes().value("powerCap").toInt();
+
+
+    FVTable table;
+    QString tableName;
+    while(xml.readNext()) {
+        if (xml.name().toString() == "table" && !xml.attributes().value("tableName").isEmpty())
+            tableName = xml.attributes().value("tableName").toString();
+
+        if (xml.name().toString() == "state" && !xml.attributes().value("stateNumber").isEmpty()) {
+            table.insert(xml.attributes().value("stateNumber").toUInt(),
+                         FreqVoltPair(xml.attributes().value("frequency").toUInt(),
+                                      xml.attributes().value("voltage").toUInt()));
+        }
+
+        if (xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "table") {
+            ocp.tables.insert(tableName, table);
+            table.clear();
+            tableName = "";
+        }
+
+        if (xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "ocProfile") {
+            ocProfiles.insert(name, ocp);
             return;
         }
     }

@@ -34,7 +34,6 @@ radeon_profile::radeon_profile(QWidget *parent) :
     counter_ticks(0),
     counter_statsTick(0),
     hysteresisRelativeTepmerature(0),
-    ocTableModified(false),
     enableChangeEvent(false),
     savedState(nullptr),
     ui(new Ui::radeon_profile)
@@ -85,6 +84,9 @@ void radeon_profile::connectSignals()
     connect(&group_Dpm, SIGNAL(buttonClicked(int)), this, SLOT(setPowerLevel(int)));
     connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
     connect(ui->combo_fanProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(createFanProfileListaAndGraph(const QString&)));
+    connect(ui->combo_ocProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(createOcProfileListsAndGraph(const QString&)));
+    connect(ui->slider_powerCap, SIGNAL(valueChanged(int)), this, SLOT(powerCapValueChange(int)));
+    connect(ui->spin_powerCap, SIGNAL(valueChanged(int)), this, SLOT(powerCapValueChange(int)));
 }
 
 void radeon_profile::setupUiElements()
@@ -131,7 +133,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM)) {
             addDpmButtons();
             ui->combo_pLevel->setEnabled(true);
-            ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo(device.getDriverFeatures().sysInfo.module));
+            ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo(features.sysInfo.module));
         }
     } else {
         ui->cb_eventsTracking->setEnabled(false);
@@ -188,13 +190,13 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     // SETUP OC
     ui->tw_main->setTabEnabled(2, false);
 
-    if (features.isChangeProfileAvailable && (device.getDriverFeatures().isOcTableAvailable || device.getDriverFeatures().isPercentCoreOcAvailable)) {
+    if (features.isChangeProfileAvailable && (features.isOcTableAvailable || features.isPercentCoreOcAvailable)) {
         ui->tw_main->setTabEnabled(2, true);
         ui->tw_overclock->setEnabled(true);
         ui->tw_overclock->setTabEnabled(0, false);
         ui->tw_overclock->setTabEnabled(1, false);
 
-        if (device.getDriverFeatures().isPercentCoreOcAvailable) {
+        if (features.isPercentCoreOcAvailable) {
             ui->group_oc->setCheckable(true);
             ui->group_oc->setEnabled(true);
             ui->group_oc->setChecked(false);
@@ -204,15 +206,15 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
             on_btn_applyOverclock_clicked();
         }
 
-        if (device.getDriverFeatures().isDpmCoreFreqTableAvailable) {
-            ui->slider_freqSclk->setMaximum(device.getDriverFeatures().sclkTable.count() - 1);
+        if (features.isDpmCoreFreqTableAvailable) {
+            ui->slider_freqSclk->setMaximum(features.sclkTable.count() - 1);
 
-            if (device.getDriverFeatures().isDpmMemFreqTableAvailable)
-                ui->slider_freqMclk->setMaximum(device.getDriverFeatures().mclkTable.count() - 1);
+            if (features.isDpmMemFreqTableAvailable)
+                ui->slider_freqMclk->setMaximum(features.mclkTable.count() - 1);
             else {
                 ui->slider_freqMclk->setEnabled(false);
-                ui->label_memFreq->setEnabled(device.getDriverFeatures().isDpmMemFreqTableAvailable);
-                ui->l_freqMclk->setEnabled(device.getDriverFeatures().isDpmMemFreqTableAvailable);
+                ui->label_memFreq->setEnabled(features.isDpmMemFreqTableAvailable);
+                ui->l_freqMclk->setEnabled(features.isDpmMemFreqTableAvailable);
             }
 
             ui->group_freq->setCheckable(true);
@@ -222,29 +224,45 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
             ui->btn_applyOverclock->setEnabled(true);
         }
 
-        if (device.getDriverFeatures().isOcTableAvailable) {
-            createOcProfileGraph();
-            setupOcTableOverclock();
-
+        if (features.isOcTableAvailable) {
             ui->tw_overclock->setTabEnabled(1, true);
-            ui->btn_applyOverclock->setEnabled(true);
+            createOcProfileGraph();
 
-            if (device.getDriverFeatures().isVDDCCurveAvailable) {
-                ui->label_ocTableTitle->setText(tr("VDDC curve"));
-                ui->btn_setOcRanges->setVisible(true);
-
-                ui->list_memStates->setVisible(false);
-                ui->label_memOcTableTitle->setVisible(false);
-            } else {
-                ui->btn_setOcRanges->setVisible(false);
-            }
-
-            if (device.getDriverFeatures().isPowerCapAvailable) {
+            if (features.isPowerCapAvailable) {
                 ui->group_powerCap->setEnabled(true);
 
                 ui->slider_powerCap->setRange(device.getGpuConstParams().power1_cap_min, device.getGpuConstParams().power1_cap_max);
                 ui->spin_powerCap->setRange(device.getGpuConstParams().power1_cap_min, device.getGpuConstParams().power1_cap_max);
                 ui->slider_powerCap->setValue(device.gpuData[ValueID::POWER_CAP_CURRENT].value);
+            }
+
+            if (ocProfiles.isEmpty()) {
+                if (features.isVDDCCurveAvailable) {
+                    loadListFromOcProfile(features.currentStatesTables.value(OD_VDDC_CURVE), ui->list_coreStates);
+                } else {
+                    loadListFromOcProfile(features.currentStatesTables.value(OD_SCLK), ui->list_coreStates);
+                    loadListFromOcProfile(features.currentStatesTables.value(OD_MCLK), ui->list_memStates);
+                }
+
+                ocProfiles.insert("default", createOcProfile());
+            }
+
+            for (const auto &k : ocProfiles.keys())
+                ui->combo_ocProfiles->addItem(k);
+
+            createOcProfileListsAndGraph(ui->combo_ocProfiles->currentText());
+
+            ui->tw_overclock->setTabEnabled(1, true);
+            ui->btn_applyOverclock->setEnabled(true);
+
+            if (features.isVDDCCurveAvailable) {
+                ui->l_ocTableTitle->setText(tr("VDDC curve"));
+                ui->btn_setOcRanges->setVisible(true);
+
+                ui->list_memStates->setVisible(false);
+                ui->l_memOcTableTitle->setVisible(false);
+            } else {
+                ui->btn_setOcRanges->setVisible(false);
             }
         }
     }

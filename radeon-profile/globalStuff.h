@@ -190,6 +190,11 @@ typedef QMap<QString, FVTable> MapFVTables;
 typedef QMap<QString, OCRange> MapOCRanges;
 typedef QMap<int, unsigned int> FanProfileSteps;
 
+struct OCProfile {
+    unsigned powerCap;
+    MapFVTables tables;
+};
+
 // structure which holds what can be display on ui and on its base
 // we enable ui elements
 struct DriverFeatures {
@@ -213,7 +218,7 @@ struct DriverFeatures {
     PowerPlayTable sclkTable, mclkTable;
 
     // base on file pp_od_clk_voltage
-    MapFVTables statesTables;
+    MapFVTables currentStatesTables;
     MapOCRanges ocRages;
 
     DriverFeatures() {

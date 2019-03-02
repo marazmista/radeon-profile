@@ -654,9 +654,9 @@ void dXorg::figureOutDriverFeatures() {
     if (!driverFiles.sysFs.pp_od_clk_voltage.isEmpty()) {
         features.isOcTableAvailable = true;
 
-        loadOcTable();
+        readOcTableAndRanges();
 
-        features.isVDDCCurveAvailable = features.statesTables.contains(OD_VDDC_CURVE);
+        features.isVDDCCurveAvailable = features.currentStatesTables.contains(OD_VDDC_CURVE);
     }
 }
 
@@ -828,9 +828,20 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
     return std::make_tuple(tables, ocRanges);
 }
 
-void dXorg::loadOcTable() {
+void dXorg::readOcTableAndRanges() {
     auto ocTable = parseOcTable();
 
-    features.statesTables = std::get<0>(ocTable);
+    features.currentStatesTables = std::get<0>(ocTable);
     features.ocRages = std::get<1>(ocTable);
+}
+
+void dXorg::setOcTable(const QString &tableType, const FVTable &table) {
+    QString cmd;
+
+    for (const auto &s : table.keys()) {
+        const FreqVoltPair &fvt = table.value(s);
+        cmd.append(createDaemonSetCmd(driverFiles.sysFs.pp_od_clk_voltage, tableType + " "+ QString::number(s) + " " + QString::number(fvt.frequency) + " " + QString::number(fvt.voltage)));
+    }
+
+    dcomm.sendCommand(cmd);
 }

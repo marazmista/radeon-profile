@@ -65,7 +65,8 @@ public:
     void finalize();
     bool isInitialized();
     int getCurrentPowerPlayTableId(const QString &file);
-    void loadOcTable();
+    void readOcTableAndRanges();
+    void setOcTable(const QString &tableType, const FVTable &table);
 
 private slots:
     void handleGpuUsageResult() {
