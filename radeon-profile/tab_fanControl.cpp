@@ -106,6 +106,9 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
 {
     QString name =  QInputDialog::getText(this, "", tr("Fan profile name:"));
 
+    if (name.isEmpty())
+        return;
+
     if (fanProfiles.contains(name)) {
         QMessageBox::information(this, "", tr("Cannot add another profile with the same name that already exists."),QMessageBox::Ok);
         return;
