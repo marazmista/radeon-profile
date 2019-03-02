@@ -24,6 +24,7 @@ public:
     daemonComm();
     ~daemonComm();
     void connectToDaemon();
+    void disconnectDaemon();
     void sendCommand(const QString command);
 
     inline bool isConnected() {

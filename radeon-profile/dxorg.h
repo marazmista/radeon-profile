@@ -28,8 +28,15 @@ public:
     dXorg() : ioctlHnd(nullptr) { }
     dXorg(const GPUSysInfo &si);
 
+    ~dXorg() {
+        cleanup();
+    }
+
     void cleanup() {
         delete ioctlHnd;
+
+        if (isDaemonConnected())
+            dcomm.disconnectDaemon();
 
         if (sharedMem.isAttached()){
             // In case the closing signal interrupts a sharedMem lock+read+unlock phase, sharedmem is unlocked

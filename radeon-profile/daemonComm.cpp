@@ -8,6 +8,7 @@ const QString confirmationString("7#1#");
 
 daemonComm::daemonComm() : signalSender(new QLocalSocket(this)) {
     feedback.setDevice(signalSender);
+    feedback.setVersion(QDataStream::Qt_5_7);
     connect(signalSender,SIGNAL(readyRead()), this, SLOT(receiveFromDaemon()));
     connect(signalSender, SIGNAL(connected()), this, SLOT(connectionSucess()));
     connect(signalSender, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -21,6 +22,11 @@ void daemonComm::connectToDaemon() {
     qDebug() << "Connecting to daemon";
     signalSender->abort();
     signalSender->connectToServer("/tmp/radeon-profile-daemon-server");
+}
+
+void daemonComm::disconnectDaemon() {
+    if (signalSender != nullptr)
+        signalSender->close();
 }
 
 void daemonComm::sendCommand(const QString command) {
