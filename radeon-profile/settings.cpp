@@ -53,10 +53,12 @@ void radeon_profile::saveConfig() {
         settings.setValue("fanMode",ui->stack_fanModes->currentIndex());
         settings.setValue("fanProfileName",ui->l_currentFanProfile->text());
 
-        settings.setValue("overclockEnabled", ui->group_oc->isChecked());
-        settings.setValue("manualFreqEnabled", ui->group_freq->isChecked());
+        settings.setValue("restorePercentOverclock", ui->cb_restorePercentOc->isChecked());
         settings.setValue("overclockValue", ui->slider_ocSclk->value());
         settings.setValue("overclockMemValue", ui->slider_ocMclk->value());
+
+        settings.setValue("ocProfileName", ui->l_currentOcProfile->text());
+        settings.setValue("restoreOcProfile", ui->cb_restoreOcProfile->isChecked());
 
         settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
         settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
@@ -278,8 +280,8 @@ void radeon_profile::loadConfig() {
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
     ui->cb_eventsTracking->setChecked(settings.value("eventsTracking", false).toBool());
 
-    ui->group_oc->setChecked(settings.value("overclockEnabled",false).toBool());
-    ui->group_freq->setChecked(settings.value("manualFreqEnabled",false).toBool());
+    ui->cb_restorePercentOc->setChecked(settings.value("restorePercentOverclock", false).toBool());
+    ui->group_oc->setChecked(ui->cb_restorePercentOc->isChecked());
     ui->slider_ocSclk->setValue(settings.value("overclockValue",0).toInt());
     ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
@@ -290,6 +292,10 @@ void radeon_profile::loadConfig() {
     ui->cb_overridePlotsBg->setChecked(settings.value("setCommonPlotsBg", false).toBool());
     ui->btn_setPlotsBackground->setEnabled(ui->cb_overridePlotsBg->isChecked());
     ui->frame_plotsBackground->setVisible(ui->cb_overridePlotsBg->isChecked());
+
+    ui->cb_restoreOcProfile->setChecked(settings.value("restoreOcProfile", false).toBool());
+    if (ui->cb_restoreOcProfile->isChecked())
+        ui->l_currentOcProfile->setText(settings.value("ocProfileName", "default").toString());
 
     globalStuff::globalConfig.daemonData = ui->cb_daemonData->isChecked();
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();

@@ -200,11 +200,11 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         if (features.isPercentCoreOcAvailable) {
             ui->group_oc->setCheckable(true);
             ui->group_oc->setEnabled(true);
-            ui->group_oc->setChecked(false);
             ui->tw_overclock->setTabEnabled(0, true);
             ui->btn_applyOverclock->setEnabled(true);
 
-            on_btn_applyOverclock_clicked();
+            if (ui->cb_restorePercentOc->isChecked())
+                on_btn_applyOverclock_clicked();
         }
 
         if (features.isDpmCoreFreqTableAvailable) {
@@ -265,6 +265,9 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
             } else {
                 ui->btn_setOcRanges->setVisible(false);
             }
+
+            if (ui->cb_restoreOcProfile->isChecked())
+                setCurrentOcProfile(ui->l_currentOcProfile->text());
         }
     }
 }

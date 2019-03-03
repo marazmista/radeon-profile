@@ -295,10 +295,6 @@ void radeon_profile::applyOc()
 void radeon_profile::on_btn_applyOverclock_clicked() {
     if (ui->group_oc->isChecked())
         applyOc();
-
-    if (ui->group_freq->isChecked()) {
-
-    }
 }
 
 void radeon_profile::on_group_freq_toggled(bool arg1)

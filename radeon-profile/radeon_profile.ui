@@ -3626,7 +3626,7 @@
              <x>0</x>
              <y>0</y>
              <width>895</width>
-             <height>562</height>
+             <height>628</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_27">
@@ -3860,6 +3860,44 @@
                  </property>
                  <property name="text">
                   <string>Refresh interval [s]</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="gropu_cfgOverclock">
+              <property name="title">
+               <string>Overclock</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_31">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="cb_restoreOcProfile">
+                 <property name="text">
+                  <string>Restore selected overclock profile on start</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cb_restorePercentOc">
+                 <property name="text">
+                  <string>Restore percent overclock on start</string>
                  </property>
                 </widget>
                </item>
