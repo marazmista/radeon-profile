@@ -87,6 +87,7 @@ void radeon_profile::connectSignals()
     connect(ui->combo_ocProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(createOcProfileListsAndGraph(const QString&)));
     connect(ui->slider_powerCap, SIGNAL(valueChanged(int)), this, SLOT(powerCapValueChange(int)));
     connect(ui->spin_powerCap, SIGNAL(valueChanged(int)), this, SLOT(powerCapValueChange(int)));
+    connect(ui->group_oc, SIGNAL(toggled(bool)), this, SLOT(percentOverclockToggled(bool)));
 }
 
 void radeon_profile::setupUiElements()

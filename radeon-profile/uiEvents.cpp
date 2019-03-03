@@ -301,17 +301,6 @@ void radeon_profile::on_btn_applyOverclock_clicked() {
     }
 }
 
-void radeon_profile::on_group_oc_toggled(bool arg1)
-{
-    if (!device.isInitialized())
-        return;
-
-    if (arg1)
-        applyOc();
-    else
-        device.resetOverclock();
-}
-
 void radeon_profile::on_group_freq_toggled(bool arg1)
 {
     if (!device.isInitialized())

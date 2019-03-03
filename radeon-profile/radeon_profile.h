@@ -133,7 +133,6 @@ private slots:
     void on_cb_daemonData_clicked(bool checked);
     void pauseRefresh(bool checked);
     void on_btn_general_clicked();
-    void on_group_oc_toggled(bool arg1);
     void on_slider_freqSclk_valueChanged(int value);
     void on_slider_freqMclk_valueChanged(int value);
     void on_group_freq_toggled(bool arg1);
@@ -151,6 +150,7 @@ private slots:
     void createOcProfileListsAndGraph(const QString &arg1);
     void on_btn_removeOcProfile_clicked();
     void powerCapValueChange(int arg1);
+    void percentOverclockToggled(bool toggle);
 
 private:
     struct CurrentStateInfo {

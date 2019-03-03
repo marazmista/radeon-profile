@@ -268,3 +268,13 @@ void radeon_profile::powerCapValueChange(int value)
 
     ui->l_ocProfileUnsavedInficator->setVisible(true);
 }
+
+void radeon_profile::percentOverclockToggled(bool toggle) {
+    if (!device.isInitialized())
+        return;
+
+    if (toggle)
+        applyOc();
+    else
+        device.resetOverclock();
+}

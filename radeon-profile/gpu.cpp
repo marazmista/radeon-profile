@@ -317,8 +317,8 @@ void gpu::setOverclockValue(const QString &file, const int value) {
 }
 
 void gpu::resetOverclock() {
-    driverHandler->setNewValue(getDriverFiles().sysFs.pp_sclk_od, 0);
-    driverHandler->setNewValue(getDriverFiles().sysFs.pp_mclk_od, 0);
+    driverHandler->setNewValue(getDriverFiles().sysFs.pp_sclk_od, "0");
+    driverHandler->setNewValue(getDriverFiles().sysFs.pp_mclk_od, "0");
 }
 
 int gpu::getCurrentPowerPlayTableId(const QString &file) {
