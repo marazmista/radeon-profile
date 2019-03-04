@@ -151,6 +151,7 @@ private slots:
     void on_btn_removeOcProfile_clicked();
     void powerCapValueChange(int arg1);
     void percentOverclockToggled(bool toggle);
+    void ocProfilesMenuActionClicked(QAction* action);
 
 private:
     struct CurrentStateInfo {
@@ -203,12 +204,11 @@ private:
     void makeFanProfilePlot();
     void refreshUI();
     void connectSignals();
-    void setCurrentFanProfile(const QString &profileName, const FanProfileSteps &profile);
+    void setCurrentFanProfile(const QString &profileName);
     void adjustFanSpeed();
     FanProfileSteps stepsListToMap();
     void addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn);
-    void setupFanProfilesMenu(const bool rebuildMode = false);
-    int findCurrentFanProfileMenuIndex();
+    void createFanProfilesMenu(const bool rebuildMode = false);
     void markFanProfileUnsaved(bool unsaved);
     void checkEvents();
     void activateEvent(const RPEvent &rpe);
@@ -253,6 +253,8 @@ private:
     OCProfile createOcProfile();
     void setCurrentOcProfile(const QString &name);
     void loadListFromOcProfile(const FVTable &table, QTreeWidget *list);
+    void createOcProfilesMenu(const bool rebuildMode = false);
+    int findCurrentMenuIndex(QMenu *menu, const QString &name);
 };
 
 #endif // RADEON_PROFILE_H

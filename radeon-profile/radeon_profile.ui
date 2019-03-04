@@ -301,6 +301,35 @@
          </spacer>
         </item>
         <item>
+         <widget class="QToolButton" name="btn_ocProfileControl">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>default</string>
+          </property>
+          <property name="icon">
+           <iconset resource="radeon-resource.qrc">
+            <normaloff>:/icon/symbols/overclock.png</normaloff>:/icon/symbols/overclock.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::InstantPopup</enum>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="btn_fanControl">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -4111,7 +4140,7 @@
        <attribute name="title">
         <string>About</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_19">
+       <layout class="QVBoxLayout" name="verticalLayout_16">
         <property name="spacing">
          <number>5</number>
         </property>
@@ -4258,7 +4287,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_contributor1">
+         <widget class="QLabel" name="label_contributorsLink">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -4299,7 +4328,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_contributors_2">
+         <widget class="QLabel" name="label_externalResources">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -4321,7 +4350,28 @@
            </font>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Icon&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Main icon&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::RichText</enum>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="openExternalLinks">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_icon_2">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://www.flaticon.com/free-icon/speedometer_53128&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Overclock icon&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
@@ -4346,16 +4396,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_14">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_18"/>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_16"/>
-          </item>
-         </layout>
         </item>
        </layout>
       </widget>

@@ -7,6 +7,7 @@
         <file>symbols/refresh.png</file>
         <file>symbols/fan.png</file>
         <file>symbols/pause.png</file>
+        <file>symbols/overclock.png</file>
     </qresource>
     <qresource prefix="/var">
         <file>variables/envVars</file>

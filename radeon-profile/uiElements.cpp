@@ -165,11 +165,11 @@ void radeon_profile::addRuntmeWidgets() {
     connect(btnBackProfiles,SIGNAL(clicked()),this,SLOT(btnBackToProfilesClicked()));
 }
 
-void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
+void radeon_profile::createFanProfilesMenu(const bool rebuildMode) {
     if (rebuildMode && ui->btn_fanControl->menu() != nullptr)
         delete ui->btn_fanControl->menu();
 
-    auto *menu_fanProfiles = new QMenu(this);
+    auto menu_fanProfiles = new QMenu(this);
     connect(menu_fanProfiles, SIGNAL(triggered(QAction*)), this, SLOT(fanProfileMenuActionClicked(QAction*)));
     QActionGroup *ag = new QActionGroup(menu_fanProfiles);
 
@@ -200,6 +200,26 @@ void radeon_profile::setupFanProfilesMenu(const bool rebuildMode) {
     }
 
     ui->btn_fanControl->setMenu(menu_fanProfiles);
+}
+
+void radeon_profile::createOcProfilesMenu(const bool rebuildMode) {
+    if (rebuildMode && ui->btn_ocProfileControl->menu() != nullptr)
+        delete ui->btn_ocProfileControl->menu();
+
+    auto menu = new QMenu(this);
+    connect(menu, SIGNAL(triggered(QAction*)), this, SLOT(ocProfilesMenuActionClicked(QAction*)));
+
+    auto ag = new QActionGroup(menu);
+
+    for (const auto &p : ocProfiles.keys()) {
+        auto a = new QAction(menu);
+        a->setText(p);
+        a->setCheckable(true);
+        a->setActionGroup(ag);
+        menu->addAction(a);
+    }
+
+    ui->btn_ocProfileControl->setMenu(menu);
 }
 
 void radeon_profile::fillConnectors(){

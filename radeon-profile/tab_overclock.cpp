@@ -170,7 +170,8 @@ void radeon_profile::on_btn_saveOcProfileAs_clicked()
     ui->combo_ocProfiles->setCurrentText(name);
 
     saveConfig();
-
+    createOcProfilesMenu(true);
+    ui->btn_ocProfileControl->menu()->actions()[findCurrentMenuIndex(ui->btn_ocProfileControl->menu(), name)]->setChecked(true);
     ui->l_ocProfileUnsavedInficator->setVisible(false);
 }
 
@@ -235,6 +236,7 @@ void radeon_profile::on_btn_removeOcProfile_clicked()
 
     ocProfiles.remove(ui->combo_ocProfiles->currentText());
     ui->combo_ocProfiles->removeItem(ui->combo_ocProfiles->currentIndex());
+    createOcProfilesMenu(true);
 
     setCurrentOcProfile("default");
     saveConfig();
@@ -259,7 +261,8 @@ void radeon_profile::setCurrentOcProfile(const QString &name) {
         device.setPowerCap(ui->slider_powerCap->value());
 
     ui->l_currentOcProfile->setText(name);
-    ui->combo_ocProfiles->setCurrentText(name);
+    ui->btn_ocProfileControl->menu()->actions()[findCurrentMenuIndex(ui->btn_ocProfileControl->menu(), name)]->setChecked(true);
+    ui->btn_ocProfileControl->setText(name);
 }
 
 void radeon_profile::powerCapValueChange(int value)
@@ -278,3 +281,11 @@ void radeon_profile::percentOverclockToggled(bool toggle) {
     else
         device.resetOverclock();
 }
+
+void radeon_profile::ocProfilesMenuActionClicked(QAction *a) {
+    if (a->isSeparator())
+        return;
+
+    setCurrentOcProfile(a->text());
+}
+

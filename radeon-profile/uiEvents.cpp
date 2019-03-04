@@ -82,7 +82,7 @@ void radeon_profile::on_btn_pwmProfile_clicked()
     ui->stack_fanModes->setCurrentIndex(2);
 
     device.setPwmManualControl(true);
-    setCurrentFanProfile(ui->l_currentFanProfile->text(), fanProfiles.value(ui->l_currentFanProfile->text()));
+    setCurrentFanProfile(ui->l_currentFanProfile->text());
 }
 
 void radeon_profile::setPowerLevelFromCombo() {
@@ -384,4 +384,13 @@ void radeon_profile::on_btn_configureTopbar_clicked()
     }
 
     delete d;
+}
+
+int radeon_profile::findCurrentMenuIndex(QMenu *menu, const QString &name) {
+    for (int i = 0; i < menu->actions().count(); ++i) {
+        if (menu->actions()[i]->text() == name)
+            return i;
+    }
+
+    return 0;
 }

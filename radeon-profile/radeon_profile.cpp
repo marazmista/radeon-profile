@@ -168,7 +168,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
         createFanProfileListaAndGraph(ui->combo_fanProfiles->currentText());
 
-        setupFanProfilesMenu();
+        createFanProfilesMenu();
 
         if (ui->cb_saveFanMode->isChecked()) {
             switch (ui->stack_fanModes->currentIndex()) {
@@ -190,6 +190,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
     // SETUP OC
     ui->tw_main->setTabEnabled(2, false);
+    ui->btn_ocProfileControl->setVisible(false);
 
     if (features.isChangeProfileAvailable && (features.isOcTableAvailable || features.isPercentCoreOcAvailable)) {
         ui->tw_main->setTabEnabled(2, true);
@@ -227,6 +228,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
         if (features.isOcTableAvailable) {
             ui->tw_overclock->setTabEnabled(1, true);
+            ui->btn_ocProfileControl->setVisible(true);
             createOcProfileGraph();
 
             if (features.isPowerCapAvailable) {
@@ -252,6 +254,8 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
                 ui->combo_ocProfiles->addItem(k);
 
             createOcProfileListsAndGraph(ui->combo_ocProfiles->currentText());
+            createOcProfilesMenu(true);
+            ui->btn_ocProfileControl->menu()->actions()[findCurrentMenuIndex(ui->btn_ocProfileControl->menu(), "default")]->setChecked(true);
 
             ui->tw_overclock->setTabEnabled(1, true);
             ui->btn_applyOverclock->setEnabled(true);
