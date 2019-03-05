@@ -52,7 +52,7 @@ QMenu* radeon_profile::createGeneralMenu() {
 
     QAction *pause = new QAction(menu_general);
     pause->setCheckable(true);
-    pause->setText(tr("Pause refresh temporairly"));
+    pause->setText(tr("Pause refresh temporarily"));
     pause->setIcon(QIcon(":/icon/symbols/pause.png"));
     connect(pause, SIGNAL(toggled(bool)), this,SLOT(pauseRefresh(bool)));
 
