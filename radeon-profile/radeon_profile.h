@@ -181,7 +181,7 @@ private:
     TopbarManager topbarManager;
     QChartView *chartView_fan, *chartView_oc;
     QList<TopbarItem*> topBarItems;
-    QMap<int, ValueID> keysInCurrentGpuList;
+    QList<ValueID> keysInCurrentGpuList;
 
     Ui::radeon_profile *ui;
     void setupTrayIcon(const DriverFeatures &features);

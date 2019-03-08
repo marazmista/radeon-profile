@@ -320,7 +320,7 @@ void radeon_profile::refreshUI() {
                     continue;
 
                 default:
-                    ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.value(i)).strValue);
+                    ui->list_currentGPUData->topLevelItem(i)->setText(1, device.gpuData.value(keysInCurrentGpuList.at(i)).strValue);
             }
         }
     }
@@ -356,7 +356,7 @@ void radeon_profile::createCurrentGpuDataListItems()
 
             default:
                 addTreeWidgetItem(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
-                keysInCurrentGpuList.insert(ui->list_currentGPUData->topLevelItemCount() - 1, device.gpuData.keys().at(i));
+                keysInCurrentGpuList.append(device.gpuData.keys().at(i));
         }
     }
 }
@@ -496,13 +496,12 @@ void radeon_profile::updateStatsTable() {
 
 void radeon_profile::refreshTooltip()
 {
-    QString tooltipdata = radeon_profile::windowTitle() + "\n" + tr("Current profile: ")+ device.currentPowerProfile + "  " + device.currentPowerLevel +"\n";
+    QString tooltipData = radeon_profile::windowTitle() + "\n" + tr("Current profile: ")+ device.currentPowerProfile + "  " + device.currentPowerLevel +"\n";
 
-    for (short i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++)
-        tooltipdata += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + ui->list_currentGPUData->topLevelItem(i)->text(1) + '\n';
+    for (auto i = 0; i < ui->list_currentGPUData->topLevelItemCount(); i++)
+        tooltipData += ui->list_currentGPUData->topLevelItem(i)->text(0) + ": " + device.gpuData.value(keysInCurrentGpuList.at(i)).strValue + '\n';
 
-    tooltipdata.remove(tooltipdata.length() - 1, 1); //remove empty line at bootom
-    icon_tray->setToolTip(tooltipdata);
+    icon_tray->setToolTip(tooltipData.trimmed());
 }
 
 bool radeon_profile::askConfirmation(const QString title, const QString question){
