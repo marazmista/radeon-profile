@@ -123,7 +123,6 @@ void radeon_profile::setupUiElements()
     connectSignals();
 }
 
-
 void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data) {
     qDebug() << "Handling found device features";
 
@@ -238,15 +237,15 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
                 ui->slider_powerCap->setValue(device.gpuData[ValueID::POWER_CAP_CURRENT].value);
             }
 
-            if (ocProfiles.isEmpty()) {
-                if (features.isVDDCCurveAvailable) {
-                    loadListFromOcProfile(features.currentStatesTables.value(OD_VDDC_CURVE), ui->list_coreStates);
-                } else {
-                    loadListFromOcProfile(features.currentStatesTables.value(OD_SCLK), ui->list_coreStates);
-                    loadListFromOcProfile(features.currentStatesTables.value(OD_MCLK), ui->list_memStates);
-                }
+            if (ocProfiles.isEmpty())
+                loadDefaultOcTables(features);
 
-                ocProfiles.insert("default", createOcProfile());
+            else if ((features.isVDDCCurveAvailable && !ocProfiles.first().tables.keys().contains(OD_VDDC_CURVE))
+                     || (!features.isVDDCCurveAvailable && ocProfiles.first().tables.keys().contains(OD_VDDC_CURVE))) {
+
+                // if the profiles in config are incompatible with system (user changed card etc), clear and load default
+                ocProfiles.clear();
+                loadDefaultOcTables(features);
             }
 
             for (const auto &k : ocProfiles.keys())

@@ -255,6 +255,7 @@ private:
     void loadListFromOcProfile(const FVTable &table, QTreeWidget *list);
     void createOcProfilesMenu(const bool rebuildMode = false);
     int findCurrentMenuIndex(QMenu *menu, const QString &name);
+    void loadDefaultOcTables(const DriverFeatures &features);
 };
 
 #endif // RADEON_PROFILE_H

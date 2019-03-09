@@ -14,6 +14,18 @@ FVTable listToMap(const QTreeWidget *list) {
     return fvt;
 }
 
+void radeon_profile::loadDefaultOcTables(const DriverFeatures &features)
+{
+    if (features.isVDDCCurveAvailable) {
+        loadListFromOcProfile(features.currentStatesTables.value(OD_VDDC_CURVE), ui->list_coreStates);
+    } else {
+        loadListFromOcProfile(features.currentStatesTables.value(OD_SCLK), ui->list_coreStates);
+        loadListFromOcProfile(features.currentStatesTables.value(OD_MCLK), ui->list_memStates);
+    }
+
+    ocProfiles.insert("default", createOcProfile());
+}
+
 void radeon_profile::loadListFromOcProfile(const FVTable &table, QTreeWidget *list) {
     for (auto k : table.keys()) {
         list->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(k)
