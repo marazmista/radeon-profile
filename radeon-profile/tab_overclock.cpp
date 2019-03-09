@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QMenu>
 
+bool tableHasBeenModified = true;
+
 FVTable listToMap(const QTreeWidget *list) {
     FVTable fvt;
     for (auto i = 0; i < list->topLevelItemCount(); ++i)
@@ -60,6 +62,7 @@ void radeon_profile::adjustState(QTreeWidgetItem *item, const OCRange &frequency
     item->setText(1, QString::number(d->getValue(0)));
     item->setText(2, QString::number(d->getValue(1)));
 
+    tableHasBeenModified = true;
     ui->l_ocProfileUnsavedInficator->setVisible(true);
     delete d;
 }
@@ -234,6 +237,7 @@ void radeon_profile::createOcProfileListsAndGraph(const QString &arg1)
     axis_volts->setTickCount(8);
 
     ui->l_ocProfileUnsavedInficator->setVisible(false);
+    tableHasBeenModified = true;
 }
 
 void radeon_profile::on_btn_removeOcProfile_clicked()
@@ -252,22 +256,22 @@ void radeon_profile::on_btn_removeOcProfile_clicked()
 
     setCurrentOcProfile("default");
     saveConfig();
-
-    ui->l_ocProfileUnsavedInficator->setVisible(false);
 }
 
 void radeon_profile::setCurrentOcProfile(const QString &name) {
-    if (static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
-        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+    if (tableHasBeenModified) {
+        if (static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
+            device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
 
-    if (device.getDriverFeatures().isVDDCCurveAvailable)
-        device.setOcTable("vc", ocProfiles.value(name).tables.value(OD_VDDC_CURVE));
-    else {
-        device.setOcTable("s", ocProfiles.value(name).tables.value(OD_SCLK));
-        device.setOcTable("m", ocProfiles.value(name).tables.value(OD_MCLK));
+        if (device.getDriverFeatures().isVDDCCurveAvailable)
+            device.setOcTable("vc", ocProfiles.value(name).tables.value(OD_VDDC_CURVE));
+        else {
+            device.setOcTable("s", ocProfiles.value(name).tables.value(OD_SCLK));
+            device.setOcTable("m", ocProfiles.value(name).tables.value(OD_MCLK));
+        }
+
+        device.sendOcTableCommand("c");
     }
-
-    device.sendOcTableCommand("c");
 
     if (device.getDriverFeatures().isPowerCapAvailable && device.gpuData[ValueID::POWER_CAP_CURRENT].value != ui->slider_powerCap->value())
         device.setPowerCap(ui->slider_powerCap->value());
@@ -275,6 +279,8 @@ void radeon_profile::setCurrentOcProfile(const QString &name) {
     ui->l_currentOcProfile->setText(name);
     ui->btn_ocProfileControl->menu()->actions()[findCurrentMenuIndex(ui->btn_ocProfileControl->menu(), name)]->setChecked(true);
     ui->btn_ocProfileControl->setText(name);
+
+    tableHasBeenModified = false;
 }
 
 void radeon_profile::powerCapValueChange(int value)
@@ -298,6 +304,10 @@ void radeon_profile::ocProfilesMenuActionClicked(QAction *a) {
     if (a->isSeparator())
         return;
 
+    if (a->text() == ui->l_currentOcProfile->text())
+        return;
+
+    tableHasBeenModified = true;
     setCurrentOcProfile(a->text());
 }
 
