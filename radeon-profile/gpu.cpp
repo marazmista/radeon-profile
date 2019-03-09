@@ -331,7 +331,7 @@ void gpu::getPowerCapCurrent() {
 }
 
 void gpu::setPowerCap(const unsigned int value) {
-    driverHandler->setNewValue(getDriverFiles().hwmonAttributes.power1_cap, QString::number(value + MICROWATT_DIVIDER));
+    driverHandler->setNewValue(getDriverFiles().hwmonAttributes.power1_cap, QString::number(value * MICROWATT_DIVIDER));
 }
 
 void gpu::setOcTableValue(const QString &type, const QString &tableKey, int powerState, const FreqVoltPair powerStateValues) {
