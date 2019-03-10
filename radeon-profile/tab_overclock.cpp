@@ -259,22 +259,24 @@ void radeon_profile::on_btn_removeOcProfile_clicked()
 }
 
 void radeon_profile::setCurrentOcProfile(const QString &name) {
+    const auto &ocp = ocProfiles.value(name);
+
     if (tableHasBeenModified) {
         if (static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
             device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
 
         if (device.getDriverFeatures().isVDDCCurveAvailable)
-            device.setOcTable("vc", ocProfiles.value(name).tables.value(OD_VDDC_CURVE));
+            device.setOcTable("vc", ocp.tables.value(OD_VDDC_CURVE));
         else {
-            device.setOcTable("s", ocProfiles.value(name).tables.value(OD_SCLK));
-            device.setOcTable("m", ocProfiles.value(name).tables.value(OD_MCLK));
+            device.setOcTable("s", ocp.tables.value(OD_SCLK));
+            device.setOcTable("m", ocp.tables.value(OD_MCLK));
         }
 
         device.sendOcTableCommand("c");
     }
 
-    if (device.getDriverFeatures().isPowerCapAvailable && device.gpuData[ValueID::POWER_CAP_CURRENT].value != ui->slider_powerCap->value())
-        device.setPowerCap(ui->slider_powerCap->value());
+    if (device.getDriverFeatures().isPowerCapAvailable)
+        device.setPowerCap(ocp.powerCap);
 
     ui->l_currentOcProfile->setText(name);
     ui->btn_ocProfileControl->menu()->actions()[findCurrentMenuIndex(ui->btn_ocProfileControl->menu(), name)]->setChecked(true);
