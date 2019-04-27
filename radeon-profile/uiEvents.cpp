@@ -163,7 +163,8 @@ void radeon_profile::closeEvent(QCloseEvent *e) {
         timer->stop();
         delete timer;
 
-        device.finalize();
+        if (device.isInitialized())
+            device.finalize();
 
         saveConfig();
     }

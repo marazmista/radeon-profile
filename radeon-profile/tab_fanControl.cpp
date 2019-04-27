@@ -148,6 +148,7 @@ void radeon_profile::fanProfileMenuActionClicked(QAction *a) {
     if (a->isSeparator())
         return;
 
+    // these two already connected to on_btn_pwmAuto_clicked and on_btn_pwmFixed_clicked
     if (a == ui->btn_fanControl->menu()->actions()[0] || a == ui->btn_fanControl->menu()->actions()[1])
         return;
 
