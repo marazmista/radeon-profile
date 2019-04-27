@@ -9,7 +9,22 @@
 
 //===================================
 // === GUI setup functions === //
-void radeon_profile::setupTrayIcon(const DriverFeatures &features) {
+void radeon_profile::addPowerMethodToTrayMenu(const DriverFeatures &features)
+{
+    auto menu = icon_tray->contextMenu();
+
+    if (features.currentPowerMethod == PowerMethod::DPM)
+        menu->insertMenu(menu->actions()[1], createDpmMenu());
+    else if (features.currentPowerMethod == PowerMethod::PROFILE) {
+        QAction *changeProfile = new QAction(menu);
+        changeProfile->setText(tr("Change standard profile"));
+        connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
+
+        menu->insertAction(menu->actions()[1], changeProfile);
+    }
+}
+
+void radeon_profile::setupTrayIcon() {
     QMenu *menu_tray = new QMenu(this);
     setWindowState(Qt::WindowMinimized);
     //close //
@@ -25,17 +40,7 @@ void radeon_profile::setupTrayIcon(const DriverFeatures &features) {
 
     // add stuff to menu //
     menu_tray->addAction(refreshWhenHidden);
-    menu_tray->addSeparator();
 
-    if (features.currentPowerMethod == PowerMethod::DPM)
-        menu_tray->addMenu(createDpmMenu());
-    else if (features.currentPowerMethod == PowerMethod::PROFILE) {
-        QAction *changeProfile = new QAction(menu_tray);
-        changeProfile->setText(tr("Change standard profile"));
-        connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
-
-        menu_tray->addAction(changeProfile);
-    }
     menu_tray->addSeparator();
     menu_tray->addAction(closeApp);
 

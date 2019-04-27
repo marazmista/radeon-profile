@@ -28,8 +28,11 @@
 #include <QMessageBox>
 #include <QDebug>
 
+DaemonComm radeon_profile::dcomm;
+
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
+    icon_tray(nullptr),
     timer(new QTimer(this)),
     counter_ticks(0),
     counter_statsTick(0),
@@ -40,18 +43,35 @@ radeon_profile::radeon_profile(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    connect(dcomm.getSocketPtr(), SIGNAL(connected()), this, SLOT(daemonConnected()));
+    connect(dcomm.getSocketPtr(), SIGNAL(disconnected()), this, SLOT(daemonDisconnected()));
+
+    loadConfig();
+    setupUiElements();
+
     // checks if running as root
     if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
-         globalStuff::globalConfig.rootMode = true;
+        globalStuff::globalConfig.rootMode = true;
         ui->label_rootWarrning->setVisible(true);
+
+        initializeDevice();
     } else {
         globalStuff::globalConfig.rootMode = false;
         ui->label_rootWarrning->setVisible(false);
+
+        dcomm.connectToDaemon();
     }
 
-    loadConfig();
+    showWindow();
+}
 
-    // find device and initialize it
+radeon_profile::~radeon_profile()
+{
+    dcomm.disconnectDaemon();
+    delete ui;
+}
+
+void radeon_profile::initializeDevice() {
     if (!device.initialize()) {
         QMessageBox::critical(this,tr("Error"), tr("No Radeon cards have been found in the system."));
 
@@ -61,19 +81,29 @@ radeon_profile::radeon_profile(QWidget *parent) :
         return;
     }
 
-    // create runtime stuff, setup rest of ui
-    setupUiElements();
+    setupDeviceDependantUiElements();
+    setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
 
     refreshUI();
 
     timer->start();
-
-    showWindow();
 }
 
-radeon_profile::~radeon_profile()
-{
-    delete ui;
+void radeon_profile::daemonConnected() {
+    qDebug() << "Daemon connected";
+
+    if (!device.isInitialized())
+        initializeDevice();
+    else {
+        enableUiControls(true);
+        restoreFanState();
+    }
+}
+
+void radeon_profile::daemonDisconnected() {
+    qDebug() << "Daemon disconnected";
+
+    enableUiControls(false);
 }
 
 void radeon_profile::connectSignals()
@@ -90,20 +120,9 @@ void radeon_profile::connectSignals()
     connect(ui->group_oc, SIGNAL(toggled(bool)), this, SLOT(percentOverclockToggled(bool)));
 }
 
-void radeon_profile::setupUiElements()
+void radeon_profile::setupDeviceDependantUiElements()
 {
-    qDebug() << "Creating ui elements";
-
-    ui->tw_main->setCurrentIndex(0);
-    ui->tw_systemInfo->setCurrentIndex(0);
-    ui->list_currentGPUData->setHeaderHidden(false);
-    ui->execPages->setCurrentIndex(0);
-    ui->btn_general->setMenu(createGeneralMenu());
-
-    addRuntmeWidgets();
-    setupTrayIcon(device.getDriverFeatures());
-
-    setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
+    addPowerMethodToTrayMenu(device.getDriverFeatures());
 
     if (topbarManager.schemas.count() == 0)
         topbarManager.createDefaultTopbarSchema(device.gpuData.keys());
@@ -115,12 +134,25 @@ void radeon_profile::setupUiElements()
 
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
 
-    fillConnectors();
     fillModInfo();
-
-    createPlots();
-
     connectSignals();
+}
+
+void radeon_profile::setupUiElements()
+{
+    qDebug() << "Creating ui elements";
+
+    ui->tw_main->setCurrentIndex(0);
+    ui->tw_systemInfo->setCurrentIndex(0);
+    ui->list_currentGPUData->setHeaderHidden(false);
+    ui->execPages->setCurrentIndex(0);
+    ui->btn_general->setMenu(createGeneralMenu());
+    enableUiControls(false);
+
+    setupTrayIcon();
+    addRuntmeWidgets();
+    fillConnectors();
+    createPlots();
 }
 
 void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data) {
@@ -145,13 +177,14 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::TEMPERATURE_CURRENT) && !device.gpuData.contains(ValueID::VOLT_CORE))
         ui->tw_main->setTabEnabled(1,false);
 
-    ui->group_cfgDaemon->setEnabled(device.isDaemonConnected());
+    ui->group_cfgDaemon->setEnabled(dcomm.isConnected());
 
     createCurrentGpuDataListItems();
 
     // SETUP FAN CONTROL
     if (features.isFanControlAvailable && features.isChangeProfileAvailable) {
         qDebug() << "Fan control available";
+        ui->tw_main->setTabEnabled(3,true);
         ui->l_fanProfileUnsavedIndicator->setVisible(false);
 
         // set pwm buttons in group
@@ -375,14 +408,19 @@ void radeon_profile::updateExecLogs() {
         }
     }
 }
-//===================================
-// === Main timer loop  === //
+
+void radeon_profile::enableUiControls(bool enable)
+{
+    ui->tw_main->setTabEnabled(2, enable);
+    ui->tw_main->setTabEnabled(3, enable);
+    ui->stack_pm->setEnabled(enable);
+}
+
 void radeon_profile::timerEvent() {
-    if (!globalStuff::globalConfig.rootMode && !device.isDaemonConnected()) {
-        ui->tw_main->setTabEnabled(2, false);
-        ui->tw_main->setTabEnabled(3, false);
-        ui->stack_pm->setEnabled(false);
-    }
+
+    // retry connection if lost and not root
+    if (!globalStuff::globalConfig.rootMode && !dcomm.isConnected())
+        dcomm.connectToDaemon();
 
     if (!refreshWhenHidden->isChecked() && this->isHidden()) {
 
@@ -463,6 +501,16 @@ void radeon_profile::adjustFanSpeed() {
     device.setPwmValue(speed);
 }
 
+void radeon_profile::restoreFanState() {
+
+    // find fan state from before distconnect and restore it
+    for (const auto &b : group_pwm.buttons()) {
+        if (b->isChecked()) {
+            b->click();
+            return;
+        }
+    }
+}
 
 void radeon_profile::refreshGraphs() {
     if (ui->stack_plots->currentIndex() != 0 || plotManager.plots.count() == 0)

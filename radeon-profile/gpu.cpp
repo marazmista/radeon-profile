@@ -40,10 +40,6 @@ static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
     "/usr/share/hwdata/pnp.ids"
 };
 
-bool gpu::isDaemonConnected() {
-   return driverHandler->isDaemonConnected();
-}
-
 void gpu::detectCards() {
     QStringList out = globalStuff::grabSystemInfo("ls /sys/class/drm/").filter(QRegExp("card\\d$"));
 

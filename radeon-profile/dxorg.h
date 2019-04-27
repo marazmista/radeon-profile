@@ -6,7 +6,6 @@
 #define DXORG_H
 
 #include "globalStuff.h"
-#include "daemonComm.h"
 #include "ioctlHandler.h"
 
 #include <QString>
@@ -34,9 +33,6 @@ public:
 
     void cleanup() {
         delete ioctlHnd;
-
-        if (isDaemonConnected())
-            dcomm.disconnectDaemon();
 
         if (sharedMem.isAttached()){
             // In case the closing signal interrupts a sharedMem lock+read+unlock phase, sharedmem is unlocked
@@ -71,7 +67,6 @@ public:
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure();
     void reconfigureDaemon();
-    bool isDaemonConnected();
     GPUClocks getFeaturesFallback();
     void setupRegex(const QString &data);
     int getCurrentPowerPlayTableId(const QString &file);
@@ -86,7 +81,6 @@ private:
     short rxMatchIndex, clocksValueDivider;
     RxPatterns rxPatterns;
 
-    daemonComm dcomm;
     ioctlHandler *ioctlHnd;
 
     QString getClocksRawData(bool forFeatures = false);

@@ -8,6 +8,7 @@
 #include "components/rpplot.h"
 #include "components/pieprogressbar.h"
 #include "components/topbarcomponents.h"
+#include "daemonComm.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -62,6 +63,8 @@ public:
     explicit radeon_profile(QWidget *parent = 0);
     ~radeon_profile();
     
+    static DaemonComm dcomm;
+
 private slots:
     void timerEvent();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -152,6 +155,9 @@ private slots:
     void powerCapValueChange(int arg1);
     void percentOverclockToggled(bool toggle);
     void ocProfilesMenuActionClicked(QAction* action);
+    void daemonConnected();
+    void daemonDisconnected();
+
 
 private:
     struct CurrentStateInfo {
@@ -164,6 +170,7 @@ private:
     QSystemTrayIcon *icon_tray;
     QAction *refreshWhenHidden;
     QTimer *timer;
+
 
     gpu device;
     QList<ExecBin*> execsRunning;
@@ -184,7 +191,7 @@ private:
     QList<ValueID> keysInCurrentGpuList;
 
     Ui::radeon_profile *ui;
-    void setupTrayIcon(const DriverFeatures &features);
+    void setupTrayIcon();
     void refreshTooltip();
     QMenu* createDpmMenu();
     void changeEvent(QEvent *event);
@@ -256,6 +263,11 @@ private:
     void createOcProfilesMenu(const bool rebuildMode = false);
     int findCurrentMenuIndex(QMenu *menu, const QString &name);
     void loadDefaultOcTables(const DriverFeatures &features);
+    void setupDeviceDependantUiElements();
+    void enableUiControls(bool enable);
+    void restoreFanState();
+    void addPowerMethodToTrayMenu(const DriverFeatures &features);
+    void initializeDevice();
 };
 
 #endif // RADEON_PROFILE_H

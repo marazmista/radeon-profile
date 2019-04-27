@@ -17,25 +17,28 @@
 #define DAEMON_SIGNAL_TIMER_OFF '5'
 #define DAEMON_SHAREDMEM_KEY '6'
 
-class daemonComm : public QObject
+class DaemonComm : public QObject
 {
     Q_OBJECT
 public:
-    daemonComm();
-    ~daemonComm();
+    DaemonComm();
+    ~DaemonComm();
     void connectToDaemon();
     void disconnectDaemon();
     void sendCommand(const QString command);
+
 
     inline bool isConnected() {
         return (signalSender->state() == QLocalSocket::ConnectedState);
     }
 
+    inline const QLocalSocket* getSocketPtr() {
+        return signalSender;
+    }
+
 
 public slots:
     void receiveFromDaemon();
-    void connectionSucess();
-    void disconnected();
 
 private:
     QDataStream feedback;

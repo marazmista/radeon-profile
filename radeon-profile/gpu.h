@@ -16,12 +16,13 @@ class gpu : public QObject
 
     Q_OBJECT
 public:
-    explicit gpu(QObject *parent = 0 ) : QObject(parent), currentGpuIndex(0) {
+    explicit gpu(QObject *parent = 0 ) : QObject(parent), currentGpuIndex(0), driverHandler(nullptr) {
         connect(&futureGpuUsage, SIGNAL(finished()),this,SLOT(handleGpuUsageResult()));
     }
 
     ~gpu() {
-        delete driverHandler;
+        if (driverHandler != nullptr)
+            delete driverHandler;
     }
 
     // main map that has all info available by ValueID
@@ -56,7 +57,6 @@ public:
 
     void detectCards();
     bool initialize();
-    bool isDaemonConnected();
     void setOverclockValue(const QString &file, int value);
     void resetOverclock();
     const DriverFeatures& getDriverFeatures() const;

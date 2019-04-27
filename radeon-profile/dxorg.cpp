@@ -2,6 +2,7 @@
 
 #include "dxorg.h"
 #include "gpu.h"
+#include "radeon_profile.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -26,9 +27,7 @@ void dXorg::configure() {
         return;
     }
 
-    dcomm.connectToDaemon();
-
-    if (isDaemonConnected() && globalStuff::globalConfig.daemonData) {
+    if (radeon_profile::dcomm.isConnected() && globalStuff::globalConfig.daemonData) {
         qDebug() << "Confguring shared memory for daemon";
         setupSharedMem();
         setupDaemon();
@@ -37,7 +36,7 @@ void dXorg::configure() {
     figureOutDriverFeatures();
 
     if (features.isFanControlAvailable)
-        dcomm.sendCommand(QString().append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR).
+        radeon_profile::dcomm.sendCommand(QString().append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR).
                           append("pwm1_enable").append(SEPARATOR).append(driverFiles.hwmonAttributes.pwm1_enable).append(SEPARATOR));
 }
 
@@ -108,12 +107,11 @@ void dXorg::setupDaemon() {
         command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR);
 
     qDebug() << "Sending daemon config command: " << command;
-    dcomm.sendCommand(command);
+    radeon_profile::dcomm.sendCommand(command);
 }
 
-bool dXorg::isDaemonConnected() {
-    return dcomm.isConnected();
-}
+//bool dXorg::isDaemonConnected() {
+//}
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     QString devicePath = "/sys/class/drm/" + gpuName + "/device/";
@@ -139,10 +137,10 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
     if (data != "-1")
         return data;
 
-    if (isDaemonConnected()) {
+    if (radeon_profile::dcomm.isConnected()) {
         if (!globalStuff::globalConfig.daemonAutoRefresh){
             qDebug() << "Asking the daemon to read clocks";
-            dcomm.sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR)); // SIGNAL_READ_CLOCKS + SEPARATOR
+            radeon_profile::dcomm.sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR)); // SIGNAL_READ_CLOCKS + SEPARATOR
         }
 
         // fist call, so notihing is in sharedmem and we need to wait for data
@@ -431,8 +429,8 @@ QString dXorg::getCurrentPowerLevel() {
 }
 
 void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
-    if (isDaemonConnected())
-        dcomm.sendCommand(createDaemonSetCmd(filePath, newValue));
+    if (radeon_profile::dcomm.isConnected())
+        radeon_profile::dcomm.sendCommand(createDaemonSetCmd(filePath, newValue));
     else {
         QFile file(filePath);
 
@@ -608,7 +606,7 @@ void dXorg::figureOutDriverFeatures() {
         case PowerMethod::DPM:
             qDebug() << "Power method: DPM";
 
-            if (globalStuff::globalConfig.rootMode || isDaemonConnected())
+            if (globalStuff::globalConfig.rootMode || radeon_profile::dcomm.isConnected())
                 features.isChangeProfileAvailable = true;
             else {
                 QFile f(driverFiles.sysFs.power_dpm_state);
@@ -843,5 +841,5 @@ void dXorg::setOcTable(const QString &tableType, const FVTable &table) {
         cmd.append(createDaemonSetCmd(driverFiles.sysFs.pp_od_clk_voltage, tableType + " "+ QString::number(s) + " " + QString::number(fvt.frequency) + " " + QString::number(fvt.voltage)));
     }
 
-    dcomm.sendCommand(cmd);
+    radeon_profile::dcomm.sendCommand(cmd);
 }
