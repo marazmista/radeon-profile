@@ -112,6 +112,7 @@ void radeon_profile::modifyPlotSchema(const QString &name) {
             item->setText(0, pds.name);
             item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
             item->setCheckState(0,Qt::Checked);
+            ui->list_plotDefinitions->addTopLevelItem(item);
         } else
             plotManager.removePlot(pds.name);
 
