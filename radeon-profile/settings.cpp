@@ -65,6 +65,7 @@ void radeon_profile::saveConfig() {
         settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
         settings.setValue("daemonData", ui->cb_daemonData->isChecked());
         settings.setValue("temperatureHysteresis", ui->spin_hysteresis->value());
+        settings.setValue("connConfirmMethod", ui->combo_connConfirmMethod->currentIndex());
     }
 
     QString xmlString;
@@ -285,6 +286,7 @@ void radeon_profile::loadConfig() {
     ui->slider_ocSclk->setValue(settings.value("overclockValue",0).toInt());
     ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
+    ui->combo_connConfirmMethod->setCurrentIndex(settings.value("connConfirmMethod", 1).toInt());
     ui->spin_hysteresis->setValue(settings.value("temperatureHysteresis", 0).toInt());
 
     ui->frame_plotsBackground->setAutoFillBackground(true);
@@ -303,6 +305,8 @@ void radeon_profile::loadConfig() {
 
     if (!ui->cb_daemonData->isChecked())
         ui->cb_daemonAutoRefresh->setEnabled(false);
+
+    dcomm.setConnectionConfirmationMethod(static_cast<DaemonComm::ConfirmationMehtod>(ui->combo_connConfirmMethod->currentIndex()));
 
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())

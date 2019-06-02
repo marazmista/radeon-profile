@@ -120,6 +120,9 @@ void radeon_profile::configureDaemonPreDeviceInit() {
     } else
         command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR);
 
+    if (ui->combo_connConfirmMethod->currentIndex() == 0)
+        command.append(DAEMON_ALIVE).append(SEPARATOR).append('0').append(SEPARATOR);
+
     dcomm.sendCommand(command);
 }
 

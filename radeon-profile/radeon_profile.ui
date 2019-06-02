@@ -24,7 +24,7 @@
     <normaloff>:/icon/extra/radeon-profile.png</normaloff>:/icon/extra/radeon-profile.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_15" rowstretch="0,0,1" columnstretch="0,1">
+   <layout class="QGridLayout" name="gridLayout_15" rowstretch="0,0,0" columnstretch="0,0">
     <property name="leftMargin">
      <number>3</number>
     </property>
@@ -40,28 +40,6 @@
     <property name="spacing">
      <number>5</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <family>Noto Sans</family>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>GPU</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1" rowspan="2">
      <widget class="QWidget" name="widget_topbar" native="true">
       <property name="sizePolicy">
@@ -99,25 +77,6 @@
         <number>0</number>
        </property>
       </layout>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QComboBox" name="combo_gpus">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <family>Monospace</family>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Selected GPU</string>
-      </property>
      </widget>
     </item>
     <item row="2" column="0">
@@ -393,6 +352,47 @@
         </item>
        </layout>
       </widget>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Noto Sans</family>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>GPU</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QComboBox" name="combo_gpus">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Monospace</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Selected GPU</string>
+      </property>
      </widget>
     </item>
     <item row="2" column="1">
@@ -3655,7 +3655,7 @@
              <x>0</x>
              <y>0</y>
              <width>895</width>
-             <height>643</height>
+             <height>672</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_27">
@@ -3972,10 +3972,7 @@
               <property name="checkable">
                <bool>false</bool>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_25">
-               <property name="spacing">
-                <number>5</number>
-               </property>
+              <layout class="QGridLayout" name="gridLayout_21">
                <property name="leftMargin">
                 <number>5</number>
                </property>
@@ -3988,17 +3985,83 @@
                <property name="bottomMargin">
                 <number>5</number>
                </property>
-               <item>
+               <item row="2" column="0" colspan="2">
+                <widget class="QLabel" name="label_21">
+                 <property name="text">
+                  <string>Daemon connection confirmation method:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QPushButton" name="btn_connConfirmMethodInfo">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>40</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>?</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="4">
+                <widget class="QComboBox" name="combo_connConfirmMethod">
+                 <property name="minimumSize">
+                  <size>
+                   <width>400</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>400</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="currentText">
+                  <string>0 - Disable connection confirmation</string>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>0 - Disable connection confirmation</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>1 - Confirm on daemon's request</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>2 - Periodically confirm without daemon's request</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="0" column="0" colspan="5">
                 <widget class="QCheckBox" name="cb_daemonData">
                  <property name="text">
                   <string>Use daemon as a data provider</string>
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="1" column="0" colspan="5">
                 <widget class="QCheckBox" name="cb_daemonAutoRefresh">
                  <property name="enabled">
                   <bool>true</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
                  </property>
                  <property name="toolTip">
                   <string>Good option to check. Causes that daemon gets data from system automaticly with interval when GUI is on instead of waiting for request to read this data. Interval is the same as GUI.</string>
@@ -4039,8 +4102,30 @@
                  </property>
                 </widget>
                </item>
+               <item row="3" column="0">
+                <widget class="QCheckBox" name="cb_execSysEnv">
+                 <property name="text">
+                  <string>Explicit append system env to exec command</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
                <item row="2" column="1">
                 <widget class="QComboBox" name="cb_execDbcAction">
+                 <property name="minimumSize">
+                  <size>
+                   <width>400</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>400</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
                  <item>
                   <property name="text">
                    <string>Run</string>
@@ -4051,16 +4136,6 @@
                    <string>Edit</string>
                   </property>
                  </item>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QCheckBox" name="cb_execSysEnv">
-                 <property name="text">
-                  <string>Explicit append system env to exec command</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
                 </widget>
                </item>
               </layout>

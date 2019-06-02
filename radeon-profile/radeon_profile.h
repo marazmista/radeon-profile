@@ -157,7 +157,7 @@ private slots:
     void ocProfilesMenuActionClicked(QAction* action);
     void daemonConnected();
     void daemonDisconnected();
-
+    void on_btn_connConfirmMethodInfo_clicked();
 
 private:
     struct CurrentStateInfo {
