@@ -301,6 +301,9 @@ void radeon_profile::loadConfig() {
     globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
     globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
 
+    if (!ui->cb_daemonData->isChecked())
+        ui->cb_daemonAutoRefresh->setEnabled(false);
+
     // apply some settings to ui on start //
     if (ui->cb_saveWindowGeometry->isChecked())
         this->setGeometry(settings.value("windowGeometry").toRect());

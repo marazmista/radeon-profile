@@ -4665,5 +4665,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_daemonData</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cb_daemonAutoRefresh</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>247</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>244</x>
+     <y>374</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
