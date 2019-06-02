@@ -31,6 +31,14 @@ void dXorg::configure() {
         qDebug() << "Confguring shared memory for daemon";
         setupSharedMem();
         sendSharedMemInfoToDaemon();
+
+        // fist call after setup to read pm_file, so notihing is in sharedmem and we need to wait for data
+        // because we need correctly figure out what is available
+        // see: https://stackoverflow.com/a/11487434/2347196
+        QTime delayTime = QTime::currentTime().addMSecs(1200);
+        qDebug() << "Waiting for first daemon data read...";
+        while (QTime::currentTime() < delayTime)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
     }
 
     figureOutDriverFeatures();
@@ -97,6 +105,9 @@ void dXorg::sendSharedMemInfoToDaemon() {
     command.append("pm_info").append(SEPARATOR).append(driverFiles.debugfs_pm_info).append(SEPARATOR);
     command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append(sharedMem.key()).append(SEPARATOR);
 
+    if (!globalStuff::globalConfig.daemonAutoRefresh)
+        command.append(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR);
+
     qDebug() << "Sending daemon shared mem info: " << command;
     radeon_profile::dcomm.sendCommand(command);
 }
@@ -118,7 +129,7 @@ void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
 }
 
 // method for gather info about clocks from deamon or from debugfs if root
-QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
+QString dXorg::getClocksRawData() {
     QString data;
 
     data = getValueFromSysFsFile(driverFiles.debugfs_pm_info);
@@ -129,16 +140,6 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
         if (!globalStuff::globalConfig.daemonAutoRefresh){
             qDebug() << "Asking the daemon to read clocks";
             radeon_profile::dcomm.sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR)); // SIGNAL_READ_CLOCKS + SEPARATOR
-        }
-
-        // fist call, so notihing is in sharedmem and we need to wait for data
-        // because we need correctly figure out what is available
-        // see: https://stackoverflow.com/a/11487434/2347196
-        if (Q_UNLIKELY(resolvingGpuFeatures)) {
-            QTime delayTime = QTime::currentTime().addMSecs(1200);
-            qDebug() << "Waiting for first daemon data read...";
-            while (QTime::currentTime() < delayTime)
-                QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
         }
 
        if (sharedMem.lock()) {
@@ -152,11 +153,6 @@ QString dXorg::getClocksRawData(bool resolvingGpuFeatures) {
         } else
             qWarning() << "Unable to lock the shared memory: " << sharedMem.errorString();
     }
-
-    #ifdef QT_DEBUG
-         if (resolvingGpuFeatures)
-             qDebug() << data;
-    #endif
 
     return data;
 }
@@ -577,7 +573,7 @@ void dXorg::figureOutDriverFeatures() {
         features.clocksDataSource = ClocksDataSource::IOCTL;
     else {
         features.clocksDataSource = ClocksDataSource::PM_FILE;
-        QString data = getClocksRawData(true);
+        QString data = getClocksRawData();
         setupRegex(data);
         GPUClocks test = getClocks();
 

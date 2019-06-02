@@ -83,7 +83,7 @@ private:
 
     ioctlHandler *ioctlHnd;
 
-    QString getClocksRawData(bool forFeatures = false);
+    QString getClocksRawData();
     QString findSysfsHwmonForGPU();
     PowerMethod getPowerMethod();
     TemperatureSensor getTemperatureSensor();
