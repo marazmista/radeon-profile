@@ -313,7 +313,7 @@ void radeon_profile::btnBackToProfilesClicked()
 
 void radeon_profile::on_list_execProfiles_itemDoubleClicked(QTreeWidgetItem *item, int column) {
     Q_UNUSED(column)
-        switch (ui->cb_execDbcAction->currentIndex()) {
+        switch (ui->combo_execDbcAction->currentIndex()) {
         default:
         case 0:
             if (QMessageBox::question(this, tr("Run"), tr("Run: \"") + item->text(0) + "?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)

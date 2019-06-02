@@ -66,7 +66,7 @@ public:
     static DaemonComm dcomm;
 
 private slots:
-    void timerEvent();
+    void mainTimerEvent();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void forceAuto();
     void forceLow();

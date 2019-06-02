@@ -4113,7 +4113,7 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QComboBox" name="cb_execDbcAction">
+                <widget class="QComboBox" name="combo_execDbcAction">
                  <property name="minimumSize">
                   <size>
                    <width>400</width>

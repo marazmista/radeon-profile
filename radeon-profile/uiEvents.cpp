@@ -124,7 +124,7 @@ void radeon_profile::gpuChanged()
     timer->stop();
     device.changeGpu(ui->combo_gpus->currentIndex());
     setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
-    timerEvent();
+    mainTimerEvent();
     refreshBtnClicked();
     timer->start();
 }

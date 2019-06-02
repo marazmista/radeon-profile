@@ -141,7 +141,7 @@ void radeon_profile::connectSignals()
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(setPowerLevelFromCombo()));
     connect(&group_Dpm, SIGNAL(buttonClicked(int)), this, SLOT(setPowerLevel(int)));
-    connect(timer,SIGNAL(timeout()),this,SLOT(timerEvent()));
+    connect(timer,SIGNAL(timeout()),this,SLOT(mainTimerEvent()));
     connect(ui->combo_fanProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(createFanProfileListaAndGraph(const QString&)));
     connect(ui->combo_ocProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(createOcProfileListsAndGraph(const QString&)));
     connect(ui->slider_powerCap, SIGNAL(valueChanged(int)), this, SLOT(powerCapValueChange(int)));
@@ -445,7 +445,7 @@ void radeon_profile::enableUiControls(bool enable)
     ui->stack_pm->setEnabled(enable);
 }
 
-void radeon_profile::timerEvent() {
+void radeon_profile::mainTimerEvent() {
 
     // retry connection if lost and not root
     if (!globalStuff::globalConfig.rootMode && !dcomm.isConnected())

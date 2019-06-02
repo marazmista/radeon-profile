@@ -60,7 +60,7 @@ void radeon_profile::saveConfig() {
         settings.setValue("ocProfileName", ui->l_currentOcProfile->text());
         settings.setValue("restoreOcProfile", ui->cb_restoreOcProfile->isChecked());
 
-        settings.setValue("execDbcAction",ui->cb_execDbcAction->currentIndex());
+        settings.setValue("execDbcAction",ui->combo_execDbcAction->currentIndex());
         settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
         settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
         settings.setValue("daemonData", ui->cb_daemonData->isChecked());
@@ -268,7 +268,7 @@ void radeon_profile::loadConfig() {
     ui->cb_stats->setChecked(settings.value("powerLevelStatistics",true).toBool());
     ui->cb_alternateRow->setChecked(settings.value("aleternateRowColors",true).toBool());
     ui->cb_daemonAutoRefresh->setChecked(settings.value("daemonAutoRefresh",true).toBool());
-    ui->cb_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
+    ui->combo_execDbcAction->setCurrentIndex(settings.value("execDbcAction",0).toInt());
     ui->slider_fanSpeed->setValue(settings.value("fanSpeedSlider",20).toInt());
     ui->cb_saveFanMode->setChecked(settings.value("saveSelectedFanMode",false).toBool());
     ui->l_currentFanProfile->setText(settings.value("fanProfileName","default").toString());
