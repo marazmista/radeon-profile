@@ -268,6 +268,8 @@ private:
     void restoreFanState();
     void addPowerMethodToTrayMenu(const DriverFeatures &features);
     void initializeDevice();
+    void configureDaemonPostDeviceInit();
+    void configureDaemonPreDeviceInit();
 };
 
 #endif // RADEON_PROFILE_H

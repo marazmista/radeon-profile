@@ -30,14 +30,10 @@ void dXorg::configure() {
     if (radeon_profile::dcomm.isConnected() && globalStuff::globalConfig.daemonData) {
         qDebug() << "Confguring shared memory for daemon";
         setupSharedMem();
-        setupDaemon();
+        sendSharedMemInfoToDaemon();
     }
 
     figureOutDriverFeatures();
-
-    if (features.isFanControlAvailable)
-        radeon_profile::dcomm.sendCommand(QString().append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR).
-                          append("pwm1_enable").append(SEPARATOR).append(driverFiles.hwmonAttributes.pwm1_enable).append(SEPARATOR));
 }
 
 void dXorg::setupIoctl() {
@@ -77,41 +73,33 @@ void dXorg::setupSharedMem() {
 
     // create the shared mem block. The if comes from that configure method
     // is called on every change gpu, so later, shared mem already exists
-    if (!sharedMem.isAttached()) {
-        qDebug() << "Shared memory is not attached, creating it";
-        sharedMem.setKey(getRandomString());
+    if (sharedMem.isAttached())
+        return;
 
-        if (!sharedMem.create(SHARED_MEM_SIZE)) {
-            if (sharedMem.error() == QSharedMemory::AlreadyExists) {
-                qDebug() << "Shared memory already exists, attaching to it";
+    qDebug() << "Shared memory is not attached, creating it";
+    sharedMem.setKey(getRandomString());
 
-                if (!sharedMem.attach())
-                    qCritical() << "Unable to attach to the shared memory: " << sharedMem.errorString();
+    if (!sharedMem.create(SHARED_MEM_SIZE)) {
+        if (sharedMem.error() == QSharedMemory::AlreadyExists) {
+            qDebug() << "Shared memory already exists, attaching to it";
 
-            } else
-                qCritical() << "Unable to create the shared memory: " << sharedMem.errorString();
-        }
+            if (!sharedMem.attach())
+                qCritical() << "Unable to attach to the shared memory: " << sharedMem.errorString();
+
+        } else
+            qCritical() << "Unable to create the shared memory: " << sharedMem.errorString();
     }
 }
 
-void dXorg::setupDaemon() {
+void dXorg::sendSharedMemInfoToDaemon() {
     QString command;
     command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR);
     command.append("pm_info").append(SEPARATOR).append(driverFiles.debugfs_pm_info).append(SEPARATOR);
     command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append(sharedMem.key()).append(SEPARATOR);
 
-    if (globalStuff::globalConfig.daemonAutoRefresh) {
-        command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR);
-        command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR);
-    } else
-        command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR);
-
-    qDebug() << "Sending daemon config command: " << command;
+    qDebug() << "Sending daemon shared mem info: " << command;
     radeon_profile::dcomm.sendCommand(command);
 }
-
-//bool dXorg::isDaemonConnected() {
-//}
 
 void dXorg::figureOutGpuDataFilePaths(const QString &gpuName) {
     QString devicePath = "/sys/class/drm/" + gpuName + "/device/";

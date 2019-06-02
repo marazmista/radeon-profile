@@ -92,9 +92,14 @@ void radeon_profile::initializeDevice() {
 void radeon_profile::daemonConnected() {
     qDebug() << "Daemon connected";
 
-    if (!device.isInitialized())
+    if (!device.isInitialized()) {
+
+        configureDaemonPreDeviceInit();
         initializeDevice();
-    else {
+        configureDaemonPostDeviceInit();
+
+    } else {
+
         enableUiControls(true);
         restoreFanState();
     }
@@ -104,6 +109,27 @@ void radeon_profile::daemonDisconnected() {
     qDebug() << "Daemon disconnected";
 
     enableUiControls(false);
+}
+
+void radeon_profile::configureDaemonPreDeviceInit() {
+    QString command;
+
+    if (globalStuff::globalConfig.daemonData && globalStuff::globalConfig.daemonAutoRefresh) {
+        command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR);
+        command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR);
+    } else
+        command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR);
+
+    dcomm.sendCommand(command);
+}
+
+void radeon_profile::configureDaemonPostDeviceInit() {
+    QString command;
+
+    if (device.getDriverFeatures().isFanControlAvailable)
+         command.append(DAEMON_SIGNAL_CONFIG).append(SEPARATOR).append("pwm1_enable").append(SEPARATOR).append(device.getDriverFiles().hwmonAttributes.pwm1_enable).append(SEPARATOR);
+
+    dcomm.sendCommand(command);
 }
 
 void radeon_profile::connectSignals()

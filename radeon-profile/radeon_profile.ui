@@ -461,11 +461,11 @@
           <attribute name="headerVisible">
            <bool>false</bool>
           </attribute>
-          <attribute name="headerDefaultSectionSize">
-           <number>190</number>
-          </attribute>
           <attribute name="headerMinimumSectionSize">
            <number>50</number>
+          </attribute>
+          <attribute name="headerDefaultSectionSize">
+           <number>190</number>
           </attribute>
           <column>
            <property name="text">
@@ -552,11 +552,11 @@
               <property name="selectionMode">
                <enum>QAbstractItemView::ExtendedSelection</enum>
               </property>
-              <attribute name="headerDefaultSectionSize">
-               <number>250</number>
-              </attribute>
               <attribute name="headerMinimumSectionSize">
                <number>100</number>
+              </attribute>
+              <attribute name="headerDefaultSectionSize">
+               <number>250</number>
               </attribute>
               <column>
                <property name="text">
@@ -605,11 +605,11 @@
               <property name="editTriggers">
                <set>QAbstractItemView::NoEditTriggers</set>
               </property>
-              <attribute name="headerDefaultSectionSize">
-               <number>125</number>
-              </attribute>
               <attribute name="headerMinimumSectionSize">
                <number>50</number>
+              </attribute>
+              <attribute name="headerDefaultSectionSize">
+               <number>125</number>
               </attribute>
               <column>
                <property name="text">
@@ -664,11 +664,11 @@
               <property name="indentation">
                <number>2</number>
               </property>
-              <attribute name="headerDefaultSectionSize">
-               <number>350</number>
-              </attribute>
               <attribute name="headerMinimumSectionSize">
                <number>100</number>
+              </attribute>
+              <attribute name="headerDefaultSectionSize">
+               <number>350</number>
               </attribute>
               <column>
                <property name="text">
@@ -2826,11 +2826,11 @@
               <property name="indentation">
                <number>5</number>
               </property>
-              <attribute name="headerDefaultSectionSize">
-               <number>200</number>
-              </attribute>
               <attribute name="headerMinimumSectionSize">
                <number>50</number>
+              </attribute>
+              <attribute name="headerDefaultSectionSize">
+               <number>200</number>
               </attribute>
               <column>
                <property name="text">
@@ -3655,7 +3655,7 @@
              <x>0</x>
              <y>0</y>
              <width>895</width>
-             <height>628</height>
+             <height>643</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_27">
@@ -4416,12 +4416,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>113</y>
+     <x>233</x>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
-     <x>212</x>
-     <y>110</y>
+     <x>233</x>
+     <y>108</y>
     </hint>
    </hints>
   </connection>
@@ -4432,12 +4432,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>113</y>
+     <x>233</x>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
-     <x>265</x>
-     <y>110</y>
+     <x>183</x>
+     <y>108</y>
     </hint>
    </hints>
   </connection>
@@ -4480,12 +4480,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>204</x>
-     <y>198</y>
+     <x>284</x>
+     <y>155</y>
     </hint>
     <hint type="destinationlabel">
-     <x>221</x>
-     <y>197</y>
+     <x>284</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
@@ -4496,12 +4496,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>221</x>
-     <y>197</y>
+     <x>284</x>
+     <y>155</y>
     </hint>
     <hint type="destinationlabel">
-     <x>204</x>
-     <y>198</y>
+     <x>284</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
@@ -4516,8 +4516,8 @@
      <y>181</y>
     </hint>
     <hint type="destinationlabel">
-     <x>854</x>
-     <y>183</y>
+     <x>1030</x>
+     <y>187</y>
     </hint>
    </hints>
   </connection>
@@ -4528,8 +4528,8 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>170</y>
+     <x>1030</x>
+     <y>187</y>
     </hint>
     <hint type="destinationlabel">
      <x>802</x>
@@ -4548,8 +4548,8 @@
      <y>222</y>
     </hint>
     <hint type="destinationlabel">
-     <x>870</x>
-     <y>231</y>
+     <x>1030</x>
+     <y>235</y>
     </hint>
    </hints>
   </connection>
@@ -4560,8 +4560,8 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>855</x>
-     <y>221</y>
+     <x>1030</x>
+     <y>235</y>
     </hint>
     <hint type="destinationlabel">
      <x>756</x>
@@ -4612,8 +4612,8 @@
      <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>870</x>
-     <y>178</y>
+     <x>1030</x>
+     <y>187</y>
     </hint>
    </hints>
   </connection>
@@ -4660,8 +4660,8 @@
      <y>128</y>
     </hint>
     <hint type="destinationlabel">
-     <x>865</x>
-     <y>218</y>
+     <x>1030</x>
+     <y>235</y>
     </hint>
    </hints>
   </connection>

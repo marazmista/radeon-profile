@@ -93,7 +93,7 @@ private:
     void figureOutConstParams();
     void setupIoctl();
     void setupSharedMem();
-    void setupDaemon();
+    void sendSharedMemInfoToDaemon();
     PowerPlayTable loadPowerPlayTable(const QString &file);
     QString createDaemonSetCmd(const QString &file, const QString &tableIndex);
         const std::tuple<QMap<QString, FVTable>, QMap<QString, OCRange>> parseOcTable();
