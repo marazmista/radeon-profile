@@ -558,7 +558,24 @@ void dXorg::setupRegex(const QString &data) {
 
                 rxMatchIndex = 0;
                 clocksValueDivider = 1;
+                return;
             }
+
+            rx.setPattern("sclk:\\s\\d+");
+            rx.indexIn(data);
+            if (!rx.cap(0).isEmpty()) {
+                dXorg::rxPatterns.powerLevel = "power\\slevel\\s\\d",
+                        dXorg::rxPatterns.sclk = "sclk:\\s\\d+",
+                        dXorg::rxPatterns.mclk = "mclk:\\s\\d+",
+                        dXorg::rxPatterns.vclk = "vclk:\\s\\d+",
+                        dXorg::rxPatterns.dclk = "dclk:\\s\\d+",
+                        dXorg::rxPatterns.vddc = "vddc:\\s\\d+",
+                        dXorg::rxPatterns.vddci = "vddci:\\s\\d+";
+
+                rxMatchIndex = 1;
+                clocksValueDivider = 100;
+            }
+
             return;
 
         case DriverModule::MODULE_UNKNOWN:
