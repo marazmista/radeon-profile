@@ -270,6 +270,7 @@ void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
     }
 
     ui->tabs_execOutputs->removeTab(index);
+    delete execsRunning[index];
     execsRunning.removeAt(index);
 
     if (ui->tabs_execOutputs->count() == 0)

@@ -249,6 +249,11 @@ void radeon_profile::on_btn_runExecProfile_clicked()
 
     QTreeWidgetItem *item = ui->list_execProfiles->currentItem();
 
+    if (!QFile::exists(item->text(BINARY))) {
+        QMessageBox::critical(this, tr("Error"), tr("Can't run something that not exists!"));
+        return;
+    }
+
     // sets the env for binary
     QProcessEnvironment penv;
     if (ui->cb_execSysEnv->isChecked())
@@ -271,25 +276,21 @@ void radeon_profile::on_btn_runExecProfile_clicked()
 
     exe->setEnv(penv);
 
-    if (QFile::exists(item->text(BINARY))) {
-        exe->runBin("\""+item->text(BINARY) +"\" " +item->text(BINARY_PARAMS));
-        ui->execPages->setCurrentIndex(2);
+    exe->runBin("\""+item->text(BINARY) +"\" " +item->text(BINARY_PARAMS));
+    ui->execPages->setCurrentIndex(2);
 
-        //  check if there will be log
-        if (!item->text(LOG_FILE).isEmpty()) {
-            exe->logEnabled = true;
-            exe->setLogFilename(item->text(LOG_FILE) +
-                    ((item->text(LOG_FILE_DATE_APPEND) == "1") ? QDateTime::currentDateTime().toString("_yyyy-MM-dd_hh-mm-ss") : ""));
-            exe->appendToLog("Profile: " +item->text(PROFILE_NAME) +"; App: " + item->text(BINARY) + "; Params: " + item->text(BINARY_PARAMS) + "; Env: " + item->text(ENV_SETTINGS));
-            exe->appendToLog("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci); temp");
-        }
-        execsRunning.append(exe);
-        ui->tabs_execOutputs->setCurrentIndex(ui->tabs_execOutputs->count() - 1);
+    //  check if there will be log
+    if (!item->text(LOG_FILE).isEmpty()) {
+        exe->logEnabled = true;
+        exe->setLogFilename(item->text(LOG_FILE) +
+                            ((item->text(LOG_FILE_DATE_APPEND) == "1") ? QDateTime::currentDateTime().toString("_yyyy-MM-dd_hh-mm-ss") : ""));
+        exe->appendToLog("Profile: " +item->text(PROFILE_NAME) +"; App: " + item->text(BINARY) + "; Params: " + item->text(BINARY_PARAMS) + "; Env: " + item->text(ENV_SETTINGS));
+        exe->appendToLog("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci); temp");
     }
-    else {
-        QMessageBox::critical(this, tr("Error"), tr("Can't run something that not exists!"));
-        delete exe;
-    }
+
+    execsRunning.append(exe);
+    ui->tabs_execOutputs->setCurrentIndex(ui->tabs_execOutputs->count() - 1);
+
 }
 
 void radeon_profile::on_cb_manualEdit_clicked(bool checked)

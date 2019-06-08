@@ -24,10 +24,10 @@ public:
         delete p;
         delete output;
         delete cmd;
-        delete mainLay;
         delete btnLay;
         delete btnSave;
         delete lStatus;
+        delete mainLay;
         delete tab;
     }
 
