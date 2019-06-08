@@ -6,20 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>687</width>
-    <height>135</height>
+    <width>726</width>
+    <height>165</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>0</width>
     <height>135</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
-    <height>150</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -41,54 +35,7 @@
    <property name="spacing">
     <number>5</number>
    </property>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="btn_add">
-     <property name="text">
-      <string>Add</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="btn_modify">
-     <property name="text">
-      <string>Modify</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QPushButton" name="btn_moveLeft">
-     <property name="maximumSize">
-      <size>
-       <width>50</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>&lt;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="7">
-    <widget class="QPushButton" name="btn_ok">
-     <property name="text">
-      <string>OK</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="4">
+   <item row="1" column="5">
     <widget class="QPushButton" name="btn_moveRight">
      <property name="maximumSize">
       <size>
@@ -101,8 +48,8 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="5">
-    <spacer name="horizontalSpacer_2">
+   <item row="1" column="3">
+    <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -115,13 +62,19 @@
     </spacer>
    </item>
    <item row="1" column="6">
-    <widget class="QPushButton" name="btn_cancel">
-     <property name="text">
-      <string>Cancel</string>
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
-   <item row="0" column="0" colspan="8">
+   <item row="0" column="0" colspan="9">
     <widget class="QListWidget" name="listWidget">
      <property name="flow">
       <enum>QListView::LeftToRight</enum>
@@ -131,10 +84,51 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="1" column="0">
+    <widget class="QPushButton" name="btn_add">
+     <property name="text">
+      <string>Add</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
     <widget class="QPushButton" name="btn_remove">
      <property name="text">
       <string>Remove</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QPushButton" name="btn_moveLeft">
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>&lt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="8">
+    <widget class="QPushButton" name="btn_ok">
+     <property name="text">
+      <string>OK</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="7">
+    <widget class="QPushButton" name="btn_cancel">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="btn_modify">
+     <property name="text">
+      <string>Modify</string>
      </property>
     </widget>
    </item>
