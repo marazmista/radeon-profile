@@ -56,7 +56,7 @@ public:
     void setPowerCap(const unsigned value);
 
     void detectCards();
-    bool initialize();
+    bool initialize(const dXorg::InitializationConfig &config);
     void setOverclockValue(const QString &file, int value);
     void resetOverclock();
     const DriverFeatures& getDriverFeatures() const;

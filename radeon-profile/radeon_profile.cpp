@@ -51,12 +51,12 @@ radeon_profile::radeon_profile(QWidget *parent) :
 
     // checks if running as root
     if (globalStuff::grabSystemInfo("whoami")[0] == "root") {
-        globalStuff::globalConfig.rootMode = true;
+        rootMode = true;
         ui->label_rootWarrning->setVisible(true);
 
         initializeDevice();
     } else {
-        globalStuff::globalConfig.rootMode = false;
+        rootMode = false;
         ui->label_rootWarrning->setVisible(false);
 
         dcomm.connectToDaemon();
@@ -72,7 +72,7 @@ radeon_profile::~radeon_profile()
 }
 
 void radeon_profile::initializeDevice() {
-    if (!device.initialize()) {
+    if (!device.initialize(dXorg::InitializationConfig(rootMode, ui->cb_daemonData->isChecked(), ui->cb_daemonAutoRefresh->isChecked()))) {
         QMessageBox::critical(this,tr("Error"), tr("No Radeon cards have been found in the system."));
 
         for (int i = 0; i < ui->tw_main->count() - 1; ++i)
@@ -114,9 +114,9 @@ void radeon_profile::daemonDisconnected() {
 void radeon_profile::configureDaemonPreDeviceInit() {
     QString command;
 
-    if (globalStuff::globalConfig.daemonData && globalStuff::globalConfig.daemonAutoRefresh) {
+    if (ui->cb_daemonData->isChecked() && ui->cb_daemonAutoRefresh->isChecked()) {
         command.append(DAEMON_SIGNAL_TIMER_ON).append(SEPARATOR);
-        command.append(QString::number(globalStuff::globalConfig.interval)).append(SEPARATOR);
+        command.append(QString::number(ui->spin_timerInterval->value())).append(SEPARATOR);
     } else
         command.append(DAEMON_SIGNAL_TIMER_OFF).append(SEPARATOR);
 
@@ -448,7 +448,7 @@ void radeon_profile::enableUiControls(bool enable)
 void radeon_profile::mainTimerEvent() {
 
     // retry connection if lost and not root
-    if (!globalStuff::globalConfig.rootMode && !dcomm.isConnected())
+    if (!rootMode && !dcomm.isConnected())
         dcomm.connectToDaemon();
 
     if (!refreshWhenHidden->isChecked() && this->isHidden()) {

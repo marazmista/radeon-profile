@@ -81,7 +81,7 @@ void gpu::detectCards() {
     }
 }
 
-bool gpu::initialize() {
+bool gpu::initialize(const dXorg::InitializationConfig &config) {
     qDebug() << "Initializing device";
 
     detectCards();
@@ -91,7 +91,7 @@ bool gpu::initialize() {
         return false;
     }
 
-    driverHandler = new dXorg(gpuList.at(0));
+    driverHandler = new dXorg(gpuList.at(0), config);
     defineAvailableDataContainer();
 
     return true;
@@ -102,9 +102,10 @@ bool gpu::isInitialized() {
 }
 
 void gpu::changeGpu(int index) {
+    dXorg::InitializationConfig initConfig = driverHandler->getInitConfig();
     delete driverHandler;
 
-    driverHandler = new dXorg(gpuList.at(index));
+    driverHandler = new dXorg(gpuList.at(index), initConfig);
     driverHandler->configure();
     defineAvailableDataContainer();
 }

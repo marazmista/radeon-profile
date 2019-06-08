@@ -24,8 +24,23 @@ class dXorg
     };
 
 public:
+    struct InitializationConfig {
+        bool daemonAutoRefresh, daemonData, rootMode;
+
+        InitializationConfig() :
+            daemonAutoRefresh(true),
+            daemonData(false),
+            rootMode(false) { }
+
+        InitializationConfig(bool isRoot, bool data, bool autoRefresh) {
+            rootMode = isRoot;
+            daemonData = autoRefresh;
+            daemonData = data;
+        }
+    };
+
     dXorg() : ioctlHnd(nullptr) { }
-    dXorg(const GPUSysInfo &si);
+    dXorg(const GPUSysInfo &si, const InitializationConfig &config);
 
     ~dXorg() {
         cleanup();
@@ -73,6 +88,7 @@ public:
     void setNewValue(const QString &filePath, const QString &newValue);
     void readOcTableAndRanges();
     void setOcTable(const QString &tableType, const FVTable &table);
+    InitializationConfig getInitConfig();
 
 private:
     QChar gpuSysIndex;
@@ -80,6 +96,7 @@ private:
     int sensorsGPUtempIndex;
     short rxMatchIndex, clocksValueDivider;
     RxPatterns rxPatterns;
+    InitializationConfig initConfig;
 
     ioctlHandler *ioctlHnd;
 

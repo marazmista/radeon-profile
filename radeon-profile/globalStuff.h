@@ -539,12 +539,6 @@ public:
     static QStringList createProfileCombo() {
         return QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low;
     }
-
-    // settings from config used across the source
-    static struct globalCfgStruct {
-        float interval;
-        bool daemonAutoRefresh, rootMode, daemonData = false;
-    } globalConfig;
 };
 
 

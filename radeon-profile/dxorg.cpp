@@ -12,8 +12,9 @@
 #include <QString>
 #include <QStringList>
 
-dXorg::dXorg(const GPUSysInfo &si) : ioctlHnd(nullptr) {
+dXorg::dXorg(const GPUSysInfo &si, const InitializationConfig &config) : ioctlHnd(nullptr) {
     features.sysInfo = si;
+    initConfig = config;
     configure();
     figureOutConstParams();
 }
@@ -22,12 +23,12 @@ void dXorg::configure() {
     figureOutGpuDataFilePaths(features.sysInfo.sysName);
     setupIoctl();
 
-    if (globalStuff::globalConfig.rootMode) {
+    if (initConfig.rootMode) {
         figureOutDriverFeatures();
         return;
     }
 
-    if (radeon_profile::dcomm.isConnected() && globalStuff::globalConfig.daemonData) {
+    if (radeon_profile::dcomm.isConnected() && initConfig.daemonData) {
         qDebug() << "Confguring shared memory for daemon";
         setupSharedMem();
         sendSharedMemInfoToDaemon();
@@ -42,6 +43,10 @@ void dXorg::configure() {
     }
 
     figureOutDriverFeatures();
+}
+
+dXorg::InitializationConfig dXorg::getInitConfig() {
+    return initConfig;
 }
 
 void dXorg::setupIoctl() {
@@ -105,7 +110,7 @@ void dXorg::sendSharedMemInfoToDaemon() {
     command.append("pm_info").append(SEPARATOR).append(driverFiles.debugfs_pm_info).append(SEPARATOR);
     command.append(DAEMON_SHAREDMEM_KEY).append(SEPARATOR).append(sharedMem.key()).append(SEPARATOR);
 
-    if (!globalStuff::globalConfig.daemonAutoRefresh)
+    if (!initConfig.daemonAutoRefresh)
         command.append(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR);
 
     qDebug() << "Sending daemon shared mem info: " << command;
@@ -137,7 +142,7 @@ QString dXorg::getClocksRawData() {
         return data;
 
     if (radeon_profile::dcomm.isConnected()) {
-        if (!globalStuff::globalConfig.daemonAutoRefresh){
+        if (!initConfig.daemonAutoRefresh){
             qDebug() << "Asking the daemon to read clocks";
             radeon_profile::dcomm.sendCommand(QString(DAEMON_SIGNAL_READ_CLOCKS).append(SEPARATOR)); // SIGNAL_READ_CLOCKS + SEPARATOR
         }
@@ -586,7 +591,7 @@ void dXorg::setupRegex(const QString &data) {
 void dXorg::figureOutDriverFeatures() {
     features.currentPowerMethod = getPowerMethod();
 
-    if (getIoctlAvailability() && !globalStuff::globalConfig.daemonData)
+    if (getIoctlAvailability() && !initConfig.daemonData)
         features.clocksDataSource = ClocksDataSource::IOCTL;
     else {
         features.clocksDataSource = ClocksDataSource::PM_FILE;
@@ -607,7 +612,7 @@ void dXorg::figureOutDriverFeatures() {
         case PowerMethod::DPM:
             qDebug() << "Power method: DPM";
 
-            if (globalStuff::globalConfig.rootMode || radeon_profile::dcomm.isConnected())
+            if (initConfig.rootMode || radeon_profile::dcomm.isConnected())
                 features.isChangeProfileAvailable = true;
             else {
                 QFile f(driverFiles.sysFs.power_dpm_state);

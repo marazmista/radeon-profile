@@ -23,9 +23,6 @@ static const QString auxStuffPath = getConfigPath() + "/radeon-profile-auxstuff"
 
 static bool loadedFromLegacy = false;
 
-// init of static struct with setting exposed to global scope
-globalStuff::globalCfgStruct globalStuff::globalConfig;
-
 void radeon_profile::saveConfig() {
     {
         // If settingsPath doesn't exist yet, running QSetting's destructor will create it.
@@ -298,10 +295,6 @@ void radeon_profile::loadConfig() {
     ui->cb_restoreOcProfile->setChecked(settings.value("restoreOcProfile", false).toBool());
     if (ui->cb_restoreOcProfile->isChecked())
         ui->l_currentOcProfile->setText(settings.value("ocProfileName", "default").toString());
-
-    globalStuff::globalConfig.daemonData = ui->cb_daemonData->isChecked();
-    globalStuff::globalConfig.interval = ui->spin_timerInterval->value();
-    globalStuff::globalConfig.daemonAutoRefresh = ui->cb_daemonAutoRefresh->isChecked();
 
     if (!ui->cb_daemonData->isChecked())
         ui->cb_daemonAutoRefresh->setEnabled(false);

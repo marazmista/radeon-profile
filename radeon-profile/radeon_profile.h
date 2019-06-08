@@ -181,7 +181,7 @@ private:
     QMap<QString, unsigned int> pmStats;
     unsigned int counter_ticks, counter_statsTick;
     short hysteresisRelativeTepmerature;
-    bool enableChangeEvent;
+    bool enableChangeEvent, rootMode;
     QButtonGroup group_pwm, group_Dpm;
     CurrentStateInfo *savedState;
     PlotManager plotManager;
