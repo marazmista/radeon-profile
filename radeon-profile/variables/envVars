@@ -46,6 +46,11 @@ LP_PERF|user_input
 LP_NUM_THREADS|user_input
 -------Driver-------
 R600_DEBUG|sb#nosb#sbcl#sbstat#nollvm#llvm#nohyperz#hyprez#bostats#tex#texmip#compute#vm#trace_cs#info#fs#vs#gs#ps#cs#nodma#forcedma#noinvalrange#no2d#notiling#switch_on_eop#precompile
+-------Wine-------
+WINEPREFIX|user_input
+WINEARCH|win32#win64
+WINEDLLOVERRIDES|user_input
+WINEDEBUG|user_input
 -------Other-------
 vblank_mode|0
 LC_ALL|user_input
