@@ -83,6 +83,7 @@ void radeon_profile::initializeDevice() {
 
     setupDeviceDependantUiElements();
     setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
+    connectSignals();
 
     refreshUI();
 
@@ -164,7 +165,6 @@ void radeon_profile::setupDeviceDependantUiElements()
     ui->list_glxinfo->addItems(device.getGLXInfo(ui->combo_gpus->currentText()));
 
     fillModInfo();
-    connectSignals();
 }
 
 void radeon_profile::setupUiElements()
