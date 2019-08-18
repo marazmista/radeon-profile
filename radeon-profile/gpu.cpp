@@ -166,10 +166,15 @@ void gpu::defineAvailableDataContainer() {
 
 
     if (driverHandler->features.isPowerCapAvailable) {
-        int tmpPowerCap = driverHandler->getPowerCapCurrent();
+        int tmpPowerCap = driverHandler->getPowerCapSelected();
 
         if (tmpPowerCap != -1)
-            gpuData.insert(ValueID::POWER_CAP_CURRENT, RPValue(ValueUnit::WATT, tmpPowerCap));
+            gpuData.insert(ValueID::POWER_CAP_SELECTED, RPValue(ValueUnit::WATT, tmpPowerCap));
+
+        tmpPowerCap = driverHandler->getPowerCapAverage();
+
+        if (tmpPowerCap != -1)
+            gpuData.insert(ValueID::POWER_CAP_AVERAGE, RPValue(ValueUnit::WATT, tmpPowerCap));
     }
 }
 
@@ -322,9 +327,14 @@ int gpu::getCurrentPowerPlayTableId(const QString &file) {
     return driverHandler->getCurrentPowerPlayTableId(file);
 }
 
-void gpu::getPowerCapCurrent() {
+void gpu::getPowerCapSelected() {
     if (getDriverFeatures().isPowerCapAvailable)
-        gpuData[ValueID::POWER_CAP_CURRENT].setValue(driverHandler->getPowerCapCurrent());
+        gpuData[ValueID::POWER_CAP_SELECTED].setValue(driverHandler->getPowerCapSelected());
+}
+
+void gpu::getPowerCapAverage() {
+    if (getDriverFeatures().isPowerCapAvailable)
+        gpuData[ValueID::POWER_CAP_AVERAGE].setValue(driverHandler->getPowerCapAverage());
 }
 
 void gpu::setPowerCap(const unsigned int value) {

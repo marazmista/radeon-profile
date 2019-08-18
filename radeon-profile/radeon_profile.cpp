@@ -296,7 +296,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
                 ui->slider_powerCap->setRange(device.getGpuConstParams().power1_cap_min, device.getGpuConstParams().power1_cap_max);
                 ui->spin_powerCap->setRange(device.getGpuConstParams().power1_cap_min, device.getGpuConstParams().power1_cap_max);
-                ui->slider_powerCap->setValue(device.gpuData[ValueID::POWER_CAP_CURRENT].value);
+                ui->slider_powerCap->setValue(device.gpuData[ValueID::POWER_CAP_SELECTED].value);
             }
 
             if (ocProfiles.isEmpty())
@@ -342,7 +342,8 @@ void radeon_profile::refreshGpuData() {
     device.getTemperature();
     device.getGpuUsage();
     device.getFanSpeed();
-    device.getPowerCapCurrent();
+    device.getPowerCapSelected();
+    device.getPowerCapAverage();
 }
 
 void radeon_profile::addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
@@ -368,8 +369,8 @@ void radeon_profile::refreshUI() {
                 case ValueID::TEMPERATURE_CURRENT:
                     ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(ValueID::TEMPERATURE_CURRENT, ValueID::TEMPERATURE_MIN, ValueID::TEMPERATURE_MAX));
                     continue;
-                case ValueID::POWER_CAP_CURRENT:
-                    ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(device.gpuData.value(ValueID::POWER_CAP_CURRENT).strValue,
+                case ValueID::POWER_CAP_SELECTED:
+                    ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(device.gpuData.value(ValueID::POWER_CAP_SELECTED).strValue,
                                                                                                    QString::number(device.getGpuConstParams().power1_cap_min),
                                                                                                    QString::number(device.getGpuConstParams().power1_cap_max)));
                     continue;

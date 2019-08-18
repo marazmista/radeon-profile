@@ -64,7 +64,8 @@ enum ValueID {
     FAN_SPEED_PERCENT,
     FAN_SPEED_RPM,
     POWER_LEVEL,
-    POWER_CAP_CURRENT
+    POWER_CAP_SELECTED,
+    POWER_CAP_AVERAGE
 };
 
 enum ValueUnit {
@@ -316,7 +317,8 @@ struct HwmonAttributes {
     fan1_input,
     power1_cap_max,
     power1_cap_min,
-    power1_cap;
+    power1_cap,
+    power1_average;
 
     HwmonAttributes() { }
 
@@ -330,6 +332,7 @@ struct HwmonAttributes {
         power1_cap_max = hwmonPath + "power1_cap_max";
         power1_cap_min = hwmonPath + "power1_cap_min";
         power1_cap = hwmonPath + "power1_cap";
+        power1_average = hwmonPath + "power1_average";
 
         if (!checkFileCorrectness(temp1))
             temp1 = "";
@@ -344,7 +347,7 @@ struct HwmonAttributes {
             fan1_input = "";
 
         if (!checkFileCorrectness(power1_cap))
-            power1_cap = power1_cap_min = power1_cap_max = "";
+            power1_cap = power1_cap_min = power1_cap_max = power1_average = "";
     }
 };
 
@@ -429,7 +432,8 @@ public:
             case ValueID::GPU_VRAM_USAGE_MB:
                 return ValueUnit::MEGABYTE;
 
-            case ValueID::POWER_CAP_CURRENT:
+            case ValueID::POWER_CAP_SELECTED:
+            case ValueID::POWER_CAP_AVERAGE:
                 return ValueUnit::WATT;
 
             default:
@@ -451,7 +455,8 @@ public:
             case ValueID::TEMPERATURE_MAX:
             case ValueID::TEMPERATURE_MIN:
             case ValueID::GPU_VRAM_USAGE_MB:
-            case ValueID::POWER_CAP_CURRENT:
+            case ValueID::POWER_CAP_SELECTED:
+            case ValueID::POWER_CAP_AVERAGE:
                 return true;
 
             default:
@@ -474,7 +479,8 @@ public:
             case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min)");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram megabyte usage");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level");
-            case ValueID::POWER_CAP_CURRENT: return QObject::tr("Power cap");
+            case ValueID::POWER_CAP_SELECTED: return QObject::tr("Power cap selected");
+            case ValueID::POWER_CAP_AVERAGE: return QObject::tr("Power cap average");
 
             default:
                  return "";
@@ -496,7 +502,8 @@ public:
             case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min) [")+QString::fromUtf8("\u00B0C]");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram usage [MB]");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level ");
-            case ValueID::POWER_CAP_CURRENT: return  QObject::tr("Power cap [W]");
+            case ValueID::POWER_CAP_SELECTED: return  QObject::tr("Power cap selected [W]");
+            case ValueID::POWER_CAP_AVERAGE: return  QObject::tr("Power cap average [W]");
 
             default:
                 return "";

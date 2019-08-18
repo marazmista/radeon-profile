@@ -761,8 +761,12 @@ int dXorg::getCurrentPowerPlayTableId(const QString &file) {
     return 0;
 }
 
-int dXorg::getPowerCapCurrent() const {
+int dXorg::getPowerCapSelected() const {
     return getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_cap).toInt() / MICROWATT_DIVIDER;
+}
+
+int dXorg::getPowerCapAverage() const {
+    return getValueFromSysFsFile(driverFiles.hwmonAttributes.power1_average).toInt() / MICROWATT_DIVIDER;
 }
 
 const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
