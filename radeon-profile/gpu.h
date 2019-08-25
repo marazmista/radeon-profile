@@ -55,6 +55,8 @@ public:
     void sendOcTableCommand(const QString cmd);
     void setOcRanges(const QString &type, const QString &tableKey, int powerState, int rangeValue);
     void setPowerCap(const unsigned value);
+    void setManualFrequencyControlStates(const QString &states);
+    void resetFrequencyControlStates();
 
     void detectCards();
     bool initialize(const dXorg::InitializationConfig &config);

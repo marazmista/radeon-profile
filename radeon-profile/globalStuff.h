@@ -185,7 +185,6 @@ struct OCRange {
 };
 
 typedef QMap<ValueID, RPValue> GPUDataContainer;
-typedef QMap<int, QString> PowerPlayTable;
 typedef QMap<unsigned, FreqVoltPair> FVTable;
 typedef QMap<QString, FVTable> MapFVTables;
 typedef QMap<QString, OCRange> MapOCRanges;
@@ -216,7 +215,7 @@ struct DriverFeatures {
     GPUSysInfo sysInfo;
 
     // base on files  pp_dpm_sclk and  pp_dpm_mclk
-    PowerPlayTable sclkTable, mclkTable;
+    QStringList sclkTable, mclkTable;
 
     // base on file pp_od_clk_voltage
     MapFVTables currentStatesTables;

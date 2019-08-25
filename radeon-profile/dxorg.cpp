@@ -731,17 +731,15 @@ QString dXorg::createDaemonSetCmd(const QString &file, const QString &value)
     return command;
 }
 
-PowerPlayTable dXorg::loadPowerPlayTable(const QString &file) {
-    PowerPlayTable ppt;
-    QStringList sl = getValueFromSysFsFile(file).split(QString::SkipEmptyParts);
+QStringList dXorg::loadPowerPlayTable(const QString &file) {
+    QStringList ppt;
+    QStringList sl = getValueFromSysFsFile(file).split('\n', QString::SkipEmptyParts);
 
     if (sl.isEmpty() || sl.at(0) == "-1")
         return ppt;
 
-    for (const QString &s : sl) {
-        QStringList tmp = s.split(":");
-        ppt.insert(tmp[0].toInt(), tmp[1].split(" ")[1]);
-    }
+    for (QString &s : sl)
+        ppt.append(s.remove("*").trimmed());
 
     return ppt;
 }

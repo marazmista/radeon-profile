@@ -112,7 +112,7 @@ private:
     void setupIoctl();
     void setupSharedMem();
     void sendSharedMemInfoToDaemon();
-    PowerPlayTable loadPowerPlayTable(const QString &file);
+    QStringList loadPowerPlayTable(const QString &file);
     QString createDaemonSetCmd(const QString &file, const QString &tableIndex);
         const std::tuple<QMap<QString, FVTable>, QMap<QString, OCRange>> parseOcTable();
 };

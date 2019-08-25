@@ -240,6 +240,7 @@ void radeon_profile::on_cb_alternateRow_clicked(bool checked) {
     ui->list_execProfiles->setAlternatingRowColors(checked);
     ui->list_variables->setAlternatingRowColors(checked);
     ui->list_vaules->setAlternatingRowColors(checked);
+    ui->list_freqStates->setAlternatingRowColors(checked);
 }
 
 void radeon_profile::on_chProfile_clicked()
@@ -277,7 +278,6 @@ void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)
         btnBackToProfilesClicked();
 }
 
-
 int radeon_profile::askNumber(const int value, const int min, const int max, const QString label) {
     bool ok;
     int number = QInputDialog::getInt(this,"",label,value,min,max,1, &ok);
@@ -286,43 +286,6 @@ int radeon_profile::askNumber(const int value, const int min, const int max, con
         return -1;
 
     return number;
-}
-
-void radeon_profile::applyOc()
-{
-    device.setOverclockValue(device.getDriverFiles().sysFs.pp_sclk_od, ui->slider_ocSclk->value());
-    device.setOverclockValue(device.getDriverFiles().sysFs.pp_mclk_od, ui->slider_ocMclk->value());
-}
-
-void radeon_profile::on_btn_applyOverclock_clicked() {
-    if (ui->group_oc->isChecked())
-        applyOc();
-}
-
-void radeon_profile::on_group_freq_toggled(bool arg1)
-{
-    if (!device.isInitialized())
-        return;
-
-    if (arg1) {
-        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
-
-        ui->slider_freqSclk->setValue(device.getCurrentPowerPlayTableId(device.getDriverFiles().sysFs.pp_dpm_sclk));
-        if (device.getDriverFeatures().isDpmMemFreqTableAvailable)
-            ui->slider_freqMclk->setValue(device.getCurrentPowerPlayTableId(device.getDriverFiles().sysFs.pp_dpm_mclk));
-    } else
-        device.setForcePowerLevel(ForcePowerLevels::F_AUTO);
-}
-
-void radeon_profile::on_slider_freqSclk_valueChanged(int value)
-{
-    ui->l_freqSclk->setText(device.getDriverFeatures().sclkTable.value(value));
-}
-
-void radeon_profile::on_slider_freqMclk_valueChanged(int value)
-{
-    ui->l_freqMclk->setText(device.getDriverFeatures().mclkTable.value(value));
-
 }
 
 void radeon_profile::on_btn_saveAll_clicked()

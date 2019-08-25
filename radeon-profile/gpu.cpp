@@ -323,6 +323,15 @@ void gpu::resetOverclock() {
     driverHandler->setNewValue(getDriverFiles().sysFs.pp_mclk_od, "0");
 }
 
+void gpu::resetFrequencyControlStates() {
+    QString states;
+
+    for (int i = 0; i < driverHandler->features.sclkTable.count(); ++i)
+        states.append(QString::number(i) + " ");
+
+    setManualFrequencyControlStates(states);
+}
+
 int gpu::getCurrentPowerPlayTableId(const QString &file) {
     return driverHandler->getCurrentPowerPlayTableId(file);
 }
@@ -330,6 +339,10 @@ int gpu::getCurrentPowerPlayTableId(const QString &file) {
 void gpu::getPowerCapSelected() {
     if (getDriverFeatures().isPowerCapAvailable)
         gpuData[ValueID::POWER_CAP_SELECTED].setValue(driverHandler->getPowerCapSelected());
+}
+
+void gpu::setManualFrequencyControlStates(const QString &states) {
+    driverHandler->setNewValue(getDriverFiles().sysFs.pp_dpm_sclk, states);
 }
 
 void gpu::getPowerCapAverage() {

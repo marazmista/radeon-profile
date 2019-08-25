@@ -110,7 +110,7 @@ private slots:
     void on_btn_addFanStep_clicked();
     void on_btn_removeFanStep_clicked();
     void on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column);
-    void on_btn_applyOverclock_clicked();
+    void on_btn_applyStatesAndOc_clicked();
     void on_btn_activateFanProfile_clicked();
     void on_btn_removeFanProfile_clicked();
     void on_btn_saveFanProfile_clicked();
@@ -136,9 +136,6 @@ private slots:
     void on_cb_daemonData_clicked(bool checked);
     void pauseRefresh(bool checked);
     void on_btn_general_clicked();
-    void on_slider_freqSclk_valueChanged(int value);
-    void on_slider_freqMclk_valueChanged(int value);
-    void on_group_freq_toggled(bool arg1);
     void on_btn_configureTopbar_clicked();
     void on_btn_setPlotsBackground_clicked();
     void createFanProfileListaAndGraph(const QString &profile);
@@ -158,6 +155,8 @@ private slots:
     void daemonConnected();
     void daemonDisconnected();
     void on_btn_connConfirmMethodInfo_clicked();
+    void frequencyControlToggled(bool toogle);
+    void applyFrequencyTable();
 
 private:
     struct CurrentStateInfo {
@@ -189,6 +188,7 @@ private:
     QChartView *chartView_fan, *chartView_oc;
     QList<TopbarItem*> topBarItems;
     QList<ValueID> keysInCurrentGpuList;
+    QString selectedFrequencyStates;
 
     Ui::radeon_profile *ui;
     void setupTrayIcon();
@@ -270,6 +270,7 @@ private:
     void initializeDevice();
     void configureDaemonPostDeviceInit();
     void configureDaemonPreDeviceInit();
+    void loadFrequencyStatesTable();
 };
 
 #endif // RADEON_PROFILE_H

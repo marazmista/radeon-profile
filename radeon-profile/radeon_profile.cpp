@@ -83,9 +83,10 @@ void radeon_profile::initializeDevice() {
 
     setupDeviceDependantUiElements();
     setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
-    connectSignals();
 
     refreshUI();
+
+    connectSignals();
 
     timer->start();
 }
@@ -148,6 +149,7 @@ void radeon_profile::connectSignals()
     connect(ui->slider_powerCap, SIGNAL(valueChanged(int)), this, SLOT(powerCapValueChange(int)));
     connect(ui->spin_powerCap, SIGNAL(valueChanged(int)), this, SLOT(powerCapValueChange(int)));
     connect(ui->group_oc, SIGNAL(toggled(bool)), this, SLOT(percentOverclockToggled(bool)));
+    connect(ui->group_freq, SIGNAL(toggled(bool)), this, SLOT(frequencyControlToggled(bool)));
 }
 
 void radeon_profile::setupDeviceDependantUiElements()
@@ -183,6 +185,7 @@ void radeon_profile::setupUiElements()
     fillConnectors();
     createPlots();
 }
+
 
 void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, const GPUDataContainer &data) {
     qDebug() << "Handling found device features";
@@ -253,7 +256,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     ui->tw_main->setTabEnabled(2, false);
     ui->btn_ocProfileControl->setVisible(false);
 
-    if (features.isChangeProfileAvailable && (features.isOcTableAvailable || features.isPercentCoreOcAvailable)) {
+    if (features.isChangeProfileAvailable && (features.isOcTableAvailable || features.isPercentCoreOcAvailable || features.isDpmCoreFreqTableAvailable)) {
         ui->tw_main->setTabEnabled(2, true);
         ui->tw_overclock->setEnabled(true);
         ui->tw_overclock->setTabEnabled(0, false);
@@ -262,28 +265,21 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         if (features.isPercentCoreOcAvailable) {
             ui->group_oc->setEnabled(true);
             ui->tw_overclock->setTabEnabled(0, true);
-            ui->btn_applyOverclock->setEnabled(true);
+            ui->btn_applyStatesAndOc->setEnabled(true);
 
             if (ui->cb_restorePercentOc->isChecked())
-                on_btn_applyOverclock_clicked();
+                on_btn_applyStatesAndOc_clicked();
         }
 
         if (features.isDpmCoreFreqTableAvailable) {
-            ui->slider_freqSclk->setMaximum(features.sclkTable.count() - 1);
-
-            if (features.isDpmMemFreqTableAvailable)
-                ui->slider_freqMclk->setMaximum(features.mclkTable.count() - 1);
-            else {
-                ui->slider_freqMclk->setEnabled(false);
-                ui->label_memFreq->setEnabled(features.isDpmMemFreqTableAvailable);
-                ui->l_freqMclk->setEnabled(features.isDpmMemFreqTableAvailable);
-            }
-
-            ui->group_freq->setCheckable(true);
-            ui->group_freq->setChecked(false);
             ui->group_freq->setEnabled(true);
             ui->tw_overclock->setTabEnabled(0, true);
-            ui->btn_applyOverclock->setEnabled(true);
+            ui->btn_applyStatesAndOc->setEnabled(true);
+
+            loadFrequencyStatesTable();
+
+            if (ui->cb_restoreFrequencyStates->isChecked())
+                on_btn_applyStatesAndOc_clicked();
         }
 
         if (features.isOcTableAvailable) {
@@ -318,7 +314,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
             ui->btn_ocProfileControl->menu()->actions()[findCurrentMenuIndex(ui->btn_ocProfileControl->menu(), "default")]->setChecked(true);
 
             ui->tw_overclock->setTabEnabled(1, true);
-            ui->btn_applyOverclock->setEnabled(true);
+            ui->btn_applyStatesAndOc->setEnabled(true);
 
             if (features.isVDDCCurveAvailable) {
                 ui->l_ocTableTitle->setText(tr("VDDC curve"));

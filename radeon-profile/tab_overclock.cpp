@@ -283,6 +283,9 @@ void radeon_profile::setCurrentOcProfile(const QString &name) {
     ui->btn_ocProfileControl->setText(name);
 
     tableHasBeenModified = false;
+
+    // refresh states table after overclock
+    loadFrequencyStatesTable();
 }
 
 void radeon_profile::powerCapValueChange(int value)
@@ -302,6 +305,54 @@ void radeon_profile::percentOverclockToggled(bool toggle) {
         device.resetOverclock();
 }
 
+void radeon_profile::frequencyControlToggled(bool toggle)
+{
+    if (!device.isInitialized())
+        return;
+
+    if (toggle)
+        applyFrequencyTable();
+    else
+        device.resetFrequencyControlStates();
+}
+
+void radeon_profile::applyOc()
+{
+    device.setOverclockValue(device.getDriverFiles().sysFs.pp_sclk_od, ui->slider_ocSclk->value());
+    device.setOverclockValue(device.getDriverFiles().sysFs.pp_mclk_od, ui->slider_ocMclk->value());
+}
+
+void radeon_profile::applyFrequencyTable() {
+    bool allChecked = true;
+
+    selectedFrequencyStates = "";
+
+    for (int i = 0; i < ui->list_freqStates->count(); ++i) {
+        if (ui->list_freqStates->item(i)->checkState() == Qt::Checked)
+            selectedFrequencyStates.append(QString::number(i) + " ");
+        else
+            allChecked = false;
+    }
+
+    if (selectedFrequencyStates.isEmpty()) {
+        QMessageBox::warning(this, "", "At least one state has to be enabled.");
+        return;
+    }
+
+    if (!allChecked && static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
+        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+
+    device.setManualFrequencyControlStates(selectedFrequencyStates);
+}
+
+void radeon_profile::on_btn_applyStatesAndOc_clicked() {
+    if (ui->group_oc->isChecked())
+        applyOc();
+
+    if (ui->group_freq->isChecked())
+        applyFrequencyTable();
+
+}
 void radeon_profile::ocProfilesMenuActionClicked(QAction *a) {
     if (a->isSeparator())
         return;
@@ -313,3 +364,12 @@ void radeon_profile::ocProfilesMenuActionClicked(QAction *a) {
     setCurrentOcProfile(a->text());
 }
 
+void radeon_profile::loadFrequencyStatesTable()
+{
+    for (const QString &s : device.getDriverFeatures().sclkTable) {
+        QListWidgetItem *item = new QListWidgetItem(ui->list_freqStates);
+        item->setCheckState((selectedFrequencyStates.contains(s.left(1))) ? Qt::Checked : Qt::Unchecked);
+        item->setText(s);
+        ui->list_freqStates->addItem(item);
+    }
+}

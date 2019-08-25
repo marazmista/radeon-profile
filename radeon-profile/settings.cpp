@@ -53,6 +53,8 @@ void radeon_profile::saveConfig() {
         settings.setValue("restorePercentOverclock", ui->cb_restorePercentOc->isChecked());
         settings.setValue("overclockValue", ui->slider_ocSclk->value());
         settings.setValue("overclockMemValue", ui->slider_ocMclk->value());
+        settings.setValue("restoreFrequencyStates", ui->cb_restoreFrequencyStates->isChecked());
+        settings.setValue("selectedFrequencyStates", selectedFrequencyStates);
 
         settings.setValue("ocProfileName", ui->l_currentOcProfile->text());
         settings.setValue("restoreOcProfile", ui->cb_restoreOcProfile->isChecked());
@@ -280,6 +282,9 @@ void radeon_profile::loadConfig() {
 
     ui->cb_restorePercentOc->setChecked(settings.value("restorePercentOverclock", false).toBool());
     ui->group_oc->setChecked(ui->cb_restorePercentOc->isChecked());
+    ui->cb_restoreFrequencyStates->setChecked(settings.value("restoreFrequencyStates", false).toBool());
+    selectedFrequencyStates = settings.value("selectedFrequencyStates", "0 1 2 3 4 5 6 7").toString();
+    ui->group_freq->setChecked(ui->cb_restoreFrequencyStates->isChecked());
     ui->slider_ocSclk->setValue(settings.value("overclockValue",0).toInt());
     ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
