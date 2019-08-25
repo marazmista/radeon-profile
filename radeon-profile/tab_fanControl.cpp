@@ -125,6 +125,42 @@ void radeon_profile::on_btn_activateFanProfile_clicked()
     setCurrentFanProfile(ui->combo_fanProfiles->currentText());
 }
 
+void radeon_profile::on_btn_pwmFixedApply_clicked()
+{
+    device.setPwmValue(ui->slider_fanSpeed->value());
+    ui->btn_fanControl->menu()->actions()[1]->setText(tr("Fixed ") + ui->spin_fanFixedSpeed->text());
+    ui->btn_fanControl->setText(ui->btn_fanControl->menu()->actions()[1]->text());
+}
+
+void radeon_profile::on_btn_pwmFixed_clicked()
+{
+    ui->btn_pwmFixed->setChecked(true);
+    ui->btn_fanControl->menu()->actions()[1]->setChecked(true);
+    ui->btn_fanControl->setText(ui->btn_fanControl->menu()->actions()[1]->text());
+    ui->stack_fanModes->setCurrentIndex(1);
+
+    device.setPwmManualControl(true);
+    device.setPwmValue(ui->slider_fanSpeed->value());
+}
+
+void radeon_profile::on_btn_pwmAuto_clicked()
+{
+    ui->btn_pwmAuto->setChecked(true);
+    ui->btn_fanControl->menu()->actions()[0]->setChecked(true);
+    ui->btn_fanControl->setText(ui->btn_fanControl->menu()->actions()[0]->text());
+    device.setPwmManualControl(false);
+    ui->stack_fanModes->setCurrentIndex(0);
+}
+
+void radeon_profile::on_btn_pwmProfile_clicked()
+{
+    ui->btn_pwmProfile->setChecked(true);
+    ui->stack_fanModes->setCurrentIndex(2);
+
+    device.setPwmManualControl(true);
+    setCurrentFanProfile(ui->l_currentFanProfile->text());
+}
+
 void radeon_profile::setCurrentFanProfile(const QString &profileName) {
     const auto profile =  fanProfiles.value(profileName);
 

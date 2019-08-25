@@ -48,43 +48,6 @@ void radeon_profile::setPerformance() {
     setPowerLevel(2);
 }
 
-// == fan control
-void radeon_profile::on_btn_pwmFixedApply_clicked()
-{
-    device.setPwmValue(ui->slider_fanSpeed->value());
-    ui->btn_fanControl->menu()->actions()[1]->setText(tr("Fixed ") + ui->spin_fanFixedSpeed->text());
-    ui->btn_fanControl->setText(ui->btn_fanControl->menu()->actions()[1]->text());
-}
-
-void radeon_profile::on_btn_pwmFixed_clicked()
-{
-    ui->btn_pwmFixed->setChecked(true);
-    ui->btn_fanControl->menu()->actions()[1]->setChecked(true);
-    ui->btn_fanControl->setText(ui->btn_fanControl->menu()->actions()[1]->text());
-    ui->stack_fanModes->setCurrentIndex(1);
-
-    device.setPwmManualControl(true);
-    device.setPwmValue(ui->slider_fanSpeed->value());
-}
-
-void radeon_profile::on_btn_pwmAuto_clicked()
-{
-    ui->btn_pwmAuto->setChecked(true);
-    ui->btn_fanControl->menu()->actions()[0]->setChecked(true);
-    ui->btn_fanControl->setText(ui->btn_fanControl->menu()->actions()[0]->text());
-    device.setPwmManualControl(false);
-    ui->stack_fanModes->setCurrentIndex(0);
-}
-
-void radeon_profile::on_btn_pwmProfile_clicked()
-{
-    ui->btn_pwmProfile->setChecked(true);
-    ui->stack_fanModes->setCurrentIndex(2);
-
-    device.setPwmManualControl(true);
-    setCurrentFanProfile(ui->l_currentFanProfile->text());
-}
-
 void radeon_profile::setPowerLevelFromCombo() {
     if (ui->group_freq->isChecked() && static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
         ui->group_freq->setChecked(false);

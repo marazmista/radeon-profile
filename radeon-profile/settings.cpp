@@ -325,14 +325,7 @@ void radeon_profile::loadConfig() {
     else
         ui->tw_systemInfo->setTabEnabled(3,false);
 
-    ui->list_currentGPUData->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
-    ui->list_glxinfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
-    ui->list_modInfo->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
-    ui->list_connectors->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
-    ui->list_stats->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
-    ui->list_execProfiles->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
-    ui->list_variables->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
-    ui->list_vaules->setAlternatingRowColors(ui->cb_alternateRow->isChecked());
+    on_cb_alternateRow_clicked(ui->cb_alternateRow->isChecked());
 
     plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
     hideEventControls(true);
