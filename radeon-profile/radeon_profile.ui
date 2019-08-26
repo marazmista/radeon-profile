@@ -1308,7 +1308,7 @@
               <property name="checked">
                <bool>false</bool>
               </property>
-              <layout class="QGridLayout" name="gridLayout_16" columnstretch="0">
+              <layout class="QGridLayout" name="gridLayout_16" columnstretch="0,0">
                <property name="leftMargin">
                 <number>5</number>
                </property>
@@ -1324,8 +1324,25 @@
                <property name="spacing">
                 <number>5</number>
                </property>
+               <item row="1" column="1">
+                <widget class="QListWidget" name="list_freqStatesMem"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QListWidget" name="list_freqStatesCore"/>
+               </item>
                <item row="0" column="0">
-                <widget class="QListWidget" name="list_freqStates"/>
+                <widget class="QLabel" name="label_22">
+                 <property name="text">
+                  <string>Core</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="label_23">
+                 <property name="text">
+                  <string>Moemory</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>

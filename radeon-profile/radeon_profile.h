@@ -156,7 +156,7 @@ private slots:
     void daemonDisconnected();
     void on_btn_connConfirmMethodInfo_clicked();
     void frequencyControlToggled(bool toogle);
-    void applyFrequencyTable();
+    void applyFrequencyTables();
 
 private:
     struct CurrentStateInfo {
@@ -188,7 +188,7 @@ private:
     QChartView *chartView_fan, *chartView_oc;
     QList<TopbarItem*> topBarItems;
     QList<ValueID> keysInCurrentGpuList;
-    QString selectedFrequencyStates;
+    QString enabledFrequencyStatesCore, enabledFrequencyStatesMem;
 
     Ui::radeon_profile *ui;
     void setupTrayIcon();
@@ -270,7 +270,7 @@ private:
     void initializeDevice();
     void configureDaemonPostDeviceInit();
     void configureDaemonPreDeviceInit();
-    void loadFrequencyStatesTable();
+    void loadFrequencyStatesTables();
 };
 
 #endif // RADEON_PROFILE_H

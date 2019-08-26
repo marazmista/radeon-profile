@@ -276,7 +276,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
             ui->tw_overclock->setTabEnabled(0, true);
             ui->btn_applyStatesAndOc->setEnabled(true);
 
-            loadFrequencyStatesTable();
+            loadFrequencyStatesTables();
 
             if (ui->cb_restoreFrequencyStates->isChecked())
                 on_btn_applyStatesAndOc_clicked();

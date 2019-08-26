@@ -285,7 +285,7 @@ void radeon_profile::setCurrentOcProfile(const QString &name) {
     tableHasBeenModified = false;
 
     // refresh states table after overclock
-    loadFrequencyStatesTable();
+    loadFrequencyStatesTables();
 }
 
 void radeon_profile::powerCapValueChange(int value)
@@ -311,7 +311,7 @@ void radeon_profile::frequencyControlToggled(bool toggle)
         return;
 
     if (toggle)
-        applyFrequencyTable();
+        applyFrequencyTables();
     else
         device.resetFrequencyControlStates();
 }
@@ -322,27 +322,43 @@ void radeon_profile::applyOc()
     device.setOverclockValue(device.getDriverFiles().sysFs.pp_mclk_od, ui->slider_ocMclk->value());
 }
 
-void radeon_profile::applyFrequencyTable() {
-    bool allChecked = true;
+void radeon_profile::applyFrequencyTables() {
+    bool allCheckedCore = true, allCheckedMem = true;
 
-    selectedFrequencyStates = "";
+    enabledFrequencyStatesCore = "";
+    enabledFrequencyStatesMem = "";
 
-    for (int i = 0; i < ui->list_freqStates->count(); ++i) {
-        if (ui->list_freqStates->item(i)->checkState() == Qt::Checked)
-            selectedFrequencyStates.append(QString::number(i) + " ");
+    for (int i = 0; i < ui->list_freqStatesCore->count(); ++i) {
+        if (ui->list_freqStatesCore->item(i)->checkState() == Qt::Checked)
+            enabledFrequencyStatesCore.append(QString::number(i) + " ");
         else
-            allChecked = false;
+            allCheckedCore = false;
     }
 
-    if (selectedFrequencyStates.isEmpty()) {
-        QMessageBox::warning(this, "", "At least one state has to be enabled.");
+    if (enabledFrequencyStatesCore.isEmpty()) {
+        QMessageBox::warning(this, "", "At least one core state has to be enabled.");
         return;
     }
 
-    if (!allChecked && static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
+    for (int i = 0; i < ui->list_freqStatesMem->count(); ++i) {
+        if (ui->list_freqStatesMem->item(i)->checkState() == Qt::Checked)
+            enabledFrequencyStatesMem.append(QString::number(i) + " ");
+        else
+            allCheckedMem = false;
+    }
+
+    if (enabledFrequencyStatesMem.isEmpty()) {
+        QMessageBox::warning(this, "", "At least one memory state has to be enabled.");
+        return;
+    }
+
+
+    if ((!allCheckedCore || !allCheckedMem) && static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
         device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
 
-    device.setManualFrequencyControlStates(selectedFrequencyStates);
+
+    device.setManualFrequencyControlStates(device.getDriverFiles().sysFs.pp_dpm_sclk, enabledFrequencyStatesCore);
+    device.setManualFrequencyControlStates(device.getDriverFiles().sysFs.pp_dpm_mclk, enabledFrequencyStatesMem);
 }
 
 void radeon_profile::on_btn_applyStatesAndOc_clicked() {
@@ -350,7 +366,7 @@ void radeon_profile::on_btn_applyStatesAndOc_clicked() {
         applyOc();
 
     if (ui->group_freq->isChecked())
-        applyFrequencyTable();
+        applyFrequencyTables();
 
 }
 void radeon_profile::ocProfilesMenuActionClicked(QAction *a) {
@@ -364,12 +380,19 @@ void radeon_profile::ocProfilesMenuActionClicked(QAction *a) {
     setCurrentOcProfile(a->text());
 }
 
-void radeon_profile::loadFrequencyStatesTable()
+void radeon_profile::loadFrequencyStatesTables()
 {
     for (const QString &s : device.getDriverFeatures().sclkTable) {
-        QListWidgetItem *item = new QListWidgetItem(ui->list_freqStates);
-        item->setCheckState((selectedFrequencyStates.contains(s.left(1))) ? Qt::Checked : Qt::Unchecked);
+        QListWidgetItem *item = new QListWidgetItem(ui->list_freqStatesCore);
+        item->setCheckState((enabledFrequencyStatesCore.contains(s.left(1))) ? Qt::Checked : Qt::Unchecked);
         item->setText(s);
-        ui->list_freqStates->addItem(item);
+        ui->list_freqStatesCore->addItem(item);
+    }
+
+    for (const QString &s : device.getDriverFeatures().mclkTable) {
+        QListWidgetItem *item = new QListWidgetItem(ui->list_freqStatesMem);
+        item->setCheckState((enabledFrequencyStatesMem.contains(s.left(1))) ? Qt::Checked : Qt::Unchecked);
+        item->setText(s);
+        ui->list_freqStatesMem->addItem(item);
     }
 }
