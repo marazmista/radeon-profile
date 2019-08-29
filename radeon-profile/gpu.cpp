@@ -340,6 +340,10 @@ int gpu::getCurrentPowerPlayTableId(const QString &file) {
     return driverHandler->getCurrentPowerPlayTableId(file);
 }
 
+void gpu::refreshPowerPlayTables() {
+    driverHandler->refreshPopwerPlayTables();
+}
+
 void gpu::getPowerCapSelected() {
     if (getDriverFeatures().isPowerCapAvailable)
         gpuData[ValueID::POWER_CAP_SELECTED].setValue(driverHandler->getPowerCapSelected());

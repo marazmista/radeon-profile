@@ -271,6 +271,8 @@ private:
     void configureDaemonPostDeviceInit();
     void configureDaemonPreDeviceInit();
     void loadFrequencyStatesTables();
+    void updateFrequencyStatesTables();
+
 };
 
 #endif // RADEON_PROFILE_H

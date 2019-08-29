@@ -57,6 +57,7 @@ public:
     void setPowerCap(const unsigned value);
     void setManualFrequencyControlStates(const QString &file, const QString &states);
     void resetFrequencyControlStates();
+    void refreshPowerPlayTables();
 
     void detectCards();
     bool initialize(const dXorg::InitializationConfig &config);

@@ -643,15 +643,9 @@ void dXorg::figureOutDriverFeatures() {
     features.isPercentCoreOcAvailable = !driverFiles.sysFs.pp_sclk_od.isEmpty();
     features.isPercentMemOcAvailable = !driverFiles.sysFs.pp_mclk_od.isEmpty();
 
-    if (!driverFiles.sysFs.pp_dpm_sclk.isEmpty()) {
-        features.sclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_sclk);
-        features.isDpmCoreFreqTableAvailable = features.sclkTable.count() > 0;
-    }
-
-    if (!driverFiles.sysFs.pp_dpm_mclk.isEmpty()) {
-        features.mclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_mclk);
-        features.isDpmMemFreqTableAvailable = features.mclkTable.count() > 0;
-    }
+    refreshPopwerPlayTables();
+    features.isDpmCoreFreqTableAvailable = features.sclkTable.count() > 0;
+    features.isDpmMemFreqTableAvailable = features.mclkTable.count() > 0;
 
     features.isPowerCapAvailable = !driverFiles.hwmonAttributes.power1_cap.isEmpty();
 
@@ -662,6 +656,15 @@ void dXorg::figureOutDriverFeatures() {
 
         features.isVDDCCurveAvailable = features.currentStatesTables.contains(OD_VDDC_CURVE);
     }
+}
+
+void dXorg::refreshPopwerPlayTables()
+{
+    if (!driverFiles.sysFs.pp_dpm_sclk.isEmpty())
+        features.sclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_sclk);
+
+    if (!driverFiles.sysFs.pp_dpm_mclk.isEmpty())
+        features.mclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_mclk);
 }
 
 bool dXorg::getIoctlAvailability() {

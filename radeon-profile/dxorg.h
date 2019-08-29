@@ -90,7 +90,8 @@ public:
     void readOcTableAndRanges();
     void setOcTable(const QString &tableType, const FVTable &table);
     InitializationConfig getInitConfig();
-
+    void refreshPopwerPlayTables();
+    
 private:
     QChar gpuSysIndex;
     QSharedMemory sharedMem;

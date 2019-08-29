@@ -285,7 +285,8 @@ void radeon_profile::setCurrentOcProfile(const QString &name) {
     tableHasBeenModified = false;
 
     // refresh states table after overclock
-    loadFrequencyStatesTables();
+    device.refreshPowerPlayTables();
+    updateFrequencyStatesTables();
 }
 
 void radeon_profile::powerCapValueChange(int value)
@@ -320,6 +321,10 @@ void radeon_profile::applyOc()
 {
     device.setOverclockValue(device.getDriverFiles().sysFs.pp_sclk_od, ui->slider_ocSclk->value());
     device.setOverclockValue(device.getDriverFiles().sysFs.pp_mclk_od, ui->slider_ocMclk->value());
+
+    // refresh states table after overclock
+    device.refreshPowerPlayTables();
+    updateFrequencyStatesTables();
 }
 
 void radeon_profile::applyFrequencyTables() {
@@ -395,4 +400,13 @@ void radeon_profile::loadFrequencyStatesTables()
         item->setText(s);
         ui->list_freqStatesMem->addItem(item);
     }
+}
+
+void radeon_profile::updateFrequencyStatesTables()
+{
+    for (int i = 0; i < ui->list_freqStatesCore->count(); ++i)
+        ui->list_freqStatesCore->item(i)->setText(device.getDriverFeatures().sclkTable.at(i));
+
+    for (int i = 0; i < ui->list_freqStatesMem->count(); ++i)
+        ui->list_freqStatesMem->item(i)->setText(device.getDriverFeatures().mclkTable.at(i));
 }
