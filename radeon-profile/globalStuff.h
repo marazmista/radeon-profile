@@ -289,7 +289,7 @@ struct DeviceSysFs {
         if (!checkFileCorrectness(pp_sclk_od, true))
             pp_sclk_od = "";
 
-        if (checkFileCorrectness(pp_mclk_od, true))
+        if (!checkFileCorrectness(pp_mclk_od, true))
             pp_mclk_od = "";
 
         if (!checkFileCorrectness(pp_dpm_sclk))
