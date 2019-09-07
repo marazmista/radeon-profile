@@ -341,7 +341,7 @@ int gpu::getCurrentPowerPlayTableId(const QString &file) {
 }
 
 void gpu::refreshPowerPlayTables() {
-    driverHandler->refreshPopwerPlayTables();
+    driverHandler->refreshPowerPlayTables();
 }
 
 void gpu::getPowerCapSelected() {
@@ -947,4 +947,3 @@ QList<QTreeWidgetItem *> gpu::getCardConnectors() const {
 
     return cardConnectorsList;
 }
-
