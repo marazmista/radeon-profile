@@ -643,7 +643,7 @@ void dXorg::figureOutDriverFeatures() {
     features.isPercentCoreOcAvailable = !driverFiles.sysFs.pp_sclk_od.isEmpty();
     features.isPercentMemOcAvailable = !driverFiles.sysFs.pp_mclk_od.isEmpty();
 
-    refreshPopwerPlayTables();
+    refreshPowerPlayTables();
     features.isDpmCoreFreqTableAvailable = features.sclkTable.count() > 0;
     features.isDpmMemFreqTableAvailable = features.mclkTable.count() > 0;
 
@@ -658,7 +658,7 @@ void dXorg::figureOutDriverFeatures() {
     }
 }
 
-void dXorg::refreshPopwerPlayTables()
+void dXorg::refreshPowerPlayTables()
 {
     if (!driverFiles.sysFs.pp_dpm_sclk.isEmpty())
         features.sclkTable = loadPowerPlayTable(driverFiles.sysFs.pp_dpm_sclk);
