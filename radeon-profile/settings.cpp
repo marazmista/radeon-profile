@@ -66,6 +66,7 @@ void radeon_profile::saveConfig() {
         settings.setValue("daemonData", ui->cb_daemonData->isChecked());
         settings.setValue("temperatureHysteresis", ui->spin_hysteresis->value());
         settings.setValue("connConfirmMethod", ui->combo_connConfirmMethod->currentIndex());
+        settings.setValue("refreshWhenHidden", refreshWhenHidden->isChecked());
     }
 
     QString xmlString;
@@ -298,6 +299,9 @@ void radeon_profile::loadConfig() {
     ui->cb_overridePlotsBg->setChecked(settings.value("setCommonPlotsBg", false).toBool());
     ui->btn_setPlotsBackground->setEnabled(ui->cb_overridePlotsBg->isChecked());
     ui->frame_plotsBackground->setVisible(ui->cb_overridePlotsBg->isChecked());
+
+    refreshWhenHidden->setCheckable(true);
+    refreshWhenHidden->setChecked(settings.value("refreshWhenHidden", true).toBool());
 
     ui->cb_restoreOcProfile->setChecked(settings.value("restoreOcProfile", false).toBool());
     if (ui->cb_restoreOcProfile->isChecked())

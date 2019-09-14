@@ -33,6 +33,7 @@ DaemonComm radeon_profile::dcomm;
 radeon_profile::radeon_profile(QWidget *parent) :
     QMainWindow(parent),
     icon_tray(nullptr),
+    refreshWhenHidden(new QAction(icon_tray)),
     timer(new QTimer(this)),
     counter_ticks(0),
     counter_statsTick(0),

@@ -33,9 +33,6 @@ void radeon_profile::setupTrayIcon() {
     connect(closeApp,SIGNAL(triggered()),this,SLOT(closeFromTray()));
 
     // refresh when hidden
-    refreshWhenHidden = new QAction(menu_tray);
-    refreshWhenHidden->setCheckable(true);
-    refreshWhenHidden->setChecked(true);
     refreshWhenHidden->setText(tr("Keep refreshing when hidden"));
 
     // add stuff to menu //
