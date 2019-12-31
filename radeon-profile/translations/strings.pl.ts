@@ -1661,7 +1661,7 @@ Rozmiar</translation>
         <location filename="../fanControlTab.cpp" line="185"/>
         <source>Don&apos;t overheat your card! Be careful! Don&apos;t use this if you don&apos;t know what you&apos;re doing! 
 
-Hovewer, looks like card won&apos;t apply too low values due its internal protection. 
+Hovewer, it looks like your card won&apos;t apply too low values due its internal protection.
 
 Closing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned!</source>
         <translation>Bądź ostrożny, nie przegrzej swojej karty! Używaj wtedy gdy wiesz co robisz.
