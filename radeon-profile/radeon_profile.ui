@@ -1340,7 +1340,7 @@
                <item row="0" column="1">
                 <widget class="QLabel" name="label_23">
                  <property name="text">
-                  <string>Moemory</string>
+                  <string>Memory</string>
                  </property>
                 </widget>
                </item>

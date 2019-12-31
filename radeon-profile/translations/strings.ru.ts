@@ -1018,7 +1018,7 @@
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1343"/>
-        <source>Moemory</source>
+        <source>Memory</source>
         <translation>Память</translation>
     </message>
     <message>
