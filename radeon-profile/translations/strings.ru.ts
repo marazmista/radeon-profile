@@ -1893,11 +1893,11 @@ Pause refreshing?</source>
     </message>
     <message>
         <location filename="../uiEvents.cpp" line="330"/>
-        <source>0 - (Not recommended in multi user envirnoments) Disable conncection confirmation. Configured options in GUI may get stuck when user session is frozen 
+        <source>0 - (Not recommended in multi-user environments) Disable connection confirmation. Configured options in GUI may get stuck when user session is frozen
 
-1 - (Default) After some time of inactivity when GUI is connected, daemon sends request to GUI to check wheather it is alive. When response is not received it restores fan settings to system default
+1 - (Default) After some time of inactivity when GUI is connected, the daemon sends request to GUI to check whether it is alive. If no response is received, it restores fan settings to system default
 
-2 - When no other commands has been sent to daemon, GUI sends periodically alive signals without deamon&apos;s requests. Select if you have issues with method 1</source>
+2 - When no other command has been sent to the daemon, GUI sends keep-alive signals without daemon&apos;s requests. Select if you have issues with method 1</source>
         <translation>0 - (не рекомендуется в многопользовательских средах) отключить подтверждение подключения. Настроенные параметры в графическом интерфейсе могут зависнуть, когда сеанс пользователя приостоновлен 
 
 1 - (по умолчанию) после некоторого времени бездействия, когда программа подключена, демон отправляет запросы к программе, чтобы проверить, подключение. Когда ответ не получен он восстанавливает настройки вентилятора по умолчанию системы 
