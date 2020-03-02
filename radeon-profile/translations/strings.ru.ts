@@ -1124,7 +1124,7 @@
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="2018"/>
-        <source>Activate</source>
+        <source>Apply</source>
         <translation>Активировать</translation>
     </message>
     <message>
@@ -1641,7 +1641,7 @@ When active event condition is no longer true, event is revoked and power profil
     <message>
         <location filename="../tab_fanControl.cpp" line="119"/>
         <location filename="../tab_overclock.cpp" line="98"/>
-        <source>Cannot activate unsaved profile. Do you want to save it?</source>
+        <source>Cannot apply unsaved profile. Do you want to save it?</source>
         <translation>Не удается активировать несохраненный профиль. Вы хотите сохранить его?</translation>
     </message>
     <message>

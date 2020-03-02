@@ -2013,9 +2013,9 @@
              </widget>
             </item>
             <item row="1" column="3">
-             <widget class="QPushButton" name="btn_activateFanProfile">
+             <widget class="QPushButton" name="btn_applyFanProfile">
               <property name="text">
-               <string>Activate</string>
+               <string>Apply</string>
               </property>
              </widget>
             </item>
