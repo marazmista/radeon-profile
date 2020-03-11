@@ -13,7 +13,7 @@ radeonIoctlHandler::radeonIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIn
 
 /**
  * @see https://cgit.freedesktop.org/mesa/drm/tree/include/drm/radeon_drm.h#n993
- * @see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/radeon_drm.h#n993
+ * @see https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/drm/radeon_drm.h#n1077
  */
 bool radeonIoctlHandler::getValue(void *data, unsigned dataSize, unsigned command) const {
 #ifdef DRM_IOCTL_RADEON_INFO
