@@ -105,9 +105,9 @@ bool amdgpuIoctlHandler::getMaxClocks(int *core, int *memory) const {
     }
     return success;
 #else
-    return false;
     Q_UNUSED(core);
     Q_UNUSED(memory);
+    return false;
 #endif
 }
 
@@ -134,9 +134,9 @@ bool amdgpuIoctlHandler::getVceClocks(int *core, int *memory) const {
     }
     return success;
 #else
-    return false;
     Q_UNUSED(core);
     Q_UNUSED(memory)
+    return false;
 #endif
 }
 
@@ -145,8 +145,8 @@ bool amdgpuIoctlHandler::getVramUsage(long *data) const {
 #ifdef AMDGPU_INFO_VRAM_USAGE
     return getValue(data, sizeof(*data), AMDGPU_INFO_VRAM_USAGE);
 #else
-    return false;
     Q_UNUSED(data);
+    return false;
 #endif
 }
 
@@ -159,8 +159,8 @@ bool amdgpuIoctlHandler::getVramSize(float *data) const {
         *data = info.vram_size;
     return success;
 #else
-    return false;
     Q_UNUSED(data);
+    return false;
 #endif
 }
 
@@ -169,8 +169,8 @@ bool amdgpuIoctlHandler::readRegistry(unsigned *data) const {
 #ifdef AMDGPU_INFO_READ_MMR_REG
     return getValue(data, sizeof(*data), AMDGPU_INFO_READ_MMR_REG);
 #else
-    return false;
     Q_UNUSED(data);
+    return false;
 #endif
 }
 
