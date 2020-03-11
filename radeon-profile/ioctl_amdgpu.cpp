@@ -20,9 +20,12 @@ bool amdgpuIoctlHandler::getSensorValue(void *data, unsigned dataSize, unsigned 
     buffer.return_pointer = reinterpret_cast<uint64_t>(data);
     buffer.return_size = dataSize;
     buffer.sensor_info.type = sensor;
+
     bool success = !ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
-    if (Q_UNLIKELY(!success))
+    if (Q_UNLIKELY(!success)) {
+        qInfo("Requested sensor: %02X", sensor);
         perror("DRM_IOCTL_AMDGPU_INFO");
+    }
     return success;
 #else
     Q_UNUSED(data);
