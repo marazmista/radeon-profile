@@ -200,6 +200,7 @@ protected:
 
 private:
     bool getSensorValue(void* data, unsigned dataSize, unsigned sensor) const;
+    QString getSensorName(unsigned sensor) const;
 
 public:
     /**
