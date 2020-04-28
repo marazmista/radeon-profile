@@ -41,8 +41,8 @@ public:
     }
 
     void updateValue(const GPUDataContainer &gpuData) {
-        data.slices().at(1)->setValue(gpuData.value(dataId).value);
-        data.slices().at(2)->setValue(maxValue - gpuData.value(dataId).value);
+        data->slices().at(1)->setValue(gpuData.value(dataId).value);
+        data->slices().at(2)->setValue(maxValue - gpuData.value(dataId).value);
         primaryLabel.setText(gpuData.value(dataId).strValue);
 
         if (secondaryDataIdEnabled)
@@ -51,7 +51,7 @@ public:
 
     void setFillColor(const QColor &c) {
         fill = c;
-        data.slices().at(1)->setBrush(fill);
+        data->slices().at(1)->setBrush(fill);
     }
 
     void setSecondaryDataId(const ValueID id) {
@@ -69,7 +69,7 @@ protected:
     bool secondaryDataIdEnabled = false;
     ValueID dataId, secondaryDataId;
 
-    QPieSeries data;
+    QPieSeries *data;
     QChart chart;
     QChartView *chartView;
     QLabel primaryLabel, secondaryLabel;
@@ -87,28 +87,29 @@ protected:
         p.setColor(QPalette::Background, Qt::black);
 
         chartView = new QChartView(this);
+        data = new QPieSeries(this);
 
-        data.setPieStartAngle(-250);
-        data.setPieEndAngle(90);
+        data->setPieStartAngle(-250);
+        data->setPieEndAngle(90);
 //        data.setPieStartAngle(-210);
 //        data.setPieEndAngle(130);
-        data.setHoleSize(0.32);
+        data->setHoleSize(0.32);
 
-        data.append("",maxValue / 3);
-        data.append("Usage", 0);
-        data.append("", maxValue);
+        data->append("",maxValue / 3);
+        data->append("Usage", 0);
+        data->append("", maxValue);
 
-        data.slices().at(0)->setBrush(bg);
-        data.slices().at(0)->setPen(QPen(bg, 0));
-        data.slices().at(1)->setPen(QPen(bg, 0));
-        data.slices().at(2)->setPen(QPen(bg, 0));
-        data.slices().at(0)->setLabelVisible(false);
-        data.slices().at(1)->setLabelVisible(false);
-        data.slices().at(2)->setLabelVisible(false);
-        data.slices().at(1)->setBrush(fill);
-        data.slices().at(2)->setBrush(Qt::darkGray);
+        data->slices().at(0)->setBrush(bg);
+        data->slices().at(0)->setPen(QPen(bg, 0));
+        data->slices().at(1)->setPen(QPen(bg, 0));
+        data->slices().at(2)->setPen(QPen(bg, 0));
+        data->slices().at(0)->setLabelVisible(false);
+        data->slices().at(1)->setLabelVisible(false);
+        data->slices().at(2)->setLabelVisible(false);
+        data->slices().at(1)->setBrush(fill);
+        data->slices().at(2)->setBrush(Qt::darkGray);
 
-        chart.addSeries(&data);
+        chart.addSeries(data);
         chart.legend()->setVisible(false);
         chart.setBackgroundVisible(false);
 
