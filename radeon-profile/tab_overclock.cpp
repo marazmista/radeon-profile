@@ -95,7 +95,7 @@ void radeon_profile::on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, 
 void radeon_profile::on_btn_applyOcTable_clicked()
 {
     if (ui->l_ocProfileUnsavedInficator->isVisible()) {
-        if (!askConfirmation("", tr("Cannot activate unsaved profile. Do you want to save it?")))
+        if (!askConfirmation("", tr("Cannot apply unsaved profile. Do you want to save it?")))
             return;
 
         on_btn_saveOcProfile_clicked();

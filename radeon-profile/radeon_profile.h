@@ -111,7 +111,7 @@ private slots:
     void on_btn_removeFanStep_clicked();
     void on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_applyStatesAndOc_clicked();
-    void on_btn_activateFanProfile_clicked();
+    void on_btn_applyFanProfile_clicked();
     void on_btn_removeFanProfile_clicked();
     void on_btn_saveFanProfile_clicked();
     void on_btn_saveAsFanProfile_clicked();

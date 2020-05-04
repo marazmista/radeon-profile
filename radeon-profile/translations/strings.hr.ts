@@ -1446,8 +1446,8 @@ Zatvaranje aplikacije će vratiti automatsko upravljanje ventilatorom. Ako se ap
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1741"/>
-        <source>Activate</source>
-        <translation>Aktiviraj</translation>
+        <source>Apply</source>
+        <translation>Primijeni</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1644"/>
@@ -2071,8 +2071,8 @@ Kada stanje aktivnog događaja nije više zadovljeno, događaj je opozvan i ener
     </message>
     <message>
         <location filename="../fanControlTab.cpp" line="140"/>
-        <source>Cannot activate unsaved profile. Do you want to save it?</source>
-        <translation>Ne može se aktivirati nespremljeni profil. Želite li ga spremiti?</translation>
+        <source>Cannot apply unsaved profile. Do you want to save it?</source>
+        <translation>Nije moguće primijeniti nespremljeni profil. Želite li ga spremiti?</translation>
     </message>
     <message>
         <location filename="../fanControlTab.cpp" line="184"/>

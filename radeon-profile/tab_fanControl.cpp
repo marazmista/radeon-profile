@@ -113,10 +113,10 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
     saveConfig();
 }
 
-void radeon_profile::on_btn_activateFanProfile_clicked()
+void radeon_profile::on_btn_applyFanProfile_clicked()
 {
     if (ui->l_fanProfileUnsavedIndicator->isVisible()) {
-        if (!askConfirmation("", tr("Cannot activate unsaved profile. Do you want to save it?")))
+        if (!askConfirmation("", tr("Cannot apply unsaved profile. Do you want to save it?")))
             return;
 
         ui->btn_saveFanProfile->click();

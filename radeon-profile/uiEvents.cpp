@@ -327,7 +327,7 @@ int radeon_profile::findCurrentMenuIndex(QMenu *menu, const QString &name) {
 void radeon_profile::on_btn_connConfirmMethodInfo_clicked()
 {
     QMessageBox::information(this, tr("Connection confirmation methods info"),
-                             tr("0 - (Not recommended in multi user envirnoments) Disable conncection confirmation. Configured options in GUI may get stuck when user session is frozen \n\n" \
-                             "1 - (Default) After some time of inactivity when GUI is connected, daemon sends request to GUI to check wheather it is alive. When response is not received it restores fan settings to system default\n\n" \
-                             "2 - When no other commands has been sent to daemon, GUI sends periodically alive signals without deamon's requests. Select if you have issues with method 1"));
+                             tr("0 - (Not recommended in multi-user environments) Disable connection confirmation. Configured options in GUI may get stuck when user session is frozen\n\n" \
+                             "1 - (Default) After some time of inactivity when GUI is connected, the daemon sends request to GUI to check whether it is alive. If no response is received, it restores fan settings to system default\n\n" \
+                             "2 - When no other command has been sent to the daemon, GUI sends keep-alive signals without daemon's request. Select if you have issues with method 1"));
 }

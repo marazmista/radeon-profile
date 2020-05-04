@@ -996,8 +996,8 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1571"/>
-        <source>Activate</source>
-        <translation>Attiva</translation>
+        <source>Apply</source>
+        <translation>Applica</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1584"/>
@@ -1569,7 +1569,7 @@ Prima di chiudersi, l&apos;applicazione reimposterà il controllo della ventola 
     </message>
     <message>
         <location filename="../fanControlTab.cpp" line="142"/>
-        <source>Cannot activate unsaved profile. Do you want to save it?</source>
+        <source>Cannot apply unsaved profile. Do you want to save it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

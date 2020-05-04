@@ -868,8 +868,8 @@ Rozmiar</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1571"/>
-        <source>Activate</source>
-        <translation>Aktywuj</translation>
+        <source>Apply</source>
+        <translation>Zastosuj</translation>
     </message>
     <message>
         <location filename="../radeon_profile.ui" line="1584"/>
@@ -1635,7 +1635,7 @@ Rozmiar</translation>
     </message>
     <message>
         <location filename="../fanControlTab.cpp" line="142"/>
-        <source>Cannot activate unsaved profile. Do you want to save it?</source>
+        <source>Cannot apply unsaved profile. Do you want to save it?</source>
         <translation>Profil nie jest zapisany. Czy chcesz zapisać?</translation>
     </message>
     <message>

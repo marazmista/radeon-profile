@@ -16,13 +16,18 @@ amdgpuIoctlHandler::amdgpuIoctlHandler(unsigned cardIndex) : ioctlHandler(cardIn
 bool amdgpuIoctlHandler::getSensorValue(void *data, unsigned dataSize, unsigned sensor) const {
 #if defined(DRM_IOCTL_AMDGPU_INFO) && defined(AMDGPU_INFO_SENSOR)
     struct drm_amdgpu_info buffer = {};
+    QString sensor_name; 
     buffer.query = AMDGPU_INFO_SENSOR;
     buffer.return_pointer = reinterpret_cast<uint64_t>(data);
     buffer.return_size = dataSize;
     buffer.sensor_info.type = sensor;
+
     bool success = !ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
-    if (Q_UNLIKELY(!success))
+    if (Q_UNLIKELY(!success)) {
+        sensor_name = getSensorName(sensor);
+        qDebug("Requested sensor: %s", qUtf8Printable(sensor_name));
         perror("DRM_IOCTL_AMDGPU_INFO");
+    }
     return success;
 #else
     Q_UNUSED(data);
@@ -32,6 +37,46 @@ bool amdgpuIoctlHandler::getSensorValue(void *data, unsigned dataSize, unsigned 
 #endif
 }
 
+QString amdgpuIoctlHandler::getSensorName(unsigned sensor) const {
+    QString sensor_name;
+    QString info_sensor = QString("0X%1 - ").arg(sensor, 2, 16, QLatin1Char('0')).toUpper();
+
+    switch (sensor) {
+        case AMDGPU_INFO_SENSOR_GFX_SCLK:
+            sensor_name = "GFX_SCLK";
+            break;
+        case AMDGPU_INFO_SENSOR_GFX_MCLK:
+            sensor_name = "GFX_MCLK";
+            break;
+        case AMDGPU_INFO_SENSOR_GPU_TEMP:
+            sensor_name = "GPU_TEMP";
+            break;
+        case AMDGPU_INFO_SENSOR_GPU_LOAD:
+            sensor_name ="GPU_LOAD";
+            break;
+        case AMDGPU_INFO_SENSOR_GPU_AVG_POWER:
+            sensor_name = "GPU_AVG_POWER";
+            break;
+        case AMDGPU_INFO_SENSOR_VDDNB:
+            sensor_name = "VDDNB";
+            break;
+        case AMDGPU_INFO_SENSOR_VDDGFX:
+            sensor_name = "VDDGFX";
+            break;
+        case AMDGPU_INFO_SENSOR_STABLE_PSTATE_GFX_SCLK:
+            sensor_name = "STABLE_PSTATE_GFX_SCLK";
+            break;
+        case AMDGPU_INFO_SENSOR_STABLE_PSTATE_GFX_MCLK:
+            sensor_name = "STABLE_PSTATE_GFX_MCLK";
+            break;
+
+        default :
+            sensor_name = "UNKNOWN";
+            break;
+    }
+
+    return info_sensor + sensor_name;
+}
 
 /**
  * @see https://cgit.freedesktop.org/mesa/drm/tree/include/drm/amdgpu_drm.h#n535
@@ -105,9 +150,9 @@ bool amdgpuIoctlHandler::getMaxClocks(int *core, int *memory) const {
     }
     return success;
 #else
-    return false;
     Q_UNUSED(core);
     Q_UNUSED(memory);
+    return false;
 #endif
 }
 
@@ -134,9 +179,9 @@ bool amdgpuIoctlHandler::getVceClocks(int *core, int *memory) const {
     }
     return success;
 #else
-    return false;
     Q_UNUSED(core);
     Q_UNUSED(memory)
+    return false;
 #endif
 }
 
@@ -145,8 +190,8 @@ bool amdgpuIoctlHandler::getVramUsage(long *data) const {
 #ifdef AMDGPU_INFO_VRAM_USAGE
     return getValue(data, sizeof(*data), AMDGPU_INFO_VRAM_USAGE);
 #else
-    return false;
     Q_UNUSED(data);
+    return false;
 #endif
 }
 
@@ -159,8 +204,8 @@ bool amdgpuIoctlHandler::getVramSize(float *data) const {
         *data = info.vram_size;
     return success;
 #else
-    return false;
     Q_UNUSED(data);
+    return false;
 #endif
 }
 
@@ -169,8 +214,8 @@ bool amdgpuIoctlHandler::readRegistry(unsigned *data) const {
 #ifdef AMDGPU_INFO_READ_MMR_REG
     return getValue(data, sizeof(*data), AMDGPU_INFO_READ_MMR_REG);
 #else
-    return false;
     Q_UNUSED(data);
+    return false;
 #endif
 }
 
