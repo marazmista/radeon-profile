@@ -25,7 +25,7 @@ bool amdgpuIoctlHandler::getSensorValue(void *data, unsigned dataSize, unsigned 
     bool success = !ioctl(fd, DRM_IOCTL_AMDGPU_INFO, &buffer);
     if (Q_UNLIKELY(!success)) {
         sensor_name = getSensorName(sensor);
-        qInfo("Requested sensor: %s", qUtf8Printable(sensor_name));
+        qDebug("Requested sensor: %s", qUtf8Printable(sensor_name));
         perror("DRM_IOCTL_AMDGPU_INFO");
     }
     return success;
