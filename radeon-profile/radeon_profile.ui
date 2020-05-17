@@ -2233,12 +2233,6 @@
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>30</height>
-             </size>
-            </property>
            </spacer>
           </item>
           <item>
