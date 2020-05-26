@@ -42,7 +42,7 @@ void radeon_profile::setupTrayIcon() {
     menu_tray->addAction(closeApp);
 
     // setup icon finally //
-    QIcon appicon(":/icon/extra/radeon-profile.png");
+    QIcon appicon = QIcon::fromTheme("radeon-profile-tray", QIcon(":/icon/extra/radeon-profile.png"));
     icon_tray = new QSystemTrayIcon(appicon,this);
     icon_tray->show();
     icon_tray->setContextMenu(menu_tray);
