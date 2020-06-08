@@ -229,7 +229,6 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
 
 QStringList gpu::getGLXInfo(QString gpuName) const {
     QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter(QRegExp(".+VGA.+|.+3D.+"));
-    gpus.removeAt(gpus.indexOf(QRegExp(".+Audio.+"))); //remove radeon audio device
 
     // loop for multi gpu
     for (int i = 0; i < gpus.count(); i++)
