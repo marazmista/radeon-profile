@@ -87,6 +87,7 @@ public:
     void setupRegex(const QString &data);
     int getCurrentPowerPlayTableId(const QString &file);
     void setNewValue(const QString &filePath, const QString &newValue);
+    void setNewValue(const QString &filePath, const QStringList &newValues);
     void readOcTableAndRanges();
     void setOcTable(const QString &tableType, const FVTable &table);
     InitializationConfig getInitConfig();

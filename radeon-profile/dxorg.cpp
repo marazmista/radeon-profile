@@ -437,6 +437,30 @@ void dXorg::setNewValue(const QString &filePath, const QString &newValue) {
     }
 }
 
+void dXorg::setNewValue(const QString &filePath, const QStringList &newValues) {
+    if (radeon_profile::dcomm.isConnected()) {
+        QString cmd;
+
+        for (auto &value : newValues)
+            cmd.append(createDaemonSetCmd(filePath, value));
+
+        radeon_profile::dcomm.sendCommand(cmd);
+    } else {
+        QFile file(filePath);
+        QTextStream stream(&file);
+
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            for (auto &value : newValues) {
+                stream << value + "\n";
+                if (!file.flush())
+                    qWarning() << "Failed to flush " << filePath;
+            }
+            file.close();
+        } else
+            qWarning() << "Unable to open " << filePath;
+    }
+}
+
 void dXorg::setPowerProfile(PowerProfiles newPowerProfile) {
     QString newValue;
     switch (newPowerProfile) {
@@ -845,12 +869,12 @@ void dXorg::readOcTableAndRanges() {
 }
 
 void dXorg::setOcTable(const QString &tableType, const FVTable &table) {
-    QString cmd;
+    QString ocTableValues;
 
     for (const auto &s : table.keys()) {
         const FreqVoltPair &fvt = table.value(s);
-        cmd.append(createDaemonSetCmd(driverFiles.sysFs.pp_od_clk_voltage, tableType + " "+ QString::number(s) + " " + QString::number(fvt.frequency) + " " + QString::number(fvt.voltage)));
+        ocTableValues.append(tableType + " "+ QString::number(s) + " " + QString::number(fvt.frequency) + " " + QString::number(fvt.voltage));
     }
 
-    radeon_profile::dcomm.sendCommand(cmd);
+    setNewValue(driverFiles.sysFs.pp_od_clk_voltage, ocTableValues);
 }
