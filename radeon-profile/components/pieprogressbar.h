@@ -21,12 +21,22 @@ class PieProgressBar : public QWidget
     Q_OBJECT
 
 public:
-    explicit PieProgressBar(QWidget *parent = nullptr) : QWidget(parent), ui(new Ui::PieProgressBar){
+    explicit PieProgressBar(QWidget *parent = nullptr) : QWidget(parent),
+        ui(new Ui::PieProgressBar),
+        data(new QPieSeries(this)),
+        chart(new QChart),
+        chartView(new QChartView(chart, this))
+    {
         ui->setupUi(this);
         init();
     }
 
-    explicit PieProgressBar(const int max, ValueID id, QColor fillColor, QWidget *parent = nullptr) : QWidget(parent), ui(new Ui::PieProgressBar) {
+    explicit PieProgressBar(const int max, ValueID id, QColor fillColor, QWidget *parent = nullptr) : QWidget(parent),
+        ui(new Ui::PieProgressBar),
+        data(new QPieSeries(this)),
+        chart(new QChart),
+        chartView(new QChartView(chart, this))
+    {
         ui->setupUi(this);
 
         maxValue = max;
@@ -37,6 +47,7 @@ public:
     }
 
     ~PieProgressBar() {
+        delete chart;
         delete ui;
     }
 
@@ -70,7 +81,7 @@ protected:
     ValueID dataId, secondaryDataId;
 
     QPieSeries *data;
-    QChart chart;
+    QChart *chart;
     QChartView *chartView;
     QLabel primaryLabel, secondaryLabel;
     QColor fill, bg;
@@ -85,9 +96,6 @@ protected:
         QPalette p = this->palette();
         setAutoFillBackground(true);
         p.setColor(QPalette::Background, Qt::black);
-
-        chartView = new QChartView(this);
-        data = new QPieSeries(this);
 
         data->setPieStartAngle(-250);
         data->setPieEndAngle(90);
@@ -109,15 +117,14 @@ protected:
         data->slices().at(1)->setBrush(fill);
         data->slices().at(2)->setBrush(Qt::darkGray);
 
-        chart.addSeries(data);
-        chart.legend()->setVisible(false);
-        chart.setBackgroundVisible(false);
+        chart->addSeries(data);
+        chart->legend()->setVisible(false);
+        chart->setBackgroundVisible(false);
 
-        chart.setMargins(QMargins(-18,-18,-18,-18));
-        chart.setContentsMargins(0,0,0,0);
-        chart.setMinimumSize(0,0);
+        chart->setMargins(QMargins(-18,-18,-18,-18));
+        chart->setContentsMargins(0,0,0,0);
+        chart->setMinimumSize(0,0);
 
-        chartView->setChart(&chart);
         chartView->setMinimumSize(0,0);
         chartView->setRenderHint(QPainter::Antialiasing);
 
