@@ -225,12 +225,6 @@ void radeon_profile::on_btn_addFanStep_clicked()
         return;
     }
 
-    if (currentFanProfile.contains(d->getValue(0))) {
-        QMessageBox::warning(this, tr("Error"), tr("This step already exists. Double click on it, to change its value"));
-        delete d;
-        return;
-    }
-
     addFanStep(d->getValue(0), d->getValue(1));
 
     markFanProfileUnsaved(true);
@@ -274,8 +268,8 @@ void radeon_profile::on_list_fanSteps_itemDoubleClicked(QTreeWidgetItem *item, i
                  item->text(0).toUInt());
 
     d->addSlider(tr("Fan speed"), "%",
-                 (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() + 1 : minFanStepSpeed,
-                 (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toUInt() - 1 : maxFanStepSpeed,
+                 (index > 0) ? ui->list_fanSteps->topLevelItem(index - 1)->text(1).toInt() : minFanStepSpeed,
+                 (index < ui->list_fanSteps->topLevelItemCount() - 1) ? ui->list_fanSteps->topLevelItem(index + 1)->text(1).toUInt() : maxFanStepSpeed,
                  item->text(1).toUInt());
 
 
