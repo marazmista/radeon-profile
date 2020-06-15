@@ -44,16 +44,28 @@ void radeon_profile::makeFanProfilePlot() {
     series->append(100, ui->list_fanSteps->topLevelItem(ui->list_fanSteps->topLevelItemCount() - 1)->text(1).toInt());
 }
 
-void radeon_profile::addFanStep(const int temperature, const int fanSpeed) {
-    const QString temperatureString = QString::number(temperature),
-            speedString = QString::number(fanSpeed);
-    const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString,Qt::MatchExactly);
+void radeon_profile::addFanStep(const unsigned int temperature, const unsigned int fanSpeed) {
+    const QString temperatureString = QString::number(temperature);
+    QString speedString = QString::number(fanSpeed);
+    const QList<QTreeWidgetItem*> existing = ui->list_fanSteps->findItems(temperatureString, Qt::MatchExactly);
 
-    if (existing.isEmpty()) { // The element does not exist
-        ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << temperatureString << speedString));
-        ui->list_fanSteps->sortItems(0, Qt::AscendingOrder);
-    } else // The element exists already, overwrite it
-        existing.first()->setText(1,speedString);
+    if (existing.isEmpty()) {
+
+        // find right place in list to insert new item
+        int i = 0;
+        while (i < ui->list_fanSteps->topLevelItemCount() && ui->list_fanSteps->topLevelItem(i)->text(0).toUInt() < temperature)
+            ++i;
+
+        // check previous and next items values before insering new
+        if (ui->list_fanSteps->topLevelItem(i - 1) != nullptr && ui->list_fanSteps->topLevelItem(i - 1)->text(1).toUInt() > fanSpeed)
+            speedString = ui->list_fanSteps->topLevelItem(i - 1)->text(1);
+
+        if (ui->list_fanSteps->topLevelItem(i) != nullptr && ui->list_fanSteps->topLevelItem(i)->text(1).toUInt() < fanSpeed)
+            speedString = ui->list_fanSteps->topLevelItem(i)->text(1);
+
+        ui->list_fanSteps->insertTopLevelItem(i, new QTreeWidgetItem(QStringList() << temperatureString << speedString));
+    } else
+        existing.first()->setText(1, speedString);
 
     markFanProfileUnsaved(true);
     makeFanProfilePlot();

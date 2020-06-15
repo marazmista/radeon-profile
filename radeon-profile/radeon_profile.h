@@ -244,7 +244,7 @@ private:
     bool askConfirmation(const QString title, const QString question);
     void createDefaultTopbar();
     void showWindow();
-    void addFanStep (int temperature, int fanSpeed);
+    void addFanStep (const unsigned int temperature, const unsigned int fanSpeed);
     QMenu* createGeneralMenu();
     PlotInitialValues figureOutInitialScale(const PlotDefinitionSchema &pds);
     void applyOc();
