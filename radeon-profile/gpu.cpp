@@ -62,6 +62,8 @@ void gpu::detectCards() {
             gsi.module = DriverModule::RADEON;
         else if (gsi.driverModuleString == "amdgpu")
             gsi.module = DriverModule::AMDGPU;
+        else
+            gsi.module = DriverModule::MODULE_UNKNOWN;
 
         gsi.sysName = gsi.name = out[i];
 
