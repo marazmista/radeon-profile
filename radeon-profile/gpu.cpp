@@ -43,41 +43,35 @@ static const char * pnpIdFiles [PNP_ID_FILE_COUNT] = {
 void gpu::detectCards() {
     QStringList out = globalStuff::grabSystemInfo("ls /sys/class/drm/").filter(QRegExp("card\\d$"));
 
-    for (char i = 0; i < out.count(); i++) {
+    for (int i = 0; i < out.count(); i++) {
         QFile f("/sys/class/drm/"+out[i]+"/device/uevent");
 
         if (!f.open(QIODevice::ReadOnly))
             continue;
 
+        QStringList ueventContents = QString(f.readAll()).split('\n');
+        f.close();
 
-        QString line = f.readLine(50).trimmed();
+        int driverIdx = ueventContents.indexOf(QRegExp("DRIVER=[radeon|amdgpu]+"));
+        if (driverIdx == -1)
+            continue;
 
-        if (line == "DRIVER=radeon") {
-            GPUSysInfo gsi;
-            gsi.driverModuleString = "radeon";
+        GPUSysInfo gsi;
+        gsi.driverModuleString = ueventContents[driverIdx].split('=')[1];
+        if (gsi.driverModuleString == "radeon")
             gsi.module = DriverModule::RADEON;
-            gsi.sysName = out[i];
-
-            gpuList.append(gsi);
-
-            qDebug() << "Card detected (radeon): " << gsi.sysName;
-
-            continue;
-        }
-
-        if (line == "DRIVER=amdgpu") {
-            GPUSysInfo gsi;
-            gsi.driverModuleString = "amdgpu";
+        else if (gsi.driverModuleString == "amdgpu")
             gsi.module = DriverModule::AMDGPU;
-            gsi.sysName = out[i];
 
-            gpuList.append(gsi);
+        gsi.sysName = gsi.name = out[i];
 
-            qDebug() << "Card detected (amdgpu): " << gsi.sysName;
+        int pciIdx = ueventContents.indexOf(QRegExp("PCI_SLOT_NAME.+"));
+        if (pciIdx != -1)
+            gsi.name = globalStuff::grabSystemInfo("lspci -s " + ueventContents[pciIdx].split('=')[1])[0].split(':')[2].trimmed();
 
-            continue;
+        gpuList.append(gsi);
 
-        }
+        qDebug() << "Card detected:\n module: " << gsi.driverModuleString <<  "\n sysName(path): "  << gsi.sysName  << "\n name: " <<  gsi.name;
     }
 }
 
@@ -228,11 +222,10 @@ QList<QTreeWidgetItem *> gpu::getModuleInfo() const {
 }
 
 QStringList gpu::getGLXInfo(QString gpuName) const {
-    QStringList data, gpus = globalStuff::grabSystemInfo("lspci").filter(QRegExp(".+VGA.+|.+3D.+"));
+    QStringList data;
 
-    // loop for multi gpu
-    for (int i = 0; i < gpus.count(); i++)
-        data << "VGA:"+gpus[i].split(":",QString::SkipEmptyParts)[2];
+    for (auto& gpu : gpuList)
+        data << "VGA: " + gpu.name;
 
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     if (!gpuName.isEmpty())

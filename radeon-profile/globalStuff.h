@@ -113,7 +113,7 @@ enum class TemperatureSensor {
 };
 
 struct GPUSysInfo {
-    QString sysName, driverModuleString;
+    QString sysName, driverModuleString, name;
     DriverModule module;
 };
 
