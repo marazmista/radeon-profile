@@ -9,8 +9,8 @@ Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-prof
 * DPM profiles and power levels
 * Fan control (HD 7000+), definition of multiple custom curves or fixed speed
 * Overclocking (amdgpu) (Wattman, Overdrive, PowerPlay etc)
-* Event derinitions (i.e. change fan profile when temp above defined or set DPM to high when selected binary executed)
-* Define binaries to run with set of envirnoment variablees (i.e. GALLIUM_HUD, MESA, LIBGL etc)
+* Per app profiles/Event definitions (i.e. change fan profile when temp above defined or set DPM to high when selected binary executed)
+* Define binaries to run with set of environment variablees (i.e. GALLIUM_HUD, MESA, LIBGL etc)
 
 # Dependencies
 
