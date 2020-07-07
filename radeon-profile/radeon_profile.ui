@@ -24,7 +24,7 @@
     <normaloff>:/icon/extra/radeon-profile.png</normaloff>:/icon/extra/radeon-profile.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_15" rowstretch="0,0,0,0,0" columnstretch="0,1">
+   <layout class="QGridLayout" name="gridLayout_15" rowstretch="0,0,0,0,0,0" columnstretch="0,1">
     <property name="leftMargin">
      <number>3</number>
     </property>
@@ -40,68 +40,7 @@
     <property name="spacing">
      <number>5</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <family>Noto Sans</family>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>GPU</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1" rowspan="2">
-     <widget class="QWidget" name="widget_topbar" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>150</width>
-        <height>60</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>60</height>
-       </size>
-      </property>
-      <layout class="QHBoxLayout" name="topbar_layout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-      </layout>
-     </widget>
-    </item>
-    <item row="4" column="0">
+    <item row="5" column="0">
      <widget class="QToolButton" name="btn_fanControl">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -133,22 +72,32 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QComboBox" name="combo_gpus">
+    <item row="4" column="0">
+     <widget class="QToolButton" name="btn_ocProfileControl">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="font">
-       <font>
-        <family>Monospace</family>
-        <pointsize>10</pointsize>
-       </font>
+      <property name="text">
+       <string>default</string>
       </property>
-      <property name="toolTip">
-       <string>Selected GPU</string>
+      <property name="icon">
+       <iconset resource="radeon-resource.qrc">
+        <normaloff>:/icon/symbols/overclock.png</normaloff>:/icon/symbols/overclock.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="popupMode">
+       <enum>QToolButton::InstantPopup</enum>
+      </property>
+      <property name="toolButtonStyle">
+       <enum>Qt::ToolButtonTextUnderIcon</enum>
       </property>
      </widget>
     </item>
@@ -277,37 +226,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="combo_pLevel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>24</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>160</width>
-            <height>24</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Monospace</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="toolTip">
-           <string>Power level</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="verticalSpacer_5">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -323,22 +241,6 @@
           </property>
          </spacer>
         </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="pageMode">
-       <layout class="QVBoxLayout" name="verticalLayout_18">
-        <property name="leftMargin">
-         <number>2</number>
-        </property>
-        <property name="topMargin">
-         <number>2</number>
-        </property>
-        <property name="rightMargin">
-         <number>2</number>
-        </property>
-        <property name="bottomMargin">
-         <number>2</number>
-        </property>
        </layout>
       </widget>
       <widget class="QWidget" name="pageProfile">
@@ -383,38 +285,25 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="pageMode">
+       <layout class="QVBoxLayout" name="verticalLayout_18">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+       </layout>
+      </widget>
      </widget>
     </item>
-    <item row="3" column="0">
-     <widget class="QToolButton" name="btn_ocProfileControl">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>default</string>
-      </property>
-      <property name="icon">
-       <iconset resource="radeon-resource.qrc">
-        <normaloff>:/icon/symbols/overclock.png</normaloff>:/icon/symbols/overclock.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>32</width>
-        <height>32</height>
-       </size>
-      </property>
-      <property name="popupMode">
-       <enum>QToolButton::InstantPopup</enum>
-      </property>
-      <property name="toolButtonStyle">
-       <enum>Qt::ToolButtonTextUnderIcon</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1" rowspan="3">
+    <item row="2" column="1" rowspan="4">
      <widget class="QTabWidget" name="tw_main">
       <property name="enabled">
        <bool>true</bool>
@@ -3578,7 +3467,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>911</width>
+             <width>931</width>
              <height>680</height>
             </rect>
            </property>
@@ -4405,6 +4294,105 @@
         </item>
        </layout>
       </widget>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QComboBox" name="combo_gpus">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Monospace</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Selected GPU</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="2">
+     <widget class="QWidget" name="widget_topbar" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>150</width>
+        <height>60</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>60</height>
+       </size>
+      </property>
+      <layout class="QHBoxLayout" name="topbar_layout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Noto Sans</family>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>GPU</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QComboBox" name="combo_pLevel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Monospace</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Power level</string>
+      </property>
      </widget>
     </item>
    </layout>
