@@ -34,7 +34,7 @@ void DaemonComm::sendConnectionConfirmation() {
 void DaemonComm::connectToDaemon() {
     qDebug() << "Connecting to daemon...";
     signalSender->abort();
-    signalSender->connectToServer("/run/radeon-profile-daemon-server");
+    signalSender->connectToServer("/run/radeon-profile-daemon/radeon-profile-daemon-server");
 }
 
 void DaemonComm::disconnectDaemon() {
