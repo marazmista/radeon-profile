@@ -60,8 +60,8 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
     qDebug() << "Activating event: " + rpe.name;
 
     savedState = new CurrentStateInfo();
-    savedState->profile = static_cast<PowerProfiles>(group_Dpm.checkedId());
-    savedState->powerLevel = static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex());
+    savedState->powerProfile = QString::number(group_profileControlButtons.checkedId());
+    savedState->powerLevel = ui->combo_pLevel->currentText();
 
     if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
         switch (ui->stack_fanModes->currentIndex()) {
@@ -79,12 +79,11 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
     hideEventControls(false);
     ui->l_currentActiveEvent->setText(rpe.name);
 
+    if (!rpe.powerProfileChange.isEmpty())
+        device.setPowerProfile(rpe.powerProfileChange);
 
-    if (rpe.dpmProfileChange > -1)
-        device.setPowerProfile(static_cast<PowerProfiles>(rpe.dpmProfileChange));
-
-    if (rpe.powerLevelChange > -1)
-        device.setForcePowerLevel(static_cast<ForcePowerLevels>(rpe.powerLevelChange));
+    if (!rpe.powerLevelChange.isEmpty())
+        device.setForcePowerLevel(rpe.powerLevelChange);
 
     if (rpe.fanComboIndex > 0 && device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
         switch (rpe.fanComboIndex) {
@@ -109,8 +108,8 @@ void radeon_profile::activateEvent(const RPEvent &rpe) {
 void radeon_profile::revokeEvent() {
     qDebug() << "Deactivating event: " + ui->l_currentActiveEvent->text();
 
-    device.setPowerProfile(static_cast<PowerProfiles>(savedState->profile));
-    device.setForcePowerLevel(static_cast<ForcePowerLevels>(savedState->powerLevel));
+    device.setPowerProfile(savedState->powerProfile);
+    device.setForcePowerLevel(savedState->powerLevel);
 
     if (device.gpuData.contains(ValueID::FAN_SPEED_PERCENT)) {
         switch (savedState->fanIndex) {

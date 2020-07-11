@@ -16,43 +16,11 @@
 
 bool closeFromTrayMenu;
 
-//===================================
-// === GUI events === //
-// == menu forcePowerLevel
-void radeon_profile::forceAuto() {
-    ui->combo_pLevel->setCurrentText(dpm_auto);
-
-    // device.setForcePowerLevel(globalStuff::F_AUTO);
-}
-
-void radeon_profile::forceLow() {
-    ui->combo_pLevel->setCurrentText(dpm_low);
-
-    //  device.setForcePowerLevel(globalStuff::F_LOW);
-}
-
-void radeon_profile::forceHigh() {
-    ui->combo_pLevel->setCurrentText(dpm_high);
-    //    device.setForcePowerLevel(globalStuff::F_HIGH);
-}
-
-void radeon_profile::setBattery() {
-    setPowerLevel(0);
-}
-
-void radeon_profile::setBalanced() {
-    setPowerLevel(1);
-}
-
-void radeon_profile::setPerformance() {
-    setPowerLevel(2);
-}
-
 void radeon_profile::setPowerLevelFromCombo() {
-    if (ui->group_freq->isChecked() && static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
+    if (ui->group_freq->isChecked() && ui->combo_pLevel->currentText() != level_manual)
         ui->group_freq->setChecked(false);
 
-    device.setForcePowerLevel(static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()));
+    device.setForcePowerLevel(ui->combo_pLevel->currentText());
 }
 
 void radeon_profile::resetMinMax() {
@@ -60,14 +28,8 @@ void radeon_profile::resetMinMax() {
     device.gpuData[ValueID::TEMPERATURE_MAX].setValue(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
 }
 
-void radeon_profile::setPowerLevel(int level) {
-            device.setPowerProfile(static_cast<PowerProfiles>((device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) ?
-                                                                               level :
-                                                                               level + 3));
-}
-
-void radeon_profile::setPowerProfileMode(int mode) {
-    device.setPowerProfileMode(QString::number(mode));
+void radeon_profile::setPowerProfile(int mode) {
+    device.setPowerProfile(QString::number(mode));
 }
 
 void radeon_profile::changeEvent(QEvent *event)
@@ -209,26 +171,6 @@ void radeon_profile::on_cb_alternateRow_clicked(bool checked) {
     ui->list_vaules->setAlternatingRowColors(checked);
     ui->list_freqStatesCore->setAlternatingRowColors(checked);
     ui->list_freqStatesMem->setAlternatingRowColors(checked);
-}
-
-void radeon_profile::on_chProfile_clicked()
-{
-    bool ok;
-
-    QString selection = QInputDialog::getItem(this, tr("Select new power profile"), tr("Profile selection"), globalStuff::createProfileCombo(), 0, false, &ok);
-
-    if (ok) {
-        if (selection == profile_default)
-            device.setPowerProfile(PowerProfiles::DEFAULT);
-        else if (selection == profile_auto)
-            device.setPowerProfile(PowerProfiles::AUTO);
-        else if (selection == profile_high)
-            device.setPowerProfile(PowerProfiles::HIGH);
-        else if (selection == profile_mid)
-            device.setPowerProfile(PowerProfiles::MID);
-        else if (selection == profile_low)
-            device.setPowerProfile(PowerProfiles::LOW);
-    }
 }
 
 void radeon_profile::on_tabs_execOutputs_tabCloseRequested(int index)

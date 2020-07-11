@@ -78,8 +78,8 @@ public:
     int getPowerCapSelected() const;
     int getPowerCapAverage() const;
 
-    void setPowerProfile(PowerProfiles newPowerProfile);
-    void setForcePowerLevel(ForcePowerLevels newForcePowerLevel);
+    void setPowerProfile(const QString &newPowerProfile);
+    void setForcePowerLevel(const QString &newForcePowerLevel);
 
     void figureOutGpuDataFilePaths(const QString &gpuName);
     void configure();
@@ -93,7 +93,7 @@ public:
     void setOcTable(const QString &tableType, const FVTable &table);
     InitializationConfig getInitConfig();
     void refreshPowerPlayTables();
-    PowerProfileModes getPowerProfileModes();
+    PowerProfiles getPowerProfiles(const PowerMethod powerMethod);
     
 private:
     QChar gpuSysIndex;

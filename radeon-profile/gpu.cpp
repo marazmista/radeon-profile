@@ -256,15 +256,11 @@ void gpu::getPowerLevel() {
     currentPowerProfile = getCurrentPowerProfile();
 }
 
-void gpu::setPowerProfileMode(const QString &newPowerProfile) {
-    driverHandler->setNewValue(getDriverFiles().sysFs.pp_power_profile_mode, newPowerProfile);
-}
-
-void gpu::setPowerProfile(PowerProfiles newPowerProfile) {
+void gpu::setPowerProfile(const QString &newPowerProfile) {
     driverHandler->setPowerProfile(newPowerProfile);
 }
 
-void gpu::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
+void gpu::setForcePowerLevel(const QString &newForcePowerLevel) {
     driverHandler->setForcePowerLevel(newForcePowerLevel);
 }
 

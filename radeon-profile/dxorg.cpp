@@ -459,72 +459,24 @@ void dXorg::setNewValue(const QString &filePath, const QStringList &newValues) {
     }
 }
 
-void dXorg::setPowerProfile(PowerProfiles newPowerProfile) {
-    QString newValue;
-    switch (newPowerProfile) {
-    case PowerProfiles::BATTERY:
-        newValue = dpm_battery;
-        break;
-    case PowerProfiles::BALANCED:
-        newValue = dpm_balanced;
-        break;
-    case PowerProfiles::PERFORMANCE:
-        newValue = dpm_performance;
-        break;
-    case PowerProfiles::AUTO:
-        newValue = profile_auto;
-        break;
-    case PowerProfiles::DEFAULT:
-        newValue = profile_default;
-        break;
-    case PowerProfiles::HIGH:
-        newValue = profile_high;
-        break;
-    case PowerProfiles::MID:
-        newValue = profile_mid;
-        break;
-    case PowerProfiles::LOW:
-        newValue = profile_low;
-        break;
+void dXorg::setPowerProfile(const QString &newPowerProfile) {
+    switch (features.currentPowerMethod) {
+        case PowerMethod::DPM:
+            setNewValue(driverFiles.sysFs.power_dpm_state, features.powerProfiles.at(newPowerProfile.toInt()).name);
+            break;
+        case PowerMethod::PP_MODE:
+            setNewValue(driverFiles.sysFs.pp_power_profile_mode, newPowerProfile);
+            break;
+        case PowerMethod::PROFILE:
+            setNewValue(driverFiles.sysFs.power_profile, features.powerProfiles.at(newPowerProfile.toInt()).name);
+            break;
+        default:
+            break;
     }
-
-    // enum is int, so first three values are dpm, rest are profile
-    if (newPowerProfile <= PowerProfiles::PERFORMANCE)
-        setNewValue(driverFiles.sysFs.power_dpm_state, newValue);
-    else
-        setNewValue(driverFiles.sysFs.power_profile, newValue);
 }
 
-void dXorg::setForcePowerLevel(ForcePowerLevels newForcePowerLevel) {
-    QString newValue;
-    switch (newForcePowerLevel) {
-        case ForcePowerLevels::F_AUTO:
-            newValue = dpm_auto;
-            break;
-        case ForcePowerLevels::F_HIGH:
-            newValue = dpm_high;
-            break;
-        case ForcePowerLevels::F_LOW:
-            newValue = dpm_low;
-            break;
-        case ForcePowerLevels::F_MANUAL:
-            newValue = dpm_manual;
-            break;
-        case  ForcePowerLevels::F_PROFILE_STANDARD:
-            newValue = dpm_profile_standard;
-            break;
-        case  ForcePowerLevels::F_PROFILE_MIN_SCLK:
-            newValue = dpm_profile_min_sclk;
-            break;
-        case ForcePowerLevels::F_PROFILE_MIN_MCLK:
-            newValue = dpm_profile_min_mclk;
-            break;
-        case ForcePowerLevels::F_PROFILE_PEAK:
-            newValue = dpm_profile_peak;
-            break;
-    }
-
-    setNewValue(driverFiles.sysFs.power_dpm_force_performance_level, newValue);
+void dXorg::setForcePowerLevel(const QString &newForcePowerLevel) {
+    setNewValue(driverFiles.sysFs.power_dpm_force_performance_level, newForcePowerLevel);
 }
 
 GPUFanSpeed dXorg::getFanSpeed() {
@@ -612,10 +564,7 @@ void dXorg::setupRegex(const QString &data) {
 
 void dXorg::figureOutDriverFeatures() {
     features.isDpmStateAvailable = !driverFiles.sysFs.power_dpm_state.isEmpty();
-
     features.isPowerProfileModesAvailable = !driverFiles.sysFs.pp_power_profile_mode.isEmpty();
-    if (features.isPowerProfileModesAvailable)
-        features.ppModes = getPowerProfileModes();
 
     features.currentPowerMethod = getPowerMethodFallback();
 
@@ -624,6 +573,8 @@ void dXorg::figureOutDriverFeatures() {
 
     if (features.isPowerProfileModesAvailable)
         features.currentPowerMethod = PowerMethod::PP_MODE;
+
+    features.powerProfiles = getPowerProfiles(features.currentPowerMethod);
 
     if (getIoctlAvailability() && !initConfig.daemonData)
         features.clocksDataSource = ClocksDataSource::IOCTL;
@@ -893,18 +844,46 @@ void dXorg::setOcTable(const QString &tableType, const FVTable &table) {
     setNewValue(driverFiles.sysFs.pp_od_clk_voltage, ocTableValues);
 }
 
-PowerProfileModes dXorg::getPowerProfileModes() {
-    QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_power_profile_mode).split('\n');
-    PowerProfileModes ppModes;
+PowerProfiles dXorg::getPowerProfiles(const PowerMethod powerMethod) {
+    PowerProfiles ppModes;
 
-    for (auto &s : sl) {
-        if (!s[0].isNumber())
-            continue;
+    switch (powerMethod) {
+        case PowerMethod::DPM: {
+            auto currentProfile = getCurrentPowerProfile();
 
-        bool isActive = s.contains('*');
-        QStringList profileLine = s.split(' ');
+            ppModes.append(PowerProfileDefinition(0, currentProfile == dpm_battery, dpm_battery));
+            ppModes.append(PowerProfileDefinition(1, currentProfile == dpm_balanced, dpm_balanced));
+            ppModes.append(PowerProfileDefinition(2, currentProfile == dpm_performance, dpm_performance));
+        }
+            break;
 
-        ppModes.append(PPMode(profileLine[0].toUInt(), isActive, profileLine[1].remove("*:")));
+        case PowerMethod::PROFILE: {
+            auto currentProfile = getCurrentPowerProfile();
+
+            ppModes.append(PowerProfileDefinition(0, currentProfile == profile_auto, profile_auto));
+            ppModes.append(PowerProfileDefinition(1, currentProfile == profile_default, profile_default));
+            ppModes.append(PowerProfileDefinition(3, currentProfile == profile_high, profile_high));
+            ppModes.append(PowerProfileDefinition(4, currentProfile == profile_mid, profile_mid));
+            ppModes.append(PowerProfileDefinition(5, currentProfile == profile_low, profile_low));
+        }
+            break;
+
+        case PowerMethod::PP_MODE: {
+            QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_power_profile_mode).split('\n');
+
+            for (auto &s : sl) {
+                if (!s[0].isNumber())
+                    continue;
+
+                bool isActive = s.contains('*');
+                QStringList profileLine = s.split(' ');
+
+                ppModes.append(PowerProfileDefinition(profileLine[0].toUInt(), isActive, profileLine[1].remove("*:")));
+            }
+        }
+            break;
+        default:
+            break;
     }
 
     return ppModes;

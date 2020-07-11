@@ -68,12 +68,6 @@ public:
 private slots:
     void mainTimerEvent();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void forceAuto();
-    void forceLow();
-    void forceHigh();
-    void setBattery();
-    void setBalanced();
-    void setPerformance();
     void resetMinMax();
     void gpuChanged();
     void closeEvent(QCloseEvent *e);
@@ -85,7 +79,6 @@ private slots:
     void copyConnectorsToClipboard();
     void resetStats();
     void on_cb_alternateRow_clicked(bool checked);
-    void on_chProfile_clicked();
     void on_btn_cancel_clicked();
     void on_btn_addExecProfile_clicked();
     void on_list_vaules_itemClicked(QListWidgetItem *item);
@@ -124,7 +117,6 @@ private slots:
     void on_btn_revokeEvent_clicked();
     void on_list_events_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_saveAll_clicked();
-    void setPowerLevel(int level);
     void on_btn_configurePlots_clicked();
     void on_btn_applySavePlotsDefinitons_clicked();
     void on_btn_addPlotDefinition_clicked();
@@ -157,14 +149,12 @@ private slots:
     void on_btn_connConfirmMethodInfo_clicked();
     void frequencyControlToggled(bool toogle);
     void applyFrequencyTables();
-    void setPowerProfileMode(int mode);
+    void setPowerProfile(int mode);
 
 private:
     struct CurrentStateInfo {
-        PowerProfiles profile;
-        ForcePowerLevels powerLevel;
         short fanIndex;
-        QString fanProfileName;
+        QString fanProfileName, powerProfile, powerLevel;
     };
 
     QSystemTrayIcon *icon_tray;
@@ -182,7 +172,7 @@ private:
     unsigned int counter_ticks, counter_statsTick;
     short hysteresisRelativeTepmerature;
     bool enableChangeEvent, rootMode;
-    QButtonGroup group_pwm, group_Dpm, group_ppm;
+    QButtonGroup group_pwm, group_profileControlButtons;
     CurrentStateInfo *savedState;
     PlotManager plotManager;
     TopbarManager topbarManager;
@@ -194,7 +184,6 @@ private:
     Ui::radeon_profile *ui;
     void setupTrayIcon();
     void refreshTooltip();
-    QMenu* createDpmMenu();
     void changeEvent(QEvent *event);
     void saveConfig();
     void loadConfig();
@@ -252,7 +241,6 @@ private:
     void setupPlot(const PlotDefinitionSchema &pds);
     QString createCurrentMinMaxString(const ValueID idCurrent, const ValueID idMin, const ValueID idMax);
     QString createCurrentMinMaxString(const QString &current, const QString &min,  const QString &max);
-    void addDpmButtons();
     void createFanProfileGraph();
     void createOcGraphSeriesFromList(const QTreeWidget *list, QLineSeries *seriesClocks, QLineSeries *seriesVoltages);
     void adjustState(QTreeWidgetItem *item, const OCRange &frequencyRange, const OCRange &voltageRange);
@@ -273,7 +261,7 @@ private:
     void configureDaemonPreDeviceInit();
     void loadFrequencyStatesTables();
     void updateFrequencyStatesTables();
-    void addPowerProfileModesButons(const PowerProfileModes& modes);
+    void createPowerProfileControlButtons(const PowerProfiles& modes);
 
 };
 

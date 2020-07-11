@@ -17,9 +17,7 @@ public:
     RPEvent() { }
 
     bool enabled;
-    QString name, activationBinary, fanProfileNameChange;
-    PowerProfiles dpmProfileChange;
-    ForcePowerLevels powerLevelChange;
+    QString name, activationBinary, fanProfileNameChange, powerProfileChange, powerLevelChange;
     unsigned short fixedFanSpeedChange, activationTemperature, fanComboIndex;
     RPEventType type;
 
@@ -32,11 +30,6 @@ public:
         }
 
         return false;
-    }
-
-    template <typename T>
-    T getEnumFromCombo(const unsigned int comboIndex) {
-        return static_cast<T>(comboIndex - 1);
     }
 };
 

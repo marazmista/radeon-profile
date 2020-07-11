@@ -143,7 +143,6 @@ void radeon_profile::connectSignals()
     // fix for warrning: QMetaObject::connectSlotsByName: No matching signal for...
     connect(ui->combo_gpus,SIGNAL(currentIndexChanged(QString)),this,SLOT(gpuChanged()));
     connect(ui->combo_pLevel,SIGNAL(currentIndexChanged(int)),this,SLOT(setPowerLevelFromCombo()));
-    connect(&group_Dpm, SIGNAL(buttonClicked(int)), this, SLOT(setPowerLevel(int)));
     connect(timer,SIGNAL(timeout()),this,SLOT(mainTimerEvent()));
     connect(ui->combo_fanProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(createFanProfileListaAndGraph(const QString&)));
     connect(ui->combo_ocProfiles, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(createOcProfileListsAndGraph(const QString&)));
@@ -151,13 +150,11 @@ void radeon_profile::connectSignals()
     connect(ui->spin_powerCap, SIGNAL(valueChanged(int)), this, SLOT(powerCapValueChange(int)));
     connect(ui->group_oc, SIGNAL(toggled(bool)), this, SLOT(percentOverclockToggled(bool)));
     connect(ui->group_freq, SIGNAL(toggled(bool)), this, SLOT(frequencyControlToggled(bool)));
-    connect(&group_ppm, SIGNAL(buttonClicked(int)), this, SLOT(setPowerProfileMode(int)));
+    connect(&group_profileControlButtons, SIGNAL(buttonClicked(int)), this, SLOT(setPowerProfile(int)));
 }
 
 void radeon_profile::setupDeviceDependantUiElements()
 {
-    addPowerMethodToTrayMenu(device.getDriverFeatures());
-
     if (topbarManager.schemas.count() == 0)
         topbarManager.createDefaultTopbarSchema(device.gpuData.keys());
 
@@ -186,6 +183,9 @@ void radeon_profile::setupUiElements()
     addRuntmeWidgets();
     fillConnectors();
     createPlots();
+
+    ui->widget_pmControls->setLayout(new QVBoxLayout(ui->widget_pmControls));
+    ui->widget_pmControls->layout()->setMargin(2);
 }
 
 
@@ -193,17 +193,13 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     qDebug() << "Handling found device features";
 
     if (features.isChangeProfileAvailable && features.currentPowerMethod < PowerMethod::PM_UNKNOWN) {
-        ui->stack_pm->setCurrentIndex(features.currentPowerMethod);
-        ui->stack_pm->setEnabled(true);
+        ui->widget_pmControls->setEnabled(true);
 
-        if (features.currentPowerMethod == PowerMethod::DPM)
-            addDpmButtons();
-        else if (features.currentPowerMethod == PowerMethod::PP_MODE)
-            addPowerProfileModesButons(features.ppModes);
+        createPowerProfileControlButtons(features.powerProfiles);
 
-        if (features.currentPowerMethod != PowerMethod::PROFILE) {
+        if (features.currentPowerMethod != PowerMethod::PROFILE)
             ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo(features.sysInfo.module));
-        } else
+        else
             ui->combo_pLevel->setVisible(false);
 
     } else {
@@ -390,23 +386,33 @@ void radeon_profile::refreshUI() {
         }
     }
 
-    if (device.getDriverFeatures().currentPowerMethod == PowerMethod::DPM) {
-        ui->combo_pLevel->setCurrentText(device.currentPowerLevel);
-        if (device.currentPowerProfile == dpm_battery)
-            ui->btn_dpmBattery->setChecked(true);
-        else if (device.currentPowerProfile == dpm_balanced)
-            ui->btn_dpmBalanced->setChecked(true);
-        else if (device.currentPowerProfile == dpm_performance)
-            ui->btn_dpmPerformance->setChecked(true);
-    } else if (device.getDriverFeatures().currentPowerMethod == PowerMethod::PP_MODE) {
-        if (group_ppm.checkedId() != device.currentPowerProfile.toInt())
-            group_ppm.button(device.currentPowerProfile.toInt())->setChecked(true);
+    if (group_profileControlButtons.checkedButton() != nullptr) {
+        switch (device.getDriverFeatures().currentPowerMethod) {
+            case PowerMethod::DPM:
+            case PowerMethod::PROFILE:
+                if (device.currentPowerProfile != group_profileControlButtons.checkedButton()->text()) {
+                    for (auto &mode :device.getDriverFeatures().powerProfiles) {
+                        if (mode.name == device.currentPowerProfile) {
+                            group_profileControlButtons.button(mode.id)->setChecked(true);
+                            break;
+                        }
+                    }
+                }
+                break;
+            case PowerMethod::PP_MODE:
+                if (group_profileControlButtons.checkedId() != device.currentPowerProfile.toInt())
+                    group_profileControlButtons.button(device.currentPowerProfile.toInt())->setChecked(true);
+                break;
+            default:
+                break;
+        }
     }
+
+    ui->combo_pLevel->setCurrentText(device.currentPowerLevel);
 
     // do the math only when user looking at stats table
     if (ui->tw_systemInfo->currentIndex() == 3 && ui->tw_main->currentIndex() == 0)
         updateStatsTable();
-
 }
 
 void radeon_profile::createCurrentGpuDataListItems()
@@ -449,7 +455,7 @@ void radeon_profile::enableUiControls(bool enable)
 {
     ui->tw_main->setTabEnabled(2, enable);
     ui->tw_main->setTabEnabled(3, enable);
-    ui->stack_pm->setEnabled(enable);
+    ui->widget_pmControls->setEnabled(enable);
 }
 
 void radeon_profile::mainTimerEvent() {

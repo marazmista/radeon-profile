@@ -14,14 +14,15 @@
 #define dpm_battery "battery"
 #define dpm_performance "performance"
 #define dpm_balanced "balanced"
-#define dpm_high "high"
-#define dpm_auto "auto"
-#define dpm_low "low"
-#define dpm_manual "manual"
-#define dpm_profile_standard "profile_standard"
-#define dpm_profile_min_sclk "profile_min_sclk"
-#define dpm_profile_min_mclk "profile_min_mclk"
-#define dpm_profile_peak "profile_peak"
+
+#define level_high "high"
+#define level_auto "auto"
+#define level_low "low"
+#define level_manual "manual"
+#define level_profile_standard "profile_standard"
+#define level_profile_min_sclk "profile_min_sclk"
+#define level_profile_min_mclk "profile_min_mclk"
+#define level_profile_peak "profile_peak"
 
 #define profile_auto "auto"
 #define profile_default "default"
@@ -81,14 +82,6 @@ enum ValueUnit {
 
 Q_DECLARE_METATYPE(ValueID)
 Q_DECLARE_METATYPE(ValueUnit)
-
-enum PowerProfiles {
-    BATTERY, BALANCED, PERFORMANCE, AUTO, DEFAULT, LOW, MID, HIGH
-};
-
-enum ForcePowerLevels {
-    F_AUTO, F_LOW, F_HIGH, F_MANUAL, F_PROFILE_STANDARD, F_PROFILE_MIN_SCLK, F_PROFILE_MIN_MCLK, F_PROFILE_PEAK
-};
 
 enum class ClocksDataSource {
     IOCTL, PM_FILE, SOURCE_UNKNOWN
@@ -185,14 +178,14 @@ struct OCRange {
     }
 };
 
-struct PPMode {
+struct PowerProfileDefinition {
     QString name;
     unsigned id;
     bool isActive;
 
-    PPMode() { }
+    PowerProfileDefinition() { }
 
-    PPMode(unsigned _id, bool _isActive, QString _name) {
+    PowerProfileDefinition(unsigned _id, bool _isActive, QString _name) {
         id = _id;
         name = _name;
         isActive = _isActive;
@@ -204,7 +197,7 @@ typedef QMap<unsigned, FreqVoltPair> FVTable;
 typedef QMap<QString, FVTable> MapFVTables;
 typedef QMap<QString, OCRange> MapOCRanges;
 typedef QMap<int, unsigned int> FanProfileSteps;
-typedef QList<PPMode> PowerProfileModes;
+typedef QList<PowerProfileDefinition> PowerProfiles;
 
 struct OCProfile {
     unsigned powerCap;
@@ -227,9 +220,9 @@ struct DriverFeatures {
     isDpmStateAvailable = false,
     isPowerProfileModesAvailable = false;
 
-    PowerMethod currentPowerMethod;
+    PowerMethod currentPowerMethod = PowerMethod::PM_UNKNOWN;
     ClocksDataSource clocksDataSource = ClocksDataSource::SOURCE_UNKNOWN;
-    TemperatureSensor currentTemperatureSensor;
+    TemperatureSensor currentTemperatureSensor = TemperatureSensor::TS_UNKNOWN;
     GPUSysInfo sysInfo;
 
     // base on files  pp_dpm_sclk and  pp_dpm_mclk
@@ -239,12 +232,10 @@ struct DriverFeatures {
     MapFVTables currentStatesTables;
     MapOCRanges ocRages;
 
-    PowerProfileModes ppModes;
+    // based on pp_power_profile_mode or power_dpm_state or power_profile
+    PowerProfiles powerProfiles;
 
-    DriverFeatures() {
-        currentPowerMethod = PowerMethod::PM_UNKNOWN;
-        currentTemperatureSensor = TemperatureSensor::TS_UNKNOWN;
-    }
+    DriverFeatures() { }
 };
 
 static bool checkFileCorrectness(const QString &fileName, const bool isZeroValidValue = false) {
@@ -549,26 +540,18 @@ public:
         }
     }
 
-    static QStringList createDPMCombo() {
-        return QStringList() << dpm_battery << dpm_balanced << dpm_performance;
-    }
-
     static QStringList createPowerLevelCombo(const DriverModule dm) {
         switch (dm) {
             case DriverModule::RADEON:
-                return QStringList() << dpm_auto << dpm_low << dpm_high;
+                return QStringList() << level_auto << level_low << level_high;
             case DriverModule::AMDGPU:
-                return QStringList() << dpm_auto << dpm_low << dpm_high << dpm_manual <<
-                                        dpm_profile_standard << dpm_profile_min_sclk << dpm_profile_min_mclk << dpm_profile_peak;
+                return QStringList() << level_auto << level_low << level_high << level_manual <<
+                                        level_profile_standard << level_profile_min_sclk << level_profile_min_mclk << level_profile_peak;
             default:
                 break;
         }
 
         return QStringList();
-    }
-
-    static QStringList createProfileCombo() {
-        return QStringList() << profile_auto << profile_default << profile_high << profile_mid << profile_low;
     }
 };
 

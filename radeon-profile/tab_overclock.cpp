@@ -262,8 +262,8 @@ void radeon_profile::setCurrentOcProfile(const QString &name) {
     const auto &ocp = ocProfiles.value(name);
 
     if (tableHasBeenModified) {
-        if (static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
-            device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+        if (ui->combo_pLevel->currentText() != level_manual)
+            device.setForcePowerLevel(level_manual);
 
         if (device.getDriverFeatures().isVDDCCurveAvailable)
             device.setOcTable("vc", ocp.tables.value(OD_VDDC_CURVE));
@@ -358,8 +358,8 @@ void radeon_profile::applyFrequencyTables() {
     }
 
 
-    if ((!allCheckedCore || !allCheckedMem) && static_cast<ForcePowerLevels>(ui->combo_pLevel->currentIndex()) != ForcePowerLevels::F_MANUAL)
-        device.setForcePowerLevel(ForcePowerLevels::F_MANUAL);
+    if ((!allCheckedCore || !allCheckedMem) && ui->combo_pLevel->currentText() != level_manual)
+        device.setForcePowerLevel(level_manual);
 
 
     device.setManualFrequencyControlStates(device.getDriverFiles().sysFs.pp_dpm_sclk, enabledFrequencyStatesCore);

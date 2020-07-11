@@ -7,23 +7,6 @@
 
 #include <QMenu>
 
-//===================================
-// === GUI setup functions === //
-void radeon_profile::addPowerMethodToTrayMenu(const DriverFeatures &features)
-{
-    auto menu = icon_tray->contextMenu();
-
-    if (features.currentPowerMethod == PowerMethod::DPM)
-        menu->insertMenu(menu->actions()[1], createDpmMenu());
-    else if (features.currentPowerMethod == PowerMethod::PROFILE) {
-        QAction *changeProfile = new QAction(menu);
-        changeProfile->setText(tr("Change standard profile"));
-        connect(changeProfile,SIGNAL(triggered()),this,SLOT(on_chProfile_clicked()));
-
-        menu->insertAction(menu->actions()[1], changeProfile);
-    }
-}
-
 void radeon_profile::setupTrayIcon() {
     QMenu *menu_tray = new QMenu(this);
     setWindowState(Qt::WindowMinimized);
@@ -67,57 +50,6 @@ QMenu* radeon_profile::createGeneralMenu() {
     menu_general->addAction(resetTemp);
 
     return menu_general;
-}
-
-QMenu* radeon_profile::createDpmMenu() {
-    QMenu *menu_dpm = new QMenu(this);
-    menu_dpm->setTitle(tr("DPM"));
-
-    QMenu *menu_forcePower = new QMenu(this);
-    menu_forcePower->setTitle(tr("Force power level"));
-
-    QAction *dpmSetBattery = new QAction(menu_dpm);
-    QAction *dpmSetBalanced = new QAction(menu_dpm);
-    QAction *dpmSetPerformance = new QAction(menu_dpm);
-
-    dpmSetBattery->setText(tr("Battery"));
-    dpmSetBattery->setIcon(QIcon(":/icon/symbols/arrow1.png"));
-    dpmSetBalanced->setText(tr("Balanced"));
-    dpmSetBalanced->setIcon(QIcon(":/icon/symbols/arrow2.png"));
-    dpmSetPerformance->setText(tr("Performance"));
-    dpmSetPerformance->setIcon(QIcon(":/icon/symbols/arrow3.png"));
-
-    connect(dpmSetBattery,SIGNAL(triggered()),this,SLOT(setBattery()));
-    connect(dpmSetBalanced,SIGNAL(triggered()),this, SLOT(setBalanced()));
-    connect(dpmSetPerformance,SIGNAL(triggered()),this,SLOT(setPerformance()));
-
-
-    QAction *forceAuto = new QAction(menu_forcePower);
-    forceAuto->setText(tr("Auto"));
-
-    QAction *forceLow = new QAction(menu_forcePower);
-    forceLow->setText(tr("Low"));
-
-    QAction *forceHigh = new QAction(menu_forcePower);
-    forceHigh->setText(tr("High"));
-
-    menu_forcePower->addAction(forceAuto);
-    menu_forcePower->addSeparator();
-    menu_forcePower->addAction(forceLow);
-    menu_forcePower->addAction(forceHigh);
-
-    connect(forceAuto,SIGNAL(triggered()),this,SLOT(forceAuto()));
-    connect(forceLow,SIGNAL(triggered()),this,SLOT(forceLow()));
-    connect(forceHigh,SIGNAL(triggered()),this,SLOT(forceHigh()));
-
-    // add all items to menu
-    menu_dpm->addAction(dpmSetBattery);
-    menu_dpm->addAction(dpmSetBalanced);
-    menu_dpm->addAction(dpmSetPerformance);
-    menu_dpm->addSeparator();
-    menu_dpm->addMenu(menu_forcePower);
-
-    return menu_dpm;
 }
 
 void radeon_profile::addRuntmeWidgets() {
@@ -264,32 +196,38 @@ void setupChart(QChart *chart, bool legendVisable) {
     chart->setBackgroundBrush(QBrush(Qt::darkGray));
 }
 
-void radeon_profile::addDpmButtons()
-{
-    group_Dpm.addButton(ui->btn_dpmBattery, PowerProfiles::BATTERY);
-    group_Dpm.addButton(ui->btn_dpmBalanced, PowerProfiles::BALANCED);
-    group_Dpm.addButton(ui->btn_dpmPerformance, PowerProfiles::PERFORMANCE);
-}
+void radeon_profile::createPowerProfileControlButtons(const PowerProfiles &modes) {
+    auto setButtonIcon = [](QToolButton *btn, QIcon icon) {
+        btn->setIcon(icon);
+        btn->setIconSize(QSize(32, 32));
+    };
 
-void radeon_profile::addPowerProfileModesButons(const PowerProfileModes &modes) {
     for (const auto &ppm : modes) {
         QToolButton *btn_mode = new QToolButton(this);
 
-        btn_mode->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        btn_mode->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-        btn_mode->setText(ppm.name);
-        btn_mode->setCheckable(true);
-        btn_mode->setChecked(ppm.isActive);
+        if (ppm.name == dpm_battery)
+            setButtonIcon(btn_mode, QIcon(":/icon/symbols/arrow1.png"));
+
+        if (ppm.name == dpm_balanced)
+            setButtonIcon(btn_mode, QIcon(":/icon/symbols/arrow2.png"));
+
+        if (ppm.name == dpm_performance)
+            setButtonIcon(btn_mode, QIcon(":/icon/symbols/arrow3.png"));
 
         // TODO impement custom
         if (ppm.name == "CUSTOM")
             btn_mode->setVisible(false);
 
-        group_ppm.addButton(btn_mode, ppm.id);
-        ui->pageMode->layout()->addWidget(btn_mode);
-    }
+        btn_mode->setText(ppm.name);
+        btn_mode->setCheckable(true);
+        btn_mode->setChecked(ppm.isActive);
+        btn_mode->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
-    ui->pageMode->layout()->addItem(new QSpacerItem(10, 40));
+        group_profileControlButtons.addButton(btn_mode, ppm.id);
+        ui->widget_pmControls->layout()->addWidget(btn_mode);
+    }
 }
 
 void radeon_profile::createFanProfileGraph()

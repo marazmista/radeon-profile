@@ -21,11 +21,9 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
 void Dialog_RPEvent::setFeatures(const GPUDataContainer &gpuData, const DriverFeatures &features, const QList<QString> &profiles) {
     switch (features.currentPowerMethod) {
         case PowerMethod::DPM:
-            ui->combo_dpmChange->addItems(globalStuff::createDPMCombo());
             ui->combo_powerLevelChange->addItems(globalStuff::createPowerLevelCombo(features.sysInfo.module));
             break;
         case PowerMethod::PROFILE:
-            ui->combo_dpmChange->addItems(globalStuff::createProfileCombo());
             ui->combo_powerLevelChange->setVisible(false);
             ui->l_powerLevel->setVisible(false);
 
@@ -34,6 +32,13 @@ void Dialog_RPEvent::setFeatures(const GPUDataContainer &gpuData, const DriverFe
         default:
             break;
     }
+
+    ui->combo_powerProfileChange->addItems([&features]()
+    { QStringList profilesList;
+        for (auto &p : features.powerProfiles)
+            profilesList.append(p.name);
+        return profilesList;
+    }());
 
     ui->combo_fanChange->addItem(tr("Auto"));
     ui->combo_fanChange->addItem(tr("Fixed speed"));
@@ -84,10 +89,10 @@ void Dialog_RPEvent::on_btn_save_clicked()
     createdEvent.activationBinary = ui->edt_binary->text();
     createdEvent.activationTemperature = ui->spin_tempActivate->value();
 
-    createdEvent.dpmProfileChange = createdEvent.getEnumFromCombo<PowerProfiles>(ui->combo_dpmChange->currentIndex());
-    createdEvent.powerLevelChange = createdEvent.getEnumFromCombo<ForcePowerLevels>(ui->combo_powerLevelChange->currentIndex());
+    createdEvent.powerProfileChange = (ui->combo_powerProfileChange->currentIndex() == 0) ? "" : QString::number(ui->combo_powerProfileChange->currentIndex() - 1);
+    createdEvent.powerLevelChange = (ui->combo_powerLevelChange->currentIndex() == 0) ? "" : ui->combo_powerLevelChange->currentText();
 
-    createdEvent.fixedFanSpeedChange  = ui->spin_fixedFanSpeed->value();
+    createdEvent.fixedFanSpeedChange = ui->spin_fixedFanSpeed->value();
     createdEvent.fanComboIndex = ui->combo_fanChange->currentIndex();
 
     if (ui->combo_fanChange->currentIndex() > 1)
@@ -108,8 +113,8 @@ void Dialog_RPEvent::setEditedEvent(const RPEvent &rpe) {
     ui->edt_eventName->setText(rpe.name);
     ui->spin_tempActivate->setValue(rpe.activationTemperature);
     ui->edt_binary->setText(rpe.activationBinary);
-    ui->combo_dpmChange->setCurrentIndex(rpe.dpmProfileChange + 1);
-    ui->combo_powerLevelChange->setCurrentIndex(rpe.powerLevelChange + 1);
+    ui->combo_powerProfileChange->setCurrentIndex(rpe.powerProfileChange.isEmpty() ? 0 : rpe.powerProfileChange.toInt() + 1);
+    ui->combo_powerLevelChange->setCurrentText(rpe.powerLevelChange);
 
     if (rpe.fanComboIndex > 1)
         ui->combo_fanChange->setCurrentText(rpe.fanProfileNameChange);

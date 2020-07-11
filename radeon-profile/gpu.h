@@ -47,8 +47,8 @@ public:
     void getPowerCapAverage();
 
     void changeGpu(int index);
-    void setPowerProfile(PowerProfiles _newPowerProfile);
-    void setForcePowerLevel(ForcePowerLevels _newForcePowerLevel);
+    void setPowerProfile(const QString &newPowerProfile);
+    void setForcePowerLevel(const QString &newForcePowerLevel);
     void setPwmManualControl(bool manual);
     void setPwmValue(unsigned int value);
     void setOcTableValue(const QString &type, const QString &tableKey, int powerState, const FreqVoltPair powerStateValues);
@@ -71,7 +71,6 @@ public:
     int getCurrentPowerPlayTableId(const QString &file);
     void readOcTableAndRanges();
     void setOcTable(const QString &tableType, const FVTable &table);
-    void setPowerProfileMode(const QString &newPowerProfile);
 
 private slots:
     void handleGpuUsageResult() {

@@ -45,7 +45,7 @@
        <number>5</number>
       </property>
       <item row="0" column="2" colspan="2">
-       <widget class="QComboBox" name="combo_dpmChange">
+       <widget class="QComboBox" name="combo_powerProfileChange">
         <item>
          <property name="text">
           <string>No change</string>
@@ -98,7 +98,7 @@
       <item row="0" column="0" colspan="2">
        <widget class="QLabel" name="l_profile">
         <property name="text">
-         <string>Set DPM to:</string>
+         <string>Set power profile to:</string>
         </property>
        </widget>
       </item>

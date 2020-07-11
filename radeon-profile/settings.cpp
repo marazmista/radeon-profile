@@ -108,8 +108,8 @@ void radeon_profile::saveRpevents(QXmlStreamWriter &xml) {
         xml.writeAttribute("tiggerType", QString::number(rpe.type));
         xml.writeAttribute("activationBinary", rpe.activationBinary);
         xml.writeAttribute("activationTemperature", QString::number(rpe.activationTemperature));
-        xml.writeAttribute("dpmProfileChange", QString::number(rpe.dpmProfileChange));
-        xml.writeAttribute("powerLevelChange", QString::number(rpe.powerLevelChange));
+        xml.writeAttribute("powerProfileChange", rpe.powerProfileChange);
+        xml.writeAttribute("powerLevelChange", rpe.powerLevelChange);
         xml.writeAttribute("fixedFanSpeedChange", QString::number(rpe.fixedFanSpeedChange));
         xml.writeAttribute("fanProfileNameChange",rpe.fanProfileNameChange);
         xml.writeAttribute("fanComboIndex", QString::number(rpe.fanComboIndex));
@@ -397,8 +397,8 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     rpe.type = static_cast<RPEventType>(xml.attributes().value("tiggerType").toInt());
     rpe.activationBinary = xml.attributes().value("activationBinary").toString();
     rpe.activationTemperature = xml.attributes().value("activationTemperature").toInt();
-    rpe.dpmProfileChange = static_cast<PowerProfiles>(xml.attributes().value("dpmProfileChange").toInt());
-    rpe.powerLevelChange = static_cast<ForcePowerLevels>(xml.attributes().value("powerLevelChange").toInt());
+    rpe.powerProfileChange = xml.attributes().value("powerProfileChange").toString();
+    rpe.powerLevelChange = xml.attributes().value("powerLevelChange").toString();
     rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toInt();
     rpe.fanProfileNameChange = xml.attributes().value("fanProfileNameChange").toString();
     rpe.fanComboIndex = xml.attributes().value("fanComboIndex").toInt();
