@@ -271,6 +271,27 @@ void radeon_profile::addDpmButtons()
     group_Dpm.addButton(ui->btn_dpmPerformance, PowerProfiles::PERFORMANCE);
 }
 
+void radeon_profile::addPowerProfileModesButons(const PowerProfileModes &modes) {
+    for (const auto &ppm : modes) {
+        QToolButton *btn_mode = new QToolButton(this);
+
+        btn_mode->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+        btn_mode->setText(ppm.name);
+        btn_mode->setCheckable(true);
+        btn_mode->setChecked(ppm.isActive);
+
+        // TODO impement custom
+        if (ppm.name == "CUSTOM")
+            btn_mode->setVisible(false);
+
+        group_ppm.addButton(btn_mode, ppm.id);
+        ui->pageMode->layout()->addWidget(btn_mode);
+    }
+
+    ui->pageMode->layout()->addItem(new QSpacerItem(10, 40));
+}
+
 void radeon_profile::createFanProfileGraph()
 {
     chartView_fan = new QChartView(this);

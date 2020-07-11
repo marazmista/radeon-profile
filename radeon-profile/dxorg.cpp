@@ -313,10 +313,7 @@ GPUUsage dXorg::getGPUUsage() {
     return data;
 }
 
-PowerMethod dXorg::getPowerMethod() {
-    if (QFile::exists(driverFiles.sysFs.power_dpm_state))
-        return PowerMethod::DPM;
-
+PowerMethod dXorg::getPowerMethodFallback() {
     QString s = getValueFromSysFsFile(driverFiles.sysFs.power_method);
 
     if (s.contains("dpm",Qt::CaseInsensitive))
@@ -406,11 +403,12 @@ QString dXorg::getCurrentPowerProfile() {
         case PowerMethod::PROFILE:
             return getValueFromSysFsFile(driverFiles.sysFs.power_profile);
 
-        case PowerMethod::PM_UNKNOWN:
+        case PowerMethod::PP_MODE:
+            return getCurrentPowerProfileMode();
+
+        default:
             return "err";
     }
-
-    return "err";
 }
 
 QString dXorg::getCurrentPowerLevel() {
@@ -613,7 +611,19 @@ void dXorg::setupRegex(const QString &data) {
 }
 
 void dXorg::figureOutDriverFeatures() {
-    features.currentPowerMethod = getPowerMethod();
+    features.isDpmStateAvailable = !driverFiles.sysFs.power_dpm_state.isEmpty();
+
+    features.isPowerProfileModesAvailable = !driverFiles.sysFs.pp_power_profile_mode.isEmpty();
+    if (features.isPowerProfileModesAvailable)
+        features.ppModes = getPowerProfileModes();
+
+    features.currentPowerMethod = getPowerMethodFallback();
+
+    if (features.isDpmStateAvailable)
+        features.currentPowerMethod = PowerMethod::DPM;
+
+    if (features.isPowerProfileModesAvailable)
+        features.currentPowerMethod = PowerMethod::PP_MODE;
 
     if (getIoctlAvailability() && !initConfig.daemonData)
         features.clocksDataSource = ClocksDataSource::IOCTL;
@@ -630,37 +640,41 @@ void dXorg::figureOutDriverFeatures() {
             test = getFeaturesFallback();
     }
 
-    features.currentTemperatureSensor = getTemperatureSensor();
+    auto checkWritePermission = [](QString fileName) {
+        QFile f(fileName);
+        bool isWritePossible = false;
 
-    switch (features.currentPowerMethod) {
-        case PowerMethod::DPM:
-            qDebug() << "Power method: DPM";
-
-            if (initConfig.rootMode || radeon_profile::dcomm.isConnected())
-                features.isChangeProfileAvailable = true;
-            else {
-                QFile f(driverFiles.sysFs.power_dpm_state);
-                if (f.open(QIODevice::WriteOnly)) {
-                    features.isChangeProfileAvailable = true;
-                    f.close();
-                }
-            }
-
-            break;
-        case PowerMethod::PROFILE: {
-            qDebug() << "Power method: Profile";
-
-            QFile f(driverFiles.sysFs.power_profile);
-            if (f.open(QIODevice::WriteOnly)) {
-                features.isChangeProfileAvailable = true;
-                f.close();
-            }
+        if (f.open(QIODevice::WriteOnly)) {
+            isWritePossible = true;
+            f.close();
         }
-            break;
-        case PowerMethod::PM_UNKNOWN:
-            qDebug() << "Power method unknown";
-            break;
+
+        return isWritePossible;
+    };
+
+    if (initConfig.rootMode || radeon_profile::dcomm.isConnected())
+        features.isChangeProfileAvailable = true;
+    else {
+        switch (features.currentPowerMethod) {
+            case PowerMethod::DPM:
+                qDebug() << "Power method: DPM";
+                features.isChangeProfileAvailable = checkWritePermission(driverFiles.sysFs.power_dpm_state);
+                break;
+           case PowerMethod::PROFILE:
+                qDebug() << "Power method: Profile";
+                features.isChangeProfileAvailable = checkWritePermission(driverFiles.sysFs.power_profile);;
+                break;
+            case PowerMethod::PP_MODE:
+                qDebug() << "Power method: Power Profile Modes";
+                features.isChangeProfileAvailable = checkWritePermission(driverFiles.sysFs.pp_power_profile_mode);;
+                break;
+            default:
+                qDebug() << "Power method unknown";
+                break;
+        }
     }
+
+    features.currentTemperatureSensor = getTemperatureSensor();
 
     features.isFanControlAvailable = !driverFiles.hwmonAttributes.pwm1.isEmpty();
 
@@ -877,4 +891,32 @@ void dXorg::setOcTable(const QString &tableType, const FVTable &table) {
     }
 
     setNewValue(driverFiles.sysFs.pp_od_clk_voltage, ocTableValues);
+}
+
+PowerProfileModes dXorg::getPowerProfileModes() {
+    QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_power_profile_mode).split('\n');
+    PowerProfileModes ppModes;
+
+    for (auto &s : sl) {
+        if (!s[0].isNumber())
+            continue;
+
+        bool isActive = s.contains('*');
+        QStringList profileLine = s.split(' ');
+
+        ppModes.append(PPMode(profileLine[0].toUInt(), isActive, profileLine[1].remove("*:")));
+    }
+
+    return ppModes;
+}
+
+QString dXorg::getCurrentPowerProfileMode() {
+    QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_power_profile_mode).split("\n");
+
+    for (auto &s : sl) {
+        if (s.contains('*'))
+            return QString(s[0]);
+     }
+
+    return "-1";
 }

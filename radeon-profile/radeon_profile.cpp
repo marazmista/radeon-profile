@@ -151,6 +151,7 @@ void radeon_profile::connectSignals()
     connect(ui->spin_powerCap, SIGNAL(valueChanged(int)), this, SLOT(powerCapValueChange(int)));
     connect(ui->group_oc, SIGNAL(toggled(bool)), this, SLOT(percentOverclockToggled(bool)));
     connect(ui->group_freq, SIGNAL(toggled(bool)), this, SLOT(frequencyControlToggled(bool)));
+    connect(&group_ppm, SIGNAL(buttonClicked(int)), this, SLOT(setPowerProfileMode(int)));
 }
 
 void radeon_profile::setupDeviceDependantUiElements()
@@ -195,11 +196,16 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
         ui->stack_pm->setCurrentIndex(features.currentPowerMethod);
         ui->stack_pm->setEnabled(true);
 
-        if (Q_LIKELY(features.currentPowerMethod == PowerMethod::DPM)) {
+        if (features.currentPowerMethod == PowerMethod::DPM)
             addDpmButtons();
-            ui->combo_pLevel->setEnabled(true);
+        else if (features.currentPowerMethod == PowerMethod::PP_MODE)
+            addPowerProfileModesButons(features.ppModes);
+
+        if (features.currentPowerMethod != PowerMethod::PROFILE) {
             ui->combo_pLevel->addItems(globalStuff::createPowerLevelCombo(features.sysInfo.module));
-        }
+        } else
+            ui->combo_pLevel->setVisible(false);
+
     } else {
         ui->cb_eventsTracking->setEnabled(false);
         ui->cb_eventsTracking->setChecked(false);
@@ -392,6 +398,9 @@ void radeon_profile::refreshUI() {
             ui->btn_dpmBalanced->setChecked(true);
         else if (device.currentPowerProfile == dpm_performance)
             ui->btn_dpmPerformance->setChecked(true);
+    } else if (device.getDriverFeatures().currentPowerMethod == PowerMethod::PP_MODE) {
+        if (group_ppm.checkedId() != device.currentPowerProfile.toInt())
+            group_ppm.button(device.currentPowerProfile.toInt())->setChecked(true);
     }
 
     // do the math only when user looking at stats table

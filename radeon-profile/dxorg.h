@@ -73,6 +73,7 @@ public:
     QList<QTreeWidgetItem *> getModuleInfo();
     QString getCurrentPowerLevel();
     QString getCurrentPowerProfile();
+    QString getCurrentPowerProfileMode();
 
     int getPowerCapSelected() const;
     int getPowerCapAverage() const;
@@ -92,6 +93,7 @@ public:
     void setOcTable(const QString &tableType, const FVTable &table);
     InitializationConfig getInitConfig();
     void refreshPowerPlayTables();
+    PowerProfileModes getPowerProfileModes();
     
 private:
     QChar gpuSysIndex;
@@ -105,7 +107,7 @@ private:
 
     QString getClocksRawData();
     QString findSysfsHwmonForGPU();
-    PowerMethod getPowerMethod();
+    PowerMethod getPowerMethodFallback();
     TemperatureSensor getTemperatureSensor();
     QString findSysFsHwmonForGpu();
     bool getIoctlAvailability();
@@ -116,7 +118,7 @@ private:
     void sendSharedMemInfoToDaemon();
     QStringList loadPowerPlayTable(const QString &file);
     QString createDaemonSetCmd(const QString &file, const QString &tableIndex);
-        const std::tuple<QMap<QString, FVTable>, QMap<QString, OCRange>> parseOcTable();
+    const std::tuple<QMap<QString, FVTable>, QMap<QString, OCRange>> parseOcTable();
 };
 
 

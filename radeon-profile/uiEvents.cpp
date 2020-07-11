@@ -66,6 +66,10 @@ void radeon_profile::setPowerLevel(int level) {
                                                                                level + 3));
 }
 
+void radeon_profile::setPowerProfileMode(int mode) {
+    device.setPowerProfileMode(QString::number(mode));
+}
+
 void radeon_profile::changeEvent(QEvent *event)
 {
     if (!enableChangeEvent)

@@ -71,6 +71,7 @@ public:
     int getCurrentPowerPlayTableId(const QString &file);
     void readOcTableAndRanges();
     void setOcTable(const QString &tableType, const FVTable &table);
+    void setPowerProfileMode(const QString &newPowerProfile);
 
 private slots:
     void handleGpuUsageResult() {

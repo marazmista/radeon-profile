@@ -101,7 +101,8 @@ enum class DriverModule {
 enum PowerMethod {
     DPM = 0,  // kernel >= 3.11
     PROFILE = 1,  // kernel <3.11 or dpm disabled
-    PM_UNKNOWN = 2
+    PP_MODE = 2,
+    PM_UNKNOWN = 3
 };
 
 enum class TemperatureSensor {
@@ -184,11 +185,26 @@ struct OCRange {
     }
 };
 
+struct PPMode {
+    QString name;
+    unsigned id;
+    bool isActive;
+
+    PPMode() { }
+
+    PPMode(unsigned _id, bool _isActive, QString _name) {
+        id = _id;
+        name = _name;
+        isActive = _isActive;
+    }
+};
+
 typedef QMap<ValueID, RPValue> GPUDataContainer;
 typedef QMap<unsigned, FreqVoltPair> FVTable;
 typedef QMap<QString, FVTable> MapFVTables;
 typedef QMap<QString, OCRange> MapOCRanges;
 typedef QMap<int, unsigned int> FanProfileSteps;
+typedef QList<PPMode> PowerProfileModes;
 
 struct OCProfile {
     unsigned powerCap;
@@ -207,7 +223,9 @@ struct DriverFeatures {
     isDpmMemFreqTableAvailable = false,
     isPowerCapAvailable = false,
     isOcTableAvailable = false,
-    isVDDCCurveAvailable = false;
+    isVDDCCurveAvailable = false,
+    isDpmStateAvailable = false,
+    isPowerProfileModesAvailable = false;
 
     PowerMethod currentPowerMethod;
     ClocksDataSource clocksDataSource = ClocksDataSource::SOURCE_UNKNOWN;
@@ -220,6 +238,8 @@ struct DriverFeatures {
     // base on file pp_od_clk_voltage
     MapFVTables currentStatesTables;
     MapOCRanges ocRages;
+
+    PowerProfileModes ppModes;
 
     DriverFeatures() {
         currentPowerMethod = PowerMethod::PM_UNKNOWN;
@@ -258,7 +278,8 @@ struct DeviceSysFs {
     pp_dpm_sclk,
     pp_dpm_mclk,
     gpu_busy_percent,
-    pp_od_clk_voltage;
+    pp_od_clk_voltage,
+    pp_power_profile_mode;
 
     DeviceSysFs() { }
 
@@ -273,6 +294,7 @@ struct DeviceSysFs {
         pp_dpm_mclk = devicePath + "pp_dpm_mclk";
         gpu_busy_percent = devicePath + "gpu_busy_percent";
         pp_od_clk_voltage = devicePath + "pp_od_clk_voltage";
+        pp_power_profile_mode = devicePath + "pp_power_profile_mode";
 
         if (!checkFileCorrectness(power_method))
             power_method = "";
@@ -303,6 +325,9 @@ struct DeviceSysFs {
 
         if (!checkFileCorrectness(pp_od_clk_voltage))
             pp_od_clk_voltage = "";
+
+        if (!checkFileCorrectness(pp_power_profile_mode))
+            pp_power_profile_mode = "";
     }
 };
 

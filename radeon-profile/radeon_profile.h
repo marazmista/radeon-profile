@@ -157,6 +157,7 @@ private slots:
     void on_btn_connConfirmMethodInfo_clicked();
     void frequencyControlToggled(bool toogle);
     void applyFrequencyTables();
+    void setPowerProfileMode(int mode);
 
 private:
     struct CurrentStateInfo {
@@ -181,7 +182,7 @@ private:
     unsigned int counter_ticks, counter_statsTick;
     short hysteresisRelativeTepmerature;
     bool enableChangeEvent, rootMode;
-    QButtonGroup group_pwm, group_Dpm;
+    QButtonGroup group_pwm, group_Dpm, group_ppm;
     CurrentStateInfo *savedState;
     PlotManager plotManager;
     TopbarManager topbarManager;
@@ -272,6 +273,7 @@ private:
     void configureDaemonPreDeviceInit();
     void loadFrequencyStatesTables();
     void updateFrequencyStatesTables();
+    void addPowerProfileModesButons(const PowerProfileModes& modes);
 
 };
 
