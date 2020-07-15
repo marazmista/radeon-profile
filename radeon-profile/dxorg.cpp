@@ -567,6 +567,7 @@ void dXorg::figureOutDriverFeatures() {
     features.isPowerProfileModesAvailable = !driverFiles.sysFs.pp_power_profile_mode.isEmpty();
 
     features.currentPowerMethod = getPowerMethodFallback();
+    qDebug() << "Detected power method based on sysfs power_method file:" << features.currentPowerMethod;
 
     if (features.isDpmStateAvailable)
         features.currentPowerMethod = PowerMethod::DPM;
@@ -849,6 +850,8 @@ PowerProfiles dXorg::getPowerProfiles(const PowerMethod powerMethod) {
 
     switch (powerMethod) {
         case PowerMethod::DPM: {
+            qDebug() << "Power method: DPM. Creating profiles list";
+
             auto currentProfile = getCurrentPowerProfile();
 
             ppModes.append(PowerProfileDefinition(0, currentProfile == dpm_battery, dpm_battery));
@@ -858,6 +861,8 @@ PowerProfiles dXorg::getPowerProfiles(const PowerMethod powerMethod) {
             break;
 
         case PowerMethod::PROFILE: {
+            qDebug() << "Power method: Profile. Creating profiles list";
+
             auto currentProfile = getCurrentPowerProfile();
 
             ppModes.append(PowerProfileDefinition(0, currentProfile == profile_auto, profile_auto));
@@ -869,6 +874,8 @@ PowerProfiles dXorg::getPowerProfiles(const PowerMethod powerMethod) {
             break;
 
         case PowerMethod::PP_MODE: {
+            qDebug() << "Power method: Power Profile Modes. Creating profiles list";
+
             QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_power_profile_mode).split('\n');
 
             for (auto &s : sl) {
@@ -878,11 +885,12 @@ PowerProfiles dXorg::getPowerProfiles(const PowerMethod powerMethod) {
                 bool isActive = s.contains('*');
                 QStringList profileLine = s.split(' ');
 
-                ppModes.append(PowerProfileDefinition(profileLine[0].toUInt(), isActive, profileLine[1].remove("*:")));
+                ppModes.append(PowerProfileDefinition(profileLine[0].toUInt(), isActive, profileLine[1].remove("*").remove(':')));
             }
         }
             break;
         default:
+            qDebug() << "Unable to create power profiles list";
             break;
     }
 

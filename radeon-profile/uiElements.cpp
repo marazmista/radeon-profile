@@ -202,6 +202,8 @@ void radeon_profile::createPowerProfileControlButtons(const PowerProfiles &modes
         btn->setIconSize(QSize(32, 32));
     };
 
+    qDebug() << "Creating power profiles control buttons";
+
     for (const auto &ppm : modes) {
         QToolButton *btn_mode = new QToolButton(this);
 
