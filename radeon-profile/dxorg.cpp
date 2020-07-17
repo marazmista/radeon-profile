@@ -882,7 +882,7 @@ PowerProfiles dXorg::getPowerProfiles(const PowerMethod powerMethod) {
                 if (!sl[i].contains(":"))
                     continue;
 
-                QStringList profileLine = sl[i].split(" " , Qt::SkipEmptyParts);
+                QStringList profileLine = sl[i].split(" " , QString::SkipEmptyParts);
 
                 ppModes.append(PowerProfileDefinition(profileLine[0].toUInt(), sl[i].contains("*"), profileLine[1].remove("*").remove(':')));
             }
