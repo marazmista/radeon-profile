@@ -879,10 +879,12 @@ PowerProfiles dXorg::getPowerProfiles(const PowerMethod powerMethod) {
             QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_power_profile_mode).split('\n');
 
             for (int i = 1; i < sl.count(); ++i) {
-                bool isActive = sl[i].contains('*');
-                QStringList profileLine = sl[i].split(' ');
+                if (!sl[i].contains(":"))
+                    continue;
 
-                ppModes.append(PowerProfileDefinition(profileLine[0].toUInt(), isActive, profileLine[1].remove("*").remove(':')));
+                QStringList profileLine = sl[i].split(" " , Qt::SkipEmptyParts);
+
+                ppModes.append(PowerProfileDefinition(profileLine[0].toUInt(), sl[i].contains("*"), profileLine[1].remove("*").remove(':')));
             }
         }
             break;
