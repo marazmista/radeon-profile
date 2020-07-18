@@ -47,6 +47,15 @@ public:
     YAxis(ValueUnit u, QObject *parent = 0) : QValueAxis(parent) {
         unit = u;
     }
+
+    void setMinAboveZero(const int &value, const int &offset) {
+        this->setMin((value - offset < 0) ? 0 : value - offset);
+    }
+
+    void setRangeAboveZero(const int &value, const int &offset) {
+        this->setRange((value - offset < 0) ? 0 : value - offset,
+                       value + offset);
+    }
 };
 
 
@@ -123,10 +132,6 @@ public:
     }
 
     void rescale(YAxis *axis,  float value,  ValueUnit unit) {
-        // percent has const scale 0-100
-        if (unit == ValueUnit::PERCENT)
-            return;
-
         if (axis == nullptr)
             return;
 
@@ -134,6 +139,9 @@ public:
             switch (axis->unit) {
                 case ValueUnit::CELSIUS:
                     axis->setMax(value + 5);
+                    return;
+                case ValueUnit::PERCENT:
+                    axis->setMax(value + 10);
                     return;
                 case ValueUnit::MEGABYTE:
                     axis->setMax(value + 50);
@@ -147,13 +155,16 @@ public:
         if (axis->unit == unit && axis->min() > value) {
             switch (unit) {
                 case ValueUnit::CELSIUS:
-                    axis->setMin(value - 5);
+                    axis->setMinAboveZero(value, 5);
+                    return;
+                case ValueUnit::PERCENT:
+                    axis->setMinAboveZero(value, 10);
                     return;
                 case ValueUnit::MEGAHERTZ:
                 case ValueUnit::MEGABYTE:
                 case ValueUnit::RPM:
                 case ValueUnit::MILIVOLT:
-                    axis->setMin(value - 100);
+                    axis->setMinAboveZero(value, 100);
                     return;
                 default:
                     return;
@@ -190,21 +201,21 @@ public:
     void setInitialYRange(YAxis *axis, const int &intialValue) {
         switch (axis->unit) {
             case ValueUnit::PERCENT:
-                axis->setRange(0, 100);
+                axis->setRangeAboveZero(intialValue, 10);
                 return;
 
             case ValueUnit::CELSIUS:
-                axis->setRange(intialValue - 5, intialValue + 5);
+                axis->setRangeAboveZero(intialValue, 5);
                 return;
 
             case ValueUnit::MEGAHERTZ:
             case ValueUnit::MILIVOLT:
             case ValueUnit::RPM:
-                axis->setRange(intialValue - 100, intialValue + 200);
+                axis->setRangeAboveZero(intialValue, 100);
                 return;
 
             case ValueUnit::MEGABYTE:
-                axis->setRange(intialValue - 100, intialValue + 100);
+                axis->setRangeAboveZero(intialValue, 100);
                 return;
             default:
                 return;
