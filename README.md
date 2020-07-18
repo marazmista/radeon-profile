@@ -58,7 +58,6 @@ sudo add-apt-repository ppa:radeon-profile/radeon-profile
 * For stable ppa: 
 ```
 sudo add-apt-repository ppa:radeon-profile/stable
-/opt/Qt5.9.1/5.9.1
 ```
 * Then run commands:
 ```
