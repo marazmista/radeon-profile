@@ -61,7 +61,7 @@ sudo add-apt-repository ppa:radeon-profile/stable
 ```
 * Then run commands:
 ```
-sudo apt-get update
+sudo apt update
 sudo apt install radeon-profile
 ```
 
