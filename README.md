@@ -48,6 +48,7 @@ For Ubuntu 17.04, qt5-charts isn't available:
 # Distro install
 
 Available for Ubuntu from PPA [stable](https://launchpad.net/~radeon-profile/+archive/ubuntu/stable) and [git develop](https://launchpad.net/~radeon-profile/+archive/ubuntu/radeon-profile) repository
+
 Add in terminal commands:
 
 * For git ppa: 
