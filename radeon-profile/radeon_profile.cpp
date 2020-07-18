@@ -84,10 +84,9 @@ void radeon_profile::initializeDevice() {
 
     setupDeviceDependantUiElements();
     setupUiEnabledFeatures(device.getDriverFeatures(), device.gpuData);
-
     refreshUI();
-
     connectSignals();
+    createPlots();
 
     timer->start();
 }
@@ -182,10 +181,6 @@ void radeon_profile::setupUiElements()
     setupTrayIcon();
     addRuntmeWidgets();
     fillConnectors();
-    createPlots();
-
-    ui->widget_pmControls->setLayout(new QVBoxLayout(ui->widget_pmControls));
-    ui->widget_pmControls->layout()->setMargin(2);
 }
 
 
