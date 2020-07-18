@@ -218,10 +218,6 @@ void radeon_profile::createPowerProfileControlButtons(const PowerProfiles &modes
         if (ppm.name == dpm_performance)
             setButtonIcon(btn_mode, QIcon(":/icon/symbols/arrow3.png"));
 
-        // TODO impement custom
-        if (ppm.name == "CUSTOM")
-            btn_mode->setVisible(false);
-
         btn_mode->setText(ppm.name);
         btn_mode->setCheckable(true);
         btn_mode->setChecked(ppm.isActive);
