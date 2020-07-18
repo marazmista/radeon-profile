@@ -903,9 +903,9 @@ PowerProfiles dXorg::getPowerProfiles(const PowerMethod powerMethod) {
 QString dXorg::getCurrentPowerProfileMode() {
     QStringList sl = getValueFromSysFsFile(driverFiles.sysFs.pp_power_profile_mode).split("\n");
 
-    for (auto &s : sl) {
-        if (s.contains('*'))
-            return QString(s[0]);
+    for (int i = 1; i < sl.count(); ++i) {
+        if (sl[i].contains("*"))
+            return QString(sl[i].trimmed()[0]);
      }
 
     return "-1";
