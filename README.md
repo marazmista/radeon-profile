@@ -45,6 +45,26 @@ For Ubuntu 17.04, qt5-charts isn't available:
 /opt/Qt5.9.1/5.9.1
 ```
 
+# Distro install
+
+Available for Ubuntu from PPA [stable](https://launchpad.net/~radeon-profile/+archive/ubuntu/stable) and [git develop](https://launchpad.net/~radeon-profile/+archive/ubuntu/radeon-profile) repository
+
+Add in terminal commands:
+
+* For git ppa: 
+```
+sudo add-apt-repository ppa:radeon-profile/radeon-profile
+```
+* For stable ppa: 
+```
+sudo add-apt-repository ppa:radeon-profile/stable
+```
+* Then run commands:
+```
+sudo apt update
+sudo apt install radeon-profile
+```
+
 
 # Links
 
