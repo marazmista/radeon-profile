@@ -45,8 +45,8 @@ For Ubuntu 17.04, qt5-charts isn't available:
 /opt/Qt5.9.1/5.9.1
 ```
 
-# Distro install
-
+# Installation
+### Ubuntu 
 Available for Ubuntu from PPA [stable](https://launchpad.net/~radeon-profile/+archive/ubuntu/stable) and [git develop](https://launchpad.net/~radeon-profile/+archive/ubuntu/radeon-profile) repository
 
 Add in terminal commands:
@@ -64,13 +64,12 @@ sudo add-apt-repository ppa:radeon-profile/stable
 sudo apt update
 sudo apt install radeon-profile
 ```
-
-
+### Arch Linux
+* AUR package: https://aur.archlinux.org/packages/radeon-profile-git/
+* System daemon AUR package: https://aur.archlinux.org/packages/radeon-profile-daemon-git/
 # Links
 
-* AUR package: https://aur.archlinux.org/packages/radeon-profile-git/
 * System daemon: https://github.com/marazmista/radeon-profile-daemon
-* System daemon AUR package: https://aur.archlinux.org/packages/radeon-profile-daemon-git/
 * Sort of official thread: http://phoronix.com/forums/showthread.php?83602-radeon-profile-tool-for-changing-profiles-and-monitoring-some-GPU-parameters
 * Icon: http://proicons.deviantart.com/art/Graphics-Cards-Icons-H1-Pack-161178339
 
