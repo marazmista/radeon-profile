@@ -196,6 +196,7 @@ GPUClocks dXorg::getClocksFromPmFile() {
     }
 
     switch (features.currentPowerMethod) {
+        case PowerMethod::PP_MODE:
         case PowerMethod::DPM: {
             QRegExp rx;
 
@@ -264,7 +265,7 @@ GPUClocks dXorg::getClocksFromPmFile() {
             return clocksData;
         }
 
-        case PowerMethod::PM_UNKNOWN:
+        default:
             qWarning() << "Unknown power method, can't get clocks";
             return clocksData;
     }
