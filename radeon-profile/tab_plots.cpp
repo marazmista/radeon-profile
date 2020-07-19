@@ -6,8 +6,8 @@
 #include "dialogs/dialog_defineplot.h"
 
 void radeon_profile::createPlots() {
-    for (const QString &name : plotManager.schemas.keys())
-        setupPlot(plotManager.schemas.value(name));
+    for (int i = 0; i < plotManager.schemas.count(); ++ i)
+        setupPlot(plotManager.schemas.at(i));
 }
 
 void radeon_profile::on_btn_configurePlots_clicked()
@@ -19,13 +19,13 @@ void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
 {
     plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
 
-    for (const QString &pk : plotManager.plots.keys()) {
-        plotManager.plots[pk]->showLegend(ui->cb_showLegends->isChecked());
+    for (int i = 0; i < plotManager.plots.count(); ++i) {
+        plotManager.plots.at(i)->showLegend(ui->cb_showLegends->isChecked());
 
         if (ui->cb_overridePlotsBg->isChecked())
-            plotManager.setPlotBackground(pk, ui->frame_plotsBackground->palette().background().color());
+            plotManager.setPlotBackground(plotManager.plots.at(i), ui->frame_plotsBackground->palette().background().color());
         else
-            plotManager.setPlotBackground(pk, plotManager.schemas.value(pk).background);
+            plotManager.setPlotBackground(plotManager.plots.at(i), plotManager.schemas.at(i).background);
     }
 
     ui->stack_plots->setCurrentIndex(0);
@@ -57,7 +57,7 @@ void radeon_profile::on_btn_addPlotDefinition_clicked()
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
         item->setCheckState(0,Qt::Checked);
 
-        if (plotManager.schemas.contains(pds.name)) {
+        if (plotManager.checkIfSchemaExists(pds.name)) {
             if (!askConfirmation(tr("Question"), tr("Plot definition with that name already exists. Replace?"))) {
                 delete d;
                 delete item;
@@ -82,39 +82,39 @@ void radeon_profile::on_btn_removePlotDefinition_clicked()
     if (!askConfirmation("",tr("Remove selected plot definition?")))
         return;
 
-    plotManager.removeSchema(ui->list_plotDefinitions->currentItem()->text(0));
+    plotManager.removeSchema(ui->list_plotDefinitions->currentIndex().row());
     delete ui->list_plotDefinitions->currentItem();
 }
 
 void radeon_profile::setupPlot(const PlotDefinitionSchema &pds)
 {
-    plotManager.createPlotFromSchema(pds.name, figureOutInitialScale(pds));
-    plotManager.plots[pds.name]->showLegend(ui->cb_showLegends->isChecked());
+    RPPlot *plot = plotManager.createPlotFromSchema(pds, figureOutInitialScale(pds));
+    plot->showLegend(ui->cb_showLegends->isChecked());
 
     if (ui->cb_overridePlotsBg->isChecked())
-        plotManager.setPlotBackground(pds.name, ui->frame_plotsBackground->palette().background().color());
+        plotManager.setPlotBackground(plot, ui->frame_plotsBackground->palette().background().color());
 
-    ui->pagePlots->layout()->addWidget(plotManager.plots.value(pds.name));
+    ui->pagePlots->layout()->addWidget(plot);
 }
 
-void radeon_profile::modifyPlotSchema(const QString &name) {
-    PlotDefinitionSchema pds = plotManager.schemas[name];
+void radeon_profile::modifyPlotSchema(const int index) {
+    const PlotDefinitionSchema &editedPds = plotManager.schemas.at(index);
 
     Dialog_definePlot *d = new Dialog_definePlot(this);
     d->setAvailableGPUData(device.gpuData.keys());
-    d->setEditedPlotSchema(pds);
+    d->setEditedPlotSchema(editedPds);
 
     if (d->exec() == QDialog::Accepted) {
         PlotDefinitionSchema pds = d->getCreatedSchema();
 
-        if (pds.name != name) {
+        if (pds.name != editedPds.name) {
             QTreeWidgetItem *item = new QTreeWidgetItem();
             item->setText(0, pds.name);
             item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
             item->setCheckState(0,Qt::Checked);
             ui->list_plotDefinitions->addTopLevelItem(item);
         } else
-            plotManager.removePlot(pds.name);
+            plotManager.removeSchema(index);
 
         plotManager.addSchema(pds);
         setupPlot(pds);
@@ -128,25 +128,27 @@ void radeon_profile::on_btn_modifyPlotDefinition_clicked()
     if (ui->list_plotDefinitions->currentItem() == nullptr)
         return;
 
-    modifyPlotSchema(ui->list_plotDefinitions->currentItem()->text(0));
+    modifyPlotSchema(ui->list_plotDefinitions->currentIndex().row());
 }
 
 void radeon_profile::on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column);
-    modifyPlotSchema(item->text(0));
+    Q_UNUSED(item);
+    modifyPlotSchema(ui->list_plotDefinitions->currentIndex().row());
 }
 
 void radeon_profile::on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column);
+    Q_UNUSED(item);
 
     switch (item->checkState(0)) {
         case Qt::Unchecked:
-            plotManager.removePlot(item->text(0));
+            plotManager.removePlot(ui->list_plotDefinitions->currentIndex().row());
             return;
         case Qt::Checked:
-            setupPlot(plotManager.schemas.value(item->text(0)));
+            setupPlot(plotManager.schemas.at(ui->list_plotDefinitions->currentIndex().row()));
             return;
         default:
             return;

@@ -216,11 +216,11 @@ void radeon_profile::writePlotAxisSchemaToXml(QXmlStreamWriter &xml, const QStri
 void radeon_profile::savePlotSchemas(QXmlStreamWriter &xml) {
     xml.writeStartElement("Plots");
 
-    for (const QString &k : plotManager.schemas.keys()) {
-        const PlotDefinitionSchema &pds = plotManager.schemas.value(k);
+    for (int i = 0; i < plotManager.schemas.count(); ++i) {
+        const PlotDefinitionSchema &pds = plotManager.schemas.at(i);
 
         xml.writeStartElement("plot");
-        xml.writeAttribute("name", k);
+        xml.writeAttribute("name", pds.name);
         xml.writeAttribute("enabled", QString::number(pds.enabled));
         xml.writeAttribute("background", pds.background.name());
 

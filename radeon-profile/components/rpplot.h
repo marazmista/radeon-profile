@@ -81,7 +81,7 @@ public:
     YAxis *axisLeft = nullptr,  *axisRight = nullptr;
     QValueAxis timeAxis;
 
-    QMap<ValueID, DataSeries*> series;
+    QList<DataSeries*> series;
 
 
     explicit RPPlot() : QChartView() {
@@ -124,10 +124,10 @@ public:
     }
 
     void updatePlot(int timestamp, const GPUDataContainer &data) {
-        for (const ValueID &dsk : series.keys()) {
-            series[dsk]->append(timestamp, data.value(dsk).value);
-            rescale(axisLeft, data.value(dsk).value, globalStuff::getUnitFomValueId(series[dsk]->id));
-            rescale(axisRight, data.value(dsk).value, globalStuff::getUnitFomValueId(series[dsk]->id));
+        for (int i = 0; i < series.count(); ++i) {
+            series.at(i)->append(timestamp, data.value(series.at(i)->id).value);
+            rescale(axisLeft, data.value(series.at(i)->id).value, globalStuff::getUnitFomValueId(series.at(i)->id));
+            rescale(axisRight, data.value(series.at(i)->id).value, globalStuff::getUnitFomValueId(series.at(i)->id));
         }
     }
 
@@ -185,8 +185,8 @@ private:
     constexpr static int maxRange = 1800;
 
 public:
-    QMap<QString, RPPlot*> plots;
-    QMap<QString, PlotDefinitionSchema> schemas;
+    QList<RPPlot*> plots;
+    QList<PlotDefinitionSchema> schemas;
 
     PlotManager() { }
 
@@ -223,38 +223,48 @@ public:
     }
 
     void addSchema(const PlotDefinitionSchema &pds) {
-        schemas.insert(pds.name, pds);
+        schemas.append(pds);
     }
 
-    void removeSchema(const QString &name) {
-        if (plots.contains(name))
-            removePlot(name);
+    void removeSchema(const int index) {
+        for (int i = 0; i < plots.count(); ++i) {
+            if (plots.at(i)->name == schemas.at(index).name)
+                removePlot(i);
+        }
 
-        schemas.remove(name);
+        schemas.removeAt(index);
     }
 
-    void removePlot(const QString &name) {
-        RPPlot *rpp = plots.take(name);
-        delete rpp;
+    bool checkIfSchemaExists(const QString &name) {
+        for (int i = 0; i < schemas.count(); ++i) {
+            if (schemas.at(i).name == name)
+                return true;
+        }
+
+        return false;
+    }
+
+    void removePlot(const int index) {
+        auto p = plots.takeAt(index);
+        delete p;
     }
 
     void createAxis(RPPlot *plot, const PlotAxisSchema &pas, Qt::Alignment align) {
         plot->addAxis(align, pas.unit, pas.penGrid, pas.ticks);
 
         for (const ValueID &id : pas.dataList.keys()) {
-            if (addSeries(plot->name, id))
-                setLineColor(plot->name, id, pas.dataList.value(id));
+            int seriesId = addSeries(plot, id);
+            if (seriesId != -1)
+                setLineColor(plot, seriesId, pas.dataList.value(id));
         }
     }
 
-    void createPlotFromSchema(const QString &name, const PlotInitialValues &intialValues) {
-        const PlotDefinitionSchema &pds = schemas.value(name);
-
+    RPPlot* createPlotFromSchema(const PlotDefinitionSchema &pds, const PlotInitialValues &intialValues) {
         RPPlot *rpp = new  RPPlot();
         rpp->name = pds.name;
-        plots.insert(rpp->name, rpp);
+        plots.append(rpp);
 
-        setPlotBackground(rpp->name, pds.background);
+        setPlotBackground(rpp, pds.background);
 
         if (pds.left.enabled) {
             createAxis(rpp, pds.left, Qt::AlignLeft);
@@ -265,6 +275,8 @@ public:
             createAxis(rpp, pds.right, Qt::AlignRight);
             setInitialYRange(rpp->axisRight, intialValues.right);
         }
+
+        return rpp;
     }
 
     void createPlotsFromSchemas(const GPUDataContainer &referenceData) {
@@ -274,79 +286,73 @@ public:
         qDeleteAll(plots);
         plots.clear();
 
-        for (const QString &k : schemas.keys()) {
-            if (!schemas.value(k).enabled)
+        for (int i = 0; i < schemas.count(); ++i) {
+            if (!schemas.at(i).enabled)
                 continue;
 
             PlotInitialValues piv;
-            if (schemas.value(k).left.enabled)
-                piv.left = referenceData.value(schemas.value(k).left.dataList.keys().at(0)).value;
+            if (schemas.at(i).left.enabled)
+                piv.left = referenceData.value(schemas.at(i).left.dataList.keys().at(0)).value;
 
-            if (schemas.value(k).right.enabled)
-                piv.right = referenceData.value(schemas.value(k).right.dataList.keys().at(0)).value;
+            if (schemas.at(i).right.enabled)
+                piv.right = referenceData.value(schemas.at(i).right.dataList.keys().at(0)).value;
 
-            createPlotFromSchema(k, piv);
+            createPlotFromSchema(schemas.at(i), piv);
         }
-    }
-
-    void addPlot(const QString &name) {
-        RPPlot *rpp = new  RPPlot();
-        plots.insert(name,rpp);
     }
 
     QColor invertColor(const QColor &c) {
         return QColor::fromRgb(255 - c.red(), 255 - c.green(),255 - c.blue());
     }
 
-    void setPlotBackground(const QString &name, const QColor &color) {
-        plots[name]->timeAxis.setGridLineColor(invertColor(color));
-        plots[name]->plotArea.legend()->setLabelColor(invertColor(color));
-        plots[name]->plotArea.setBackgroundBrush(QBrush(color));
-        plots[name]->setBackgroundBrush(QBrush(color));
+    void setPlotBackground(RPPlot *plot, const QColor &color) {
+        plot->timeAxis.setGridLineColor(invertColor(color));
+        plot->plotArea.legend()->setLabelColor(invertColor(color));
+        plot->plotArea.setBackgroundBrush(QBrush(color));
+        plot->setBackgroundBrush(QBrush(color));
     }
 
-    void setLineColor(const QString &pn, ValueID id, const QColor &color) {
-        plots[pn]->series[id]->setColor(color);
+    void setLineColor(RPPlot *plot, const int index, const QColor &color) {
+        plot->series.at(index)->setColor(color);
     }
 
-    bool addSeries(const QString &name, ValueID id) {
+    int addSeries(RPPlot *plot, ValueID id) {
         ValueUnit tmpUnit = globalStuff::getUnitFomValueId(id);
-        RPPlot *p = plots[name];
+        DataSeries *ds = new DataSeries(id, plot);
 
-        DataSeries *ds = new DataSeries(id, p);
+        plot->plotArea.addSeries(ds);
 
-        p->plotArea.addSeries(ds);
-
-        ds->attachAxis(&p->timeAxis);
+        ds->attachAxis(&plot->timeAxis);
         ds->id = id;
 
-        if (p->axisLeft != nullptr && p->axisLeft->unit == tmpUnit)
-            ds->attachAxis(p->axisLeft);
-        else if (p->axisRight != nullptr && p->axisRight->unit == tmpUnit)
-            ds->attachAxis(p->axisRight);
+        if (plot->axisLeft != nullptr && plot->axisLeft->unit == tmpUnit)
+            ds->attachAxis(plot->axisLeft);
+        else if (plot->axisRight != nullptr && plot->axisRight->unit == tmpUnit)
+            ds->attachAxis(plot->axisRight);
         else {
             delete ds;
-            return false;
+            return -1;
         }
 
         ds->setUseOpenGL(true);
-        p->series.insert(id, ds);
-        return true;
+        plot->series.append(ds);
+
+        return plot->series.count() - 1;
     }
 
     void cleanupSeries() {
-        for (const QString &rppk : plots.keys()) {
-            for (ValueID &sk : plots.value(rppk)->series.keys()) {
-                if (plots[rppk]->series[sk]->count() > maxRange)
-                    plots[rppk]->series[sk]->remove(0);
+        for (int i = 0; i < plots.count(); ++i) {
+            for (int j = 0; i < plots.at(i)->series.count(); ++j) {
+                if (plots.at(i)->series.at(j)->count() > maxRange)
+                    plots.at(i)->series.at(j)->remove(0);
             }
         }
     }
 
     void updateSeries(int timestamp, const GPUDataContainer &data) {
-        for (const QString &rppk : plots.keys()) {
-            plots[rppk]->timeAxis.setRange(timestamp - timeRange, timestamp + rightGap);
-            plots[rppk]->updatePlot(timestamp, data);
+        for (int i = 0; i < plots.count(); ++i) {
+            plots.at(i)->timeAxis.setRange(timestamp - timeRange, timestamp + rightGap);
+            plots.at(i)->updatePlot(timestamp, data);
         }
 
         // cleaunp every 60 refreshes

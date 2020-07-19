@@ -227,7 +227,7 @@ private:
     void loadExecProfiles();
     void setupUiElements();
     void createPlots();
-    void modifyPlotSchema(const QString &name);
+    void modifyPlotSchema(const int index);
     void createCurrentGpuDataListItems();
     void fillConnectors();
     void fillModInfo();
