@@ -29,8 +29,9 @@ struct PlotAxisSchema {
 
 struct PlotDefinitionSchema {
     QString name;
-    bool enabled;
+    bool enabled, modified = false;
     QColor background;
+    RPPlot *plot = nullptr;
 
     PlotAxisSchema left, right;
 };
@@ -76,7 +77,6 @@ class RPPlot : public QChartView
     Q_OBJECT
 
 public:
-    QString name;
     QChart plotArea;
     YAxis *axisLeft = nullptr,  *axisRight = nullptr;
     QValueAxis timeAxis;
@@ -184,14 +184,19 @@ private:
 
     constexpr static int maxRange = 1800;
 
+    struct PlotsGeneralConfiguration {
+        bool graphOffset, showLegend, commonPlotsBackground;
+        QColor plotsBackground;
+    };
+
 public:
-    QList<RPPlot*> plots;
     QList<PlotDefinitionSchema> schemas;
+    PlotsGeneralConfiguration generalConfig;
 
     PlotManager() { }
 
-    void setRightGap(bool enabled) {
-        rightGap = (enabled) ? 10 : 0;
+    void setRightGap() {
+        rightGap = (generalConfig.graphOffset) ? 10 : 0;
     }
 
     void setTimeRange(int range) {
@@ -222,31 +227,38 @@ public:
         }
     }
 
+    static PlotInitialValues figureOutInitialScale(const PlotDefinitionSchema &pds, GPUDataContainer *gpuData) {
+        PlotInitialValues piv;
+        if (pds.left.enabled)
+            piv.left = gpuData->value(pds.left.dataList.keys().at(0)).value;
+
+        if (pds.right.enabled)
+            piv.right = gpuData->value(pds.right.dataList.keys().at(0)).value;
+
+        return piv;
+    }
+
+    int findSchemaIdByName(const QString &name) {
+        for (int i = 0; i < schemas.count(); ++i) {
+            if (schemas.at(i).name == name)
+                return i;
+        }
+
+        return -1;
+    }
+
     void addSchema(const PlotDefinitionSchema &pds) {
         schemas.append(pds);
     }
 
     void removeSchema(const int index) {
-        for (int i = 0; i < plots.count(); ++i) {
-            if (plots.at(i)->name == schemas.at(index).name)
-                removePlot(i);
-        }
-
+        removePlot(schemas[index]);
         schemas.removeAt(index);
     }
 
-    bool checkIfSchemaExists(const QString &name) {
-        for (int i = 0; i < schemas.count(); ++i) {
-            if (schemas.at(i).name == name)
-                return true;
-        }
-
-        return false;
-    }
-
-    void removePlot(const int index) {
-        auto p = plots.takeAt(index);
-        delete p;
+    void removePlot(PlotDefinitionSchema &pds) {
+        delete pds.plot;
+        pds.plot = nullptr;
     }
 
     void createAxis(RPPlot *plot, const PlotAxisSchema &pas, Qt::Alignment align) {
@@ -259,32 +271,28 @@ public:
         }
     }
 
-    RPPlot* createPlotFromSchema(const PlotDefinitionSchema &pds, const PlotInitialValues &intialValues) {
-        RPPlot *rpp = new  RPPlot();
-        rpp->name = pds.name;
-        plots.append(rpp);
+    void createPlotFromSchema(PlotDefinitionSchema &pds, const PlotInitialValues &intialValues) {
+        if (pds.plot != nullptr)
+            delete pds.plot;
 
-        setPlotBackground(rpp, pds.background);
+        pds.plot = new RPPlot();
+
+        setPlotBackground(pds.plot, pds.background);
 
         if (pds.left.enabled) {
-            createAxis(rpp, pds.left, Qt::AlignLeft);
-            setInitialYRange(rpp->axisLeft, intialValues.left);
+            createAxis(pds.plot , pds.left, Qt::AlignLeft);
+            setInitialYRange(pds.plot ->axisLeft, intialValues.left);
         }
 
         if (pds.right.enabled) {
-            createAxis(rpp, pds.right, Qt::AlignRight);
-            setInitialYRange(rpp->axisRight, intialValues.right);
+            createAxis(pds.plot , pds.right, Qt::AlignRight);
+            setInitialYRange(pds.plot ->axisRight, intialValues.right);
         }
-
-        return rpp;
     }
 
     void createPlotsFromSchemas(const GPUDataContainer &referenceData) {
         if (schemas.count() == 0)
             return;
-
-        qDeleteAll(plots);
-        plots.clear();
 
         for (int i = 0; i < schemas.count(); ++i) {
             if (!schemas.at(i).enabled)
@@ -297,7 +305,7 @@ public:
             if (schemas.at(i).right.enabled)
                 piv.right = referenceData.value(schemas.at(i).right.dataList.keys().at(0)).value;
 
-            createPlotFromSchema(schemas.at(i), piv);
+            createPlotFromSchema(schemas[i], piv);
         }
     }
 
@@ -341,18 +349,24 @@ public:
     }
 
     void cleanupSeries() {
-        for (int i = 0; i < plots.count(); ++i) {
-            for (int j = 0; i < plots.at(i)->series.count(); ++j) {
-                if (plots.at(i)->series.at(j)->count() > maxRange)
-                    plots.at(i)->series.at(j)->remove(0);
+        for (int i = 0; i < schemas.count(); ++i) {
+            if (schemas.at(i).plot == nullptr)
+                continue;
+
+            for (int j = 0; j < schemas.at(i).plot->series.count(); ++i) {
+                if (schemas.at(i).plot->series.at(j)->count() > maxRange)
+                    schemas.at(i).plot->series.at(j)->remove(0);
             }
         }
     }
 
     void updateSeries(int timestamp, const GPUDataContainer &data) {
-        for (int i = 0; i < plots.count(); ++i) {
-            plots.at(i)->timeAxis.setRange(timestamp - timeRange, timestamp + rightGap);
-            plots.at(i)->updatePlot(timestamp, data);
+        for (int i = 0; i < schemas.count(); ++i) {
+            if (schemas.at(i).plot == nullptr)
+                continue;
+
+            schemas.at(i).plot->timeAxis.setRange(timestamp - timeRange, timestamp + rightGap);
+            schemas.at(i).plot->updatePlot(timestamp, data);
         }
 
         // cleaunp every 60 refreshes

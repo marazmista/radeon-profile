@@ -118,18 +118,11 @@ private slots:
     void on_list_events_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_saveAll_clicked();
     void on_btn_configurePlots_clicked();
-    void on_btn_applySavePlotsDefinitons_clicked();
-    void on_btn_addPlotDefinition_clicked();
-    void on_btn_removePlotDefinition_clicked();
-    void on_btn_modifyPlotDefinition_clicked();
-    void on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, int column);
-    void on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_slider_timeRange_valueChanged(int value);
     void on_cb_daemonData_clicked(bool checked);
     void pauseRefresh(bool checked);
     void on_btn_general_clicked();
     void on_btn_configureTopbar_clicked();
-    void on_btn_setPlotsBackground_clicked();
     void createFanProfileListaAndGraph(const QString &profile);
     void on_list_coreStates_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_list_memStates_itemDoubleClicked(QTreeWidgetItem *item, int column);
@@ -227,7 +220,6 @@ private:
     void loadExecProfiles();
     void setupUiElements();
     void createPlots();
-    void modifyPlotSchema(const int index);
     void createCurrentGpuDataListItems();
     void fillConnectors();
     void fillModInfo();
@@ -236,9 +228,8 @@ private:
     void showWindow();
     void addFanStep (const unsigned int temperature, const unsigned int fanSpeed);
     QMenu* createGeneralMenu();
-    PlotInitialValues figureOutInitialScale(const PlotDefinitionSchema &pds);
     void applyOc();
-    void setupPlot(const PlotDefinitionSchema &pds);
+    void setupPlot(PlotDefinitionSchema &pds);
     QString createCurrentMinMaxString(const ValueID idCurrent, const ValueID idMin, const ValueID idMax);
     QString createCurrentMinMaxString(const QString &current, const QString &min,  const QString &max);
     void createFanProfileGraph();

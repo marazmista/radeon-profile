@@ -24,7 +24,7 @@ CONFIG(release, debug|release){
 }
 
 SOURCES += main.cpp\
-        radeon_profile.cpp \
+    radeon_profile.cpp \
     uiElements.cpp \
     uiEvents.cpp \
     gpu.cpp \
@@ -44,7 +44,9 @@ SOURCES += main.cpp\
     tab_fanControl.cpp \
     tab_exec.cpp \
     tab_overclock.cpp \
-    dialogs/dialog_sliders.cpp
+    dialogs/dialog_sliders.cpp \
+    dialogs/dialog_plotsconfiguration.cpp
+
 
 HEADERS  += radeon_profile.h \
     gpu.h \
@@ -62,11 +64,13 @@ HEADERS  += radeon_profile.h \
     dialogs/dialog_topbarcfg.h \
     dialogs/dialog_deinetopbaritem.h \
     dialogs/dialog_sliders.h \
+    dialogs/dialog_plotsconfiguration.h \
     components/slider.h
 
 FORMS    += radeon_profile.ui \
     components/pieprogressbar.ui \
     dialogs/dialog_defineplot.ui \
+    dialogs/dialog_plotsconfiguration.ui \
     dialogs/dialog_rpevent.ui \
     dialogs/dialog_topbarcfg.ui \
     dialogs/dialog_deinetopbaritem.ui \

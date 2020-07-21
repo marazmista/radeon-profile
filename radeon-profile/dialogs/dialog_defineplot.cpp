@@ -2,16 +2,13 @@
 #include "ui_dialog_defineplot.h"
 
 
-Dialog_definePlot::Dialog_definePlot(QWidget *parent) :
+Dialog_definePlot::Dialog_definePlot(const QList<ValueID> &gpu, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog_definePlot)
 {
     ui->setupUi(this);
     init();
 
-}
-
-void Dialog_definePlot::setAvailableGPUData(const QList<ValueID> &gpu) {
     availableGPUData = gpu;
 
     ui->list_leftData->addTopLevelItems(createList());

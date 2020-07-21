@@ -39,11 +39,11 @@ void radeon_profile::saveConfig() {
         settings.setValue("powerLevelStatistics", ui->cb_stats->isChecked());
         settings.setValue("aleternateRowColors",ui->cb_alternateRow->isChecked());
 
-        settings.setValue("graphOffset", ui->cb_plotsRightGap->isChecked());
-        settings.setValue("graphRange",ui->slider_timeRange->value());
-        settings.setValue("showLegend",ui->cb_showLegends->isChecked());
-        settings.setValue("plotsBackgroundColor", ui->frame_plotsBackground->palette().background().color().name());
-        settings.setValue("setCommonPlotsBg", ui->cb_overridePlotsBg->isChecked());
+        settings.setValue("graphOffset", plotManager.generalConfig.graphOffset);
+        settings.setValue("graphRange", ui->slider_timeRange->value());
+        settings.setValue("showLegend", plotManager.generalConfig.showLegend);
+        settings.setValue("plotsBackgroundColor", plotManager.generalConfig.plotsBackground);
+        settings.setValue("setCommonPlotsBg", plotManager.generalConfig.commonPlotsBackground);
         settings.setValue("daemonAutoRefresh",ui->cb_daemonAutoRefresh->isChecked());
         settings.setValue("fanSpeedSlider",ui->slider_fanSpeed->value());
         settings.setValue("saveSelectedFanMode",ui->cb_saveFanMode->isChecked());
@@ -276,9 +276,9 @@ void radeon_profile::loadConfig() {
     if (ui->cb_saveFanMode->isChecked())
         ui->stack_fanModes->setCurrentIndex(settings.value("fanMode",0).toInt());
 
-    ui->cb_plotsRightGap->setChecked(settings.value("graphOffset",true).toBool());
+    plotManager.generalConfig.graphOffset = settings.value("graphOffset",true).toBool();
     ui->slider_timeRange->setValue(settings.value("graphRange",600).toInt());
-    ui->cb_showLegends->setChecked(settings.value("showLegend",false).toBool());
+    plotManager.generalConfig.showLegend = settings.value("showLegend",false).toBool();
     ui->cb_execSysEnv->setChecked(settings.value("appendSysEnv",true).toBool());
     ui->cb_eventsTracking->setChecked(settings.value("eventsTracking", false).toBool());
 
@@ -294,11 +294,8 @@ void radeon_profile::loadConfig() {
     ui->combo_connConfirmMethod->setCurrentIndex(settings.value("connConfirmMethod", 1).toInt());
     ui->spin_hysteresis->setValue(settings.value("temperatureHysteresis", 0).toInt());
 
-    ui->frame_plotsBackground->setAutoFillBackground(true);
-    ui->frame_plotsBackground->setPalette(QPalette(QColor(settings.value("plotsBackgroundColor","#808080").toString())));
-    ui->cb_overridePlotsBg->setChecked(settings.value("setCommonPlotsBg", false).toBool());
-    ui->btn_setPlotsBackground->setEnabled(ui->cb_overridePlotsBg->isChecked());
-    ui->frame_plotsBackground->setVisible(ui->cb_overridePlotsBg->isChecked());
+    plotManager.generalConfig.plotsBackground = QColor(settings.value("plotsBackgroundColor","#808080").toString());
+    plotManager.generalConfig.commonPlotsBackground = settings.value("setCommonPlotsBg", false).toBool();
 
     refreshWhenHidden->setCheckable(true);
     refreshWhenHidden->setChecked(settings.value("refreshWhenHidden", true).toBool());
@@ -333,7 +330,7 @@ void radeon_profile::loadConfig() {
 
     on_cb_alternateRow_clicked(ui->cb_alternateRow->isChecked());
 
-    plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
+    plotManager.setRightGap();
     hideEventControls(true);
 
     const auto auxFilePath = loadedFromLegacy ? legacyAuxStuffPath : auxStuffPath;
@@ -382,12 +379,7 @@ void radeon_profile::loadConfig() {
     if (fanProfiles.count() == 0)
         createDefaultFanProfile();
 
-    // create plots from xml config
-    if (plotManager.schemas.count() == 0)
-        ui->stack_plots->setCurrentIndex(1);
-
     topbarManager.setDefaultForeground(QWidget::palette().foreground().color());
-
 }
 
 void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
@@ -451,11 +443,6 @@ void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
     }
 
     plotManager.addSchema(pds);
-
-    QTreeWidgetItem *item = new QTreeWidgetItem();
-    item->setText(0, pds.name);
-    item->setCheckState(0,(pds.enabled) ? Qt::Checked : Qt::Unchecked);
-    ui->list_plotDefinitions->addTopLevelItem(item);
 }
 
 void radeon_profile::loadTopbarItemsSchemas(const QXmlStreamReader &xml) {

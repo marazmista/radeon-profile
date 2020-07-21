@@ -4,166 +4,70 @@
 #include "radeon_profile.h"
 #include "ui_radeon_profile.h"
 #include "dialogs/dialog_defineplot.h"
+#include "dialogs/dialog_plotsconfiguration.h"
 
 void radeon_profile::createPlots() {
-    for (int i = 0; i < plotManager.schemas.count(); ++ i)
-        setupPlot(plotManager.schemas.at(i));
+    ui->widget_plots->setLayout(new QVBoxLayout(ui->widget_plots));
+    ui->widget_plots->layout()->setMargin(0);
+    ui->widget_plots->layout()->setSpacing(2);
+
+    for (int i = 0; i < plotManager.schemas.count(); ++ i) {
+        if (plotManager.schemas.at(i).enabled)
+            setupPlot(plotManager.schemas[i]);
+    }
 }
 
 void radeon_profile::on_btn_configurePlots_clicked()
 {
-    ui->stack_plots->setCurrentIndex(1);
-}
-
-void radeon_profile::on_btn_applySavePlotsDefinitons_clicked()
-{
-    plotManager.setRightGap(ui->cb_plotsRightGap->isChecked());
-
-    for (int i = 0; i < plotManager.plots.count(); ++i) {
-        plotManager.plots.at(i)->showLegend(ui->cb_showLegends->isChecked());
-
-        if (ui->cb_overridePlotsBg->isChecked())
-            plotManager.setPlotBackground(plotManager.plots.at(i), ui->frame_plotsBackground->palette().background().color());
-        else
-            plotManager.setPlotBackground(plotManager.plots.at(i), plotManager.schemas.at(i).background);
-    }
-
-    ui->stack_plots->setCurrentIndex(0);
-    saveConfig();
-}
-
-PlotInitialValues radeon_profile::figureOutInitialScale(const PlotDefinitionSchema &pds)
-{
-    PlotInitialValues piv;
-    if (pds.left.enabled)
-        piv.left = device.gpuData.value(pds.left.dataList.keys().at(0)).value;
-
-    if (pds.right.enabled)
-        piv.right = device.gpuData.value(pds.right.dataList.keys().at(0)).value;
-
-    return piv;
-}
-
-void radeon_profile::on_btn_addPlotDefinition_clicked()
-{
-    Dialog_definePlot *d = new Dialog_definePlot(this);
-    d->setAvailableGPUData(device.gpuData.keys());
+    Dialog_plotsConfiguration *d = new Dialog_plotsConfiguration(&plotManager, &device.gpuData, this);
 
     if (d->exec() == QDialog::Accepted) {
-        const PlotDefinitionSchema pds = d->getCreatedSchema();
+        plotManager.setRightGap();
 
-        QTreeWidgetItem *item = new QTreeWidgetItem();
-        item->setText(0, pds.name);
-        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        item->setCheckState(0,Qt::Checked);
+        for (int i = 0; i < plotManager.schemas.count(); ++i) {
+            if (plotManager.schemas.at(i).plot == nullptr) {
+                if (plotManager.schemas.at(i).enabled) {
+                    setupPlot(plotManager.schemas[i]);
+                    plotManager.schemas[i].plot->showLegend(plotManager.generalConfig.showLegend);
 
-        if (plotManager.checkIfSchemaExists(pds.name)) {
-            if (!askConfirmation(tr("Question"), tr("Plot definition with that name already exists. Replace?"))) {
-                delete d;
-                delete item;
-                return;
+                    if (plotManager.generalConfig.commonPlotsBackground)
+                        plotManager.setPlotBackground(plotManager.schemas[i].plot, plotManager.generalConfig.plotsBackground);
+                }
+
+                continue;
             }
-        } else
-            ui->list_plotDefinitions->addTopLevelItem(item);
 
+            plotManager.schemas[i].plot->showLegend(plotManager.generalConfig.showLegend);
+            if (plotManager.generalConfig.commonPlotsBackground)
+                plotManager.setPlotBackground(plotManager.schemas[i].plot, plotManager.generalConfig.plotsBackground);
 
-        plotManager.addSchema(pds);
-        setupPlot(pds);
+            if (!plotManager.schemas.at(i).enabled) {
+                plotManager.removePlot(plotManager.schemas[i]);
+                continue;
+            }
+
+            if (plotManager.schemas.at(i).modified) {
+                plotManager.removePlot(plotManager.schemas[i]);
+                setupPlot(plotManager.schemas[i]);
+                plotManager.schemas[i].modified = false;
+                continue;
+            }
+        }
+
+        saveConfig();
     }
+
 
     delete d;
 }
 
-void radeon_profile::on_btn_removePlotDefinition_clicked()
+void radeon_profile::setupPlot(PlotDefinitionSchema &pds)
 {
-    if (!ui->list_plotDefinitions->currentItem())
-        return;
+    plotManager.createPlotFromSchema(pds, PlotManager::figureOutInitialScale(pds, &device.gpuData));
+    pds.plot->showLegend(plotManager.generalConfig.showLegend);
 
-    if (!askConfirmation("",tr("Remove selected plot definition?")))
-        return;
+    if (plotManager.generalConfig.commonPlotsBackground)
+        plotManager.setPlotBackground(pds.plot, plotManager.generalConfig.plotsBackground);
 
-    plotManager.removeSchema(ui->list_plotDefinitions->currentIndex().row());
-    delete ui->list_plotDefinitions->currentItem();
-}
-
-void radeon_profile::setupPlot(const PlotDefinitionSchema &pds)
-{
-    RPPlot *plot = plotManager.createPlotFromSchema(pds, figureOutInitialScale(pds));
-    plot->showLegend(ui->cb_showLegends->isChecked());
-
-    if (ui->cb_overridePlotsBg->isChecked())
-        plotManager.setPlotBackground(plot, ui->frame_plotsBackground->palette().background().color());
-
-    ui->pagePlots->layout()->addWidget(plot);
-}
-
-void radeon_profile::modifyPlotSchema(const int index) {
-    const PlotDefinitionSchema &editedPds = plotManager.schemas.at(index);
-
-    Dialog_definePlot *d = new Dialog_definePlot(this);
-    d->setAvailableGPUData(device.gpuData.keys());
-    d->setEditedPlotSchema(editedPds);
-
-    if (d->exec() == QDialog::Accepted) {
-        PlotDefinitionSchema pds = d->getCreatedSchema();
-
-        if (pds.name != editedPds.name) {
-            QTreeWidgetItem *item = new QTreeWidgetItem();
-            item->setText(0, pds.name);
-            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-            item->setCheckState(0,Qt::Checked);
-            ui->list_plotDefinitions->addTopLevelItem(item);
-        } else
-            plotManager.removeSchema(index);
-
-        plotManager.addSchema(pds);
-        setupPlot(pds);
-    }
-
-    delete d;
-}
-
-void radeon_profile::on_btn_modifyPlotDefinition_clicked()
-{
-    if (ui->list_plotDefinitions->currentItem() == nullptr)
-        return;
-
-    modifyPlotSchema(ui->list_plotDefinitions->currentIndex().row());
-}
-
-void radeon_profile::on_list_plotDefinitions_itemDoubleClicked(QTreeWidgetItem *item, int column)
-{
-    Q_UNUSED(column);
-    Q_UNUSED(item);
-    modifyPlotSchema(ui->list_plotDefinitions->currentIndex().row());
-}
-
-void radeon_profile::on_list_plotDefinitions_itemChanged(QTreeWidgetItem *item, int column)
-{
-    Q_UNUSED(column);
-    Q_UNUSED(item);
-
-    switch (item->checkState(0)) {
-        case Qt::Unchecked:
-            plotManager.removePlot(ui->list_plotDefinitions->currentIndex().row());
-            return;
-        case Qt::Checked:
-            setupPlot(plotManager.schemas.at(ui->list_plotDefinitions->currentIndex().row()));
-            return;
-        default:
-            return;
-    }
-}
-
-QColor getColor(const QColor &c) {
-    QColor color = QColorDialog::getColor(c);
-    if (color.isValid())
-        return color;
-
-    return c;
-}
-
-void radeon_profile::on_btn_setPlotsBackground_clicked()
-{
-    ui->frame_plotsBackground->setPalette(QPalette(getColor(ui->frame_plotsBackground->palette().background().color())));
+    ui->widget_plots->layout()->addWidget(pds.plot);
 }

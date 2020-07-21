@@ -14,11 +14,10 @@ class Dialog_definePlot : public QDialog
     Q_OBJECT
 
 public:
-    explicit Dialog_definePlot(QWidget *parent = 0);
+    explicit Dialog_definePlot(const QList<ValueID> &gpu, QWidget *parent = 0);
 
     PlotDefinitionSchema getCreatedSchema();
     void setEditedPlotSchema(const PlotDefinitionSchema &pds);
-    void setAvailableGPUData(const QList<ValueID> &gpu);
 
     ~Dialog_definePlot();
 
