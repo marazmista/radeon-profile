@@ -98,6 +98,7 @@ void Dialog_plotsConfiguration::modifyPlotSchema(const int index) {
             item->setCheckState(0,Qt::Checked);
             ui->list_plotDefinitions->addTopLevelItem(item);
 
+            pds.plot = nullptr;
             plotManager->addSchema(pds);
 
         } else {
