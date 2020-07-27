@@ -550,9 +550,6 @@ void radeon_profile::restoreFanState() {
 }
 
 void radeon_profile::refreshGraphs() {
-    if (ui->tw_main->currentIndex() != 1)
-        return;
-
     plotManager.updateSeries(++counter_ticks, device.gpuData);
 }
 
