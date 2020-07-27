@@ -353,7 +353,7 @@ public:
             if (schemas.at(i).plot == nullptr)
                 continue;
 
-            for (int j = 0; j < schemas.at(i).plot->series.count(); ++i) {
+            for (int j = 0; j < schemas.at(i).plot->series.count(); ++j) {
                 if (schemas.at(i).plot->series.at(j)->count() > maxRange)
                     schemas.at(i).plot->series.at(j)->remove(0);
             }
