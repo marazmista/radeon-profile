@@ -141,7 +141,7 @@ public:
                     axis->setMax(value + 5);
                     return;
                 case ValueUnit::PERCENT:
-                    axis->setMax(value + 10);
+                    axis->setMax((value + 10 > 100) ? 100 : value + 10);
                     return;
                 case ValueUnit::MEGABYTE:
                     axis->setMax(value + 50);
