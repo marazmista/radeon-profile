@@ -202,6 +202,16 @@ void radeon_profile::createPowerProfileControlButtons(const PowerProfiles &modes
         btn->setIconSize(QSize(32, 32));
     };
 
+    if (ui->widget_pmControls->layout() != NULL) {
+        QLayoutItem* item;
+        while ((item = ui->widget_pmControls->layout()->takeAt(0)) != NULL) {
+            delete item->widget();
+            delete item;
+        }
+
+        delete ui->widget_pmControls->layout();
+    }
+
     ui->widget_pmControls->setLayout(new QVBoxLayout(ui->widget_pmControls));
     ui->widget_pmControls->layout()->setMargin(2);
 
