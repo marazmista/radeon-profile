@@ -31,6 +31,7 @@ public:
 
     char currentGpuIndex;
     QString currentPowerProfile, currentPowerLevel;
+    bool pwmEnabled = false;
 
     QList<QTreeWidgetItem *> getCardConnectors() const;
     QStringList getGLXInfo(QString gpuName) const;
