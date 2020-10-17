@@ -35,6 +35,8 @@ qmake
 make 
 ```
 
+The resulting binary is `./target/radeon-profile`
+
 For Ubuntu 17.04, qt5-charts isn't available:
 * Use `qtchooser -l` to list available profiles
 * Use `qmake -qt=[profile from qtchooser]` to specify Qt root or download and install a Qt bundle from https://www.qt.io/download-open-source/#section-2
