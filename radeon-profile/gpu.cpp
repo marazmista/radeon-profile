@@ -265,6 +265,17 @@ void gpu::setForcePowerLevel(const QString &newForcePowerLevel) {
 }
 
 void gpu::setPwmValue(unsigned int value) {
+    // If the PC is sent to sleep (or hibernate) it can happen that PWM is
+    // disabled (by the OS..?) and that we have to re-enable it, if needed,
+    // after returning from sleep
+    static QFile pwmEnableFile(getDriverFiles().hwmonAttributes.pwm1_enable);
+    if (Q_UNLIKELY(pwmEnableFile.open(QFile::ReadOnly)
+                   && !pwmEnableFile.read(1).contains(pwm_manual)))
+    {
+        setPwmManualControl(true);
+    }
+    pwmEnableFile.close();
+
     value = getGpuConstParams().pwmMaxSpeed * value / 100;
     driverHandler->setNewValue(getDriverFiles().hwmonAttributes.pwm1, QString::number(value));
 }
