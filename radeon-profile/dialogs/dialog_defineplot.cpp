@@ -13,6 +13,7 @@ Dialog_definePlot::Dialog_definePlot(const QList<ValueID> &gpu, QWidget *parent)
 
     ui->list_leftData->addTopLevelItems(createList());
     ui->list_rightData->addTopLevelItems(createList());
+    ui->cb_enableLeftScale->click();
 }
 
 void Dialog_definePlot::setEditedPlotSchema(const PlotDefinitionSchema &pds) {
