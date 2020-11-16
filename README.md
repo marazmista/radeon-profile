@@ -14,7 +14,7 @@ Install and run radeon-profile-daemon (https://github.com/marazmista/radeon-prof
 
 # Dependencies
 
-* Qt 5.6<= (qt5-base and qt5-charts) (On Debian/Ubuntu: `qt5-default libqt5charts5-dev`)
+* Qt 5.6<= (qt5-base and qt5-charts) (On Debian/Ubuntu: `libqt5charts5-dev`)
 * libxrandr
 * libdrm (for amdgpu, 2.4.79<=, more recent, the better)
 * recent kernel (for amdgpu 4.12<=, more recent, the better)
