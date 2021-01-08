@@ -69,6 +69,12 @@ sudo apt install radeon-profile
 ### Arch Linux
 * AUR package: https://aur.archlinux.org/packages/radeon-profile-git/
 * System daemon AUR package: https://aur.archlinux.org/packages/radeon-profile-daemon-git/
+
+### Fedora
+Available in official Fedora [repository](https://src.fedoraproject.org/rpms/radeon-profile).
+```
+sudo dnf install radeon-profile
+```
 # Links
 
 * System daemon: https://github.com/marazmista/radeon-profile-daemon
