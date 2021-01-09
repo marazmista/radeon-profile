@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 2021 Artem Polishchuk <ego.cordatus@gmail.com> -->
+<component type="desktop-application">
+    <id>radeon-profile.desktop</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-2.0-or-later</project_license>
+    <content_rating type="oars-1.0">
+    </content_rating>
+    <name>Radeon profile</name>
+    <summary>
+        Application to read current clocks of ATi Radeon cards
+    </summary>
+    <description>
+        <p>Simple application to read current clocks of ATi Radeon cards
+        (xf86-video-ati, xf86-video-amdgpu).</p>
+
+        <p>Functionality:</p>
+
+        <p>- Monitoring of basic GPU parameters (frequencies, voltages, usage,
+             temperature, fan speed)</p>
+        <p>- DPM profiles and power levels</p>
+        <p>- Fan control (HD 7000+), definition of multiple custom curves or
+             fixed speed</p>
+        <p>- Overclocking (amdgpu) (Wattman, Overdrive, PowerPlay etc)</p>
+        <p>- Per app profiles/Event definitions (i.e. change fan profile when
+             temp above defined or set DPM to high when selected binary executed)</p>
+        <p>- Define binaries to run with set of environment variablees (i.e.
+             GALLIUM_HUD, MESA, LIBGL etc)</p>
+    </description>
+    <screenshots>
+        <screenshot type="default">
+            <image>https://i.imgur.com/Z880p47.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://i.imgur.com/ooVckZP.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://i.imgur.com/Qq7vS9O.png</image>
+        </screenshot>
+    </screenshots>
+    <keywords>
+        <keyword>amd</keyword>
+        <keyword>amdgpu</keyword>
+        <keyword>gpu</keyword>
+        <keyword>overclock</keyword>
+        <keyword>radeon</keyword>
+        <keyword>videocard</keyword>
+        <keyword>wattman</keyword>
+    </keywords>
+    <url type="homepage">https://github.com/marazmista/radeon-profile</url>
+    <url type="bugtracker">https://github.com/marazmista/radeon-profile/issues</url>
+    <url type="translate">https://github.com/marazmista/radeon-profile/tree/master/radeon-profile/translations</url>
+    <url type="contact">http://phoronix.com/forums/showthread.php?83602-radeon-profile-tool-for-changing-profiles-and-monitoring-some-GPU-parameters</url>
+    <provides>
+        <binary>radeon-profile</binary>
+    </provides>
+</component>
