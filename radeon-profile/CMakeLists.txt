@@ -14,6 +14,8 @@ find_package(Qt5 REQUIRED COMPONENTS
 
 find_package(X11 REQUIRED)
 
+find_library(LIBDRM drm REQUIRED)
+
 add_executable(${PROJECT_NAME}
     main.cpp
     radeon_profile.cpp
@@ -78,6 +80,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt5::Charts
     X11::X11
     X11::Xrandr
+    ${LIBDRM}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
