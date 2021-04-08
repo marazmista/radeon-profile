@@ -18,6 +18,8 @@
 *.pro.user.*
 *.qbs.user
 *.qbs.user.*
+*.txt.user
+*.txt.user.*
 *.moc
 moc_*.cpp
 qrc_*.cpp
