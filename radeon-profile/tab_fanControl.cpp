@@ -210,7 +210,7 @@ void radeon_profile::fanProfileMenuActionClicked(QAction *a) {
 
 void radeon_profile::on_btn_fanInfo_clicked()
 {
-    QMessageBox::information(this,tr("Fan control information"), tr("Don't overheat your card! Be careful! Don't use this if you don't know what you're doing! \n\nHovewer, it looks like your card won't apply too low values due its internal protection. \n\nClosing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned!"));
+    QMessageBox::information(this,tr("Fan control information"), tr("Don't overheat your card! Be careful! Don't use this if you don't know what you're doing! \n\nHowever, it looks like your card won't apply too low values due its internal protection. \n\nClosing application will restore fan control to Auto. If application crashes, last fan value will remain, so you have been warned!"));
 }
 
 void radeon_profile::on_btn_addFanStep_clicked()
