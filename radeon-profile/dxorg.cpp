@@ -61,7 +61,7 @@ QString getValueFromSysFsFile(QString fileName) {
     QString value("-1");
 
     if (f.open(QIODevice::ReadOnly))
-        value = QString(f.readAll()).trimmed();
+        value = QString(f.readAll().replace('\0', "")).trimmed();
 
     f.close();
     return value;
