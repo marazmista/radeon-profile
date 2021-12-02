@@ -45,6 +45,9 @@ void Dialog_topbarCfg::on_btn_cancel_clicked()
 
 void Dialog_topbarCfg::on_btn_moveLeft_clicked()
 {
+    if (ui->listWidget->currentRow() <= 0)
+        return;
+
     int a = ui->listWidget->currentRow() == ui->listWidget->count() - 1 ? 0 : 1;
 
     schemas.insert(ui->listWidget->currentRow() - 1, schemas.takeAt(ui->listWidget->currentRow()));
@@ -54,6 +57,10 @@ void Dialog_topbarCfg::on_btn_moveLeft_clicked()
 
 void Dialog_topbarCfg::on_btn_moveRight_clicked()
 {
+    if ((ui->listWidget->currentRow() == -1) ||
+        (ui->listWidget->currentRow() == ui->listWidget->count() - 1))
+        return;
+
     schemas.insert(ui->listWidget->currentRow() + 1, schemas.takeAt(ui->listWidget->currentRow()));
     ui->listWidget->insertItem(ui->listWidget->currentRow() + 1, ui->listWidget->takeItem(ui->listWidget->currentRow()));
     ui->listWidget->setCurrentRow(ui->listWidget->currentRow() + 1);
