@@ -204,7 +204,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
     ui->tw_systemInfo->setTabEnabled(3,data.contains(ValueID::CLK_CORE));
 
-    if (!device.gpuData.contains(ValueID::CLK_CORE) && !data.contains(ValueID::TEMPERATURE_CURRENT) && !device.gpuData.contains(ValueID::VOLT_CORE))
+    if (!device.gpuData.contains(ValueID::CLK_CORE) && !features.tempSensors.empty() && !device.gpuData.contains(ValueID::VOLT_CORE))
         ui->tw_main->setTabEnabled(1,false);
 
     ui->group_cfgDaemon->setEnabled(dcomm.isConnected());
@@ -359,10 +359,12 @@ void radeon_profile::refreshUI() {
     // GPU data list
     if (ui->tw_main->currentIndex() == 0) {
         for (int i = 0; i < ui->list_currentGPUData->topLevelItemCount(); ++i) {
-            switch (keysInCurrentGpuList.value(i)) {
+            const ValueID key = keysInCurrentGpuList.value(i);
+            switch (key.type) {
                 case ValueID::TEMPERATURE_CURRENT:
-                    ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(ValueID::TEMPERATURE_CURRENT, ValueID::TEMPERATURE_MIN, ValueID::TEMPERATURE_MAX));
+                    ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(key, key.asType(ValueID::TEMPERATURE_MIN), key.asType(ValueID::TEMPERATURE_MAX)));
                     continue;
+
                 case ValueID::POWER_CAP_SELECTED:
                     ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(device.gpuData.value(ValueID::POWER_CAP_SELECTED).strValue,
                                                                                                    QString::number(device.getGpuConstParams().power1_cap_min),
@@ -413,9 +415,8 @@ void radeon_profile::refreshUI() {
 void radeon_profile::createCurrentGpuDataListItems()
 {
     ui->list_currentGPUData->clear();
-    for (int i = 0; i < device.gpuData.keys().count(); ++i) {
-
-        switch (device.gpuData.keys().at(i)) {
+    for (const auto key : device.gpuData.keys()) {
+        switch (key.type) {
 
             // ignored values
             case ValueID::TEMPERATURE_BEFORE_CURRENT:
@@ -424,8 +425,8 @@ void radeon_profile::createCurrentGpuDataListItems()
                 continue;
 
             default:
-                addTreeWidgetItem(ui->list_currentGPUData, globalStuff::getNameOfValueID(device.gpuData.keys().at(i)), "");
-                keysInCurrentGpuList.append(device.gpuData.keys().at(i));
+                addTreeWidgetItem(ui->list_currentGPUData, globalStuff::getNameOfValueID(key), "");
+                keysInCurrentGpuList.append(key);
         }
     }
 }
