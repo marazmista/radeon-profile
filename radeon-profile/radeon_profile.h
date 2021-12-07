@@ -173,6 +173,7 @@ private:
     QList<TopbarItem*> topBarItems;
     QList<ValueID> keysInCurrentGpuList;
     QString enabledFrequencyStatesCore, enabledFrequencyStatesMem;
+    CheckInfoStruct eventData;
 
     Ui::radeon_profile *ui;
     void setupTrayIcon();
