@@ -341,7 +341,9 @@ void radeon_profile::refreshGpuData() {
 }
 
 void radeon_profile::addTreeWidgetItem(QTreeWidget * parent, const QString &leftColumn, const QString  &rightColumn) {
-    parent->addTopLevelItem(new QTreeWidgetItem(QStringList() << leftColumn << rightColumn));
+    QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << leftColumn << rightColumn);
+    item->setForeground(2, Qt::darkGray);
+    parent->addTopLevelItem(item);
 }
 
 QString radeon_profile::createCurrentMinMaxString(const QString &current, const QString &min,  const QString &max) {
@@ -361,9 +363,27 @@ void radeon_profile::refreshUI() {
         for (int i = 0; i < ui->list_currentGPUData->topLevelItemCount(); ++i) {
             const ValueID key = keysInCurrentGpuList.value(i);
             switch (key.type) {
-                case ValueID::TEMPERATURE_CURRENT:
-                    ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(key, key.asType(ValueID::TEMPERATURE_MIN), key.asType(ValueID::TEMPERATURE_MAX)));
+                case ValueID::TEMPERATURE_CURRENT: {
+                    auto *listItem = ui->list_currentGPUData->topLevelItem(i);
+                    listItem->setText(1, createCurrentMinMaxString(key,
+                        key.asType(ValueID::TEMPERATURE_MIN),
+                        key.asType(ValueID::TEMPERATURE_MAX)));
+
+                    QStringList limits;
+                    const int crit = device.getGpuConstParams().temp_crit[key.instance];
+                    const int emergency = device.getGpuConstParams().temp_emergency[key.instance];
+                    if (crit != -1) {
+                        limits.push_back(QObject::tr("critical:"));
+                        limits.push_back(RPValue(ValueUnit::CELSIUS, crit).strValue.rightJustified(6, ' '));
+                    }
+                    if (emergency != -1) {
+                        limits.push_back(QObject::tr("emergency:"));
+                        limits.push_back(RPValue(ValueUnit::CELSIUS, emergency).strValue.rightJustified(6, ' '));
+                    }
+                    listItem->setText(2, limits.join(" "));
+
                     continue;
+                }
 
                 case ValueID::POWER_CAP_SELECTED:
                     ui->list_currentGPUData->topLevelItem(i)->setText(1, createCurrentMinMaxString(device.gpuData.value(ValueID::POWER_CAP_SELECTED).strValue,
