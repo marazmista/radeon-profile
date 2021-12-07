@@ -60,28 +60,27 @@ void Dialog_deineTopbarItem::createCombo(QComboBox *combo, const TopbarItemType 
     switch (type) {
         case TopbarItemType::LABEL_PAIR:
         case TopbarItemType::LARGE_LABEL:
-            for (int i = 0; i < availableGpuData->count(); ++i) {
-                if (availableGpuData->at(i) == ValueID::TEMPERATURE_BEFORE_CURRENT)
+            for (const ValueID id : *availableGpuData) {
+                if (id == ValueID::TEMPERATURE_BEFORE_CURRENT)
                     continue;
 
-                combo->addItem(globalStuff::getNameOfValueID(availableGpuData->at(i)), QVariant::fromValue(availableGpuData->at(i)));
+                combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
             }
             break;
 
         case TopbarItemType::PIE:
-            for (int i = 0; i < availableGpuData->count(); ++i) {
-                if (globalStuff::getUnitFomValueId(availableGpuData->at(i)) == ValueUnit::PERCENT)
-                    combo->addItem(globalStuff::getNameOfValueID(availableGpuData->at(i)), QVariant::fromValue(availableGpuData->at(i)));
+            for (const ValueID id : *availableGpuData) {
+                if (globalStuff::getUnitFomValueId(id) == ValueUnit::PERCENT)
+                    combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
 
-                if (availableGpuData->at(i) == ValueID::CLK_CORE && gpuParams->maxCoreClock != -1)
-                    combo->addItem(globalStuff::getNameOfValueID(ValueID::CLK_CORE), QVariant::fromValue(ValueID::CLK_CORE));
+                if (id == ValueID::CLK_CORE && gpuParams->maxCoreClock != -1)
+                    combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
 
-                if (availableGpuData->at(i) == ValueID::CLK_MEM && gpuParams->maxMemClock != -1)
-                    combo->addItem(globalStuff::getNameOfValueID(ValueID::CLK_MEM), QVariant::fromValue(ValueID::CLK_MEM));
+                if (id == ValueID::CLK_MEM && gpuParams->maxMemClock != -1)
+                    combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
 
-                if (availableGpuData->at(i) == ValueID::TEMPERATURE_CURRENT && gpuParams->temp_crit[0] != -1)
-                    combo->addItem(globalStuff::getNameOfValueID(ValueID::TEMPERATURE_CURRENT), QVariant::fromValue(ValueID::TEMPERATURE_CURRENT));
-
+                if (id == ValueID::TEMPERATURE_CURRENT)
+                    combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
             }
             break;
     }
