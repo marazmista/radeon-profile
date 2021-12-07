@@ -79,7 +79,7 @@ void Dialog_deineTopbarItem::createCombo(QComboBox *combo, const TopbarItemType 
                 if (availableGpuData->at(i) == ValueID::CLK_MEM && gpuParams->maxMemClock != -1)
                     combo->addItem(globalStuff::getNameOfValueID(ValueID::CLK_MEM), QVariant::fromValue(ValueID::CLK_MEM));
 
-                if (availableGpuData->at(i) == ValueID::TEMPERATURE_CURRENT && gpuParams->temp1_crit != -1)
+                if (availableGpuData->at(i) == ValueID::TEMPERATURE_CURRENT && gpuParams->temp_crit[0] != -1)
                     combo->addItem(globalStuff::getNameOfValueID(ValueID::TEMPERATURE_CURRENT), QVariant::fromValue(ValueID::TEMPERATURE_CURRENT));
 
             }

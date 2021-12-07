@@ -66,7 +66,7 @@ public:
     GPUClocks getClocksFromIoctl();
     GPUClocks getClocks();
 
-    float getTemperature();
+    float getTemperature(int sensor_id=0);
     GPUUsage getGPUUsage();
     GPUFanSpeed getFanSpeed();
 
@@ -106,7 +106,7 @@ private:
     ioctlHandler *ioctlHnd;
 
     QString getClocksRawData();
-    QString findSysfsHwmonForGPU();
+    HwmonTempSensor findSysfsHwmonForGPU();
     PowerMethod getPowerMethodFallback();
     TemperatureSensor getTemperatureSensor();
     QString findSysFsHwmonForGpu();
