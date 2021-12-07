@@ -151,6 +151,17 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="1">
+       <widget class="QComboBox" name="combo_sensorInstance">
+       </widget>
+     </item>
+     <item row="3" column="0">
+       <widget class="QLabel" name="label_sensorInstance">
+           <property name="text">
+             <string>Temperature Sensor</string>
+           </property>
+       </widget>
+     </item>
     </layout>
    </item>
    <item row="1" column="0" colspan="3">

@@ -19,6 +19,11 @@ Dialog_RPEvent::Dialog_RPEvent(QWidget *parent) :
 }
 
 void Dialog_RPEvent::setFeatures(const GPUDataContainer &gpuData, const DriverFeatures &features, const QList<QString> &profiles) {
+    for (const ValueID::Instance instance : features.tempSensors) {
+        const ValueID id(ValueID::TEMPERATURE_CURRENT, instance);
+        ui->combo_sensorInstance->addItem(globalStuff::getNameOfValueID(id), QVariant(instance));
+    }
+
     switch (features.currentPowerMethod) {
         case PowerMethod::DPM:
             ui->combo_powerLevelChange->addItems(globalStuff::createPowerLevelCombo(features.sysInfo.module));
@@ -72,6 +77,7 @@ void Dialog_RPEvent::on_btn_save_clicked()
     switch (ui->combo_eventTrigger->currentIndex()) {
         case 0:
             createdEvent.type = RPEventType::TEMPERATURE;
+            createdEvent.sensorInstance = ui->combo_sensorInstance->currentData().value<ValueID::Instance>();
             break;
         case 1:
             createdEvent.type = RPEventType::BINARY;
@@ -109,6 +115,7 @@ void Dialog_RPEvent::setEditedEvent(const RPEvent &rpe) {
     createdEvent = rpe;
 
     ui->combo_eventTrigger->setCurrentIndex(rpe.type);
+    ui->combo_sensorInstance->setCurrentIndex(ui->combo_sensorInstance->findData(rpe.sensorInstance));
     ui->cb_enabled->setChecked(rpe.enabled);
     ui->edt_eventName->setText(rpe.name);
     ui->spin_tempActivate->setValue(rpe.activationTemperature);
@@ -127,6 +134,12 @@ void Dialog_RPEvent::setEditedEvent(const RPEvent &rpe) {
 void Dialog_RPEvent::on_combo_fanChange_currentIndexChanged(int index)
 {
     ui->spin_fixedFanSpeed->setVisible(index == 2);
+}
+
+void Dialog_RPEvent::on_combo_eventTrigger_currentIndexChanged(int index)
+{
+    ui->combo_sensorInstance->setVisible(index == 0);
+    ui->label_sensorInstance->setVisible(index == 0);
 }
 
 void Dialog_RPEvent::on_btn_setBinary_clicked()
