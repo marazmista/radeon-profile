@@ -464,7 +464,7 @@ struct HwmonTempSensor {
     HwmonTempSensor(const QString& hwmonPath, int index)
         : HwmonTempSensor(buildPath(hwmonPath, index, "input"),
                           buildPath(hwmonPath, index, "crit"),
-                          buildPath(hwmonPath, index, "emergecy"),
+                          buildPath(hwmonPath, index, "emergency"),
                           buildPath(hwmonPath, index, "label"))
     {
     }
