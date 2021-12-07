@@ -207,7 +207,7 @@ void radeon_profile::writePlotAxisSchemaToXml(QXmlStreamWriter &xml, const QStri
     for (const ValueID &sk : pas.dataList.keys()) {
         xml.writeStartElement("serie");
         xml.writeAttribute("align", side);
-        xml.writeAttribute("id", QString::number(sk));
+        xml.writeAttribute("id", QString::number(sk.key()));
         xml.writeAttribute("color", pas.dataList.value(sk).name());
         xml.writeEndElement();
     }
@@ -240,10 +240,10 @@ void radeon_profile::saveTopbarItemsSchemas(QXmlStreamWriter &xml) {
         xml.writeStartElement("topbarItem");
 
         xml.writeAttribute("type", QString::number(tis.type));
-        xml.writeAttribute("primaryValueId", QString::number(tis.primaryValueId));
+        xml.writeAttribute("primaryValueId", QString::number(tis.primaryValueId.key()));
         xml.writeAttribute("primaryColor", tis.primaryColor.name());
         xml.writeAttribute("secondaryValueIdEnabled", QString::number(tis.secondaryValueIdEnabled));
-        xml.writeAttribute("secondaryValueId", QString::number(tis.secondaryValueId));
+        xml.writeAttribute("secondaryValueId", QString::number(tis.secondaryValueId.key()));
         xml.writeAttribute("secondaryColor", tis.secondaryColor.name());
         xml.writeAttribute("pieMaxValue", QString::number(tis.pieMaxValue));
 
@@ -431,9 +431,9 @@ void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
 
         if (xml.name().toString() == "serie") {
             if (xml.attributes().value("align").toString() == "left")
-                pds.left.dataList.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+                pds.left.dataList.insert(ValueID::fromKey(xml.attributes().value("id").toULong()), QColor(xml.attributes().value("color").toString()));
             else if (xml.attributes().value("align").toString() == "right")
-                pds.right.dataList.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+                pds.right.dataList.insert(ValueID::fromKey(xml.attributes().value("id").toULong()), QColor(xml.attributes().value("color").toString()));
 
         }
 
@@ -446,7 +446,7 @@ void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
 }
 
 void radeon_profile::loadTopbarItemsSchemas(const QXmlStreamReader &xml) {
-    TopbarItemDefinitionSchema tis(static_cast<ValueID>(xml.attributes().value("primaryValueId").toInt()),
+    TopbarItemDefinitionSchema tis(ValueID::fromKey(xml.attributes().value("primaryValueId").toULong()),
                                    static_cast<TopbarItemType>(xml.attributes().value("type").toInt()),
                                    QColor(xml.attributes().value("primaryColor").toString()));
 
@@ -454,7 +454,7 @@ void radeon_profile::loadTopbarItemsSchemas(const QXmlStreamReader &xml) {
 
     if (xml.attributes().value("secondaryValueIdEnabled").toInt() == 1) {
         tis.setSecondaryColor(QColor(xml.attributes().value("secondaryColor").toString()));
-        tis.setSecondaryValueId(static_cast<ValueID>(xml.attributes().value("secondaryValueId").toInt()));
+        tis.setSecondaryValueId(ValueID::fromKey(xml.attributes().value("secondaryValueId").toULong()));
     }
 
     topbarManager.addSchema(tis);
