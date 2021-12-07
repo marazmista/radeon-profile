@@ -5,6 +5,7 @@
 #ifndef PUBLICSTUFF_H
 #define PUBLICSTUFF_H
 
+#include <cstdint>
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QStringList>
@@ -48,25 +49,123 @@
 
 static QString MOCK_PATH("/home/marazmista/aasd/testfies/");
 
-enum ValueID {
-    CLK_CORE,
-    CLK_MEM,
-    VOLT_CORE,
-    VOLT_MEM,
-    CLK_UVD,
-    DCLK_UVD,
-    TEMPERATURE_CURRENT,
-    TEMPERATURE_BEFORE_CURRENT,
-    TEMPERATURE_MIN,
-    TEMPERATURE_MAX,
-    GPU_USAGE_PERCENT,
-    GPU_VRAM_USAGE_PERCENT,
-    GPU_VRAM_USAGE_MB,
-    FAN_SPEED_PERCENT,
-    FAN_SPEED_RPM,
-    POWER_LEVEL,
-    POWER_CAP_SELECTED,
-    POWER_CAP_AVERAGE
+
+
+/** Value keys for gpu::gpuData
+ *
+ * Each value stored, updated and provided by the gpu class can be referred to
+ * by a unique ValueID.
+ *
+ * The key is split into two components:
+ * type: the type of value provided by the gpu driver as defined in Type
+ * instance: If hardware provides multiple values of the same type, they are
+ *           differenciated by the instance component of the ValueID.
+ *           For example, a GPU with multiple temp sensors will have mulitple
+ *           instances of the Type::TEPERATURE_* values for each sensor.
+ */
+struct ValueID {
+
+    enum Type : std::uint16_t {
+        CLK_CORE,
+        CLK_MEM,
+        VOLT_CORE,
+        VOLT_MEM,
+        CLK_UVD,
+        DCLK_UVD,
+        TEMPERATURE_CURRENT,
+        TEMPERATURE_BEFORE_CURRENT,
+        TEMPERATURE_MIN,
+        TEMPERATURE_MAX,
+        GPU_USAGE_PERCENT,
+        GPU_VRAM_USAGE_PERCENT,
+        GPU_VRAM_USAGE_MB,
+        FAN_SPEED_PERCENT,
+        FAN_SPEED_RPM,
+        POWER_LEVEL,
+        POWER_CAP_SELECTED,
+        POWER_CAP_AVERAGE
+    };
+
+    // instances are not defined in an enum, as we may have instances
+    // of unknown type that need their own unique id.
+    // Known instances are defined as constexpr constants instead.
+    // Unknown instance types start at INSTANCE_UNKNOWN, i.e. have the most
+    // significant bit set.
+    typedef std::uint16_t Instance;
+
+    static constexpr Instance T_EDGE     = 0;
+    static constexpr Instance T_JUNCTION = 1;
+    static constexpr Instance T_MEM      = 2;
+
+    static constexpr Instance INSTANCE_UNKNOWN = 1 << 15;
+
+    // 64-bit key is split into three sections:
+    // type: the type of data as defined in TYPE above
+    // subtype:
+    Type type;
+    Instance instance = 0;
+
+    ValueID() = default;
+
+    ValueID(const ValueID&) = default;
+
+    ValueID(Type v_type, Instance v_instance = 0)
+        : type(v_type), instance(v_instance)
+    {
+    }
+
+    operator Type() const
+    {
+        return type;
+    }
+
+    // returns a unique representation of a key as a 32-bit integer.
+    // this key is used to uniquely refer to a valueID in config files.
+    // This key is different from orderKey() to preserve backwards compatibilty
+    // with previous config files: a ValueID of instance=0 maps to
+    // the same int value as a type only id did.
+    std::uint32_t key() const
+    {
+        return type + (std::uint32_t(instance) << 16);
+    }
+
+    // compare by combined key (i.e. all values)
+    bool operator==(const ValueID& rhs) const
+    {
+        return key() == rhs.key();
+    }
+
+    // compare to Type only
+    bool operator==(const ValueID::Type& rhs) const
+    {
+        return type == rhs;
+    }
+
+    // for ordering via comparison operator, flip the two components
+    // in the key. This keeps values of the same type adjecent.
+    std::uint32_t orderKey() const
+    {
+        return instance + (std::uint32_t(type) << 16);
+    }
+
+    // comparison operators: ordering in containers, to be usable in containers
+    bool operator<(const ValueID& rhs) const
+    {
+        return orderKey() < rhs.orderKey();
+    }
+
+    // get ValueID of the same instance as a different type
+    ValueID asType(const Type& as_type) const
+    {
+        return ValueID(as_type, instance);
+    }
+
+
+    // create ValueID from 32-bit key
+    static ValueID fromKey(std::uint32_t key)
+    {
+       return ValueID(Type(key & 0xFFFF), key >> 16);
+    }
 };
 
 enum ValueUnit {
@@ -81,6 +180,7 @@ enum ValueUnit {
 };
 
 Q_DECLARE_METATYPE(ValueID)
+Q_DECLARE_METATYPE(ValueID::Type)
 Q_DECLARE_METATYPE(ValueUnit)
 
 enum class ClocksDataSource {

@@ -166,7 +166,7 @@ void Dialog_deineTopbarItem::on_combo_primaryData_currentIndexChanged(int index)
     ui->combo_secondaryData->clear();
     ui->combo_secondaryData->addItem("");
 
-    switch (static_cast<ValueID>(ui->combo_primaryData->currentData().toInt())) {
+    switch (ui->combo_primaryData->currentData().value<ValueID>()) {
         case ValueID::FAN_SPEED_PERCENT:
             if (availableGpuData->contains(ValueID::FAN_SPEED_RPM))
                 ui->combo_secondaryData->addItem(globalStuff::getNameOfValueID(ValueID::FAN_SPEED_RPM), QVariant::fromValue(ValueID::FAN_SPEED_RPM));
@@ -191,16 +191,16 @@ void Dialog_deineTopbarItem::on_btn_cancel_clicked()
 
 void Dialog_deineTopbarItem::on_btn_save_clicked()
 {
-    editedSchema = TopbarItemDefinitionSchema(static_cast<ValueID>(ui->combo_primaryData->currentData().toInt()),
+    editedSchema = TopbarItemDefinitionSchema(ui->combo_primaryData->currentData().value<ValueID>(),
                                               getItemType(), ui->frame_primaryColor->palette().background().color());
 
     if (!ui->combo_secondaryData->currentText().isEmpty() && ui->combo_secondaryData->isEnabled()) {
-        editedSchema.setSecondaryValueId(static_cast<ValueID>(ui->combo_secondaryData->currentData().toInt()));
+        editedSchema.setSecondaryValueId(ui->combo_secondaryData->currentData().value<ValueID>());
         editedSchema.setSecondaryColor(ui->frame_secondaryColor->palette().background().color());
     }
 
     if (ui->radio_pie->isChecked()) {
-        switch (static_cast<ValueID>(ui->combo_primaryData->currentData().toInt())) {
+        switch (ui->combo_primaryData->currentData().value<ValueID>()) {
             case ValueID::CLK_CORE:
                 editedSchema.pieMaxValue = gpuParams->maxCoreClock;
                 break;
