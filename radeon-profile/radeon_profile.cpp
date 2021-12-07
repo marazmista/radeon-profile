@@ -460,8 +460,10 @@ void radeon_profile::updateExecLogs() {
                     device.gpuData.value(ValueID::CLK_UVD).strValue + ";"+
                     device.gpuData.value(ValueID::DCLK_UVD).strValue + ";"+
                     device.gpuData.value(ValueID::VOLT_CORE).strValue + ";"+
-                    device.gpuData.value(ValueID::VOLT_MEM).strValue + ";"+
-                    device.gpuData.value(ValueID::TEMPERATURE_CURRENT).strValue;
+                    device.gpuData.value(ValueID::VOLT_MEM).strValue + ";";
+            for (const ValueID::Instance instance : device.getDriverFeatures().tempSensors) {
+                logData += device.gpuData.value(ValueID(ValueID::TEMPERATURE_CURRENT, instance)).strValue;
+            }
             execsRunning.at(i)->appendToLog(logData);
         }
     }
