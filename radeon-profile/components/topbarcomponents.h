@@ -263,8 +263,23 @@ public:
             addSchema(tis);
         }
 
-        if (availableData.contains(ValueID::TEMPERATURE_CURRENT)) {
-            TopbarItemDefinitionSchema tis(ValueID::TEMPERATURE_CURRENT, TopbarItemType::LARGE_LABEL, defaultForeground);
+        const ValueID t_edge = ValueID(ValueID::TEMPERATURE_CURRENT, ValueID::T_EDGE);
+        if (availableData.contains(t_edge)) {
+            TopbarItemDefinitionSchema tis(t_edge, TopbarItemType::LARGE_LABEL, defaultForeground);
+            addSchema(tis);
+        }
+
+        const ValueID t_junction = ValueID(ValueID::TEMPERATURE_CURRENT, ValueID::T_JUNCTION);
+        const ValueID t_mem = ValueID(ValueID::TEMPERATURE_CURRENT, ValueID::T_MEM);
+        if (availableData.contains(t_junction)) {
+            TopbarItemDefinitionSchema tis(t_junction, TopbarItemType::LABEL_PAIR, defaultForeground);
+            if (availableData.contains(t_mem)) {
+                tis.setSecondaryValueId(t_mem);
+                tis.setSecondaryColor(defaultForeground);
+            }
+            addSchema(tis);
+        } else if (availableData.contains(t_mem)) {
+            TopbarItemDefinitionSchema tis(t_mem, TopbarItemType::LABEL_PAIR, defaultForeground);
             addSchema(tis);
         }
 
