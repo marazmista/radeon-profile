@@ -232,6 +232,12 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
 
         createFanProfilesMenu();
 
+        for (const ValueID::Instance instance : device.getDriverFeatures().tempSensors) {
+            const ValueID id(ValueID::TEMPERATURE_CURRENT, instance);
+            ui->combo_fanProfile_sensorInstance->addItem(
+                globalStuff::getNameOfValueID(id), QVariant(instance));
+        }
+
         if (ui->cb_saveFanMode->isChecked()) {
             switch (ui->stack_fanModes->currentIndex()) {
                 case 1:
@@ -518,47 +524,51 @@ void radeon_profile::mainTimerEvent() {
 }
 
 void radeon_profile::adjustFanSpeed() {
-    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value == device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value)
+    const auto current = device.gpuData.value(
+        ValueID(ValueID::TEMPERATURE_CURRENT, currentFanProfile.sensor)).value;
+    const auto before = device.gpuData.value(
+        ValueID(ValueID::TEMPERATURE_BEFORE_CURRENT, currentFanProfile.sensor)).value;
+    if (current == before)
         return;
 
-    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value < device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value &&
-            currentFanProfile.hysteresis > (hysteresisRelativeTepmerature - device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value))
+    if ((current < before) &&
+        (currentFanProfile.hysteresis > (hysteresisRelativeTepmerature - current)))
         return;
 
-    hysteresisRelativeTepmerature = device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value;
+    hysteresisRelativeTepmerature = current;
 
     // exact match
     const auto &steps = currentFanProfile.steps;
-    if (steps.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {
-        device.setPwmValue(steps.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));
+    if (steps.contains(current)) {
+        device.setPwmValue(steps.value(current));
         return;
     }
 
     // below first step
-    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value <= steps.firstKey()) {
+    if (current <= steps.firstKey()) {
         device.setPwmValue(steps.first());
         return;
     }
 
     // above last setep
-    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value >= steps.lastKey()) {
+    if (current >= steps.lastKey()) {
         device.setPwmValue(steps.last());
         return;
     }
 
     // find bounds of current temperature
-    auto high = steps.upperBound(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
-    auto low = (steps.size() > 1 ? high - 1 : high);
+    const auto high = steps.upperBound(current);
+    const auto low = (steps.size() > 1 ? high - 1 : high);
 
-    int hSpeed = high.value(),
-            lSpeed = low.value();
+    const int hSpeed = high.value();
+    const int lSpeed = low.value();
 
     // calculate two point stright line equation based on boundaries of current temperature
     // y = mx + b = (y2-y1)/(x2-x1)*(x-x1)+y1
-    int hTemperature = high.key(),
-            lTemperature = low.key();
+    const int hTemperature = high.key();
+    const int lTemperature = low.key();
 
-    float speed = (float)(hSpeed - lSpeed) / (float)(hTemperature - lTemperature)  * (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value - lTemperature)  + lSpeed;
+    const float speed = (float)(hSpeed - lSpeed) / (float)(hTemperature - lTemperature) * (current - lTemperature) + lSpeed;
     device.setPwmValue(speed);
 }
 

@@ -31,6 +31,12 @@ void radeon_profile::createFanProfileListaAndGraph(const QString &profileName) {
     series->append(100, profile.steps.last());
 
     ui->spin_hysteresis->setValue(profile.hysteresis);
+
+    auto index = ui->combo_fanProfile_sensorInstance->findData(profile.sensor);
+    if (index == -1)
+        index = ui->combo_fanProfile_sensorInstance->findData(
+            device.getDriverFeatures().tempSensors.first());
+    ui->combo_fanProfile_sensorInstance->setCurrentIndex(index);
 }
 
 void radeon_profile::makeFanProfilePlot() {
@@ -97,7 +103,9 @@ void radeon_profile::on_btn_removeFanProfile_clicked()
 void radeon_profile::on_btn_saveFanProfile_clicked()
 {
     markFanProfileUnsaved(false);
-    const FanProfile fanProfile(stepsListToMap(), ui->spin_hysteresis->value());
+    const FanProfile fanProfile(stepsListToMap(),
+        ui->spin_hysteresis->value(),
+        ui->combo_fanProfile_sensorInstance->currentData().value<ValueID::Instance>());
     fanProfiles.insert(ui->combo_fanProfiles->currentText(), fanProfile);
 
     saveConfig();
@@ -119,7 +127,9 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
     }
 
     markFanProfileUnsaved(false);
-    const FanProfile fanProfile(stepsListToMap(), ui->spin_hysteresis->value());
+    const FanProfile fanProfile(stepsListToMap(),
+        ui->spin_hysteresis->value(),
+        ui->combo_fanProfile_sensorInstance->currentData().value<ValueID::Instance>());
     fanProfiles.insert(name, fanProfile);
     ui->combo_fanProfiles->addItem(name);
     ui->combo_fanProfiles->setCurrentText(name);
