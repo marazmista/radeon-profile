@@ -309,13 +309,16 @@ struct OCProfile {
 struct FanProfile {
     FanProfileSteps steps;
     int hysteresis = 0;
+    ValueID::Instance sensor = ValueID::T_EDGE;
 
     FanProfile() = default;
 
     FanProfile(const FanProfileSteps& fp_steps,
-               int fp_hysteresis = 0)
+               int fp_hysteresis = 0,
+               ValueID::Instance fp_sensor = ValueID::T_EDGE)
         : steps(fp_steps),
-          hysteresis(fp_hysteresis)
+          hysteresis(fp_hysteresis),
+          sensor(fp_sensor)
     {
     }
 };

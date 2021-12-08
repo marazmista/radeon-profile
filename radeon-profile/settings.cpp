@@ -146,6 +146,7 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
         FanProfile fps = fanProfiles.value(k);
 
         xml.writeAttribute("hysteresis", QString::number(fps.hysteresis));
+        xml.writeAttribute("sensorInstance", QString::number(fps.sensor));
 
         for (auto ks : fps.steps.keys()) {
             xml.writeStartElement("step");
@@ -485,6 +486,9 @@ void radeon_profile::loadFanProfile(QXmlStreamReader &xml, const int default_hys
     fps.hysteresis = xml.attributes().hasAttribute("hysteresis")
                    ? xml.attributes().value("hysteresis").toInt()
                    : default_hysteresis;
+    fps.sensor = xml.attributes().hasAttribute("sensorInstance")
+               ? xml.attributes().value("sensorInstance").toInt()
+               : ValueID::T_EDGE;
     while (xml.readNext()) {
         if (xml.name().toString() == "step" && !xml.attributes().value("temperature").isEmpty())
             fps.steps.insert(xml.attributes().value("temperature").toString().toInt(),
