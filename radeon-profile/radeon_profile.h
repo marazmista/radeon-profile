@@ -157,8 +157,8 @@ private:
 
     gpu device;
     QList<ExecBin*> execsRunning;
-    FanProfileSteps currentFanProfile;
-    QMap<QString, FanProfileSteps> fanProfiles;
+    FanProfile currentFanProfile;
+    QMap<QString, FanProfile> fanProfiles;
     QMap<QString, OCProfile> ocProfiles;
     QMap<QString, RPEvent> events;
     QMap<QString, unsigned int> pmStats;
@@ -210,7 +210,7 @@ private:
     void saveExecProfiles(QXmlStreamWriter &xml);
     void loadExecProfile(const QXmlStreamReader &xml);
     void saveFanProfiles(QXmlStreamWriter &xml);
-    void loadFanProfile(QXmlStreamReader &xml);
+    void loadFanProfile(QXmlStreamReader &xml, const int default_hysteresis);
     void savePlotSchemas(QXmlStreamWriter &xml);
     void loadPlotSchemas(QXmlStreamReader &xml);
     void saveTopbarItemsSchemas(QXmlStreamWriter &xml);

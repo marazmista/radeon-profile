@@ -64,7 +64,6 @@ void radeon_profile::saveConfig() {
         settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
         settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
         settings.setValue("daemonData", ui->cb_daemonData->isChecked());
-        settings.setValue("temperatureHysteresis", ui->spin_hysteresis->value());
         settings.setValue("connConfirmMethod", ui->combo_connConfirmMethod->currentIndex());
         settings.setValue("refreshWhenHidden", refreshWhenHidden->isChecked());
     }
@@ -144,12 +143,14 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
         xml.writeStartElement("fanProfile");
         xml.writeAttribute("name", k);
 
-        FanProfileSteps fps = fanProfiles.value(k);
+        FanProfile fps = fanProfiles.value(k);
 
-        for (auto ks : fps.keys()) {
+        xml.writeAttribute("hysteresis", QString::number(fps.hysteresis));
+
+        for (auto ks : fps.steps.keys()) {
             xml.writeStartElement("step");
             xml.writeAttribute("temperature", QString::number(ks));
-            xml.writeAttribute("speed", QString::number(fps.value(ks)));
+            xml.writeAttribute("speed", QString::number(fps.steps.value(ks)));
             xml.writeEndElement();
         }
         xml.writeEndElement();
@@ -293,7 +294,9 @@ void radeon_profile::loadConfig() {
     ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
     ui->combo_connConfirmMethod->setCurrentIndex(settings.value("connConfirmMethod", 1).toInt());
-    ui->spin_hysteresis->setValue(settings.value("temperatureHysteresis", 0).toInt());
+    // old config files without per FanProfile hysteresis value may still have
+    // the global value. This will be applied in loadFanProfile().
+    const int legacy_hysteresis = settings.value("temperatureHysteresis", 0).toInt();
 
     plotManager.generalConfig.plotsBackground = QColor(settings.value("plotsBackgroundColor","#808080").toString());
     plotManager.generalConfig.commonPlotsBackground = settings.value("setCommonPlotsBg", false).toBool();
@@ -352,7 +355,7 @@ void radeon_profile::loadConfig() {
                 }
 
                 if (xml.name().toString() == "fanProfile") {
-                    loadFanProfile(xml);
+                    loadFanProfile(xml, legacy_hysteresis);
                     continue;
                 }
 
@@ -475,14 +478,17 @@ void radeon_profile::loadExecProfile(const QXmlStreamReader &xml) {
     ui->list_execProfiles->addTopLevelItem(item);
 }
 
-void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
+void radeon_profile::loadFanProfile(QXmlStreamReader &xml, const int default_hysteresis) {
     QString fpName = xml.attributes().value("name").toString();
 
-    FanProfileSteps fps;
+    FanProfile fps;
+    fps.hysteresis = xml.attributes().hasAttribute("hysteresis")
+                   ? xml.attributes().value("hysteresis").toInt()
+                   : default_hysteresis;
     while (xml.readNext()) {
         if (xml.name().toString() == "step" && !xml.attributes().value("temperature").isEmpty())
-            fps.insert(xml.attributes().value("temperature").toString().toInt(),
-                       xml.attributes().value("speed").toString().toInt());
+            fps.steps.insert(xml.attributes().value("temperature").toString().toInt(),
+                             xml.attributes().value("speed").toString().toInt());
 
         if (xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "fanProfile") {
             fanProfiles.insert(fpName, fps);
