@@ -522,32 +522,33 @@ void radeon_profile::adjustFanSpeed() {
         return;
 
     if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value < device.gpuData.value(ValueID::TEMPERATURE_BEFORE_CURRENT).value &&
-            ui->spin_hysteresis->value() > (hysteresisRelativeTepmerature - device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value))
+            currentFanProfile.hysteresis > (hysteresisRelativeTepmerature - device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value))
         return;
 
     hysteresisRelativeTepmerature = device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value;
 
     // exact match
-    if (currentFanProfile.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {
-        device.setPwmValue(currentFanProfile.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));
+    const auto &steps = currentFanProfile.steps;
+    if (steps.contains(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value)) {
+        device.setPwmValue(steps.value(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value));
         return;
     }
 
     // below first step
-    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value <= currentFanProfile.firstKey()) {
-        device.setPwmValue(currentFanProfile.first());
+    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value <= steps.firstKey()) {
+        device.setPwmValue(steps.first());
         return;
     }
 
     // above last setep
-    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value >= currentFanProfile.lastKey()) {
-        device.setPwmValue(currentFanProfile.last());
+    if (device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value >= steps.lastKey()) {
+        device.setPwmValue(steps.last());
         return;
     }
 
     // find bounds of current temperature
-    auto high = currentFanProfile.upperBound(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
-    auto low = (currentFanProfile.size() > 1 ? high - 1 : high);
+    auto high = steps.upperBound(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+    auto low = (steps.size() > 1 ? high - 1 : high);
 
     int hSpeed = high.value(),
             lSpeed = low.value();

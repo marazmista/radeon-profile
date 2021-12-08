@@ -306,6 +306,20 @@ struct OCProfile {
     MapFVTables tables;
 };
 
+struct FanProfile {
+    FanProfileSteps steps;
+    int hysteresis = 0;
+
+    FanProfile() = default;
+
+    FanProfile(const FanProfileSteps& fp_steps,
+               int fp_hysteresis = 0)
+        : steps(fp_steps),
+          hysteresis(fp_hysteresis)
+    {
+    }
+};
+
 // structure which holds what can be display on ui and on its base
 // we enable ui elements
 struct DriverFeatures {
