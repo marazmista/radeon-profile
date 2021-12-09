@@ -285,7 +285,12 @@ void radeon_profile::on_btn_runExecProfile_clicked()
         exe->setLogFilename(item->text(LOG_FILE) +
                             ((item->text(LOG_FILE_DATE_APPEND) == "1") ? QDateTime::currentDateTime().toString("_yyyy-MM-dd_hh-mm-ss") : ""));
         exe->appendToLog("Profile: " +item->text(PROFILE_NAME) +"; App: " + item->text(BINARY) + "; Params: " + item->text(BINARY_PARAMS) + "; Env: " + item->text(ENV_SETTINGS));
-        exe->appendToLog("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci); temp");
+        QStringList sensors;
+        for (const ValueID::Instance instance : device.getDriverFeatures().tempSensors) {
+            sensors.push_back(globalStuff::getNameOfValueID(ValueID(ValueID::TEMPERATURE_CURRENT, instance)));
+        }
+        exe->appendToLog("Date and time; power level; GPU core clk; mem clk; uvd core clk; uvd decoder clk; core voltage (vddc); mem voltage (vddci);" + sensors.join("; "));
+
     }
 
     execsRunning.append(exe);

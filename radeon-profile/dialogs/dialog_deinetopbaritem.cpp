@@ -60,28 +60,27 @@ void Dialog_deineTopbarItem::createCombo(QComboBox *combo, const TopbarItemType 
     switch (type) {
         case TopbarItemType::LABEL_PAIR:
         case TopbarItemType::LARGE_LABEL:
-            for (int i = 0; i < availableGpuData->count(); ++i) {
-                if (availableGpuData->at(i) == ValueID::TEMPERATURE_BEFORE_CURRENT)
+            for (const ValueID id : *availableGpuData) {
+                if (id == ValueID::TEMPERATURE_BEFORE_CURRENT)
                     continue;
 
-                combo->addItem(globalStuff::getNameOfValueID(availableGpuData->at(i)), QVariant::fromValue(availableGpuData->at(i)));
+                combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
             }
             break;
 
         case TopbarItemType::PIE:
-            for (int i = 0; i < availableGpuData->count(); ++i) {
-                if (globalStuff::getUnitFomValueId(availableGpuData->at(i)) == ValueUnit::PERCENT)
-                    combo->addItem(globalStuff::getNameOfValueID(availableGpuData->at(i)), QVariant::fromValue(availableGpuData->at(i)));
+            for (const ValueID id : *availableGpuData) {
+                if (globalStuff::getUnitFomValueId(id) == ValueUnit::PERCENT)
+                    combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
 
-                if (availableGpuData->at(i) == ValueID::CLK_CORE && gpuParams->maxCoreClock != -1)
-                    combo->addItem(globalStuff::getNameOfValueID(ValueID::CLK_CORE), QVariant::fromValue(ValueID::CLK_CORE));
+                if (id == ValueID::CLK_CORE && gpuParams->maxCoreClock != -1)
+                    combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
 
-                if (availableGpuData->at(i) == ValueID::CLK_MEM && gpuParams->maxMemClock != -1)
-                    combo->addItem(globalStuff::getNameOfValueID(ValueID::CLK_MEM), QVariant::fromValue(ValueID::CLK_MEM));
+                if (id == ValueID::CLK_MEM && gpuParams->maxMemClock != -1)
+                    combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
 
-                if (availableGpuData->at(i) == ValueID::TEMPERATURE_CURRENT && gpuParams->temp1_crit != -1)
-                    combo->addItem(globalStuff::getNameOfValueID(ValueID::TEMPERATURE_CURRENT), QVariant::fromValue(ValueID::TEMPERATURE_CURRENT));
-
+                if (id == ValueID::TEMPERATURE_CURRENT)
+                    combo->addItem(globalStuff::getNameOfValueID(id), QVariant::fromValue(id));
             }
             break;
     }
@@ -166,7 +165,7 @@ void Dialog_deineTopbarItem::on_combo_primaryData_currentIndexChanged(int index)
     ui->combo_secondaryData->clear();
     ui->combo_secondaryData->addItem("");
 
-    switch (static_cast<ValueID>(ui->combo_primaryData->currentData().toInt())) {
+    switch (ui->combo_primaryData->currentData().value<ValueID>()) {
         case ValueID::FAN_SPEED_PERCENT:
             if (availableGpuData->contains(ValueID::FAN_SPEED_RPM))
                 ui->combo_secondaryData->addItem(globalStuff::getNameOfValueID(ValueID::FAN_SPEED_RPM), QVariant::fromValue(ValueID::FAN_SPEED_RPM));
@@ -191,16 +190,16 @@ void Dialog_deineTopbarItem::on_btn_cancel_clicked()
 
 void Dialog_deineTopbarItem::on_btn_save_clicked()
 {
-    editedSchema = TopbarItemDefinitionSchema(static_cast<ValueID>(ui->combo_primaryData->currentData().toInt()),
+    editedSchema = TopbarItemDefinitionSchema(ui->combo_primaryData->currentData().value<ValueID>(),
                                               getItemType(), ui->frame_primaryColor->palette().background().color());
 
     if (!ui->combo_secondaryData->currentText().isEmpty() && ui->combo_secondaryData->isEnabled()) {
-        editedSchema.setSecondaryValueId(static_cast<ValueID>(ui->combo_secondaryData->currentData().toInt()));
+        editedSchema.setSecondaryValueId(ui->combo_secondaryData->currentData().value<ValueID>());
         editedSchema.setSecondaryColor(ui->frame_secondaryColor->palette().background().color());
     }
 
     if (ui->radio_pie->isChecked()) {
-        switch (static_cast<ValueID>(ui->combo_primaryData->currentData().toInt())) {
+        switch (ui->combo_primaryData->currentData().value<ValueID>()) {
             case ValueID::CLK_CORE:
                 editedSchema.pieMaxValue = gpuParams->maxCoreClock;
                 break;

@@ -25,6 +25,7 @@ private slots:
     void on_btn_cancel_clicked();
     void on_btn_save_clicked();
     void on_combo_fanChange_currentIndexChanged(int index);
+    void on_combo_eventTrigger_currentIndexChanged(int index);
     void on_btn_setBinary_clicked();
 
 private:

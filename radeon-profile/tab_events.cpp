@@ -27,16 +27,20 @@ void radeon_profile::on_btn_addEvent_clicked()
 }
 
 void radeon_profile::checkEvents() {
-    CheckInfoStruct data;
-    data.checkTemperature = device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value;
+    for (const ValueID::Instance instance : device.getDriverFeatures().tempSensors) {
+        const ValueID id(ValueID::TEMPERATURE_CURRENT, instance);
+        eventData.checkTemperature[instance] = device.gpuData.value(id).value;
+    }
 
     if (savedState != nullptr)  {
         RPEvent e = events.value(ui->l_currentActiveEvent->text());
 
         // one degree handicap to avid constant activation when on the fence
-        data.checkTemperature += 1;
+        for (auto& data : eventData.checkTemperature) {
+            data += 1;
+        }
 
-        if (!e.isActivationConditonFulfilled(data))
+        if (!e.isActivationConditonFulfilled(eventData))
             revokeEvent();
 
         return;
@@ -46,7 +50,7 @@ void radeon_profile::checkEvents() {
         if (!e.enabled)
             continue;
 
-        if (e.isActivationConditonFulfilled(data)) {
+        if (e.isActivationConditonFulfilled(eventData)) {
             activateEvent(e);
             return;
         }

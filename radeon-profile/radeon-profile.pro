@@ -24,6 +24,7 @@ CONFIG(release, debug|release){
 }
 
 SOURCES += main.cpp\
+    globalStuff.cpp \
     radeon_profile.cpp \
     uiElements.cpp \
     uiEvents.cpp \

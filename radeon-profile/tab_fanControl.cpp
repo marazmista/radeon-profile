@@ -21,14 +21,22 @@ void radeon_profile::createFanProfileListaAndGraph(const QString &profileName) {
     series->clear();
     ui->list_fanSteps->clear();
 
-    series->append(0, profile.first());
+    series->append(0, profile.steps.first());
 
-    for (int temperature : profile.keys()) {
-        series->append(temperature, profile.value(temperature));
-        ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.value(temperature))));
+    for (int temperature : profile.steps.keys()) {
+        series->append(temperature, profile.steps.value(temperature));
+        ui->list_fanSteps->addTopLevelItem(new QTreeWidgetItem(QStringList() << QString::number(temperature) << QString::number(profile.steps.value(temperature))));
     }
 
-    series->append(100, profile.last());
+    series->append(100, profile.steps.last());
+
+    ui->spin_hysteresis->setValue(profile.hysteresis);
+
+    auto index = ui->combo_fanProfile_sensorInstance->findData(profile.sensor);
+    if (index == -1)
+        index = ui->combo_fanProfile_sensorInstance->findData(
+            device.getDriverFeatures().tempSensors.first());
+    ui->combo_fanProfile_sensorInstance->setCurrentIndex(index);
 }
 
 void radeon_profile::makeFanProfilePlot() {
@@ -95,8 +103,11 @@ void radeon_profile::on_btn_removeFanProfile_clicked()
 void radeon_profile::on_btn_saveFanProfile_clicked()
 {
     markFanProfileUnsaved(false);
-    const auto fanProfile = stepsListToMap();
+    const FanProfile fanProfile(stepsListToMap(),
+        ui->spin_hysteresis->value(),
+        ui->combo_fanProfile_sensorInstance->currentData().value<ValueID::Instance>());
     fanProfiles.insert(ui->combo_fanProfiles->currentText(), fanProfile);
+
     saveConfig();
 
     if (ui->combo_fanProfiles->currentText() == ui->l_currentFanProfile->text())
@@ -116,8 +127,10 @@ void radeon_profile::on_btn_saveAsFanProfile_clicked()
     }
 
     markFanProfileUnsaved(false);
-
-    fanProfiles.insert(name, stepsListToMap());
+    const FanProfile fanProfile(stepsListToMap(),
+        ui->spin_hysteresis->value(),
+        ui->combo_fanProfile_sensorInstance->currentData().value<ValueID::Instance>());
+    fanProfiles.insert(name, fanProfile);
     ui->combo_fanProfiles->addItem(name);
     ui->combo_fanProfiles->setCurrentText(name);
     createFanProfilesMenu(true);
@@ -242,7 +255,7 @@ void radeon_profile::on_btn_removeFanStep_clicked()
     QTreeWidgetItem *current = ui->list_fanSteps->takeTopLevelItem(ui->list_fanSteps->currentIndex().row());
 
     // The selected item can be removed, remove it
-    currentFanProfile.remove(current->text(0).toInt());
+    currentFanProfile.steps.remove(current->text(0).toInt());
     adjustFanSpeed();
 
     // Remove the step from the list and from the graph
