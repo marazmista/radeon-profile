@@ -11,6 +11,8 @@
 #include <QStringList>
 #include <QFile>
 #include <QMap>
+#include <QHash>
+#include <QVector>
 
 #define dpm_battery "battery"
 #define dpm_performance "performance"
@@ -335,6 +337,10 @@ struct DriverFeatures {
     // based on pp_power_profile_mode or power_dpm_state or power_profile
     PowerProfiles powerProfiles;
 
+    // list of temperature sensor. Maps hwmon sensor id to ValueID::instance
+    // and provides a list of available instances
+    QVector<ValueID::Instance> tempSensors;
+
     DriverFeatures() { }
 };
 
@@ -422,10 +428,70 @@ struct DeviceSysFs {
     }
 };
 
+
+struct HwmonTempSensor {
+    QString input;
+    QString crit;
+    QString emergency;
+    QString label;
+
+    HwmonTempSensor() = default;
+
+    HwmonTempSensor(const HwmonTempSensor&) = default;
+
+    HwmonTempSensor(HwmonTempSensor&&) = default;
+
+    HwmonTempSensor(const QString& input_path,
+                    const QString& crit_path,
+                    const QString& emergency_path,
+                    const QString& label_path)
+    {
+        // create empty object if input is invalid. operator bool returns false
+        if (checkFileCorrectness(input_path))
+            input = input_path;
+        else
+            return;
+        // leave label, emerg and crit empty, if they don't exist or are empty
+        if (checkFileCorrectness(crit_path))
+            crit = crit_path;
+        if (checkFileCorrectness(emergency_path))
+            emergency = emergency_path;
+        if (checkFileCorrectness(label_path))
+            label = label_path;
+    }
+
+
+    HwmonTempSensor(const QString& hwmonPath, int index)
+        : HwmonTempSensor(buildPath(hwmonPath, index, "input"),
+                          buildPath(hwmonPath, index, "crit"),
+                          buildPath(hwmonPath, index, "emergency"),
+                          buildPath(hwmonPath, index, "label"))
+    {
+    }
+
+
+    operator bool () const
+    {
+        return !input.isEmpty();
+    }
+
+
+    static QString buildPath(const QString& hwmonPath,
+                             int index,
+                             const char* suffix = "input")
+    {
+        return hwmonPath + "temp" + QString::number(index) + "_" + suffix;
+    }
+
+
+    static bool exists(const QString& hwmonPath, int index)
+    {
+        return checkFileCorrectness(buildPath(hwmonPath, index, "input"));
+    }
+};
+
 struct HwmonAttributes {
     QString
-    temp1,
-    temp1_crit,
     pwm1,
     pwm1_enable,
     pwm1_max,
@@ -435,11 +501,15 @@ struct HwmonAttributes {
     power1_cap,
     power1_average;
 
+    QVector<HwmonTempSensor> temp;
+
     HwmonAttributes() { }
 
     HwmonAttributes(const QString &hwmonPath) {
-        temp1 = hwmonPath + "temp1_input";
-        temp1_crit = hwmonPath + "temp1_crit";
+        for (int i = 1; HwmonTempSensor::exists(hwmonPath, i); i++) {
+            temp.push_back(HwmonTempSensor(hwmonPath, i));
+        }
+
         pwm1 = hwmonPath + "pwm1";
         pwm1_enable = hwmonPath + "pwm1_enable";
         pwm1_max = hwmonPath + "pwm1_max";
@@ -448,12 +518,6 @@ struct HwmonAttributes {
         power1_cap_min = hwmonPath + "power1_cap_min";
         power1_cap = hwmonPath + "power1_cap";
         power1_average = hwmonPath + "power1_average";
-
-        if (!checkFileCorrectness(temp1))
-            temp1 = "";
-
-        if (!checkFileCorrectness(temp1_crit))
-            temp1_crit = "";
 
         if (!checkFileCorrectness(pwm1_enable, true))
             pwm1 = pwm1_enable = pwm1_max = "";
@@ -487,8 +551,10 @@ struct GPUUsage {
 };
 
 struct GPUConstParams {
-     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1, temp1_crit = -1, power1_cap_max = -1, power1_cap_min = -1;
+     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1, power1_cap_max = -1, power1_cap_min = -1;
      float VRAMSize = -1;
+     QHash<ValueID::Instance, int> temp_crit;
+     QHash<ValueID::Instance, int> temp_emergency;
 };
 
 class globalStuff {
@@ -589,9 +655,9 @@ public:
             case ValueID::GPU_USAGE_PERCENT:  return QObject::tr("GPU usage");
             case ValueID::GPU_VRAM_USAGE_PERCENT:  return QObject::tr("GPU Vram usage");
             case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed RPM");
-            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature");
-            case ValueID::TEMPERATURE_MAX: return QObject::tr("Temperature (max)");
-            case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min)");
+            case ValueID::TEMPERATURE_CURRENT: return getNameOfTempSensor(id);
+            case ValueID::TEMPERATURE_MAX: return getNameOfTempSensor(id) + " " + QObject::tr("(max)");
+            case ValueID::TEMPERATURE_MIN: return getNameOfTempSensor(id) + " " + QObject::tr("(min)");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram megabyte usage");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level");
             case ValueID::POWER_CAP_SELECTED: return QObject::tr("Power cap selected");
@@ -612,13 +678,15 @@ public:
             case ValueID::GPU_USAGE_PERCENT:  return QObject::tr("GPU usage [%]");
             case ValueID::GPU_VRAM_USAGE_PERCENT:  return QObject::tr("GPU Vram usage [%]");
             case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed [rpm]");
-            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature [")+QString::fromUtf8("\u00B0C]");
-            case ValueID::TEMPERATURE_MAX: return QObject::tr("Temperature (max) [")+QString::fromUtf8("\u00B0C]");
-            case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min) [")+QString::fromUtf8("\u00B0C]");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram usage [MB]");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level ");
             case ValueID::POWER_CAP_SELECTED: return  QObject::tr("Power cap selected [W]");
             case ValueID::POWER_CAP_AVERAGE: return  QObject::tr("Power cap average [W]");
+
+            case ValueID::TEMPERATURE_CURRENT:
+            case ValueID::TEMPERATURE_MAX:
+            case ValueID::TEMPERATURE_MIN:
+                return getNameOfValueID(id) + " " + QObject::tr("[\u00B0C]");
 
             default:
                 return "";
@@ -652,6 +720,46 @@ public:
         }
 
         return QStringList();
+    }
+
+    /* stores labels of names from ValueID types of an unknown instance.
+     * This will only be used if instances of ValueID types are supported
+     * by the hardware that could not be recognized.
+     * For unknown temperature sensors, the temp*_label will be stored here
+     * to be used by getNameOfValueID() to give a meaningful name of the
+     * sensor to the user.
+     */
+    static QHash<ValueID, QString> customInstanceLabels;
+
+    static ValueID::Instance setCustomInstanceLabel(ValueID::Type type,
+                                                    const QString& label)
+    {
+        ValueID::Instance instance = ValueID::INSTANCE_UNKNOWN
+                                   + customInstanceLabels.size();
+        customInstanceLabels.insert(ValueID(type, instance), label);
+        return instance;
+    }
+
+
+private:
+
+    static QString getNameOfTempSensor(ValueID id)
+    {
+        switch (id.instance) {
+
+            case ValueID::T_EDGE: return QObject::tr("Edge Temperature");
+            case ValueID::T_JUNCTION: return QObject::tr("Junction Temperature");
+            case ValueID::T_MEM: return QObject::tr("Memory Temperature");
+
+            default:
+                const ValueID custom_key = id.asType(ValueID::TEMPERATURE_CURRENT);
+                if (customInstanceLabels.contains(custom_key)) {
+                    return customInstanceLabels[custom_key]
+                         + " " + QObject::tr("Temperature");
+                } else {
+                    return QObject::tr("Unknown Temperature Sensor");
+                }
+        }
     }
 };
 
