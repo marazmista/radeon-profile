@@ -44,6 +44,7 @@
 #define MCLK "MCLK"
 #define VDDC "VDDC"
 #define OD_VDDC_CURVE "OD_VDDC_CURVE"
+#define OD_VDDGFX_OFFSET "OD_VDDGFX_OFFSET"
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 

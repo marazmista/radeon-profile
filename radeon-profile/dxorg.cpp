@@ -854,10 +854,12 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
 
     // OD_VDDC_CURVE only in Vega20+
     bool vega20Mode = sl.contains(QString(OD_VDDC_CURVE).append('|'));
+    // OD_VDDGFX_OFFSET since navi2x (or all navi?)
+    bool naviMode = sl.contains(QString(OD_VDDGFX_OFFSET).append('|'));
 
     for (auto i = 0; i < sl.length(); ++i) {
 
-        if (vega20Mode) {
+        if (vega20Mode || naviMode) {
             if (sl.at(i).contains(OD_SCLK)) {
                 qDebug() << "parsing OD_SCLK table";
                 QStringList stateMin = sl[++i].split("|", QString::SkipEmptyParts);
@@ -867,8 +869,20 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
             }
 
             if (sl.at(i).contains(OD_MCLK)) {
-                QStringList stateMax = sl[++i].split("|", QString::SkipEmptyParts);
-                ocRanges.insert(OD_MCLK, OCRange(0, stateMax[1].toUInt()));
+                qDebug() << "parsing OD_MCLK table";
+                unsigned int stateMin = 0;
+                unsigned int stateMax = 0;
+                QStringList state = sl[++i].split("|", QString::SkipEmptyParts);
+                if (state[0] == "0") {
+                    stateMin = state[1].toUInt();
+                    state = sl[++i].split("|", QString::SkipEmptyParts);
+                    assert(state[0] == "1");
+                    stateMax = state[1].toUInt();
+                } else {
+                    stateMax = state[1].toUInt();
+                }
+
+                ocRanges.insert(OD_MCLK, OCRange(stateMin, stateMax));
                 continue;
             }
         }
