@@ -192,6 +192,7 @@ void radeon_profile::on_btn_saveOcProfileAs_clicked()
 
 void radeon_profile::createOcProfileListsAndGraph(const QString &arg1)
 {
+    qDebug() << "creating OC profile list/graph for: " << arg1;
     ui->list_coreStates->clear();
     ui->list_memStates->clear();
 

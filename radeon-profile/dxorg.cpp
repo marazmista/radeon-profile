@@ -859,6 +859,7 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
 
         if (vega20Mode) {
             if (sl.at(i).contains(OD_SCLK)) {
+                qDebug() << "parsing OD_SCLK table";
                 QStringList stateMin = sl[++i].split("|", QString::SkipEmptyParts);
                 QStringList stateMax = sl[++i].split("|", QString::SkipEmptyParts);
                 ocRanges.insert(OD_SCLK, OCRange(stateMin[1].toUInt(), stateMax[1].toUInt()));
@@ -879,6 +880,7 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
             if (tableItems.length() == 1) {
 
                 if (tableItems[0] == OD_RANGE) {
+                    qDebug() << "parsing OD_RANGE table";
                     for (++i; i < sl.length(); ++i) {
 
                         auto state = sl[i].split("|", QString::SkipEmptyParts);
@@ -892,6 +894,7 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
 
             } else {
 
+                qDebug() << "parsing FreqVolt table";
                 FVTable fvt;
                 for (; i < sl.length(); ++i) {
                     auto state = sl[i].split("|", QString::SkipEmptyParts);
@@ -909,6 +912,7 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
         }
     }
 
+    qDebug() << "parsing OC tables done.";
     return std::make_tuple(tables, ocRanges);
 }
 

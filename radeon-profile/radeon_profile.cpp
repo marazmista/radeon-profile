@@ -257,6 +257,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
     }
 
     // SETUP OC
+    qDebug() << "setting up OC UI elements";
     ui->tw_main->setTabEnabled(2, false);
     ui->btn_ocProfileControl->setVisible(false);
 
@@ -334,6 +335,7 @@ void radeon_profile::setupUiEnabledFeatures(const DriverFeatures &features, cons
                 setCurrentOcProfile(ui->l_currentOcProfile->text());
         }
     }
+    qDebug() << "UI init complete.";
 }
 
 void radeon_profile::refreshGpuData() {
