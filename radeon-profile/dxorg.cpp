@@ -898,7 +898,7 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
                     for (++i; i < sl.length(); ++i) {
 
                         auto state = sl[i].split("|", QString::SkipEmptyParts);
-                        if (state.length() == 1)
+                        if (state.length() <= 2)
                             break;
 
                         ocRanges.insert(state[0], OCRange(state[1].toUInt(), state[2].toUInt()));
@@ -915,6 +915,11 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
 
                     if (state.length() == 1) {
                         --i; // go back to next table start
+                        break;
+                    }
+
+                    if (state.length() <= 2) {
+                        qDebug() << "unexpected column count while parsing FreqVoltPair";
                         break;
                     }
 
