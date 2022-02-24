@@ -220,9 +220,10 @@ void radeon_profile::createOcProfileListsAndGraph(const QString &arg1)
         createOcGraphSeriesFromList(ui->list_memStates, static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_FREQUENCY]),
                 static_cast<QLineSeries*>(chartView_oc->chart()->series()[OcSeriesType::MEM_VOLTAGE]));
 
-        axis_state->setMax(device.getDriverFeatures().currentStatesTables.value(OD_SCLK).lastKey());
+        const auto& sclk_table = device.getDriverFeatures().currentStatesTables.value(OD_SCLK);
+        if (!sclk_table.isEmpty())
+           axis_state->setMax(sclk_table.isEmpty() ? 0 : sclk_table.lastKey());
         axis_state->setTickCount(device.getDriverFeatures().currentStatesTables.value(OD_SCLK).keys().count());
-
         axis_volts->setMax(device.getDriverFeatures().ocRages.value(VDDC).max + 100);
     }
 
