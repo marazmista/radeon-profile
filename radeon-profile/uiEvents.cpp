@@ -24,8 +24,11 @@ void radeon_profile::setPowerLevelFromCombo() {
 }
 
 void radeon_profile::resetMinMax() {
-    device.gpuData[ValueID::TEMPERATURE_MIN].setValue(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
-    device.gpuData[ValueID::TEMPERATURE_MAX].setValue(device.gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+    for (const ValueID::Instance instance : device.getDriverFeatures().tempSensors) {
+        const auto current = device.gpuData.value(ValueID(ValueID::TEMPERATURE_CURRENT, instance)).value;
+        device.gpuData[ValueID(ValueID::TEMPERATURE_MIN, instance)].setValue(current);
+        device.gpuData[ValueID(ValueID::TEMPERATURE_MAX, instance)].setValue(current);
+    }
 }
 
 void radeon_profile::setPowerProfile(int mode) {

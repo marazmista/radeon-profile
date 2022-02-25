@@ -139,14 +139,17 @@ void gpu::defineAvailableDataContainer() {
     if (tmpPwm.fanSpeedRpm != -1)
         gpuData.insert(ValueID::FAN_SPEED_RPM, RPValue(ValueUnit::RPM, tmpPwm.fanSpeedRpm));
 
-
-    float tmpTemp = driverHandler->getTemperature();
-
-    if (tmpTemp != -1) {
-        gpuData.insert(ValueID::TEMPERATURE_CURRENT, RPValue(ValueUnit::CELSIUS, tmpTemp));
-        gpuData.insert(ValueID::TEMPERATURE_BEFORE_CURRENT, RPValue(ValueUnit::CELSIUS, tmpTemp));
-        gpuData.insert(ValueID::TEMPERATURE_MIN, RPValue(ValueUnit::CELSIUS, tmpTemp));
-        gpuData.insert(ValueID::TEMPERATURE_MAX, RPValue(ValueUnit::CELSIUS, tmpTemp));
+    const auto &sensors = driverHandler->features.tempSensors;
+    for (int hwmon_id = 0; hwmon_id < sensors.size(); hwmon_id++) {
+        const ValueID::Instance instance = sensors[hwmon_id];
+        const float current = driverHandler->getTemperature(hwmon_id);
+        if (current != -1) {
+            const RPValue rpcurrent(ValueUnit::CELSIUS, current);
+            gpuData.insert(ValueID(ValueID::TEMPERATURE_CURRENT, instance), rpcurrent);
+            gpuData.insert(ValueID(ValueID::TEMPERATURE_BEFORE_CURRENT, instance), rpcurrent);
+            gpuData.insert(ValueID(ValueID::TEMPERATURE_MIN, instance), rpcurrent);
+            gpuData.insert(ValueID(ValueID::TEMPERATURE_MAX, instance), rpcurrent);
+        }
     }
 
     GPUUsage tmpUsage = driverHandler->getGPUUsage();
@@ -200,17 +203,24 @@ void gpu::getClocks() {
 }
 
 void gpu::getTemperature() {
-    if (!gpuData.contains(ValueID::TEMPERATURE_CURRENT))
-        return;
+    const auto &sensors = driverHandler->features.tempSensors;
+    for (int hwmon_id = 0; hwmon_id < sensors.size(); hwmon_id++) {
+       const float current = driverHandler->getTemperature(hwmon_id);
 
-    gpuData[ValueID::TEMPERATURE_BEFORE_CURRENT].setValue(gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
-    gpuData[ValueID::TEMPERATURE_CURRENT].setValue(driverHandler->getTemperature());
+        const ValueID key(ValueID::TEMPERATURE_CURRENT, sensors[hwmon_id]);
+        const ValueID key_before = key.asType(ValueID::TEMPERATURE_BEFORE_CURRENT);
+        gpuData[key_before].setValue(gpuData[key].value);
 
-    if (gpuData.value(ValueID::TEMPERATURE_MIN, RPValue()).value > gpuData.value(ValueID::TEMPERATURE_CURRENT).value)
-        gpuData[ValueID::TEMPERATURE_MIN].setValue(gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+        gpuData[key].setValue(current);
 
-    if (gpuData.value(ValueID::TEMPERATURE_MAX, RPValue()).value < gpuData.value(ValueID::TEMPERATURE_CURRENT).value)
-        gpuData[ValueID::TEMPERATURE_MAX].setValue(gpuData.value(ValueID::TEMPERATURE_CURRENT).value);
+        const ValueID key_min = key.asType(ValueID::TEMPERATURE_MIN);
+        if (gpuData.value(key_min, RPValue()).value > current)
+            gpuData[key_min].setValue(current);
+
+        const ValueID key_max = key.asType(ValueID::TEMPERATURE_MAX);
+        if (gpuData.value(key_max, RPValue()).value < current)
+            gpuData[key_max].setValue(current);
+    }
 }
 
 void gpu::getGpuUsage() {
@@ -265,6 +275,17 @@ void gpu::setForcePowerLevel(const QString &newForcePowerLevel) {
 }
 
 void gpu::setPwmValue(unsigned int value) {
+    // If the PC is sent to sleep (or hibernate) it can happen that PWM is
+    // disabled (by the OS..?) and that we have to re-enable it, if needed,
+    // after returning from sleep
+    static QFile pwmEnableFile(getDriverFiles().hwmonAttributes.pwm1_enable);
+    if (Q_UNLIKELY(pwmEnableFile.open(QFile::ReadOnly)
+                   && !pwmEnableFile.read(1).contains(pwm_manual)))
+    {
+        setPwmManualControl(true);
+    }
+    pwmEnableFile.close();
+
     value = getGpuConstParams().pwmMaxSpeed * value / 100;
     driverHandler->setNewValue(getDriverFiles().hwmonAttributes.pwm1, QString::number(value));
 }

@@ -5,11 +5,14 @@
 #ifndef PUBLICSTUFF_H
 #define PUBLICSTUFF_H
 
+#include <cstdint>
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QStringList>
 #include <QFile>
 #include <QMap>
+#include <QHash>
+#include <QVector>
 
 #define dpm_battery "battery"
 #define dpm_performance "performance"
@@ -41,6 +44,7 @@
 #define MCLK "MCLK"
 #define VDDC "VDDC"
 #define OD_VDDC_CURVE "OD_VDDC_CURVE"
+#define OD_VDDGFX_OFFSET "OD_VDDGFX_OFFSET"
 
 #define logDateFormat "yyyy-MM-dd_hh-mm-ss"
 
@@ -48,25 +52,123 @@
 
 static QString MOCK_PATH("/home/marazmista/aasd/testfies/");
 
-enum ValueID {
-    CLK_CORE,
-    CLK_MEM,
-    VOLT_CORE,
-    VOLT_MEM,
-    CLK_UVD,
-    DCLK_UVD,
-    TEMPERATURE_CURRENT,
-    TEMPERATURE_BEFORE_CURRENT,
-    TEMPERATURE_MIN,
-    TEMPERATURE_MAX,
-    GPU_USAGE_PERCENT,
-    GPU_VRAM_USAGE_PERCENT,
-    GPU_VRAM_USAGE_MB,
-    FAN_SPEED_PERCENT,
-    FAN_SPEED_RPM,
-    POWER_LEVEL,
-    POWER_CAP_SELECTED,
-    POWER_CAP_AVERAGE
+
+
+/** Value keys for gpu::gpuData
+ *
+ * Each value stored, updated and provided by the gpu class can be referred to
+ * by a unique ValueID.
+ *
+ * The key is split into two components:
+ * type: the type of value provided by the gpu driver as defined in Type
+ * instance: If hardware provides multiple values of the same type, they are
+ *           differenciated by the instance component of the ValueID.
+ *           For example, a GPU with multiple temp sensors will have mulitple
+ *           instances of the Type::TEPERATURE_* values for each sensor.
+ */
+struct ValueID {
+
+    enum Type : std::uint16_t {
+        CLK_CORE,
+        CLK_MEM,
+        VOLT_CORE,
+        VOLT_MEM,
+        CLK_UVD,
+        DCLK_UVD,
+        TEMPERATURE_CURRENT,
+        TEMPERATURE_BEFORE_CURRENT,
+        TEMPERATURE_MIN,
+        TEMPERATURE_MAX,
+        GPU_USAGE_PERCENT,
+        GPU_VRAM_USAGE_PERCENT,
+        GPU_VRAM_USAGE_MB,
+        FAN_SPEED_PERCENT,
+        FAN_SPEED_RPM,
+        POWER_LEVEL,
+        POWER_CAP_SELECTED,
+        POWER_CAP_AVERAGE
+    };
+
+    // instances are not defined in an enum, as we may have instances
+    // of unknown type that need their own unique id.
+    // Known instances are defined as constexpr constants instead.
+    // Unknown instance types start at INSTANCE_UNKNOWN, i.e. have the most
+    // significant bit set.
+    typedef std::uint16_t Instance;
+
+    static constexpr Instance T_EDGE     = 0;
+    static constexpr Instance T_JUNCTION = 1;
+    static constexpr Instance T_MEM      = 2;
+
+    static constexpr Instance INSTANCE_UNKNOWN = 1 << 15;
+
+    // 64-bit key is split into three sections:
+    // type: the type of data as defined in TYPE above
+    // subtype:
+    Type type;
+    Instance instance = 0;
+
+    ValueID() = default;
+
+    ValueID(const ValueID&) = default;
+
+    ValueID(Type v_type, Instance v_instance = 0)
+        : type(v_type), instance(v_instance)
+    {
+    }
+
+    operator Type() const
+    {
+        return type;
+    }
+
+    // returns a unique representation of a key as a 32-bit integer.
+    // this key is used to uniquely refer to a valueID in config files.
+    // This key is different from orderKey() to preserve backwards compatibilty
+    // with previous config files: a ValueID of instance=0 maps to
+    // the same int value as a type only id did.
+    std::uint32_t key() const
+    {
+        return type + (std::uint32_t(instance) << 16);
+    }
+
+    // compare by combined key (i.e. all values)
+    bool operator==(const ValueID& rhs) const
+    {
+        return key() == rhs.key();
+    }
+
+    // compare to Type only
+    bool operator==(const ValueID::Type& rhs) const
+    {
+        return type == rhs;
+    }
+
+    // for ordering via comparison operator, flip the two components
+    // in the key. This keeps values of the same type adjecent.
+    std::uint32_t orderKey() const
+    {
+        return instance + (std::uint32_t(type) << 16);
+    }
+
+    // comparison operators: ordering in containers, to be usable in containers
+    bool operator<(const ValueID& rhs) const
+    {
+        return orderKey() < rhs.orderKey();
+    }
+
+    // get ValueID of the same instance as a different type
+    ValueID asType(const Type& as_type) const
+    {
+        return ValueID(as_type, instance);
+    }
+
+
+    // create ValueID from 32-bit key
+    static ValueID fromKey(std::uint32_t key)
+    {
+       return ValueID(Type(key & 0xFFFF), key >> 16);
+    }
 };
 
 enum ValueUnit {
@@ -81,6 +183,7 @@ enum ValueUnit {
 };
 
 Q_DECLARE_METATYPE(ValueID)
+Q_DECLARE_METATYPE(ValueID::Type)
 Q_DECLARE_METATYPE(ValueUnit)
 
 enum class ClocksDataSource {
@@ -204,6 +307,23 @@ struct OCProfile {
     MapFVTables tables;
 };
 
+struct FanProfile {
+    FanProfileSteps steps;
+    int hysteresis = 0;
+    ValueID::Instance sensor = ValueID::T_EDGE;
+
+    FanProfile() = default;
+
+    FanProfile(const FanProfileSteps& fp_steps,
+               int fp_hysteresis = 0,
+               ValueID::Instance fp_sensor = ValueID::T_EDGE)
+        : steps(fp_steps),
+          hysteresis(fp_hysteresis),
+          sensor(fp_sensor)
+    {
+    }
+};
+
 // structure which holds what can be display on ui and on its base
 // we enable ui elements
 struct DriverFeatures {
@@ -234,6 +354,10 @@ struct DriverFeatures {
 
     // based on pp_power_profile_mode or power_dpm_state or power_profile
     PowerProfiles powerProfiles;
+
+    // list of temperature sensor. Maps hwmon sensor id to ValueID::instance
+    // and provides a list of available instances
+    QVector<ValueID::Instance> tempSensors;
 
     DriverFeatures() { }
 };
@@ -322,10 +446,70 @@ struct DeviceSysFs {
     }
 };
 
+
+struct HwmonTempSensor {
+    QString input;
+    QString crit;
+    QString emergency;
+    QString label;
+
+    HwmonTempSensor() = default;
+
+    HwmonTempSensor(const HwmonTempSensor&) = default;
+
+    HwmonTempSensor(HwmonTempSensor&&) = default;
+
+    HwmonTempSensor(const QString& input_path,
+                    const QString& crit_path,
+                    const QString& emergency_path,
+                    const QString& label_path)
+    {
+        // create empty object if input is invalid. operator bool returns false
+        if (checkFileCorrectness(input_path))
+            input = input_path;
+        else
+            return;
+        // leave label, emerg and crit empty, if they don't exist or are empty
+        if (checkFileCorrectness(crit_path))
+            crit = crit_path;
+        if (checkFileCorrectness(emergency_path))
+            emergency = emergency_path;
+        if (checkFileCorrectness(label_path))
+            label = label_path;
+    }
+
+
+    HwmonTempSensor(const QString& hwmonPath, int index)
+        : HwmonTempSensor(buildPath(hwmonPath, index, "input"),
+                          buildPath(hwmonPath, index, "crit"),
+                          buildPath(hwmonPath, index, "emergency"),
+                          buildPath(hwmonPath, index, "label"))
+    {
+    }
+
+
+    operator bool () const
+    {
+        return !input.isEmpty();
+    }
+
+
+    static QString buildPath(const QString& hwmonPath,
+                             int index,
+                             const char* suffix = "input")
+    {
+        return hwmonPath + "temp" + QString::number(index) + "_" + suffix;
+    }
+
+
+    static bool exists(const QString& hwmonPath, int index)
+    {
+        return checkFileCorrectness(buildPath(hwmonPath, index, "input"));
+    }
+};
+
 struct HwmonAttributes {
     QString
-    temp1,
-    temp1_crit,
     pwm1,
     pwm1_enable,
     pwm1_max,
@@ -335,11 +519,15 @@ struct HwmonAttributes {
     power1_cap,
     power1_average;
 
+    QVector<HwmonTempSensor> temp;
+
     HwmonAttributes() { }
 
     HwmonAttributes(const QString &hwmonPath) {
-        temp1 = hwmonPath + "temp1_input";
-        temp1_crit = hwmonPath + "temp1_crit";
+        for (int i = 1; HwmonTempSensor::exists(hwmonPath, i); i++) {
+            temp.push_back(HwmonTempSensor(hwmonPath, i));
+        }
+
         pwm1 = hwmonPath + "pwm1";
         pwm1_enable = hwmonPath + "pwm1_enable";
         pwm1_max = hwmonPath + "pwm1_max";
@@ -348,12 +536,6 @@ struct HwmonAttributes {
         power1_cap_min = hwmonPath + "power1_cap_min";
         power1_cap = hwmonPath + "power1_cap";
         power1_average = hwmonPath + "power1_average";
-
-        if (!checkFileCorrectness(temp1))
-            temp1 = "";
-
-        if (!checkFileCorrectness(temp1_crit))
-            temp1_crit = "";
 
         if (!checkFileCorrectness(pwm1_enable, true))
             pwm1 = pwm1_enable = pwm1_max = "";
@@ -387,8 +569,10 @@ struct GPUUsage {
 };
 
 struct GPUConstParams {
-     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1, temp1_crit = -1, power1_cap_max = -1, power1_cap_min = -1;
+     int pwmMaxSpeed = -1, maxCoreClock = -1, maxMemClock = -1, power1_cap_max = -1, power1_cap_min = -1;
      float VRAMSize = -1;
+     QHash<ValueID::Instance, int> temp_crit;
+     QHash<ValueID::Instance, int> temp_emergency;
 };
 
 class globalStuff {
@@ -489,9 +673,9 @@ public:
             case ValueID::GPU_USAGE_PERCENT:  return QObject::tr("GPU usage");
             case ValueID::GPU_VRAM_USAGE_PERCENT:  return QObject::tr("GPU Vram usage");
             case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed RPM");
-            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature");
-            case ValueID::TEMPERATURE_MAX: return QObject::tr("Temperature (max)");
-            case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min)");
+            case ValueID::TEMPERATURE_CURRENT: return getNameOfTempSensor(id);
+            case ValueID::TEMPERATURE_MAX: return getNameOfTempSensor(id) + " " + QObject::tr("(max)");
+            case ValueID::TEMPERATURE_MIN: return getNameOfTempSensor(id) + " " + QObject::tr("(min)");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram megabyte usage");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level");
             case ValueID::POWER_CAP_SELECTED: return QObject::tr("Power cap selected");
@@ -512,13 +696,15 @@ public:
             case ValueID::GPU_USAGE_PERCENT:  return QObject::tr("GPU usage [%]");
             case ValueID::GPU_VRAM_USAGE_PERCENT:  return QObject::tr("GPU Vram usage [%]");
             case ValueID::FAN_SPEED_RPM:  return QObject::tr("Fan speed [rpm]");
-            case ValueID::TEMPERATURE_CURRENT:  return QObject::tr("Temperature [")+QString::fromUtf8("\u00B0C]");
-            case ValueID::TEMPERATURE_MAX: return QObject::tr("Temperature (max) [")+QString::fromUtf8("\u00B0C]");
-            case ValueID::TEMPERATURE_MIN: return QObject::tr("Temperature (min) [")+QString::fromUtf8("\u00B0C]");
             case ValueID::GPU_VRAM_USAGE_MB:  return QObject::tr("GPU Vram usage [MB]");
             case ValueID::POWER_LEVEL: return QObject::tr("Power level ");
             case ValueID::POWER_CAP_SELECTED: return  QObject::tr("Power cap selected [W]");
             case ValueID::POWER_CAP_AVERAGE: return  QObject::tr("Power cap average [W]");
+
+            case ValueID::TEMPERATURE_CURRENT:
+            case ValueID::TEMPERATURE_MAX:
+            case ValueID::TEMPERATURE_MIN:
+                return getNameOfValueID(id) + " " + QObject::tr("[\u00B0C]");
 
             default:
                 return "";
@@ -552,6 +738,46 @@ public:
         }
 
         return QStringList();
+    }
+
+    /* stores labels of names from ValueID types of an unknown instance.
+     * This will only be used if instances of ValueID types are supported
+     * by the hardware that could not be recognized.
+     * For unknown temperature sensors, the temp*_label will be stored here
+     * to be used by getNameOfValueID() to give a meaningful name of the
+     * sensor to the user.
+     */
+    static QHash<ValueID, QString> customInstanceLabels;
+
+    static ValueID::Instance setCustomInstanceLabel(ValueID::Type type,
+                                                    const QString& label)
+    {
+        ValueID::Instance instance = ValueID::INSTANCE_UNKNOWN
+                                   + customInstanceLabels.size();
+        customInstanceLabels.insert(ValueID(type, instance), label);
+        return instance;
+    }
+
+
+private:
+
+    static QString getNameOfTempSensor(ValueID id)
+    {
+        switch (id.instance) {
+
+            case ValueID::T_EDGE: return QObject::tr("Edge Temperature");
+            case ValueID::T_JUNCTION: return QObject::tr("Junction Temperature");
+            case ValueID::T_MEM: return QObject::tr("Memory Temperature");
+
+            default:
+                const ValueID custom_key = id.asType(ValueID::TEMPERATURE_CURRENT);
+                if (customInstanceLabels.contains(custom_key)) {
+                    return customInstanceLabels[custom_key]
+                         + " " + QObject::tr("Temperature");
+                } else {
+                    return QObject::tr("Unknown Temperature Sensor");
+                }
+        }
     }
 };
 

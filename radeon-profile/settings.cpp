@@ -64,7 +64,6 @@ void radeon_profile::saveConfig() {
         settings.setValue("appendSysEnv",ui->cb_execSysEnv->isChecked());
         settings.setValue("eventsTracking", ui->cb_eventsTracking->isChecked());
         settings.setValue("daemonData", ui->cb_daemonData->isChecked());
-        settings.setValue("temperatureHysteresis", ui->spin_hysteresis->value());
         settings.setValue("connConfirmMethod", ui->combo_connConfirmMethod->currentIndex());
         settings.setValue("refreshWhenHidden", refreshWhenHidden->isChecked());
     }
@@ -108,6 +107,7 @@ void radeon_profile::saveRpevents(QXmlStreamWriter &xml) {
         xml.writeAttribute("tiggerType", QString::number(rpe.type));
         xml.writeAttribute("activationBinary", rpe.activationBinary);
         xml.writeAttribute("activationTemperature", QString::number(rpe.activationTemperature));
+        xml.writeAttribute("sensorInstance", QString::number(rpe.sensorInstance));
         xml.writeAttribute("powerProfileChange", rpe.powerProfileChange);
         xml.writeAttribute("powerLevelChange", rpe.powerLevelChange);
         xml.writeAttribute("fixedFanSpeedChange", QString::number(rpe.fixedFanSpeedChange));
@@ -143,12 +143,15 @@ void radeon_profile::saveFanProfiles(QXmlStreamWriter &xml) {
         xml.writeStartElement("fanProfile");
         xml.writeAttribute("name", k);
 
-        FanProfileSteps fps = fanProfiles.value(k);
+        FanProfile fps = fanProfiles.value(k);
 
-        for (auto ks : fps.keys()) {
+        xml.writeAttribute("hysteresis", QString::number(fps.hysteresis));
+        xml.writeAttribute("sensorInstance", QString::number(fps.sensor));
+
+        for (auto ks : fps.steps.keys()) {
             xml.writeStartElement("step");
             xml.writeAttribute("temperature", QString::number(ks));
-            xml.writeAttribute("speed", QString::number(fps.value(ks)));
+            xml.writeAttribute("speed", QString::number(fps.steps.value(ks)));
             xml.writeEndElement();
         }
         xml.writeEndElement();
@@ -207,7 +210,7 @@ void radeon_profile::writePlotAxisSchemaToXml(QXmlStreamWriter &xml, const QStri
     for (const ValueID &sk : pas.dataList.keys()) {
         xml.writeStartElement("serie");
         xml.writeAttribute("align", side);
-        xml.writeAttribute("id", QString::number(sk));
+        xml.writeAttribute("id", QString::number(sk.key()));
         xml.writeAttribute("color", pas.dataList.value(sk).name());
         xml.writeEndElement();
     }
@@ -240,10 +243,10 @@ void radeon_profile::saveTopbarItemsSchemas(QXmlStreamWriter &xml) {
         xml.writeStartElement("topbarItem");
 
         xml.writeAttribute("type", QString::number(tis.type));
-        xml.writeAttribute("primaryValueId", QString::number(tis.primaryValueId));
+        xml.writeAttribute("primaryValueId", QString::number(tis.primaryValueId.key()));
         xml.writeAttribute("primaryColor", tis.primaryColor.name());
         xml.writeAttribute("secondaryValueIdEnabled", QString::number(tis.secondaryValueIdEnabled));
-        xml.writeAttribute("secondaryValueId", QString::number(tis.secondaryValueId));
+        xml.writeAttribute("secondaryValueId", QString::number(tis.secondaryValueId.key()));
         xml.writeAttribute("secondaryColor", tis.secondaryColor.name());
         xml.writeAttribute("pieMaxValue", QString::number(tis.pieMaxValue));
 
@@ -292,7 +295,9 @@ void radeon_profile::loadConfig() {
     ui->slider_ocMclk->setValue(settings.value("overclockMemValue",0).toInt());
     ui->cb_daemonData->setChecked(settings.value("daemonData", false).toBool());
     ui->combo_connConfirmMethod->setCurrentIndex(settings.value("connConfirmMethod", 1).toInt());
-    ui->spin_hysteresis->setValue(settings.value("temperatureHysteresis", 0).toInt());
+    // old config files without per FanProfile hysteresis value may still have
+    // the global value. This will be applied in loadFanProfile().
+    const int legacy_hysteresis = settings.value("temperatureHysteresis", 0).toInt();
 
     plotManager.generalConfig.plotsBackground = QColor(settings.value("plotsBackgroundColor","#808080").toString());
     plotManager.generalConfig.commonPlotsBackground = settings.value("setCommonPlotsBg", false).toBool();
@@ -351,7 +356,7 @@ void radeon_profile::loadConfig() {
                 }
 
                 if (xml.name().toString() == "fanProfile") {
-                    loadFanProfile(xml);
+                    loadFanProfile(xml, legacy_hysteresis);
                     continue;
                 }
 
@@ -389,6 +394,7 @@ void radeon_profile::loadRpevent(const QXmlStreamReader &xml) {
     rpe.type = static_cast<RPEventType>(xml.attributes().value("tiggerType").toInt());
     rpe.activationBinary = xml.attributes().value("activationBinary").toString();
     rpe.activationTemperature = xml.attributes().value("activationTemperature").toInt();
+    rpe.sensorInstance = xml.attributes().value("sensorInstance").toUInt();
     rpe.powerProfileChange = xml.attributes().value("powerProfileChange").toString();
     rpe.powerLevelChange = xml.attributes().value("powerLevelChange").toString();
     rpe.fixedFanSpeedChange = xml.attributes().value("fixedFanSpeedChange").toInt();
@@ -431,9 +437,9 @@ void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
 
         if (xml.name().toString() == "serie") {
             if (xml.attributes().value("align").toString() == "left")
-                pds.left.dataList.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+                pds.left.dataList.insert(ValueID::fromKey(xml.attributes().value("id").toULong()), QColor(xml.attributes().value("color").toString()));
             else if (xml.attributes().value("align").toString() == "right")
-                pds.right.dataList.insert(static_cast<ValueID>(xml.attributes().value("id").toInt()), QColor(xml.attributes().value("color").toString()));
+                pds.right.dataList.insert(ValueID::fromKey(xml.attributes().value("id").toULong()), QColor(xml.attributes().value("color").toString()));
 
         }
 
@@ -446,7 +452,7 @@ void radeon_profile::loadPlotSchemas(QXmlStreamReader &xml) {
 }
 
 void radeon_profile::loadTopbarItemsSchemas(const QXmlStreamReader &xml) {
-    TopbarItemDefinitionSchema tis(static_cast<ValueID>(xml.attributes().value("primaryValueId").toInt()),
+    TopbarItemDefinitionSchema tis(ValueID::fromKey(xml.attributes().value("primaryValueId").toULong()),
                                    static_cast<TopbarItemType>(xml.attributes().value("type").toInt()),
                                    QColor(xml.attributes().value("primaryColor").toString()));
 
@@ -454,7 +460,7 @@ void radeon_profile::loadTopbarItemsSchemas(const QXmlStreamReader &xml) {
 
     if (xml.attributes().value("secondaryValueIdEnabled").toInt() == 1) {
         tis.setSecondaryColor(QColor(xml.attributes().value("secondaryColor").toString()));
-        tis.setSecondaryValueId(static_cast<ValueID>(xml.attributes().value("secondaryValueId").toInt()));
+        tis.setSecondaryValueId(ValueID::fromKey(xml.attributes().value("secondaryValueId").toULong()));
     }
 
     topbarManager.addSchema(tis);
@@ -473,14 +479,20 @@ void radeon_profile::loadExecProfile(const QXmlStreamReader &xml) {
     ui->list_execProfiles->addTopLevelItem(item);
 }
 
-void radeon_profile::loadFanProfile(QXmlStreamReader &xml) {
+void radeon_profile::loadFanProfile(QXmlStreamReader &xml, const int default_hysteresis) {
     QString fpName = xml.attributes().value("name").toString();
 
-    FanProfileSteps fps;
+    FanProfile fps;
+    fps.hysteresis = xml.attributes().hasAttribute("hysteresis")
+                   ? xml.attributes().value("hysteresis").toInt()
+                   : default_hysteresis;
+    fps.sensor = xml.attributes().hasAttribute("sensorInstance")
+               ? xml.attributes().value("sensorInstance").toInt()
+               : ValueID::T_EDGE;
     while (xml.readNext()) {
         if (xml.name().toString() == "step" && !xml.attributes().value("temperature").isEmpty())
-            fps.insert(xml.attributes().value("temperature").toString().toInt(),
-                       xml.attributes().value("speed").toString().toInt());
+            fps.steps.insert(xml.attributes().value("temperature").toString().toInt(),
+                             xml.attributes().value("speed").toString().toInt());
 
         if (xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "fanProfile") {
             fanProfiles.insert(fpName, fps);

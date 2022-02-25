@@ -1,6 +1,7 @@
 ﻿// copyright marazmista @ 29.03.2014
 
 #include "dxorg.h"
+#include "globalStuff.h"
 #include "gpu.h"
 #include "radeon_profile.h"
 
@@ -61,7 +62,7 @@ QString getValueFromSysFsFile(QString fileName) {
     QString value("-1");
 
     if (f.open(QIODevice::ReadOnly))
-        value = QString(f.readAll()).trimmed();
+        value = QString(f.readAll().replace('\0', "")).trimmed();
 
     f.close();
     return value;
@@ -273,13 +274,18 @@ GPUClocks dXorg::getClocksFromPmFile() {
     return clocksData;
 }
 
-float dXorg::getTemperature() {
+float dXorg::getTemperature(int hwmon_id) {
     QString temp;
 
     switch (features.currentTemperatureSensor) {
         case TemperatureSensor::SYSFS_HWMON:
         case TemperatureSensor::CARD_HWMON:
-            return getValueFromSysFsFile(driverFiles.hwmonAttributes.temp1).toFloat() / 1000;
+            if (hwmon_id < features.tempSensors.size()) {
+                return getValueFromSysFsFile(driverFiles.hwmonAttributes.temp[hwmon_id].input).toFloat() / 1000;
+            } else {
+                return -1;
+            }
+
         case TemperatureSensor::PCI_SENSOR: {
             QStringList out = globalStuff::grabSystemInfo("sensors");
             temp = out[sensorsGPUtempIndex+2].split(" ",QString::SkipEmptyParts)[1].remove("+").remove("C").remove("°");
@@ -327,16 +333,18 @@ PowerMethod dXorg::getPowerMethodFallback() {
 
 TemperatureSensor dXorg::getTemperatureSensor() {
 
-    // first method, try read temp from sysfs in card dir (path from figureOutGPUDataPaths())
-    QString tmpValue = getValueFromSysFsFile(driverFiles.hwmonAttributes.temp1);
-    if (!tmpValue.isEmpty() || tmpValue != "-1")
-        return TemperatureSensor::CARD_HWMON;
-    else {
-        // second method, try find in system hwmon dir for file labeled VGA_TEMP
-        driverFiles.hwmonAttributes.temp1 = findSysfsHwmonForGPU();
-        if (!driverFiles.hwmonAttributes.temp1.isEmpty())
-            return TemperatureSensor::SYSFS_HWMON;
+    // first method, read temp from sysfs in card dir (path from figureOutGPUDataPaths())
+    // This should work, if hwmonAttribtes.temp was populated.
 
+    if (!driverFiles.hwmonAttributes.temp.empty()) {
+        return TemperatureSensor::CARD_HWMON;
+    } else {
+        // second method, try find in system hwmon dir for file labeled VGA_TEMP
+        HwmonTempSensor sensor = findSysfsHwmonForGPU();
+        if (sensor) {
+            driverFiles.hwmonAttributes.temp.push_back(std::move(sensor));
+            return TemperatureSensor::SYSFS_HWMON;
+        }
         // if above fails, use lm_sensors
         QStringList out = globalStuff::grabSystemInfo("sensors");
         if (out.indexOf(QRegExp(features.sysInfo.driverModuleString+"-pci.+")) != -1) {
@@ -351,7 +359,7 @@ TemperatureSensor dXorg::getTemperatureSensor() {
     return TemperatureSensor::TS_UNKNOWN;
 }
 
-QString dXorg::findSysfsHwmonForGPU() {
+HwmonTempSensor dXorg::findSysfsHwmonForGPU() {
     QStringList hwmonDev = globalStuff::grabSystemInfo("ls /sys/class/hwmon/");
 
     for (int i = 0; i < hwmonDev.count(); i++) {
@@ -361,11 +369,15 @@ QString dXorg::findSysfsHwmonForGPU() {
             QString file("/sys/class/hwmon/"+hwmonDev[i]+"/device/"+temp[o]);
             QString s = getValueFromSysFsFile(file);
             if (!s.isEmpty() && s.contains("VGA_TEMP"))
-                return file.replace("label", "input");
+                return HwmonTempSensor(
+                    file.replace("label", "input"),
+                    file.replace("label", "crit"),
+                    file.replace("label", "emergency"),
+                    file);
         }
     }
 
-    return "";
+    return HwmonTempSensor();
 }
 
 QList<QTreeWidgetItem *> dXorg::getModuleInfo() {
@@ -629,6 +641,57 @@ void dXorg::figureOutDriverFeatures() {
 
     features.currentTemperatureSensor = getTemperatureSensor();
 
+    if ((features.currentTemperatureSensor == TemperatureSensor::SYSFS_HWMON) ||
+        (features.currentTemperatureSensor == TemperatureSensor::CARD_HWMON)) {
+        const auto num_sensors = driverFiles.hwmonAttributes.temp.size();
+
+        #ifdef QT_DEBUG
+        QStringList sensorLabels;
+        sensorLabels.reserve(num_sensors);
+        #endif
+
+        features.tempSensors.reserve(num_sensors);
+        int hwmon_id = 1;
+        for (const auto &sensor : driverFiles.hwmonAttributes.temp) {
+            QString label = getValueFromSysFsFile(sensor.label);
+            ValueID id(ValueID::TEMPERATURE_CURRENT);
+            if (label.isEmpty() || (label == "-1")) {
+                // use "tempX" as label, if we have no label for this sensor
+                const auto str_begin = sensor.label.lastIndexOf("/") + 1;
+                const auto str_end   = sensor.label.lastIndexOf("_");
+                label = sensor.label.mid(str_begin, str_end - str_begin);
+                id.instance = globalStuff::setCustomInstanceLabel(id, label);
+                qDebug() << "temp sensor at"
+                         << sensor.label.left(sensor.label.lastIndexOf("_"))
+                         << "has no label.";
+            } else if (label == "edge") {
+                id.instance = ValueID::T_EDGE;
+            } else if (label == "junction") {
+                id.instance = ValueID::T_JUNCTION;
+            } else if (label == "mem") {
+                id.instance = ValueID::T_MEM;
+            } else {
+                // unknown label: Use the label reported by the driver as UI label
+                id.instance = globalStuff::setCustomInstanceLabel(id, label);
+                qDebug() << "unknown temp sensor type detected:" << label;
+            }
+
+            features.tempSensors.push_back(id.instance);
+            #ifdef QT_DEBUG
+            sensorLabels.push_back(label);
+            #endif
+            hwmon_id++;
+        }
+        #ifdef QT_DEBUG
+        qDebug().noquote() << "detected" << num_sensors << "temperature sensors:"
+                           << sensorLabels.join(",");
+        #endif
+
+    } else {
+        // for any non hwmon temp reading, assume edge (instance == 0)
+        features.tempSensors.push_back(0);
+    }
+
     features.isFanControlAvailable = !driverFiles.hwmonAttributes.pwm1.isEmpty();
 
     features.isPercentCoreOcAvailable = !driverFiles.sysFs.pp_sclk_od.isEmpty();
@@ -681,9 +744,30 @@ void dXorg::figureOutConstParams() {
                  << "\n vram size: " << params.VRAMSize;
     }
 
-    if (!driverFiles.hwmonAttributes.temp1_crit.isEmpty())
-        params.temp1_crit = getValueFromSysFsFile(driverFiles.hwmonAttributes.temp1_crit).toInt() / 1000;
+    if ((features.currentTemperatureSensor == TemperatureSensor::SYSFS_HWMON) ||
+        (features.currentTemperatureSensor == TemperatureSensor::CARD_HWMON)) {
+        const auto num_sensors = driverFiles.hwmonAttributes.temp.size();
+        params.temp_crit.reserve(num_sensors);
+        params.temp_emergency.reserve(num_sensors);
+        for (int hwmon_id = 0; hwmon_id < num_sensors; hwmon_id++) {
+            const auto& sensor = driverFiles.hwmonAttributes.temp[hwmon_id];
+            const ValueID::Instance instance = features.tempSensors[hwmon_id];
 
+            const int crit = sensor.crit.isEmpty()
+                ? - 1
+                : getValueFromSysFsFile(sensor.crit).toInt() / 1000;
+
+            const int emergency = sensor.emergency.isEmpty()
+                ? - 1
+                : getValueFromSysFsFile(sensor.emergency).toInt() / 1000;
+
+            params.temp_crit.insert(instance, crit);
+            params.temp_emergency.insert(instance, emergency);
+        }
+    } else {
+        params.temp_crit.insert(0, -1);
+        params.temp_emergency.insert(0, -1);
+    }
 
     if (!driverFiles.hwmonAttributes.pwm1_max.isEmpty())
         params.pwmMaxSpeed = getValueFromSysFsFile(driverFiles.hwmonAttributes.pwm1_max).toInt();
@@ -770,11 +854,14 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
 
     // OD_VDDC_CURVE only in Vega20+
     bool vega20Mode = sl.contains(QString(OD_VDDC_CURVE).append('|'));
+    // OD_VDDGFX_OFFSET since navi2x (or all navi?)
+    bool naviMode = sl.contains(QString(OD_VDDGFX_OFFSET).append('|'));
 
     for (auto i = 0; i < sl.length(); ++i) {
 
-        if (vega20Mode) {
+        if (vega20Mode || naviMode) {
             if (sl.at(i).contains(OD_SCLK)) {
+                qDebug() << "parsing OD_SCLK table";
                 QStringList stateMin = sl[++i].split("|", QString::SkipEmptyParts);
                 QStringList stateMax = sl[++i].split("|", QString::SkipEmptyParts);
                 ocRanges.insert(OD_SCLK, OCRange(stateMin[1].toUInt(), stateMax[1].toUInt()));
@@ -782,8 +869,20 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
             }
 
             if (sl.at(i).contains(OD_MCLK)) {
-                QStringList stateMax = sl[++i].split("|", QString::SkipEmptyParts);
-                ocRanges.insert(OD_MCLK, OCRange(0, stateMax[1].toUInt()));
+                qDebug() << "parsing OD_MCLK table";
+                unsigned int stateMin = 0;
+                unsigned int stateMax = 0;
+                QStringList state = sl[++i].split("|", QString::SkipEmptyParts);
+                if (state[0] == "0") {
+                    stateMin = state[1].toUInt();
+                    state = sl[++i].split("|", QString::SkipEmptyParts);
+                    assert(state[0] == "1");
+                    stateMax = state[1].toUInt();
+                } else {
+                    stateMax = state[1].toUInt();
+                }
+
+                ocRanges.insert(OD_MCLK, OCRange(stateMin, stateMax));
                 continue;
             }
         }
@@ -795,10 +894,11 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
             if (tableItems.length() == 1) {
 
                 if (tableItems[0] == OD_RANGE) {
+                    qDebug() << "parsing OD_RANGE table";
                     for (++i; i < sl.length(); ++i) {
 
                         auto state = sl[i].split("|", QString::SkipEmptyParts);
-                        if (state.length() == 1)
+                        if (state.length() <= 2)
                             break;
 
                         ocRanges.insert(state[0], OCRange(state[1].toUInt(), state[2].toUInt()));
@@ -808,12 +908,18 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
 
             } else {
 
+                qDebug() << "parsing FreqVolt table";
                 FVTable fvt;
                 for (; i < sl.length(); ++i) {
                     auto state = sl[i].split("|", QString::SkipEmptyParts);
 
                     if (state.length() == 1) {
                         --i; // go back to next table start
+                        break;
+                    }
+
+                    if (state.length() <= 2) {
+                        qDebug() << "unexpected column count while parsing FreqVoltPair";
                         break;
                     }
 
@@ -825,6 +931,7 @@ const std::tuple<MapFVTables, MapOCRanges> dXorg::parseOcTable() {
         }
     }
 
+    qDebug() << "parsing OC tables done.";
     return std::make_tuple(tables, ocRanges);
 }
 
